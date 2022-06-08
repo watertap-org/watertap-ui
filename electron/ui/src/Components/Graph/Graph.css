@@ -1,0 +1,14 @@
+#Graph {
+	min-width: 800px;
+	width: 90%;
+	height: 50%;
+	flex-grow: 1;
+	background: white;
+	margin:15px auto 15px auto;
+	padding: 12px 19px 16px 19px;
+	border-radius: 5px;
+	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.23);
+	border: solid 1px #e0e0e0;
+	resize: vertical;
+	overflow: auto;
+}
