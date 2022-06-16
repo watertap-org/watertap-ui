@@ -28,12 +28,12 @@ export default function NewProjectDialog(props) {
  
 
   return (
-    <Dialog onClose={handleClose} open={open} fullWidth="true" maxWidth="md">
-        <DialogTitle>Create Project</DialogTitle>
+    <Dialog onClose={handleClose} open={open} fullWidth={true} maxWidth="md">
+        <DialogTitle>Create Flowsheet</DialogTitle>
         <DialogContent> 
             <TextField  
                 id="name"
-                label="Project Name" 
+                label="Flowsheet Name" 
                 fullWidth
                 variant="standard"
             />

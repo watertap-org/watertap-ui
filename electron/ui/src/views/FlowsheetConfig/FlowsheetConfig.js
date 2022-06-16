@@ -2,7 +2,7 @@
 import React from 'react'; 
 import {useEffect, useState} from 'react';   
 import { useParams } from "react-router-dom";
-import { getProject } from "../../services/project.service"; 
+import { getFlowsheet } from "../../services/flowsheet.service"; 
 import Container from '@mui/material/Container';
 import Graph from "../../components/Graph/Graph";
 import Tabs from '@mui/material/Tabs';
@@ -31,14 +31,14 @@ function TabPanel(props) {
 }
 
 
-function a11yProps(index: number) {
+function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
     'aria-controls': `simple-tabpanel-${index}`,
   };
 }
 
-export default function ProjectConfig() {
+export default function FlowsheetConfig() {
   
     let params = useParams(); 
     const [project, setProject] = useState(null); 
@@ -46,12 +46,12 @@ export default function ProjectConfig() {
 
 
     useEffect(()=>{ 
-      getProject(params.projectId)
+      getFlowsheet(params.projectId)
       .then((data)=>{
         console.log("Project:", data);
           setProject(data);
       });
-    }, []);
+    }, [params.projectId]);
 
 
     const handleTabChange = (event, newValue) => {
@@ -63,7 +63,7 @@ export default function ProjectConfig() {
       <Container>
         <h2 style={{textAlign:"left"}}>
         {(project) &&
-          <>{project.projectName + params.projectId}</> 
+          <>{project.projectName + params.id}</> 
         }  
         </h2>
 

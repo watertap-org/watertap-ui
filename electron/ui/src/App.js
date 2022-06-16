@@ -7,8 +7,8 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { Routes, Route, Link } from "react-router-dom";
 import Header from 'components/Boilerplate/Header/Header'; 
-import ProjectsList from 'views/ProjectsList/ProjectsList';
-import ProjectConfig from 'views/ProjectConfig/ProjectConfig';
+import FlowsheetsList from 'views/FlowsheetsList/FlowsheetsList';
+import FlowsheetConfig from 'views/FlowsheetConfig/FlowsheetConfig';
 
 function App() {
   
@@ -16,9 +16,9 @@ function App() {
     <div className="App">  
       <Header/>
       <Routes>
-        <Route path="/" element={<ProjectsList />} />
-        <Route path="projects" element={<ProjectsList />} />
-        <Route path="project/:projectId/config" element={<ProjectConfig />} />
+        <Route path="/" element={<FlowsheetsList />} />
+        <Route path="flowsheets" element={<FlowsheetsList />} />
+        <Route path="flowsheet/:id/config" element={<FlowsheetConfig />} />
       </Routes> 
     </div> 
   );

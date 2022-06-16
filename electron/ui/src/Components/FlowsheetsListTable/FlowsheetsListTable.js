@@ -23,7 +23,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import SettingsIcon from '@mui/icons-material/Settings'; 
 
  
-export default function ProjectsListTable(props) {
+export default function FlowsheetsListTable(props) {
 
     
 
@@ -47,7 +47,7 @@ export default function ProjectsListTable(props) {
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                 <TableCell>
-                    <a href={"/project/" + row.id + "/config"}>{row.name}</a>
+                    <a href={"/flowsheet/" + row.id + "/config"}>{row.name}</a>
                 </TableCell>
                 <TableCell>{row.train}</TableCell>
                 <TableCell>{row.lastRun}</TableCell>

@@ -1,20 +1,20 @@
-import './ProjectList.css';
+import './FlowsheetsList.css';
 import {useEffect, useState} from 'react';   
-import ProjectsListTable from "../../components/ProjectsListTable/ProjectsListTable";
+import FlowsheetsListTable from "../../components/FlowsheetsListTable/FlowsheetsListTable";
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
-import { getProjectsList } from "../../services/projectsList.service"; 
+import { getFlowsheetsList } from "../../services/flowsheetsList.service"; 
 import NewProjectDialog from "../../components/NewProjectDialog/NewProjectDialog";
 
-export default function ProjectsList() {
+export default function FlowsheetsList() {
 
   const [rows, setRows] = useState([]); 
   const [newProjectDialogOpen, setNewProjectDialogOpen] = useState(false);
 
   useEffect(()=>{
-      getProjectsList()
+      getFlowsheetsList()
       .then((data)=>{
           setRows(data);
       });
@@ -34,7 +34,7 @@ export default function ProjectsList() {
   
   return ( 
     <Container>
-      <h2 style={{textAlign:"left"}}>Projects</h2>  
+      <h2 style={{textAlign:"left"}}>Flowsheets</h2>  
         
       <Toolbar>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleNewProjectDialogClickOpen}>
@@ -42,7 +42,7 @@ export default function ProjectsList() {
         </Button>
       </Toolbar> 
 
-      <ProjectsListTable rows={rows}></ProjectsListTable> 
+      <FlowsheetsListTable rows={rows}></FlowsheetsListTable> 
       
       <NewProjectDialog open={newProjectDialogOpen} onClose={handleReloadData}></NewProjectDialog>
     </Container> 
