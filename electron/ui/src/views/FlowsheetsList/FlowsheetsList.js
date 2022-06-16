@@ -6,12 +6,12 @@ import AddIcon from '@mui/icons-material/Add';
 import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import { getFlowsheetsList } from "../../services/flowsheetsList.service"; 
-import NewProjectDialog from "../../components/NewProjectDialog/NewProjectDialog";
+import NewFlowsheetDialog from "../../components/NewFlowsheetDialog/NewFlowsheetDialog";
 
 export default function FlowsheetsList() {
 
   const [rows, setRows] = useState([]); 
-  const [newProjectDialogOpen, setNewProjectDialogOpen] = useState(false);
+  const [newFlowsheetDialogOpen, setNewFlowsheetDialogOpen] = useState(false);
 
   useEffect(()=>{
       getFlowsheetsList()
@@ -20,12 +20,12 @@ export default function FlowsheetsList() {
       });
   }, []);
 
-  const handleNewProjectDialogClickOpen = () => {
-    setNewProjectDialogOpen(true);
+  const handleNewFlowsheetDialogClickOpen = () => {
+    setNewFlowsheetDialogOpen(true);
   };
 
   const handleReloadData = (shouldReload) => {
-    setNewProjectDialogOpen(false);
+    setNewFlowsheetDialogOpen(false);
     if(shouldReload)
       console.log("reload table data....");
     else
@@ -37,14 +37,14 @@ export default function FlowsheetsList() {
       <h2 style={{textAlign:"left"}}>Flowsheets</h2>  
         
       <Toolbar>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleNewProjectDialogClickOpen}>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={handleNewFlowsheetDialogClickOpen}>
           New
         </Button>
       </Toolbar> 
 
       <FlowsheetsListTable rows={rows}></FlowsheetsListTable> 
       
-      <NewProjectDialog open={newProjectDialogOpen} onClose={handleReloadData}></NewProjectDialog>
+      <NewFlowsheetDialog open={newFlowsheetDialogOpen} onClose={handleReloadData}></NewFlowsheetDialog>
     </Container> 
   );
 

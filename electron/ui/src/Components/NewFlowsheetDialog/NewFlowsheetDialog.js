@@ -15,7 +15,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import TextField from '@mui/material/TextField';
  
 
-export default function NewProjectDialog(props) {
+export default function NewFlowsheetDialog(props) {
   const { onClose, open } = props;
 
   const handleClose = () => {
