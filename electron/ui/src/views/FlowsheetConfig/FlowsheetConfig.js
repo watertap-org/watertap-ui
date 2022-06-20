@@ -1,6 +1,6 @@
 //import './Page.css';
 import React from 'react'; 
-import {useEffect, useState} from 'react';   
+import {useEffect, useState, useContext} from 'react';   
 import { useParams } from "react-router-dom";
 import { getFlowsheet } from "../../services/flowsheet.service"; 
 import Container from '@mui/material/Container';
@@ -8,7 +8,9 @@ import Graph from "../../components/Graph/Graph";
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-
+import ConfigInput from "./ConfigInput/ConfigInput";
+import Alert from '@mui/material/Alert';
+import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -41,49 +43,100 @@ function a11yProps(index) {
 export default function FlowsheetConfig() {
   
     let params = useParams(); 
-    const [project, setProject] = useState(null); 
+    const [flowsheetData, setFlowsheetData] = useState(null); 
     const [tabValue, setTabValue] = useState(0);
-
+    const [title, setTitle] = useState("");
+    const [solveDialogOpen, setSolveDialogOpen] = useState(false);
+    const [outputData, setOutputData] = useState(null);
 
     useEffect(()=>{ 
-      getFlowsheet(params.projectId)
+      //console.log("params.id",params.id);
+      if( !params.hasOwnProperty("id") || !params.id)
+        return;
+
+      getFlowsheet(params.id)
       .then((data)=>{
-        console.log("Project:", data);
-          setProject(data);
+        console.log("Flowsheet Data:", data);
+        setFlowsheetData(data);
+        setTitle(getTitle(data));
+        //setContexFlowsheetData(data);
       });
-    }, [params.projectId]);
+    }, [params.id]);
 
 
     const handleTabChange = (event, newValue) => {
       setTabValue(newValue);
     };
+
     
+    const getTitle = (data) => {
+      try{
+        let v = data.blocks.fs.display_name;
+        if(v)
+          return v;
+        else
+          return "";
+      }
+      catch{
+        return "";
+      }
+    };
+
+
+    //send updated flowsheet data
+    const updateFlowsheetData = (data, solve) => {
+      console.log(">main updateFlowsheetData:",data);
+      if(solve==="SOLVE")
+      {
+        setSolveDialogOpen(true);
+      }
+    };
   
-    return (
+
+    const handleSolved = (data) => {
+      console.log("handle solved.....",data);
+      setOutputData(data);
+      setTabValue(1);
+      setSolveDialogOpen(false);
+    };
+
+
+    return ( 
       <Container>
-        <h2 style={{textAlign:"left"}}>
-        {(project) &&
-          <>{project.projectName + params.id}</> 
-        }  
-        </h2>
+      {(flowsheetData) ? (
+        
+        <>
+          <h2 style={{textAlign:"left"}}>
+          {title}
+          </h2>
 
+          <Graph/>
 
-        <Graph/>
-
-        <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
-          <Tab label="Input" {...a11yProps(0)} />
-          <Tab label="Output" {...a11yProps(1)} /> 
-        </Tabs>
-        <TabPanel value={tabValue} index={0}>
-          IN
-        </TabPanel>
-        <TabPanel value={tabValue} index={1}>
-          OUT
-        </TabPanel> 
-        </Box>
- 
-      </Container> 
+          <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
+            <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
+              <Tab label="Input" {...a11yProps(0)} />
+              <Tab label="Output" {...a11yProps(1)} /> 
+            </Tabs>
+            <TabPanel value={tabValue} index={0}>
+              <ConfigInput flowsheetData={flowsheetData} 
+                          updateFlowsheetData={updateFlowsheetData}>
+              </ConfigInput>
+            </TabPanel>
+            <TabPanel value={tabValue} index={1}>
+              <div style={{textAlign:"left"}} dangerouslySetInnerHTML={{ __html: outputData}} />
+            </TabPanel> 
+          </Box>
+        </>
+        )
+        :
+        (
+          <Box>
+            <Alert severity="error">No data found!</Alert>
+          </Box>
+        )
+      }  
+      <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} flowsheetData={flowsheetData}></SolveDialog>
+      </Container>  
       
     );
   

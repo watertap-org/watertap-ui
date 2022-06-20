@@ -15,10 +15,11 @@ function App() {
   return (
     <div className="App">  
       <Header/>
-      <Routes>
-        <Route path="/" element={<FlowsheetsList />} />
+      <Routes> 
+        <Route path="flowsheet/:id/config" element={<FlowsheetConfig />} /> 
         <Route path="flowsheets" element={<FlowsheetsList />} />
-        <Route path="flowsheet/:id/config" element={<FlowsheetConfig />} />
+        <Route path="/" element={<FlowsheetsList />} />
+        
       </Routes> 
     </div> 
   );
