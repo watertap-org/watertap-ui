@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "setup": "./setup.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Abdelrahman Elbashandy",
