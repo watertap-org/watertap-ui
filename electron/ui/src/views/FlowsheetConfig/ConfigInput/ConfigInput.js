@@ -96,7 +96,7 @@ export default function ConfigInput(props) {
             </Toolbar>
             <Grid container spacing={2}>
                 <Grid item xs={6}>
-                    <h3>Costig</h3>
+                    <h3>Costing</h3>
                     {   
                         Object.keys(costingBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={costingBlocks[key]}></InputAccordion>)
                     }

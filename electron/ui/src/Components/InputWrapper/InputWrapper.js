@@ -9,7 +9,8 @@ import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper'; 
 import TextField from '@mui/material/TextField';
-
+import InputAdornment from '@mui/material/InputAdornment';
+import Tooltip from '@mui/material/Tooltip';
 
 export default function InputWrapper(props) {
 
@@ -25,12 +26,18 @@ export default function InputWrapper(props) {
         fieldData.value.value = event.target.value;
     };
 
-    return <TextField id="outlined-basic" 
-                    label={fieldData.display_name}
-                    variant="outlined" 
-                    size="small"
-                    value={fieldData.value.value}
-                    onChange={handleFieldChange}
-                    fullWidth />
+    return  <Tooltip title={fieldData.description}>
+                <TextField id="outlined-basic" 
+                        label={fieldData.display_name}
+                        variant="outlined" 
+                        size="small"
+                        value={fieldData.value.value}
+                        onChange={handleFieldChange}
+                        fullWidth 
+                        InputProps={{
+                            endAdornment:<InputAdornment position="end">{fieldData.units}</InputAdornment>
+                        }}
+                />
+            </Tooltip>
 
 }

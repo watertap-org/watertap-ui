@@ -59,7 +59,7 @@ export default function InputAccordion(props) {
             {"["+dataKey+"] "+data.display_name}
         </AccordionSummary>
         <AccordionDetails>
-            {/*data.description*/}
+            {data.description}
 
             <Box
                 component="form"
