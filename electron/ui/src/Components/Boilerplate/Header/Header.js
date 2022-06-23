@@ -1,16 +1,22 @@
 import './Header.css';
 import React from 'react';
-
+import logo from "../../../assets/nawi-logo-color.png";
+ 
 class Header extends React.Component {
   render() {
     return (
       <div id="Header">
-        <div className="idaes-titlebar">
-          <div id="idaes_logo"><img src="https://idaes.org/wp-content/uploads/sites/10/2020/02/idaes-logo-300x138.png"
-          alt="IDAES logo"/></div>
-          <div id="idaes-titlebar-right"></div>
-        </div>
-        <hr></hr> 
+        <div className="titlebar">
+          <a href="/">
+            <div id="nawi_logo">
+              <img src={logo} alt="NAWI logo"/>
+            </div>
+          </a>
+           
+          <div id="titlebar-name">
+            WaterTAP<sup>3</sup>
+          </div>
+        </div> 
       </div>
     );
   }
