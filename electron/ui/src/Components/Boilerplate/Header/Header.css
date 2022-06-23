@@ -8,28 +8,59 @@ hr {
   height: 1px;
   margin: 5px 0px 0px 0px;
 }
-
-/* Dotted border */
-hr.dotted {
-  border-top: 2px dotted #bbb;
-  margin-bottom: 10px;
-}
+ 
 
 #Header {
-  margin: 20px auto 10px auto;
-  width: 90%;
+  margin: 0px auto 10px auto;
+  width: 100%;
+  height: 50px;
+  background: #67c3e4;
 }
 
-.idaes-titlebar {
+.titlebar {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   flex-grow: 0;
+  align-items: center;
 }
 
-#idaes_logo img {
-  height: 80px;
+#nawi_logo {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  background: #f2f7f8;
+  padding: 0 10px 0 10px;
 }
+
+#nawi_logo img {
+  height: 40px;
+}
+
+#titlebar-name {
+  display: flex;
+  padding: 0 10px 0 10px;
+  color: #FFF;
+  font-weight: bold;
+  font-size: 25px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #idaes-fs-name {
   font-size: 125%;
@@ -53,9 +84,7 @@ hr.dotted {
   z-index: 1;
 }
 
-#idaes-titlebar-right {
-  width: 100px;
-}
+
 
 .idaes-content {
   display: flex;
