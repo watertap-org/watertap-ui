@@ -34,5 +34,8 @@ npm install
 
 ### Run UI
 
-**PLEASE FILL THIS IN**
+```
+cd electron
+npm start
+```
 
