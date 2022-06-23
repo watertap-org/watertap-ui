@@ -4,6 +4,15 @@ This repository is for work on the user interface(s) (UI) for the WaterTAP libra
 
 ## Getting started (developer)
 
+### Install Python
+
+The Python code, and the PIP requirements, are in the `backend/` folder.
+
+```
+cd backend
+pip install -r requirements.txt
+```
+
 ### Install Javascript
 
 Prerequisites: Node Package Manager (npm)
