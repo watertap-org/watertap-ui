@@ -38,7 +38,7 @@ npm start
 
 ## Windows instructions
 
-The JS spawning doesn't work on Windows, so in order to start the app there you need to start things by hand using 3 separate consoles:
+The JS spawning doesn't work on Windows, so in order to start the app there you need to start things by hand using the following commands:
 
 0. Turn off default browser opening with `$Env:Browser="none"`
 1. From the repo root: `cd backend/app` and run `uvicorn main:app --host 127.0.0.1 --port 8000 --reload &`
