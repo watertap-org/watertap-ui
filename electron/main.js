@@ -46,7 +46,7 @@ const startServer = () => {
             "--reload"
         ],
         {
-            cwd: 'backend'
+            cwd: '../backend'
         }
     );
 

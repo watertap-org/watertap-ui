@@ -28,11 +28,9 @@ cd ui
 npm install
 ```
 
-### Install Electron
-
-**PLEASE FILL THIS IN**
-
 ### Run UI
 
-**PLEASE FILL THIS IN**
-
+```console
+cd electron
+npm start
+```
