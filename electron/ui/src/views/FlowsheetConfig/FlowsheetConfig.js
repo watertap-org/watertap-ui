@@ -55,11 +55,11 @@ export default function FlowsheetConfig() {
         return;
 
       getFlowsheet(params.id)
+      //.then(response => response.json())
       .then((data)=>{
         console.log("Flowsheet Data:", data);
         setFlowsheetData(data);
-        setTitle(getTitle(data));
-        //setContexFlowsheetData(data);
+        setTitle(getTitle(data)); 
       });
     }, [params.id]);
 

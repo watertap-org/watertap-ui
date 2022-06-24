@@ -466,9 +466,315 @@ const data = {
     }
 };
 
+const data2 = {
+    "Feed": {
+        "Volumetric flowrate": [0.002341,"m3/h"],
+        "Salinity": [0.12323,"ppm"],
+        "Temperature": [0.23423,"K"],
+        "Pressure": [0.345346,"bar"]
+    },
+    "Treatment specification": {
+        "Recovery": [3.45345,"%"],
+        "Maximum product salinity": [43.34534,"ppm"],
+        "Maximum allowable pressure": [2.35345,"bar"]
+    },
+    "Performance parameters": {
+        "Pump efficiency": [2.435355,"%"],
+        "ERD efficiency": [2.2300122,"%"],
+        "Water permeability coeff": [0.23435,"L/(m2-h-bar)"],
+        "Salt permeability coeff": [2.456456456,"L/(m2-h)"],
+        "RO channel height": [0.234234,"mm"],
+        "RO spacer porosity": [1.234234,"%"]
+    },
+    "Cost parameters": {
+        "Electricity cost": [0.345345,"$/kWh"],
+        "Membrane cost": [0.56767,"$/m2"],
+        "Pump cost": [0.45435,"$/kW"],
+        "ERD cost": [0.546456,"$/(m3/h)"],
+        "Load factor": [0.3432424,"%"],
+        "Capital annualization factor": [234.3434,"%/year"],
+        "Membrane replacement factor": [0.2342,"%/year"]
+    }
+};
+
+
+const data3 = {
+    "id": 1,
+    "blocks": {
+        "fs": {
+            "variables": {
+                "max_product_salinity": {
+                    "value": {
+                        "value": 500.0,
+                        "bounds": [null, null]
+                    },
+                    "display_name": "Maximum product salinity",
+                    "description": "",
+                    "display_units": "ppm",
+                    "indices": [],
+                    "scale_factor": 1000000,
+                    "to_units": "",
+                    "readonly": false,
+                    "category": "Treatment specification"
+                },
+                "max_pressure": {
+                    "value": {
+                        "value": 85.0, 
+                        "bounds": [null, null]
+                    },
+                    "display_name": "Maximum allowable pressure",
+                    "description": "",
+                    "display_units": "bar",
+                    "indices": [],
+                    "scale_factor": 0,
+                    "to_units": "bar",
+                    "readonly": false,
+                    "category": "Treatment specification"
+                }
+            },
+            "blocks": {
+                "costing": {
+                    "variables": {
+                        "electricity_base_cost": {
+                            "value": {"value": 0.07,
+                                        "bounds": [null, null]
+                            },
+                            "display_name": "Electricity cost",
+                            "description": "Electricity cost",
+                            "display_units": "$/kWh",
+                            "indices": [],
+                            "scale_factor": 0,
+                            "to_units": "",
+                            "readonly": false,
+                            "category": "Cost parameters"
+                        },
+                        "reverse_osmosis_membrane_cost": {
+                            "value": {"value": 30.0,
+                                        "bounds": [null, null]
+                            },
+                            "display_name": "Membrane cost",
+                            "description": "Membrane cost",
+                            "display_units": "$/m**2",
+                            "indices": [],
+                            "scale_factor": 0,
+                            "to_units": "",
+                            "readonly": false,
+                            "category": "Cost parameters"
+                        },
+                        "high_pressure_pump_cost": {
+                            "value": {"value": 1908.0000000000002,
+                                        "bounds": [null, null]
+                            },
+                            "display_name": "Pump cost",
+                            "description": "High pressure pump cost",
+                            "display_units": "USD_2018/kW",
+                            "indices": [],
+                            "scale_factor": 0,
+                            "to_units": "{USD_2018} / kW",
+                            "readonly": false,
+                            "category": "Cost parameters"
+                        },
+                        "erd_pressure_exchanger_cost": {
+                            "value": {"value": 535.0,
+                                    "bounds": [null, null]
+                            },
+                            "display_name": "ERD cost",
+                            "description": "Pressure exchanger cost",
+                            "display_units": "$/(m3/h)",
+                            "indices": [],
+                            "scale_factor": 0,
+                            "to_units": "{USD_2018} / (m**3 / hr)",
+                            "readonly": false,
+                            "category": "Cost parameters"
+                        },
+                        "load_factor": {
+                            "value": {
+                                "value": 90.0, 
+                                "bounds": [null, null]
+                            },
+                            "display_name": "Load factor",
+                            "description": "Load factor [fraction of uptime]",
+                            "display_units": "%",
+                            "indices": [],
+                            "scale_factor": 100,
+                            "to_units": "",
+                            "readonly": false,
+                            "category": "Cost parameters"
+                        },
+                        "factor_capital_annualization": {
+                            "value": {"value": 10.0,
+                                "bounds": [null, null]
+                            },
+                            "display_name": "Capital annualization factor",
+                            "description": "Capital annualization factor [fraction of investment cost/year]",
+                            "display_units": "%/year",
+                            "indices": [],
+                            "scale_factor": 100,
+                            "to_units": "",
+                            "readonly": false,
+                            "category": "Cost parameters"
+                        },
+                        "factor_membrane_replacement": {
+                            "value": {"value": 20.0,
+                                "bounds": [null, null]
+                            },
+                            "display_name": "Membrane replacement factor",
+                            "description": "Membrane replacement factor [fraction of membrane replaced/year]",
+                            "display_units": "%/year",
+                            "indices": [],
+                            "scale_factor": 100,
+                            "to_units": "",
+                            "readonly": false,
+                            "category": "Cost parameters"
+                        }
+                    },
+                    "blocks": {},
+                    "meta": {"parameters": {}
+                    },
+                    "display_name": "factor_membrane_replacement",
+                    "description": "none"
+                },
+                "pump": {
+                    "variables": {
+                        "efficiency_pump": {"value": {"value": 80.0,
+                                            "bounds": [null, null]
+                                },
+                            "display_name": "Pump efficiency",
+                            "description": "Pump efficiency",
+                            "display_units": "%",
+                            "indices": [
+                                    0
+                                ],
+                            "scale_factor": 100,
+                            "to_units": "",
+                            "readonly": false,
+                            "category": ""
+                            }
+                        },
+                    "blocks": {},
+                    "meta": {"parameters": {}
+                        },
+                    "display_name": "efficiency_pump",
+                    "description": "none"
+                    },
+                "RO": {
+                    "variables": {
+                        "recovery_vol_phase": {
+                            "value": {"value": 25.0,
+                                    "bounds": [1.0,99.9999]
+                                },
+                            "display_name": "Recovery",
+                            "description": "Volumetric recovery rate",
+                            "display_units": "%",
+                            "indices": [
+                                    0, "Liq"
+                                ],
+                            "scale_factor": 100,
+                            "to_units": "",
+                            "readonly": false,
+                            "category": "Treatment specification"
+                            },
+                        "A_comp": {
+                            "value": {"value": 1.5120000000000005,
+                                    "bounds": [1e-18,1e-06]
+                                },
+                            "display_name": "Water permeability coeff",
+                            "description": "Solvent permeability coeff.",
+                            "display_units": "mm/(bar h)",
+                            "indices": [
+                                    0, "H2O"
+                                ],
+                            "scale_factor": 0,
+                            "to_units": "mm / hr / bar",
+                            "readonly": false,
+                            "category": "Performance parameters"
+                            },
+                        "B_comp": {"value": {"value": 0.126, "bounds": [1e-11,
+                                    1e-05]
+                                },
+                            "display_name": "Salt permeability coeff",
+                            "description": "Solute permeability coeff.",
+                            "display_units": "mm/h",
+                            "indices": [
+                                    0, "TDS"
+                                ],
+                            "scale_factor": 0,
+                            "to_units": "mm / hr",
+                            "readonly": false,
+                            "category": "Performance parameters"
+                            },
+                        "channel_height": {"value": {"value": 1.0, "bounds": [0.0001,
+                                    0.005]
+                                },
+                            "display_name": "RO channel height",
+                            "description": "Feed-channel height",
+                            "display_units": "mm",
+                            "indices": [],
+                            "scale_factor": 0,
+                            "to_units": "mm",
+                            "readonly": false,
+                            "category": "Performance parameters"
+                            },
+                        "spacer_porosity": {"value": {"value": 97.0, "bounds": [10.0,
+                                    99.0]
+                                },
+                            "display_name": "RO spacer porosity",
+                            "description": "Feed-channel spacer porosity",
+                            "display_units": "%",
+                            "indices": [],
+                            "scale_factor": 100,
+                            "to_units": "",
+                            "readonly": false,
+                                "category": "Performance parameters"
+                            }
+                        },
+                "blocks": {},
+                "meta": {"parameters": {}
+                        },
+                "display_name": "spacer_porosity",
+                "description": "none"
+                    },
+                "erd": {
+                    "variables": {
+                            "efficiency_pump": {
+                                "value": {"value": 80.0,
+                                    "bounds": [null, null]
+                                },
+                                "display_name": "ERD efficiency",
+                                "description": "Pump efficiency",
+                                "display_units": "%",
+                                "indices": [
+                                                    0
+                                                ],
+                                "scale_factor": 100,
+                                "to_units": "",
+                                "readonly": false,
+                                "category": ""
+                            }
+                        },
+                    "blocks": {},
+                    "meta": {"parameters": {}
+                          },
+                    "display_name": "efficiency_pump",
+                    "description": "none"
+                }
+            },
+            "meta": {"parameters": {}
+            },
+            "display_name": "max_pressure",
+            "description": "none"
+        }
+    },
+    "meta": {"parameters": {}
+    }
+};
+
+
 
 export const getFlowsheet = (id) => {
+    //return fetch('http://localhost:8001/flowsheets/'+id+'/config', {mode: 'cors'});
     return new Promise((resolve, reject) => { 
-        resolve(data);
+        resolve(data3);
     });
+    
 }; 

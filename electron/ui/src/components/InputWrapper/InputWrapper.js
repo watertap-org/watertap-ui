@@ -14,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 export default function InputWrapper(props) {
 
-    const {fieldData} = props;
+    const {fieldLabel, fieldData} = props;
     const [value, setValue] = useState("");
 
     useEffect(()=>{  
@@ -35,7 +35,7 @@ export default function InputWrapper(props) {
                         onChange={handleFieldChange}
                         fullWidth 
                         InputProps={{
-                            endAdornment:<InputAdornment position="end">{fieldData.units}</InputAdornment>
+                            endAdornment:<InputAdornment position="end">{fieldData.display_units}</InputAdornment>
                         }}
                 />
             </Tooltip>

@@ -38,7 +38,7 @@ export default function InputAccordion(props) {
         });
     };
 
-
+    /*
     const renderFieldsO = () => {
         return Object.keys(data.variables).map((key)=>{
             let vItem = data.variables[key];
@@ -51,15 +51,16 @@ export default function InputAccordion(props) {
                     fullWidth />
         });
     };
+    */
 
 
     return (
-        <Accordion expanded={expanded1 === 'panel1'} onChange={handleAccordionChange('panel1')}>
+        <Accordion expanded={expanded1 === 'panel1'} onChange={handleAccordionChange('panel1')} style={{border:"1px solid #ddd"}}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-            {"["+dataKey+"] "+data.display_name}
+            {/*"["+dataKey+"] "+*/data.display_name}
         </AccordionSummary>
         <AccordionDetails>
-            {data.description}
+            {/*data.description*/}
 
             <Box
                 component="form"

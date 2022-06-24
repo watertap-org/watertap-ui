@@ -15,7 +15,9 @@ export default function FlowsheetsList() {
 
   useEffect(()=>{
       getFlowsheetsList()
+      .then(response => response.json())
       .then((data)=>{
+        console.log("f list:",data);
           setRows(data);
       });
   }, []);
