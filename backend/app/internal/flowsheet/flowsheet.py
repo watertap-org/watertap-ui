@@ -17,7 +17,7 @@ class Flowsheet:
 
         self.prepare_env()
         self.build()
-        self.save_default_flowsheet()
+        self._save_default_flowsheet()
 
         self.default_data = self.load_json(self.default_data_path)
         self.data = self.load_json(self.data_path)
@@ -47,6 +47,11 @@ class Flowsheet:
         self.flowsheet_interface_json = self.flowsheet_interface.dict()
         self.flowsheet_interface_json['id'] = self.id
 
+    def update(self, flowsheet_config):
+        self.flowsheet_interface.update(flowsheet_config)
+        self._save_flowsheet()
+        return self.flowsheet_interface.dict()
+
     def solve(self):
         self.flowsheet_interface.run_action(WorkflowActions.solve)
         results = self.flowsheet_interface.dict()
@@ -56,9 +61,18 @@ class Flowsheet:
             json.dump(results, f, indent=4)
         return results
 
-    def save_default_flowsheet(self):
+    def reset(self):
+        with open(self.default_data_path, 'r') as f:
+            self.default_fsi_json = json.load(f)
+            return self.update(self.default_fsi_json)
+
+    def _save_default_flowsheet(self):
         with open(self.default_data_path, 'w') as f_d, open(self.data_path, 'w') as f:
             json.dump(self.flowsheet_interface_json, f_d, indent=4)
+            json.dump(self.flowsheet_interface_json, f, indent=4)
+
+    def _save_flowsheet(self):
+        with open(self.data_path, 'w') as f:
             json.dump(self.flowsheet_interface_json, f, indent=4)
 
     def load_txt(self, path):
