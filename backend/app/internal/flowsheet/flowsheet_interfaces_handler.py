@@ -9,7 +9,8 @@ class FlowsheetInterfacesHandler:
 
     def retrieve_interfaces(self):
         fsi_id = 0
-        for _, fsi_interface in find_flowsheet_interfaces().items():
+        config = {'packages': ['tutorials', 'watertap']}
+        for _, fsi_interface in find_flowsheet_interfaces(config=config).items():
             fsi = Flowsheet(fsi_id, fsi_interface)
             self.fs_interfaces[fsi_id] = fsi
             fsi_id += 1 # increment id

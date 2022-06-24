@@ -49,22 +49,25 @@ class Flowsheet:
 
     def update(self, flowsheet_config):
         self.flowsheet_interface.update(flowsheet_config)
+        self.flowsheet_interface_json = self.flowsheet_interface.dict()
         self._save_flowsheet()
-        return self.flowsheet_interface.dict()
+        return self.flowsheet_interface_json
 
     def solve(self):
-        self.flowsheet_interface.run_action(WorkflowActions.solve)
-        results = self.flowsheet_interface.dict()
-        results['id'] = self.id
+        results = {'id': self.id}
+        results['output'] = self.flowsheet_interface.run_action(WorkflowActions.solve)
+        self.flowsheet_interface._action_clear_was_run(WorkflowActions.solve)
+        results['input'] = self.flowsheet_interface.dict()
+        self.flowsheet_interface_json = self.flowsheet_interface.dict()
+        self._save_flowsheet()
         with open(self.solve_path, 'w') as f:
-            #f.write(results)
             json.dump(results, f, indent=4)
         return results
 
     def reset(self):
-        with open(self.default_data_path, 'r') as f:
-            self.default_fsi_json = json.load(f)
-            return self.update(self.default_fsi_json)
+        self.flowsheet_interface._action_clear_was_run(WorkflowActions.build)
+        self.build()
+        return self.flowsheet_interface_json
 
     def _save_default_flowsheet(self):
         with open(self.default_data_path, 'w') as f_d, open(self.data_path, 'w') as f:
