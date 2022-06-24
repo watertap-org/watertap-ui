@@ -1,5 +1,5 @@
 import io
-from fastapi import APIRouter, HTTPException
+from fastapi import Request, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
 from app.internal.flowsheet.flowsheet_interfaces_handler import flowsheet_interfaces_handler
@@ -12,7 +12,7 @@ router = APIRouter(
     responses={404: {"description": "Flowsheet not found"}},
 )
 
-flowsheets_list = [
+fake_flowsheets_list = [
     {"id":1, "name":'Flowsheet C', "train":"Seawater Desalination", "lastRun": "2020-12-04", "created": "2020-12-04"},
     {"id":2, "name":'Flowsheet B', "train":"Municipal Potable Water Reuse", "lastRun":"2020-12-04", "created":"2020-12-04"},
     {"id":3, "name":'Flowsheet E', "train":"Custom", "lastRun":"2020-12-04", "created":"2020-12-04"},
@@ -49,5 +49,24 @@ async def solve(flowsheet_id: int):
         fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
         results = fs.solve()
         return results
+    except KeyError:
+        raise HTTPException(status_code = 404, detail="Flowsheet not found")
+
+@router.post("/{flowsheet_id}/reset")
+async def reset(flowsheet_id: int):
+    try:
+        fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
+        default_fs_config = fs.reset()
+        return default_fs_config
+    except KeyError:
+        raise HTTPException(status_code = 404, detail="Flowsheet not found")
+
+@router.post("/{flowsheet_id}/update")
+async def update(flowsheet_id: int, request: Request):
+    try:
+        fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
+        updated_fs_config = await request.json()
+        updated_fs_config = fs.update(updated_fs_config)
+        return updated_fs_config
     except KeyError:
         raise HTTPException(status_code = 404, detail="Flowsheet not found")
