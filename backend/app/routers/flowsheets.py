@@ -2,7 +2,9 @@ import io
 from fastapi import Request, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
-from app.internal.flowsheet.flowsheet_interfaces_handler import flowsheet_interfaces_handler
+from app.internal.flowsheet.flowsheet_interfaces_handler import (
+    flowsheet_interfaces_handler,
+)
 
 from watertap.ui.api import find_flowsheet_interfaces, WorkflowActions
 
@@ -12,18 +14,10 @@ router = APIRouter(
     responses={404: {"description": "Flowsheet not found"}},
 )
 
-fake_flowsheets_list = [
-    {"id":1, "name":'Flowsheet C', "train":"Seawater Desalination", "lastRun": "2020-12-04", "created": "2020-12-04"},
-    {"id":2, "name":'Flowsheet B', "train":"Municipal Potable Water Reuse", "lastRun":"2020-12-04", "created":"2020-12-04"},
-    {"id":3, "name":'Flowsheet E', "train":"Custom", "lastRun":"2020-12-04", "created":"2020-12-04"},
-    {"id":4, "name":'Flowsheet D', "train":"Custom", "lastRun":"2020-12-04", "created":"2020-12-04"},
-    {"id":5, "name":'Flowsheet A', "train":"Municipal Potable Water Reuse", "lastRun":"2020-12-04", "created":"2020-12-04"},
-    {"id":6, "name":'Flowsheet F', "train":"Municipal Potable Water Reuse", "lastRun":"2020-12-04", "created":"2020-12-04"},
-]
-
 @router.get("/")
 async def get_all():
     return flowsheet_interfaces_handler.get_list()
+
 
 @router.get("/{flowsheet_id}/config")
 async def get_config(flowsheet_id: int):
@@ -32,7 +26,8 @@ async def get_config(flowsheet_id: int):
         config = fs.get_flowsheet_json()
         return config
     except KeyError:
-        raise HTTPException(status_code = 404, detail="Flowsheet not found")
+        raise HTTPException(status_code=404, detail="Flowsheet not found")
+
 
 @router.get("/{flowsheet_id}/graph")
 async def get_graph(flowsheet_id: int):
@@ -41,7 +36,8 @@ async def get_graph(flowsheet_id: int):
         graph = fs.get_graph()
         return StreamingResponse(io.BytesIO(graph), media_type="image/png")
     except KeyError:
-        raise HTTPException(status_code = 404, detail="Flowsheet not found")
+        raise HTTPException(status_code=404, detail="Flowsheet not found")
+
 
 @router.get("/{flowsheet_id}/solve")
 async def solve(flowsheet_id: int):
@@ -50,7 +46,8 @@ async def solve(flowsheet_id: int):
         results = fs.solve()
         return results
     except KeyError:
-        raise HTTPException(status_code = 404, detail="Flowsheet not found")
+        raise HTTPException(status_code=404, detail="Flowsheet not found")
+
 
 @router.post("/{flowsheet_id}/reset")
 async def reset(flowsheet_id: int):
@@ -58,8 +55,9 @@ async def reset(flowsheet_id: int):
         fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
         default_fs_config = fs.reset()
         return default_fs_config
-    except KeyError:
-        raise HTTPException(status_code = 404, detail="Flowsheet not found")
+    except KeyError as err:
+        raise HTTPException(status_code=404, detail=f"Flowsheet not found: {err}")
+
 
 @router.post("/{flowsheet_id}/update")
 async def update(flowsheet_id: int, request: Request):
@@ -69,4 +67,4 @@ async def update(flowsheet_id: int, request: Request):
         updated_fs_config = fs.update(updated_fs_config)
         return updated_fs_config
     except KeyError:
-        raise HTTPException(status_code = 404, detail="Flowsheet not found")
+        raise HTTPException(status_code=404, detail="Flowsheet not found")

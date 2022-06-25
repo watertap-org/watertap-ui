@@ -136,14 +136,14 @@ export default function FlowsheetConfig() {
 
 
     const handleReset = () => {
-      console.log("handle resete.....");
+      console.log("reset. id:", params.id)
       resetFlowsheet(params.id)
       .then(response => response.json())
       .then((data)=>{
-        console.log("reset Flowsheet:", data); 
-        setFlowsheetData(data);
-      });
-    };
+        console.log("reset Flowsheet:", data)
+        setFlowsheetData(data)
+      })
+    }
 
 
     return ( 
