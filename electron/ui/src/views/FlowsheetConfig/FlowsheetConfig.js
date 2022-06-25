@@ -9,6 +9,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import ConfigInput from "./ConfigInput/ConfigInput";
+import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import Alert from '@mui/material/Alert';
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
 
@@ -123,7 +124,9 @@ export default function FlowsheetConfig() {
               </ConfigInput>
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-              <div style={{textAlign:"left"}} dangerouslySetInnerHTML={{ __html: outputData}} />
+              {/*<div style={{textAlign:"left"}} dangerouslySetInnerHTML={{ __html: outputData}} />*/}
+              <ConfigOutput outputData={outputData} >
+              </ConfigOutput>
             </TabPanel> 
           </Box>
         </>
