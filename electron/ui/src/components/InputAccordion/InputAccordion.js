@@ -34,7 +34,7 @@ export default function InputAccordion(props) {
     const renderFields = () => {
         return Object.keys(data.variables).map((key)=>{
             let vItem = data.variables[key];
-            return <InputWrapper fieldData={vItem} />
+            return <InputWrapper key={key} fieldData={vItem} />
         });
     };
 
@@ -57,7 +57,7 @@ export default function InputAccordion(props) {
     return (
         <Accordion expanded={expanded1 === 'panel1'} onChange={handleAccordionChange('panel1')} style={{border:"1px solid #ddd"}}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-            {/*"["+dataKey+"] "+*/data.display_name}
+            {data.display_name}
         </AccordionSummary>
         <AccordionDetails>
             {/*data.description*/}

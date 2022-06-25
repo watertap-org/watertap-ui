@@ -147,8 +147,9 @@ const data2 = {
 };
 
 
-export const solve = (flowsheetData) => {
-    return new Promise((resolve, reject) => { 
+export const solve = (id) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/solve', {mode: 'cors'});
+    /*return new Promise((resolve, reject) => { 
         resolve(data2);
-    });
+    });*/
 }; 

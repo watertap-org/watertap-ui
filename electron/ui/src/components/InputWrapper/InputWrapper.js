@@ -18,7 +18,7 @@ export default function InputWrapper(props) {
     const [value, setValue] = useState("");
 
     useEffect(()=>{  
-        console.log("fieldData:", fieldData);
+        //console.log("fieldData:", fieldData);
     }, [fieldData]);
 
     const handleFieldChange = (event) => {

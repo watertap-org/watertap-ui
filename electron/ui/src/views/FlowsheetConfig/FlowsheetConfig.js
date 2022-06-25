@@ -2,7 +2,7 @@
 import React from 'react'; 
 import {useEffect, useState, useContext} from 'react';   
 import { useParams } from "react-router-dom";
-import { getFlowsheet } from "../../services/flowsheet.service"; 
+import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
 import Container from '@mui/material/Container';
 import Graph from "../../components/Graph/Graph";
 import Tabs from '@mui/material/Tabs';
@@ -12,6 +12,8 @@ import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import Alert from '@mui/material/Alert';
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
+import Snackbar from '@mui/material/Snackbar';
+
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -49,6 +51,7 @@ export default function FlowsheetConfig() {
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
     const [outputData, setOutputData] = useState(null);
+    const [openSuccessSaveSnackbar, setOpenSuccessSaveSnackbar] = React.useState(false);
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
@@ -56,7 +59,7 @@ export default function FlowsheetConfig() {
         return;
 
       getFlowsheet(params.id)
-      //.then(response => response.json())
+      .then(response => response.json())
       .then((data)=>{
         console.log("Flowsheet Data:", data);
         setFlowsheetData(data);
@@ -91,14 +94,55 @@ export default function FlowsheetConfig() {
       {
         setSolveDialogOpen(true);
       }
+      else if(solve===null)
+      {
+        handleSave(data);
+      }
+      else if(solve==="RESET")
+      {
+        handleReset();
+      }
     };
   
 
     const handleSolved = (data) => {
       console.log("handle solved.....",data);
       setOutputData(data);
+      
+      if(data.hasOwnProperty("input") && data.input)
+      {console.log("iiiiiiii:",data.input);
+        setFlowsheetData(data.input);
+      }
+
       setTabValue(1);
       setSolveDialogOpen(false);
+    };
+
+
+    const handleSave = (data) => {
+      console.log("handle save.....",data);
+      saveFlowsheet(params.id, data)
+      .then(response => response.json())
+      .then((data)=>{
+        console.log("new Flowsheet Data:", data); 
+        setOpenSuccessSaveSnackbar(true);
+      });
+    };
+
+
+    const handleSuccessSaveSnackbarClose = () => {
+      setOpenSuccessSaveSnackbar(false);
+    };
+
+
+    const handleReset = () => {
+      console.log("handle resete.....");
+      resetFlowsheet(params.id)
+      .then(response => response.json())
+      .then((data)=>{
+        console.log("reset Flowsheet:", data); 
+        setFlowsheetData(data);
+      });
     };
 
 
@@ -138,7 +182,13 @@ export default function FlowsheetConfig() {
           </Box>
         )
       }  
-      <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} flowsheetData={flowsheetData}></SolveDialog>
+      <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} flowsheetData={flowsheetData} id={params.id}></SolveDialog>
+      <Snackbar
+        open={openSuccessSaveSnackbar}
+        autoHideDuration={2000} 
+        onClose={handleSuccessSaveSnackbarClose}
+        message="Changes saved!" 
+      />
       </Container>  
       
     );

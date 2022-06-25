@@ -23,6 +23,7 @@ export default function ConfigInput(props) {
 
     useEffect(()=>{   
         //splitData(flowsheetData); 
+        //console.log("changed");
     }, [flowsheetData]);
  
 
@@ -36,7 +37,8 @@ export default function ConfigInput(props) {
             let _inputBlocks = {};
             let b = flowsheetData.blocks.fs.blocks; 
             for(let key of Object.keys(b))
-            { console.log("kkk:",key,b[key]);
+            { 
+                //console.log("kkk:",key,b[key]);
                 let variables = b[key].variables;
                 for(let varItem of variables)
                 {
@@ -79,9 +81,9 @@ export default function ConfigInput(props) {
     const renderInputAccordions = () => {
         let sectionBlocks = flowsheetData.blocks.fs.blocks;
         return Object.keys(sectionBlocks).map((key)=>{
-            console.log("key:",key);
+            //console.log("key:",key);
             let _key = key + Math.floor(Math.random() * 100001);
-            console.log("_key:",_key);
+            //console.log("_key:",_key);
             return (<Grid item xs={6} key={_key}>
                         <InputAccordion  dataKey={key} data={sectionBlocks[key]}></InputAccordion>
                     </Grid>)

@@ -9,17 +9,19 @@ import Box from '@mui/material/Box';
 import { solve } from "../../services/output.service"; 
 
 export default function SolveDialog(props) {
-  const { open, handleSolved, flowsheetData } = props;
+  const { open, handleSolved, flowsheetData, id } = props;
 
   useEffect(()=>{  
     if(open)
     {
-    setTimeout(()=>{
-        solve(flowsheetData).then((outputData)=>{ 
+        //setTimeout(()=>{
+        solve(id)
+        .then(response => response.json())
+        .then((outputData)=>{ 
             console.log("outputData",outputData);
             handleSolved(outputData);
         });
-    },3000);
+        //},3000);
     }
   },[open]);
 
