@@ -22,6 +22,7 @@ class Flowsheet:
         self.default_data = self.load_json(self.default_data_path)
         self.data = self.load_json(self.data_path)
         self.graph = self.load_graph(self.graph_path)
+        self._cached_output = {}
         #self.solve_results = self.load_txt(self.solve_path)
 
     def prepare_env(self):
@@ -55,8 +56,16 @@ class Flowsheet:
 
     def solve(self):
         results = {'id': self.id}
-        results['output'] = self.flowsheet_interface.run_action(WorkflowActions.solve)
-        self.flowsheet_interface._action_clear_was_run(WorkflowActions.solve)
+        output = self.flowsheet_interface.run_action(WorkflowActions.solve)
+        # If solve returns nothing, there was nothing to do - so use previous value
+        # XXX: It would be even more efficient to simply return an empty value
+        # XXX: to the front-end and let it use this same logic.
+        if output is None:
+            output = self._cached_output
+        else:
+            self._cached_output = output
+        results['output'] = output
+        # self.flowsheet_interface._action_clear_was_run(WorkflowActions.solve)
         results['input'] = self.flowsheet_interface.dict()
         self.flowsheet_interface_json = self.flowsheet_interface.dict()
         self._save_flowsheet()
@@ -65,7 +74,7 @@ class Flowsheet:
         return results
 
     def reset(self):
-        self.flowsheet_interface._action_clear_was_run(WorkflowActions.build)
+        self.flowsheet_interface.clear_action(WorkflowActions.build)
         self.build()
         return self.flowsheet_interface_json
 
