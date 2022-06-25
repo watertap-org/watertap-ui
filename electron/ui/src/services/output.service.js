@@ -108,8 +108,48 @@ Levelized Cost of Methane: 1.2266 $/kg<br/>
 `;
 
 
-export const solve = (flowsheetData) => {
-    return new Promise((resolve, reject) => { 
-        resolve(data);
-    });
+const data2 = {
+    "System metrics": {
+        "Recovery": [50.0, "%"],
+        "Specific energy consumption": [2.4, "kWh/m3"],
+        "Levelized cost of water": [0.53, "$/m3"]
+    },
+    "Feed": {
+        "Volumetric flowrate": [3.6, "m3/h"],
+        "Salinity": [35000.0, "ppm"],
+        "Temperature": [298.0, "K"],
+        "Pressure": [1.0, "bar"]
+    },
+    "Product": {
+        "Volumetric flowrate": [1.8, "m3/h"],
+        "Salinity": [497.0, "ppm"],
+        "Temperature": [298.0, "K"],
+        "Pressure": [1.0, "bar"]
+    },
+    "Disposal": {
+        "Volumetric flowrate": [1.8, "m3/h"],
+        "Salinity": [67774.0, "ppm"],
+        "Temperature": [298.0, "K"],
+        "Pressure": [1.0, "bar"]
+    },
+    "Decision variables": {
+        "Operating pressure": [51.2, "bar"],
+        "Membrane area": [130.4, "m2"],
+        "Inlet crossflow velocity": [17.5, "cm/s"]
+    },
+    "System variables": {
+        "Pump power": [6.3, "kW"],
+        "ERD power": [2.0, "kW"],
+        "Average water flux": [13.8, "L/[m2-h]"],
+        "Pressure drop": [1.43, "bar"],
+        "Max interfacial salinity": [68414.0, "ppm"]
+    }
+};
+
+
+export const solve = (id) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/solve', {mode: 'cors'});
+    /*return new Promise((resolve, reject) => { 
+        resolve(data2);
+    });*/
 }; 

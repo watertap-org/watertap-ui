@@ -14,7 +14,7 @@ class Header extends React.Component {
           </a>
            
           <div id="titlebar-name">
-            WaterTAP<sup>3</sup>
+            WaterTAP
           </div>
         </div> 
       </div>

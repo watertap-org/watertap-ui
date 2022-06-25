@@ -17,7 +17,10 @@ const rows = [
 
 
 export const getFlowsheetsList = () => {
-    return new Promise((resolve, reject) => { 
+    return fetch('http://localhost:8001/flowsheets/',{mode: 'cors'});
+
+    /*return new Promise((resolve, reject) => { 
         resolve(rows);
     });
+    */
 }; 

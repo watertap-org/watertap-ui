@@ -43,11 +43,11 @@ export default function FlowsheetsListTable(props) {
             <TableBody>
             {props.rows.map((row) => (
                 <TableRow
-                key={row.name}
+                key={row.blocks.fs.display_name}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                 <TableCell>
-                    <a href={"/flowsheet/" + row.id + "/config"}>{row.name}</a>
+                    <a href={"/flowsheet/" + row.id + "/config"}>{row.blocks.fs.display_name}</a>
                 </TableCell>
                 <TableCell>{row.train}</TableCell>
                 <TableCell>{row.lastRun}</TableCell>

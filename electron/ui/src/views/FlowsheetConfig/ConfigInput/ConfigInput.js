@@ -19,9 +19,11 @@ export default function ConfigInput(props) {
     const { flowsheetData, updateFlowsheetData } = props;  
     const [costingBlocks, setCostingBlocks] = useState({});
     const [parametersBlocks, setParametersBlocks] = useState({}); 
+    const [inputBlocks, setInputBlocks] = useState({});
 
     useEffect(()=>{   
-        splitData(flowsheetData); 
+        //splitData(flowsheetData); 
+        //console.log("changed");
     }, [flowsheetData]);
  
 
@@ -32,36 +34,40 @@ export default function ConfigInput(props) {
 
         try 
         {
+            let _inputBlocks = {};
             let b = flowsheetData.blocks.fs.blocks; 
             for(let key of Object.keys(b))
             { 
-                if(b[key].hasOwnProperty("category"))
+                //console.log("kkk:",key,b[key]);
+                let variables = b[key].variables;
+                for(let varItem of variables)
                 {
-                    if(b[key].category==="costing")
+                    if(varItem.hasOwnProperty("category"))
                     {
-                        _costingBlocks[key] = b[key];
-                    }
-                    else
-                    {
-                        _parametersBlocks[key] = b[key];
+                        
+                        
+                        /*if(varItem.category==="costing")
+                        {
+                            _costingBlocks[key] = b[key];
+                        }
+                        else
+                        {
+                            _parametersBlocks[key] = b[key];
+                        }*/
                     }
                 }
+                
             }
 
             console.log("blocks:",_costingBlocks, _parametersBlocks);
             setCostingBlocks(_costingBlocks);
             setParametersBlocks(_parametersBlocks);
 
-
-
             //===========
             //_costingBlocks.costing.variables.TIC.value.value=9999999999;
             //console.log("-----22222 blocks:",_costingBlocks);
             //console.log("-----22222 flowsheetData:",flowsheetData);
             //===========
-
-
-
 
         }
         catch {
@@ -71,18 +77,19 @@ export default function ConfigInput(props) {
     };
 
 
-    /*
+    
     const renderInputAccordions = () => {
-        //console.log("--------", flowsheetData);
-        let b = flowsheetData.blocks.fs.blocks;
-        return Object.keys(b).map((key)=>{
-             return (
-                <InputAccordion key={key} data={b[key]}></InputAccordion>
-                
-             );
+        let sectionBlocks = flowsheetData.blocks.fs.blocks;
+        return Object.keys(sectionBlocks).map((key)=>{
+            //console.log("key:",key);
+            let _key = key + Math.floor(Math.random() * 100001);
+            //console.log("_key:",_key);
+            return (<Grid item xs={6} key={_key}>
+                        <InputAccordion  dataKey={key} data={sectionBlocks[key]}></InputAccordion>
+                    </Grid>)
         })
     };
-    */
+    
   
     return ( 
         <>
@@ -94,15 +101,24 @@ export default function ConfigInput(props) {
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData,"SOLVE")}>SOLVE</Button>
                 </Stack>
             </Toolbar>
+
+            <Grid container spacing={2} alignItems="flex-start">
+                 
+            {   
+                renderInputAccordions()
+            }
+                 
+            </Grid>
+
+
+
             <Grid container spacing={2}>
-                <Grid item xs={6}>
-                    <h3>Costing</h3>
+                <Grid item xs={6}> 
                     {   
                         Object.keys(costingBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={costingBlocks[key]}></InputAccordion>)
                     }
                 </Grid>
-                <Grid item xs={6}>
-                    <h3>Parameters</h3>
+                <Grid item xs={6}> 
                     {   
                         Object.keys(parametersBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={parametersBlocks[key]}></InputAccordion>) 
                     }
