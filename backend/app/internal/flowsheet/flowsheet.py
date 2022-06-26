@@ -55,23 +55,25 @@ class Flowsheet:
         return self.flowsheet_interface_json
 
     def solve(self):
-        results = {'id': self.id}
-        output = self.flowsheet_interface.run_action(WorkflowActions.solve)
         # If solve returns nothing, there was nothing to do - so use previous value
         # XXX: It would be even more efficient to simply return an empty value
         # XXX: to the front-end and let it use this same logic.
-        if output is None:
-            output = self._cached_output
+        output_dict = self.flowsheet_interface.run_action(WorkflowActions.solve)
+        if output_dict is None:
+            output_dict = self._cached_output
         else:
-            self._cached_output = output
-        results['output'] = output
-        # self.flowsheet_interface._action_clear_was_run(WorkflowActions.solve)
-        results['input'] = self.flowsheet_interface.dict()
-        self.flowsheet_interface_json = self.flowsheet_interface.dict()
+            # save result for the future
+            self._cached_output = output_dict
+        input_dict = self.flowsheet_interface.dict()
+        
+        self.flowsheet_interface_json = input_dict
         self._save_flowsheet()
+        
+        results = dict(input=input_dict, output=output_dict, id=self.id)
         with open(self.solve_path, 'w') as f:
             json.dump(results, f, indent=4)
-        return results
+     
+        return results 
 
     def reset(self):
         self.flowsheet_interface.clear_action(WorkflowActions.build)
