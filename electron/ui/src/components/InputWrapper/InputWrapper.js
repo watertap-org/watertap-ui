@@ -26,6 +26,15 @@ export default function InputWrapper(props) {
         fieldData.value.value = event.target.value;
     };
 
+    const displayUnits = (d) => {
+        let u = d.display_units
+        // replace USD currency with simple '$'
+        u = u.replace(/USD_[^/]*/, "$")
+        u = u.replace(/USD/, "$")
+        console.log("displayUnits:", u)
+        return {__html: u}
+    }
+
     return  <Tooltip title={fieldData.description}>
                 <TextField id="outlined-basic" 
                         label={fieldData.display_name}
@@ -35,7 +44,11 @@ export default function InputWrapper(props) {
                         onChange={handleFieldChange}
                         fullWidth 
                         InputProps={{
-                            endAdornment:<InputAdornment position="end">{fieldData.display_units}</InputAdornment>
+                            endAdornment:
+                                <InputAdornment position="end">
+                                <span dangerouslySetInnerHTML={displayUnits(fieldData)}>
+                                </span>
+                                </InputAdornment>
                         }}
                 />
             </Tooltip>

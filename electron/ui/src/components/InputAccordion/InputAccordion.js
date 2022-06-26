@@ -32,6 +32,7 @@ export default function InputAccordion(props) {
 
 
     const renderFields = () => {
+        console.debug("renderFields, data=", data)
         return Object.keys(data.variables).map((key)=>{
             let vItem = data.variables[key];
             return <InputWrapper key={key} fieldData={vItem} />

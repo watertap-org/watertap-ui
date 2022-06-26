@@ -77,17 +77,65 @@ export default function ConfigInput(props) {
     };
 
 
-    
+    /**
+     * Collect all variables from 'block' and its subblocks.
+     *
+     * @param Object Root block
+     * @returns Object with a flattened map of variables
+     */
+    const extractVariables = (block) => {
+        console.debug("extractVariables. block=", block.display_name)
+        let bvars = { ...block.variables }  // shallow copy
+        // iterate through subblocks
+        for (const [_, subblock] of Object.entries(block.blocks)) {
+            // add extracted values of each subblock to this one (recursively)
+            let subv = extractVariables(subblock)
+            for (const [key, value] of Object.entries(subv)) {
+                bvars[key] = value
+            }
+        }
+        console.debug("Block and subblock vars:", bvars)
+        return bvars
+    }
+
+    /**
+     * Organize variables into sections by their 'category' attribute.
+     *
+     * @returns Object {<category-name>: [list, of, variable, objects]}
+     */
+    const organizeVariables = (bvars) => {
+        let var_sections = {}
+        for (const [key, v] of Object.entries(bvars)) {
+            console.debug("organizeVariables:map. variable=", key)
+            let catg = v.category
+            if (!Object.hasOwn(var_sections, catg)) {
+                var_sections[catg] = {display_name: catg, variables: {}}
+            }
+            var_sections[catg]["variables"][key] = v
+        }
+        return var_sections
+    }
+
     const renderInputAccordions = () => {
-        let sectionBlocks = flowsheetData.blocks.fs.blocks;
-        return Object.keys(sectionBlocks).map((key)=>{
-            //console.log("key:",key);
+        console.debug("calling extractVariables with root block:", flowsheetData.blocks.fs)
+        let variables = extractVariables(flowsheetData.blocks.fs)
+        let var_sections = organizeVariables(variables)
+        console.debug("var_sections:", var_sections)
+        // let sectionBlocks = flowsheetData.blocks.fs.blocks
+        return Object.keys(var_sections).map((key)=>{
             let _key = key + Math.floor(Math.random() * 100001);
-            //console.log("_key:",_key);
             return (<Grid item xs={6} key={_key}>
-                        <InputAccordion  dataKey={key} data={sectionBlocks[key]}></InputAccordion>
+                        <InputAccordion  dataKey={key} data={var_sections[key]}></InputAccordion>
                     </Grid>)
         })
+        // return Object.keys(sectionBlocks).map((key)=>{
+        //     //console.log("key:",key);
+        //     let _key = key + Math.floor(Math.random() * 100001);
+        //     //console.log("_key:",_key);
+        //     return (<Grid item xs={6} key={_key}>
+        //                 <InputAccordion  dataKey={key} data={sectionBlocks[key]}></InputAccordion>
+        //             </Grid>)
+        // })
     };
     
   
@@ -103,11 +151,9 @@ export default function ConfigInput(props) {
             </Toolbar>
 
             <Grid container spacing={2} alignItems="flex-start">
-                 
-            {   
-                renderInputAccordions()
-            }
-                 
+                {
+                    renderInputAccordions()
+                }
             </Grid>
 
 
@@ -118,7 +164,7 @@ export default function ConfigInput(props) {
                         Object.keys(costingBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={costingBlocks[key]}></InputAccordion>)
                     }
                 </Grid>
-                <Grid item xs={6}> 
+                <Grid item xs={6}>
                     {   
                         Object.keys(parametersBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={parametersBlocks[key]}></InputAccordion>) 
                     }
