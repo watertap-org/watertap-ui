@@ -160,7 +160,7 @@ export default function FlowsheetConfig() {
           <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
             <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
               <Tab label="Input" {...a11yProps(0)} />
-              <Tab label="Output" {...a11yProps(1)} /> 
+              <Tab label="Output" disabled={!outputData} {...a11yProps(1)} /> 
             </Tabs>
             <TabPanel value={tabValue} index={0}>
               <ConfigInput flowsheetData={flowsheetData} 
