@@ -120,9 +120,35 @@ export default function ConfigInput(props) {
         console.debug("calling extractVariables with root block:", flowsheetData.blocks.fs)
         let variables = extractVariables(flowsheetData.blocks.fs)
         let var_sections = organizeVariables(variables)
-        console.debug("var_sections:", var_sections)
+        console.log("var_sections:", var_sections);
+
+        //sort sections, put treatment and feed first
+        let sortedSectionKeys = [];
+        console.log("1sortedSectionKeys::",sortedSectionKeys);
+        for(let key of Object.keys(var_sections))
+        {
+            if(key.toLowerCase() === "feed")
+            {
+                sortedSectionKeys.unshift(key)
+            }
+        }
+        for(let key of Object.keys(var_sections))
+        {
+            if(key.toLowerCase() === "treatment specification")
+            {
+                sortedSectionKeys.unshift(key)
+            }
+        }
+        for(let key of Object.keys(var_sections))
+        {
+            if(key.toLowerCase() !== "feed" && key.toLowerCase() !== "treatment specification")
+            {
+                sortedSectionKeys.push(key)
+            }
+        }
+        console.log("2sortedSectionKeys::",sortedSectionKeys);
         // let sectionBlocks = flowsheetData.blocks.fs.blocks
-        return Object.keys(var_sections).map((key)=>{
+        return sortedSectionKeys.map((key)=>{
             let _key = key + Math.floor(Math.random() * 100001);
             return (<Grid item xs={6} key={_key}>
                         <InputAccordion  dataKey={key} data={var_sections[key]}></InputAccordion>
@@ -160,13 +186,15 @@ export default function ConfigInput(props) {
 
             <Grid container spacing={2}>
                 <Grid item xs={6}> 
-                    {   
+                    {  /* 
                         Object.keys(costingBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={costingBlocks[key]}></InputAccordion>)
+                    */
                     }
                 </Grid>
                 <Grid item xs={6}>
-                    {   
+                    { /*  
                         Object.keys(parametersBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={parametersBlocks[key]}></InputAccordion>) 
+                    */
                     }
                 </Grid>
             </Grid>
