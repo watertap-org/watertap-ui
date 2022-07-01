@@ -1,7 +1,7 @@
 describe('flowsheetslist', () => {
     it('test flowsheetslist page', () => {
         //load webpage
-        cy.visit('localhost:3000/')
+        cy.visit('/')
 
         //locate new flowsheet button
         cy.findByRole('button', { name: /new/i })
@@ -19,7 +19,7 @@ describe('flowsheetslist', () => {
 
     it('test new flowsheet button', () => {
         //load webpage
-        cy.visit('localhost:3000/')
+        cy.visit('/')
 
         //click on new flowsheet button
         cy.findByRole('button', { name: /new/i }).click()
