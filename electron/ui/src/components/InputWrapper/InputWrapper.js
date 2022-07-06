@@ -31,7 +31,7 @@ export default function InputWrapper(props) {
         // replace USD currency with simple '$'
         u = u.replace(/USD_[^/]*/, "$")
         u = u.replace(/USD/, "$")
-        console.log("displayUnits:", u)
+        //console.log("displayUnits:", u)
         return {__html: u}
     }
 
