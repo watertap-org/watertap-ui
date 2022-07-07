@@ -13,7 +13,9 @@
     "electron": "^18.2.3"
   },
   "dependencies": {
+    "@testing-library/cypress": "^8.0.3",
     "axios": "^0.27.2",
+    "cypress": "^10.2.0",
     "dotenv": "^16.0.1"
   }
 }
