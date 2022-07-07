@@ -36,7 +36,7 @@ export default function InputWrapper(props) {
     }
 
     return  <Tooltip title={fieldData.description}>
-                <TextField id="outlined-basic" 
+                <TextField id={"outlined-basic"+fieldData.display_name} 
                         label={fieldData.display_name}
                         variant="outlined" 
                         size="small"

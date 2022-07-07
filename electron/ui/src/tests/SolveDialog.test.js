@@ -561,7 +561,7 @@ const id = 1;
 test('test input accordion', () => {
 
     render( <SolveDialog open={solveDialogOpen} handleSolved={mockhandleSolved} flowsheetData={flowsheetData} id={id}></SolveDialog> )
-///flow_vol/i
+
     //test for component elements
     screen.getAllByRole('presentation', {  name: ""});
     screen.getByRole('dialog', {  name: ""});

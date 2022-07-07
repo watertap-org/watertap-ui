@@ -52,6 +52,7 @@ export default function FlowsheetConfig() {
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
     const [outputData, setOutputData] = useState(null);
     const [openSuccessSaveSnackbar, setOpenSuccessSaveSnackbar] = React.useState(false);
+    const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
@@ -118,6 +119,12 @@ export default function FlowsheetConfig() {
       setSolveDialogOpen(false);
     };
 
+    const handleError = () => {
+      console.log("handle error");
+      
+      setOpenErrorSnackbar(true);
+      setSolveDialogOpen(false);
+    };
 
     const handleSave = (data) => {
       console.log("handle save.....",data);
@@ -134,6 +141,9 @@ export default function FlowsheetConfig() {
       setOpenSuccessSaveSnackbar(false);
     };
 
+    const handleErrorSnackbarClose = () => {
+      setOpenErrorSnackbar(false);
+    };
 
     const handleReset = () => {
       console.log("reset. id:", params.id)
@@ -182,13 +192,24 @@ export default function FlowsheetConfig() {
           </Box>
         )
       }  
-      <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} flowsheetData={flowsheetData} id={params.id}></SolveDialog>
+      <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id}></SolveDialog>
       <Snackbar
         open={openSuccessSaveSnackbar}
         autoHideDuration={2000} 
         onClose={handleSuccessSaveSnackbarClose}
         message="Changes saved!" 
       />
+      <Snackbar
+        open={openSuccessSaveSnackbar}
+        autoHideDuration={2000} 
+        onClose={handleSuccessSaveSnackbarClose}
+        message="Changes saved!" 
+      />
+      <Snackbar open={openErrorSnackbar} autoHideDuration={3000} onClose={handleErrorSnackbarClose}>
+        <Alert onClose={handleErrorSnackbarClose} severity="error">
+          Error: Data Input Infeasible
+        </Alert>
+      </Snackbar>
       </Container>  
       
     );

@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import { solve } from "../../services/output.service"; 
 
 export default function SolveDialog(props) {
-  const { open, handleSolved, flowsheetData, id } = props;
+  const { open, handleSolved, handleError, flowsheetData, id } = props;
 
   useEffect(()=>{  
     if(open)
@@ -20,7 +20,10 @@ export default function SolveDialog(props) {
         .then((outputData)=>{ 
             console.log("outputData",outputData);
             handleSolved(outputData);
-        });
+        }).catch(e => {
+          console.log("caught error: "+e)
+          handleError()
+      });
         //},3000);
     }
   },[open]);
