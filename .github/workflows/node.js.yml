@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
        run:
-         working-directory: ./electron/
+         working-directory: ./electron/ui/
     strategy:
       matrix:
         node-version: [12.x, 14.x]
@@ -27,7 +27,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: './electron/package-lock.json'
+        cache-dependency-path: './electron/ui/package-lock.json'
     # - run: cd electron
     - run: npm ci
     - run: npm run postinstall 
