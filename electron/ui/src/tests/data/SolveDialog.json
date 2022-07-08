@@ -1,0 +1,550 @@
+{
+    "blocks": {
+      "fs": {
+        "variables": {},
+        "blocks": {
+          "feed": {
+            "variables": {
+              "flow_vol": {
+                "value": {
+                  "index": [
+                    [
+                      0
+                    ]
+                  ],
+                  "value": [
+                    0.0003286
+                  ],
+                  "bounds": [
+                    [
+                      null,
+                      null
+                    ]
+                  ]
+                },
+                "display_name": "flow_vol",
+                "description": "Volumetric flowrate in feed",
+                "display_units": "m<sup>3</sup>/s",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "conc_mass_comp": {
+                "value": {
+                  "index": [
+                    [
+                      0,
+                      "cod"
+                    ],
+                    [
+                      0,
+                      "hydrogen"
+                    ],
+                    [
+                      0,
+                      "methane"
+                    ]
+                  ],
+                  "value": [
+                    6.76,
+                    0.000030432136335974136,
+                    0.000030432136335974136
+                  ],
+                  "bounds": [
+                    [
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null
+                    ]
+                  ]
+                },
+                "display_name": "conc_mass_comp",
+                "description": "Component mass concentrations",
+                "display_units": "kg/m<sup>3</sup>",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              }
+            },
+            "blocks": {},
+            "meta": {
+              "parameters": {}
+            },
+            "display_name": "conc_mass_comp",
+            "description": "Zero-Order feed block"
+          },
+          "metab_hydrogen": {
+            "variables": {
+              "volume": {
+                "value": {
+                  "value": 1,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "volume",
+                "description": "Reactor volume",
+                "display_units": "m<sup>3</sup>",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "hydraulic_retention_time": {
+                "value": {
+                  "value": 6,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "hydraulic_retention_time",
+                "description": "Hydraulic residence time",
+                "display_units": "h",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "electricity": {
+                "value": {
+                  "index": [
+                    [
+                      0
+                    ]
+                  ],
+                  "value": [
+                    1
+                  ],
+                  "bounds": [
+                    [
+                      0,
+                      null
+                    ]
+                  ]
+                },
+                "display_name": "electricity",
+                "description": "Electricity demand of unit",
+                "display_units": "kW",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "heat": {
+                "value": {
+                  "index": [
+                    [
+                      0
+                    ]
+                  ],
+                  "value": [
+                    1
+                  ],
+                  "bounds": [
+                    [
+                      0,
+                      null
+                    ]
+                  ]
+                },
+                "display_name": "heat",
+                "description": "Thermal demand of unit",
+                "display_units": "kW",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "energy_electric_mixer_vol": {
+                "value": {
+                  "value": 0.049875,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "energy_electric_mixer_vol",
+                "description": "Electricity intensity of mixer with respect to reactor volume",
+                "display_units": "kW/m<sup>3</sup>",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "energy_electric_vacuum_flow_vol_byproduct": {
+                "value": {
+                  "value": 9.19,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "energy_electric_vacuum_flow_vol_byproduct",
+                "description": "Electricity intensity of vacuum pump with respect to product gas flow",
+                "display_units": "h kW/kg",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "energy_thermal_flow_vol_inlet": {
+                "value": {
+                  "value": 7875,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "energy_thermal_flow_vol_inlet",
+                "description": "Thermal energy intensity of reactor with respect to inlet volumetric flowrate",
+                "display_units": "kJ/m<sup>3</sup>",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              }
+            },
+            "blocks": {
+              "costing": {
+                "variables": {
+                  "DCC_bead": {
+                    "value": {
+                      "value": 1,
+                      "bounds": [
+                        0,
+                        null
+                      ]
+                    },
+                    "display_name": "DCC_bead",
+                    "description": "Direct capital cost of beads",
+                    "display_units": "USD_2020",
+                    "indices": [],
+                    "scale_factor": 0,
+                    "to_units": "",
+                    "readonly": false,
+                    "category": ""
+                  },
+                  "DCC_reactor": {
+                    "value": {
+                      "value": 1,
+                      "bounds": [
+                        0,
+                        null
+                      ]
+                    },
+                    "display_name": "DCC_reactor",
+                    "description": "Direct capital cost of reactor",
+                    "display_units": "USD_2020",
+                    "indices": [],
+                    "scale_factor": 0,
+                    "to_units": "",
+                    "readonly": false,
+                    "category": ""
+                  },
+                  "DCC_mixer": {
+                    "value": {
+                      "value": 1,
+                      "bounds": [
+                        0,
+                        null
+                      ]
+                    },
+                    "display_name": "DCC_mixer",
+                    "description": "Direct capital cost of mixer",
+                    "display_units": "USD_2020",
+                    "indices": [],
+                    "scale_factor": 0,
+                    "to_units": "",
+                    "readonly": false,
+                    "category": ""
+                  },
+                  "DCC_vacuum": {
+                    "value": {
+                      "value": 1,
+                      "bounds": [
+                        0,
+                        null
+                      ]
+                    },
+                    "display_name": "DCC_vacuum",
+                    "description": "Direct capital cost of vacuum pump",
+                    "display_units": "USD_2020",
+                    "indices": [],
+                    "scale_factor": 0,
+                    "to_units": "",
+                    "readonly": false,
+                    "category": ""
+                  },
+                  "DCC_membrane": {
+                    "value": {
+                      "value": 1,
+                      "bounds": [
+                        0,
+                        null
+                      ]
+                    },
+                    "display_name": "DCC_membrane",
+                    "description": "Direct capital cost of membrane",
+                    "display_units": "USD_2020",
+                    "indices": [],
+                    "scale_factor": 0,
+                    "to_units": "",
+                    "readonly": false,
+                    "category": ""
+                  }
+                },
+                "blocks": {},
+                "meta": {
+                  "parameters": {}
+                },
+                "display_name": "DCC_membrane",
+                "description": "none"
+              }
+            },
+            "meta": {
+              "parameters": {}
+            },
+            "display_name": "energy_thermal_flow_vol_inlet",
+            "description": "Zero-Order model for a METAB bioreactor"
+          },
+          "metab_methane": {
+            "variables": {
+              "volume": {
+                "value": {
+                  "value": 1,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "volume",
+                "description": "Reactor volume",
+                "display_units": "m<sup>3</sup>",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "hydraulic_retention_time": {
+                "value": {
+                  "value": 15,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "hydraulic_retention_time",
+                "description": "Hydraulic residence time",
+                "display_units": "h",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "electricity": {
+                "value": {
+                  "index": [
+                    [
+                      0
+                    ]
+                  ],
+                  "value": [
+                    1
+                  ],
+                  "bounds": [
+                    [
+                      0,
+                      null
+                    ]
+                  ]
+                },
+                "display_name": "electricity",
+                "description": "Electricity demand of unit",
+                "display_units": "kW",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "heat": {
+                "value": {
+                  "index": [
+                    [
+                      0
+                    ]
+                  ],
+                  "value": [
+                    1
+                  ],
+                  "bounds": [
+                    [
+                      0,
+                      null
+                    ]
+                  ]
+                },
+                "display_name": "heat",
+                "description": "Thermal demand of unit",
+                "display_units": "kW",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "energy_electric_mixer_vol": {
+                "value": {
+                  "value": 0.049875,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "energy_electric_mixer_vol",
+                "description": "Electricity intensity of mixer with respect to reactor volume",
+                "display_units": "kW/m<sup>3</sup>",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "energy_electric_vacuum_flow_vol_byproduct": {
+                "value": {
+                  "value": 1.53,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "energy_electric_vacuum_flow_vol_byproduct",
+                "description": "Electricity intensity of vacuum pump with respect to product gas flow",
+                "display_units": "h kW/kg",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "energy_thermal_flow_vol_inlet": {
+                "value": {
+                  "value": 0,
+                  "bounds": [
+                    0,
+                    null
+                  ]
+                },
+                "display_name": "energy_thermal_flow_vol_inlet",
+                "description": "Thermal energy intensity of reactor with respect to inlet volumetric flowrate",
+                "display_units": "kJ/m<sup>3</sup>",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              }
+            },
+            "blocks": {},
+            "meta": {
+              "parameters": {}
+            },
+            "display_name": "energy_thermal_flow_vol_inlet",
+            "description": "Zero-Order model for a METAB bioreactor"
+          },
+          "costing": {
+            "variables": {
+              "utilization_factor": {
+                "value": {
+                  "value": 0.85,
+                  "bounds": [
+                    null,
+                    null
+                  ]
+                },
+                "display_name": "utilization_factor",
+                "description": "Plant capacity utilization [%]",
+                "display_units": "",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "TIC": {
+                "value": {
+                  "value": 2,
+                  "bounds": [
+                    null,
+                    null
+                  ]
+                },
+                "display_name": "TIC",
+                "description": "Total Installed Cost (TIC)",
+                "display_units": "",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              },
+              "maintenance_costs_percent_FCI": {
+                "value": {
+                  "value": 0.03,
+                  "bounds": [
+                    null,
+                    null
+                  ]
+                },
+                "display_name": "maintenance_costs_percent_FCI",
+                "description": "Maintenance and contingency costs as % FCI",
+                "display_units": "1/a",
+                "indices": [],
+                "scale_factor": 0,
+                "to_units": "",
+                "readonly": false,
+                "category": ""
+              }
+            },
+            "blocks": {},
+            "meta": {
+              "parameters": {}
+            },
+            "display_name": "maintenance_costs_percent_FCI",
+            "description": "Costing block for METAB model"
+          }
+        },
+        "meta": {
+          "parameters": {}
+        },
+        "display_name": "METAB treatment train",
+        "description": "Modular Encapsulated Two-stage Anaerobic Biological model"
+      }
+    },
+    "meta": {
+      "parameters": {}
+    },
+    "id": 1
+}
