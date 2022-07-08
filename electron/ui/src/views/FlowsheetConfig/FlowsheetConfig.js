@@ -207,7 +207,7 @@ export default function FlowsheetConfig() {
       />
       <Snackbar open={openErrorSnackbar} autoHideDuration={3000} onClose={handleErrorSnackbarClose}>
         <Alert onClose={handleErrorSnackbarClose} severity="error">
-          Error: Data Input Infeasible
+          Error: Invalid Data Input
         </Alert>
       </Snackbar>
       </Container>  
