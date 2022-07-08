@@ -24,6 +24,7 @@ async def get_config(flowsheet_id: int):
     try:
         fs = fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
         config = fs.get_flowsheet_json()
+        fs_title = config['blocks']['fs']['display_name']
         return config
     except KeyError:
         raise HTTPException(status_code=404, detail="Flowsheet not found")
@@ -43,8 +44,8 @@ async def get_graph(flowsheet_id: int):
 async def solve(flowsheet_id: int):
     try:
         fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
-        results = fs.solve()
-        return results
+        results, history = fs.solve()
+        return history
     except KeyError:
         raise HTTPException(status_code=404, detail="Flowsheet not found")
 

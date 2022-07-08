@@ -53,6 +53,7 @@ export default function FlowsheetConfig() {
     const [outputData, setOutputData] = useState(null);
     const [openSuccessSaveSnackbar, setOpenSuccessSaveSnackbar] = React.useState(false);
     const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
+    const [historyData, setHistoryData] = useState(null);
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
@@ -108,6 +109,9 @@ export default function FlowsheetConfig() {
 
     const handleSolved = (data) => {
       console.log("handle solved.....",data);
+      console.log('history amount: ', data.length)
+      setHistoryData(data)
+      data = data[data.length - 1]
       setOutputData(data);
       
       if(data.hasOwnProperty("input") && data.input)
@@ -178,8 +182,7 @@ export default function FlowsheetConfig() {
               </ConfigInput>
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-              {/*<div style={{textAlign:"left"}} dangerouslySetInnerHTML={{ __html: outputData}} />*/}
-              <ConfigOutput outputData={outputData} >
+              <ConfigOutput outputData={outputData} historyData={historyData}>
               </ConfigOutput>
             </TabPanel> 
           </Box>
