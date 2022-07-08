@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import NewFlowsheetDialog from "Components/NewFlowsheetDialog/NewFlowsheetDialog"
+import NewFlowsheetDialog from "../components/NewFlowsheetDialog/NewFlowsheetDialog"
 
 
 //mock props

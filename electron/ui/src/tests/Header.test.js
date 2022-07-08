@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import Header from "Components/Boilerplate/Header/Header"
+import Header from "../components/Boilerplate/Header/Header"
 
 //mock props
 

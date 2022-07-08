@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import InputAccordion from "Components/InputAccordion/InputAccordion"
+import InputAccordion from "../components/InputAccordion/InputAccordion"
 
 //mock props
 const key = ""

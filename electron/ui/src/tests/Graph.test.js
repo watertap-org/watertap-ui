@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import Graph from "Components/Graph/Graph"
+import Graph from "../components/Graph/Graph"
 
 //mock props
 

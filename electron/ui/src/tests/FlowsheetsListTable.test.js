@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import FlowsheetsListTable from "Components/FlowsheetsListTable/FlowsheetsListTable"
+import FlowsheetsListTable from "../components/FlowsheetsListTable/FlowsheetsListTable"
 import test_data from '../../../../backend/data/flowsheets/fake/data.json'
 
 
