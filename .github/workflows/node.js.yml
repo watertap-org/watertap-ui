@@ -27,6 +27,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: './electron/package-lock.json'
     # - run: cd electron
     - run: npm ci
     - run: cd ui
