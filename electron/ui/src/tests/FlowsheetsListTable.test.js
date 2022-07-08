@@ -10,6 +10,4 @@ test('test flowsheets list table', () => {
     expect(screen.getByRole('link', {  name: /METAB treatment train/i}))
     expect(screen.getByRole('button', { name: /edit project/i }))
 
-    screen.debug();
-
 })
