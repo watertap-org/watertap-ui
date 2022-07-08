@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import FlowsheetsListTable from "../components/FlowsheetsListTable/FlowsheetsListTable"
 import test_data from '../../../../backend/data/flowsheets/fake/data.json'
-
+import * as React from 'react'
 
 test('test flowsheets list table', () => {
     render( <FlowsheetsListTable rows={[test_data]}/> )

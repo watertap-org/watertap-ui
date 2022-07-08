@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import SolveDialog from "../components/SolveDialog/SolveDialog"
+import * as React from 'react'
 
 //mock props
 const solveDialogOpen = true

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import NewFlowsheetDialog from "../components/NewFlowsheetDialog/NewFlowsheetDialog"
-
+import * as React from 'react'
 
 //mock props
 const open = true

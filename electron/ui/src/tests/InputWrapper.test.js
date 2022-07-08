@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import InputWrapper from "../components/InputWrapper/InputWrapper"
+import * as React from 'react'
 
 //mock props
 const key = "flow_vol"

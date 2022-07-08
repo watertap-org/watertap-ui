@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import Page from "../components/Page/Page"
+import * as React from 'react'
 
 //mock props
 
