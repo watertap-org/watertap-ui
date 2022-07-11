@@ -13,6 +13,7 @@ import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import Alert from '@mui/material/Alert';
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
 import Snackbar from '@mui/material/Snackbar';
+import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
 
 
 function TabPanel(props) {
@@ -175,6 +176,7 @@ export default function FlowsheetConfig() {
             <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
               <Tab label="Input" {...a11yProps(0)} />
               <Tab label="Output" disabled={!outputData} {...a11yProps(1)} /> 
+              <Tab label="Compare" disabled={!outputData} {...a11yProps(2)} /> 
             </Tabs>
             <TabPanel value={tabValue} index={0}>
               <ConfigInput flowsheetData={flowsheetData} 
@@ -184,6 +186,10 @@ export default function FlowsheetConfig() {
             <TabPanel value={tabValue} index={1}>
               <ConfigOutput outputData={outputData} historyData={historyData}>
               </ConfigOutput>
+            </TabPanel> 
+            <TabPanel value={tabValue} index={2}>
+              <ConfigOutputComparisonTable outputData={outputData} historyData={historyData}>
+              </ConfigOutputComparisonTable>
             </TabPanel> 
           </Box>
         </>
