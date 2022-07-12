@@ -153,3 +153,11 @@ export const solve = (id) => {
         resolve(data2);
     });*/
 }; 
+
+export const downloadCSV = (id,data) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/download', {
+        method: 'POST', 
+        mode: 'cors',
+        body: JSON.stringify(data)
+    });
+}
