@@ -75,15 +75,12 @@ class Flowsheet:
         with open(self.solve_path, 'w') as f:
             json.dump(results, f, indent=4)
 
-
         # read in history
         try:
             with open(self.history_path, 'r') as f:
                 history = f.read()
                 history = eval(history.replace('null','None').replace('false','False').replace('true','True'))
         except Exception as e:
-            print('error reading history')
-            print(e)
             history = []
         history.append(results)
         # update history
