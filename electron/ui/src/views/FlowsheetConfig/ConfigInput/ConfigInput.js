@@ -28,10 +28,10 @@ export default function ConfigInput(props) {
  
 
     //separate blocks data into costing or parameters
+    //is this not even used ??
     const splitData = (flowsheetData) => {
         let _costingBlocks = {};
         let _parametersBlocks = {};
-
         try 
         {
             let _inputBlocks = {};
@@ -44,31 +44,14 @@ export default function ConfigInput(props) {
                 {
                     if(varItem.hasOwnProperty("category"))
                     {
-                        
-                        
-                        /*if(varItem.category==="costing")
-                        {
-                            _costingBlocks[key] = b[key];
-                        }
-                        else
-                        {
-                            _parametersBlocks[key] = b[key];
-                        }*/
+
                     }
                 }
                 
             }
-
             console.log("blocks:",_costingBlocks, _parametersBlocks);
             setCostingBlocks(_costingBlocks);
             setParametersBlocks(_parametersBlocks);
-
-            //===========
-            //_costingBlocks.costing.variables.TIC.value.value=9999999999;
-            //console.log("-----22222 blocks:",_costingBlocks);
-            //console.log("-----22222 flowsheetData:",flowsheetData);
-            //===========
-
         }
         catch {
             console.log("Error in split flowsheet data.");
@@ -154,14 +137,6 @@ export default function ConfigInput(props) {
                         <InputAccordion  dataKey={key} data={var_sections[key]}></InputAccordion>
                     </Grid>)
         })
-        // return Object.keys(sectionBlocks).map((key)=>{
-        //     //console.log("key:",key);
-        //     let _key = key + Math.floor(Math.random() * 100001);
-        //     //console.log("_key:",_key);
-        //     return (<Grid item xs={6} key={_key}>
-        //                 <InputAccordion  dataKey={key} data={sectionBlocks[key]}></InputAccordion>
-        //             </Grid>)
-        // })
     };
     
   
@@ -181,8 +156,6 @@ export default function ConfigInput(props) {
                     renderInputAccordions()
                 }
             </Grid>
-
-
 
             <Grid container spacing={2}>
                 <Grid item xs={6}> 

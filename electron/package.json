@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cd ui && react-scripts test",
+    "postinstall": "cd ui && npm install"
   },
   "author": "Abdelrahman Elbashandy",
   "license": "ISC",
@@ -13,7 +14,10 @@
     "electron": "^18.2.3"
   },
   "dependencies": {
+    "@testing-library/cypress": "^8.0.3",
     "axios": "^0.27.2",
-    "dotenv": "^16.0.1"
+    "cypress": "^10.2.0",
+    "dotenv": "^16.0.1",
+    "react-scripts": "^5.0.1"
   }
 }

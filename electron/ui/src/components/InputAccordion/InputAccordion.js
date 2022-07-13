@@ -1,13 +1,10 @@
 import React from 'react'; 
 import {useEffect, useState} from 'react';    
-import Container from '@mui/material/Container';  
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; 
-import TextField from '@mui/material/TextField';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InputWrapper from "../InputWrapper/InputWrapper";
 
 
@@ -25,11 +22,9 @@ export default function InputAccordion(props) {
       setExpanded1(isExpanded ? panel : false);
     };
 
-
     const handleFieldChange = (event) => {
         setValue(event.target.value);
     };
-
 
     const renderFields = () => {
         console.debug("renderFields, data=", data)
@@ -39,22 +34,6 @@ export default function InputAccordion(props) {
         });
     };
 
-    /*
-    const renderFieldsO = () => {
-        return Object.keys(data.variables).map((key)=>{
-            let vItem = data.variables[key];
-            return <TextField id="outlined-basic" 
-                    label={vItem.display_name}
-                    variant="outlined" 
-                    size="small"
-                    value={value}
-                    onChange={handleFieldChange}
-                    fullWidth />
-        });
-    };
-    */
-
-
     return (
         <Accordion expanded={expanded1 === 'panel1'} onChange={handleAccordionChange('panel1')} style={{border:"1px solid #ddd"}}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />} >
@@ -62,7 +41,6 @@ export default function InputAccordion(props) {
         </AccordionSummary>
         <AccordionDetails>
             {/*data.description*/}
-
             <Box
                 component="form"
                 sx={{

@@ -8,14 +8,10 @@ __pycache__/
 
 # node
 node_modules/
-package-lock.json
+# package-lock.json
 
 # C extensions
 *.so
-
-# node
-node_modules/
-package-lock.json
 
 # Distribution / packaging
 .Python
@@ -138,3 +134,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# DS_store
+.DS_store
