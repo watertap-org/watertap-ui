@@ -72,6 +72,29 @@ export default function OutputComparisonTable(props) {
       });
     }
 
+    const renderRows = () => {
+
+
+      return Object.keys(historyData[leftConfigIndex].output).map((category,index)=>{ return ( <Fragment>
+        <TableRow key={category+index}>
+          <TableCell rowSpan={Object.keys(historyData[0].output[category]).length + 1}>
+            <b>{category}</b>
+          </TableCell>
+        </TableRow>
+        {Object.keys(historyData[leftConfigIndex].output[category]).map((metric, index) => { return <TableRow key={metric+index}>
+            <TableCell>{metric}</TableCell>
+            <TableCell>{historyData[leftConfigIndex].output[category][metric][0]+historyData[leftConfigIndex].output[category][metric][1]}</TableCell>
+            <TableCell>{historyData[rightConfigIndex].output[category][metric][0]+historyData[rightConfigIndex].output[category][metric][1]}</TableCell>
+            <TableCell align='right'>
+              {(Math.round((historyData[leftConfigIndex].output[category][metric][0]-historyData[rightConfigIndex].output[category][metric][0]) * 100) / 100).toFixed(2)}</TableCell>
+          </TableRow>
+        })}
+      </Fragment>
+        )
+        })
+    }
+
+
     const renderComparisonTable = () => {
       return <Box>
       <Paper>
@@ -86,22 +109,7 @@ export default function OutputComparisonTable(props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.keys(historyData[leftConfigIndex].output).map((category,index)=>{ return ( <Fragment>
-            <TableRow key={category+index}>
-              <TableCell rowSpan={Object.keys(historyData[0].output[category]).length + 1}>
-                <b>{category}</b>
-              </TableCell>
-            </TableRow>
-            {Object.keys(historyData[leftConfigIndex].output[category]).map((metric, index) => { return <TableRow key={metric+index}>
-                <TableCell>{metric}</TableCell>
-                <TableCell>{historyData[leftConfigIndex].output[category][metric][0]+historyData[leftConfigIndex].output[category][metric][1]}</TableCell>
-                <TableCell>{historyData[rightConfigIndex].output[category][metric][0]+historyData[rightConfigIndex].output[category][metric][1]}</TableCell>
-                <TableCell>{Math.round((historyData[leftConfigIndex].output[category][metric][0]-historyData[rightConfigIndex].output[category][metric][0]) * 100) / 100}</TableCell>
-              </TableRow>
-            })}
-          </Fragment>
-            )
-        })}
+            {renderRows()}
           </TableBody>
         </Table>
       </Paper>
