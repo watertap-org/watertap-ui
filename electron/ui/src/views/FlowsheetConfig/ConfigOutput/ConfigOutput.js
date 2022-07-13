@@ -11,15 +11,18 @@ import Alert from '@mui/material/Alert';
 
 
 export default function ConfigOutput(props) {
-    const { outputData } = props;   
+    const { outputData, historyData } = props;
+
 
     useEffect(()=>{   
-         
+        // console.log(outputData)
     }, [outputData]);
- 
+
+
+
     // renders the data in output accordions
     const renderFields = (fieldData) => {
-        console.log("F:",fieldData);
+        // console.log("F:",fieldData);
         return Object.keys(fieldData).map((key)=>{ 
             let _key = key + Math.floor(Math.random() * 100001); 
             return (<div key={_key}>

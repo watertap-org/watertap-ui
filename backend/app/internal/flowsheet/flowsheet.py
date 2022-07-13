@@ -14,6 +14,7 @@ class Flowsheet:
         self.data_path = None
         self.graph_path = None
         self.solve_path = None
+        self.history_path = None
 
         self.prepare_env()
         self.build()
@@ -42,6 +43,7 @@ class Flowsheet:
         self.data_path = os.path.join(self.data_dir, 'data.json')
         self.graph_path = os.path.join(self.data_dir, 'graph.png')
         self.solve_path = os.path.join(self.data_dir, 'solve.txt')
+        self.history_path = os.path.join(self.data_dir, 'history.json')
 
     def build(self):
         self.flowsheet_interface.run_action(WorkflowActions.build)
@@ -72,8 +74,20 @@ class Flowsheet:
         results = dict(input=input_dict, output=output_dict, id=self.id)
         with open(self.solve_path, 'w') as f:
             json.dump(results, f, indent=4)
+
+        # read in history
+        try:
+            with open(self.history_path, 'r') as f:
+                history = f.read()
+                history = eval(history.replace('null','None').replace('false','False').replace('true','True'))
+        except Exception as e:
+            history = []
+        history.append(results)
+        # update history
+        with open(self.history_path, 'w') as f:
+            json.dump(history, f, indent=4)
      
-        return results 
+        return results, history 
 
     def reset(self):
         self.flowsheet_interface.clear_action(WorkflowActions.build)

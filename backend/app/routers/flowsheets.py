@@ -1,6 +1,8 @@
 import io
+import os
 from fastapi import Request, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse
 
 from app.internal.flowsheet.flowsheet_interfaces_handler import (
     flowsheet_interfaces_handler,
@@ -24,6 +26,7 @@ async def get_config(flowsheet_id: int):
     try:
         fs = fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
         config = fs.get_flowsheet_json()
+        fs_title = config['blocks']['fs']['display_name']
         return config
     except KeyError:
         raise HTTPException(status_code=404, detail="Flowsheet not found")
@@ -43,8 +46,8 @@ async def get_graph(flowsheet_id: int):
 async def solve(flowsheet_id: int):
     try:
         fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
-        results = fs.solve()
-        return results
+        results, history = fs.solve()
+        return history
     except KeyError:
         raise HTTPException(status_code=404, detail="Flowsheet not found")
 
@@ -66,5 +69,27 @@ async def update(flowsheet_id: int, request: Request):
         updated_fs_config = await request.json()
         updated_fs_config = fs.update(updated_fs_config)
         return updated_fs_config
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Flowsheet not found")
+
+@router.post("/{flowsheet_id}/download")
+async def download(flowsheet_id: int, request: Request):
+    try:
+        fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
+        data = await request.json()
+        data1 = data[0]['output']
+        data2 = data[1]['output']
+        outputText = 'Category, Metric, Configuration 1, Configuration 2, Value Difference\n'
+        for category in data1:
+            for metric in data1[category]:
+                value1 = str(data1[category][metric][0])+data1[category][metric][1]
+                value2 = str(data2[category][metric][0])+data2[category][metric][1]
+                difference = round(data1[category][metric][0]-data2[category][metric][0],2)
+                nextLine = '{}, {}, {}, {}, {}\n'.format(category,metric,value1,value2,difference)
+                outputText += nextLine
+        filePath = os.path.join(fs.data_dir, 'comparison_results.csv')
+        with open(filePath, 'w') as f:
+            f.write(outputText)
+        return FileResponse(filePath)
     except KeyError:
         raise HTTPException(status_code=404, detail="Flowsheet not found")

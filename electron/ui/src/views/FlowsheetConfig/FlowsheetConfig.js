@@ -1,6 +1,6 @@
 //import './Page.css';
 import React from 'react'; 
-import {useEffect, useState, useContext} from 'react';   
+import {useEffect, useState } from 'react';   
 import { useParams } from "react-router-dom";
 import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
 import Container from '@mui/material/Container';
@@ -13,6 +13,7 @@ import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import Alert from '@mui/material/Alert';
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
 import Snackbar from '@mui/material/Snackbar';
+import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
 
 
 function TabPanel(props) {
@@ -53,6 +54,7 @@ export default function FlowsheetConfig() {
     const [outputData, setOutputData] = useState(null);
     const [openSuccessSaveSnackbar, setOpenSuccessSaveSnackbar] = React.useState(false);
     const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
+    const [historyData, setHistoryData] = useState(null);
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
@@ -108,6 +110,9 @@ export default function FlowsheetConfig() {
 
     const handleSolved = (data) => {
       console.log("handle solved.....",data);
+      console.log('history amount: ', data.length)
+      setHistoryData(data)
+      data = data[data.length - 1]
       setOutputData(data);
       
       if(data.hasOwnProperty("input") && data.input)
@@ -171,6 +176,7 @@ export default function FlowsheetConfig() {
             <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
               <Tab label="Input" {...a11yProps(0)} />
               <Tab label="Output" disabled={!outputData} {...a11yProps(1)} /> 
+              <Tab label="Compare" disabled={!outputData} {...a11yProps(2)} /> 
             </Tabs>
             <TabPanel value={tabValue} index={0}>
               <ConfigInput flowsheetData={flowsheetData} 
@@ -178,9 +184,12 @@ export default function FlowsheetConfig() {
               </ConfigInput>
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-              {/*<div style={{textAlign:"left"}} dangerouslySetInnerHTML={{ __html: outputData}} />*/}
-              <ConfigOutput outputData={outputData} >
+              <ConfigOutput outputData={outputData} historyData={historyData}>
               </ConfigOutput>
+            </TabPanel> 
+            <TabPanel value={tabValue} index={2}>
+              <ConfigOutputComparisonTable outputData={outputData} historyData={historyData}>
+              </ConfigOutputComparisonTable>
             </TabPanel> 
           </Box>
         </>
