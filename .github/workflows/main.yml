@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  component & e2e testing:
+  component_e2e_testing:
 
     runs-on: ubuntu-latest
 
