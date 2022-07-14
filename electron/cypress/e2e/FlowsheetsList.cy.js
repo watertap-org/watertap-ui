@@ -15,6 +15,7 @@ describe('flowsheetslist', () => {
         cy.findByRole('columnheader', {  name: /last run/i})
         cy.findByRole('columnheader', {  name: /created/i})
         
+        cy.screenshot('end-test1')
     })
 
     it('test new flowsheet button', () => {
@@ -51,5 +52,6 @@ describe('flowsheetslist', () => {
         // click cancel button
         cy.findByRole('button', {  name: /cancel/i})
 
+        cy.screenshot('end-test2')
     })
 })
