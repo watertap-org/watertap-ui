@@ -38,6 +38,7 @@ jobs:
         run: |
           npm ci
           npm test
+
       # set up python
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -80,7 +81,7 @@ jobs:
         run: npx cypress run
 
       # upload screenshots & videos on failure
-      - name: Upload artifact for screenshots & videos
+      - name: Upload artifact for screenshots & videos on failure
         uses: actions/upload-artifact@v3
         if: failure()
         with:
