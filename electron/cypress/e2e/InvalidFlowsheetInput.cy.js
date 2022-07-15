@@ -3,7 +3,7 @@ describe('Invalid Input Test', () => {
         //load webpage
         cy.visit('/')
         cy.screenshot('loaded homepage')
-        
+
         //click example ro flowsheet
         cy.findByRole('link', {  name: /example ro flowsheet/i}).click()
 
@@ -19,6 +19,9 @@ describe('Invalid Input Test', () => {
 
         //click on solve
         cy.findAllByRole('button', {  name: /solve/i}).eq(0).click()
+
+        //wait .5 seconds to ensure alert pops up
+        cy.wait(500)
 
         //find error message
         cy.findByRole('alert')
