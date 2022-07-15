@@ -52,9 +52,10 @@ export default function FlowsheetConfig() {
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
     const [outputData, setOutputData] = useState(null);
-    const [openSuccessSaveSnackbar, setOpenSuccessSaveSnackbar] = React.useState(false);
-    const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
     const [historyData, setHistoryData] = useState(null);
+    const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
+    const [openErrorMessage, setOpenErrorMessage] = useState(false);
+
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
@@ -127,7 +128,7 @@ export default function FlowsheetConfig() {
     const handleError = () => {
       console.log("handle error");
       
-      setOpenErrorSnackbar(true);
+      setOpenErrorMessage(true);
       setSolveDialogOpen(false);
     };
 
@@ -137,17 +138,17 @@ export default function FlowsheetConfig() {
       .then(response => response.json())
       .then((data)=>{
         console.log("new Flowsheet Data:", data); 
-        setOpenSuccessSaveSnackbar(true);
+        setOpenSuccessSaveConfirmation(true);
       });
     };
 
 
-    const handleSuccessSaveSnackbarClose = () => {
-      setOpenSuccessSaveSnackbar(false);
+    const handleSuccessSaveConfirmationClose = () => {
+      setOpenSuccessSaveConfirmation(false);
     };
 
-    const handleErrorSnackbarClose = () => {
-      setOpenErrorSnackbar(false);
+    const handleErrorClose = () => {
+      setOpenErrorMessage(false);
     };
 
     const handleReset = () => {
@@ -203,19 +204,13 @@ export default function FlowsheetConfig() {
       }  
       <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id}></SolveDialog>
       <Snackbar
-        open={openSuccessSaveSnackbar}
+        open={openSuccessSaveConfirmation}
         autoHideDuration={2000} 
-        onClose={handleSuccessSaveSnackbarClose}
+        onClose={handleSuccessSaveConfirmationClose}
         message="Changes saved!" 
       />
-      <Snackbar
-        open={openSuccessSaveSnackbar}
-        autoHideDuration={2000} 
-        onClose={handleSuccessSaveSnackbarClose}
-        message="Changes saved!" 
-      />
-      <Snackbar open={openErrorSnackbar} autoHideDuration={3000} onClose={handleErrorSnackbarClose}>
-        <Alert onClose={handleErrorSnackbarClose} severity="error">
+      <Snackbar open={openErrorMessage} autoHideDuration={3000} onClose={handleErrorClose}>
+        <Alert onClose={handleErrorClose} severity="error">
           Error: Invalid Data Input
         </Alert>
       </Snackbar>
