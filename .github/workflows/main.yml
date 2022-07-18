@@ -2,9 +2,7 @@ name: Run App Tests
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   component_e2e_testing:
