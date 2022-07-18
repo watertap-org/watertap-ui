@@ -1,4 +1,4 @@
-name: Run App Tests
+name: App Tests
 
 on:
   push:
@@ -24,14 +24,15 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './electron/ui/package-lock.json'
 
+      # install node packages using a clean install for a deterministic, repeatable build
       - name: install electron
         working-directory: ./electron
-        run: npm ci
+        run: npm clean-install
 
       - name: npm install & test
         working-directory: ./electron/ui
         run: |
-          npm ci
+          npm clean-install
           npm test
 
       - name: Set up Python
