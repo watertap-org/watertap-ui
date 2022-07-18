@@ -78,19 +78,9 @@ jobs:
         working-directory: electron
         run: npx cypress run
 
-      # upload screenshots & videos on failure
-      - name: Upload artifact for screenshots & videos on failure
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-            name: cypress_results
-            path: |
-              electron/cypress/screenshots/
-              electron/cypress/videos/
-
-      # upload screenshots & videos
       - name: Upload artifact for screenshots & videos
         uses: actions/upload-artifact@v3
+        if: always()
         with:
             name: cypress_results
             path: |
