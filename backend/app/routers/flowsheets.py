@@ -82,10 +82,13 @@ async def download(flowsheet_id: int, request: Request):
         outputText = 'Category, Metric, Configuration 1, Configuration 2, Value Difference\n'
         for category in data1:
             for metric in data1[category]:
-                value1 = str(data1[category][metric][0])+data1[category][metric][1]
-                value2 = str(data2[category][metric][0])+data2[category][metric][1]
-                difference = round(data1[category][metric][0]-data2[category][metric][0],2)
-                nextLine = '{}, {}, {}, {}, {}\n'.format(category,metric,value1,value2,difference)
+                unit1 = data1[category][metric][1]
+                unit2 = data2[category][metric][1]
+                value1 = data1[category][metric][0]
+                value2 = data2[category][metric][0]
+                difference = round(value1-value2,2)
+
+                nextLine = '{}, {}, {}, {}, {}\n'.format(category,metric,'{} {}'.format(value1,unit1),'{} {}'.format(value2,unit2),difference)
                 outputText += nextLine
         filePath = os.path.join(fs.data_dir, 'comparison_results.csv')
         with open(filePath, 'w') as f:

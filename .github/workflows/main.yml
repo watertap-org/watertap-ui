@@ -17,7 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # set up node
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -25,19 +24,16 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './electron/ui/package-lock.json'
 
-      # install electron
       - name: install electron
         working-directory: ./electron
         run: npm ci
 
-      # install frontend and test
       - name: npm install & test
         working-directory: ./electron/ui
         run: |
           npm ci
           npm test
 
-      # set up python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -46,34 +42,29 @@ jobs:
           cache: 'pip'
           cache-dependency-path: './backend/requirements.txt'  
 
-      # install backend
       - name: install backend
         working-directory: backend
         run: pip install -r requirements.txt
 
-      # clone & install watertap
       - name: clone & install watertap
         run: |
           git clone https://github.com/watertap-org/watertap.git
           cd watertap
           git checkout workshop_tutorial
           pip install .
-      # get idaes extensions
+
       - name: get idaes extensions
         working-directory: backend/app
         run: idaes get-extensions
 
-      # run backend server
       - name: run backend server
         working-directory: backend/app
         run: uvicorn main:app --reload --host 0.0.0.0 --port 8001 &
 
-      # run frontend server
       - name: run frontend
         working-directory: electron/ui
         run: npm start &
 
-      # run cypress tests
       - name: Cypress e2e tests
         working-directory: electron
         run: npx cypress run
