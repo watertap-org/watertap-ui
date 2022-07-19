@@ -137,3 +137,7 @@ dmypy.json
 
 # DS_store
 .DS_store
+
+# cypress logs
+screenshots/
+videos/
