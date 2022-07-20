@@ -19,7 +19,8 @@ export default function ConfigOutput(props) {
     let params = useParams(); 
     const { outputData, historyData } = props;
     const [ configName, setConfigName ] = useState("Configuration #"+props.historyData.length)
-    const [openSaveConfig, setOpenSaveConfig] = React.useState(false);
+    const [ openSaveConfig, setOpenSaveConfig ] = React.useState(false);
+    const [ saved, setSaved ] = React.useState(false);
 
     const handleOpenSaveConfig = () => setOpenSaveConfig(true);
     const handleCloseSaveConfig = () => setOpenSaveConfig(false);
@@ -52,6 +53,7 @@ export default function ConfigOutput(props) {
             console.log('successfully saved config')
             historyData[historyData.length-1]['name'] = configName
             handleCloseSaveConfig()
+            setSaved(true)
         })
         .catch((e) => {
             console.log('error saving config')
@@ -118,9 +120,9 @@ export default function ConfigOutput(props) {
                 renderOutputAccordions()
             }
             <Grid item xs={12}> 
-                <Button onClick={handleOpenSaveConfig}>
+                <Button disabled={saved ? true : false} onClick={handleOpenSaveConfig}>
                     Save Configuration
-                </Button>
+                </Button> 
                 <Modal
                     open={openSaveConfig}
                     onClose={handleCloseSaveConfig}
@@ -148,9 +150,6 @@ export default function ConfigOutput(props) {
             </Grid>
             </Grid>
         </>
-         
-      
     );
-  
 }
  
