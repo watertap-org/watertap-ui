@@ -1,6 +1,7 @@
  
 import React from 'react'; 
 import {useEffect, useState, useContext} from 'react';
+import { useParams } from "react-router-dom";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Accordion from '@mui/material/Accordion';
@@ -8,17 +9,36 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';  
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { saveConfig }  from '../../../services/output.service.js'
 
 
 export default function ConfigOutput(props) {
+    let params = useParams(); 
     const { outputData, historyData } = props;
+    const [ configName, setConfigName ] = useState("Configuration #"+props.historyData.length)
 
 
     useEffect(()=>{   
         // console.log(outputData)
     }, [outputData]);
 
+    const handleChangeConfigName = (event) => {
+        setConfigName(event.target.value)
+    }
 
+    const handleSaveConfig = () => {
+        saveConfig(params.id,configName)
+        .then(response => response.json())
+        .then((data)=>{
+            console.log('successfully saved config')
+            historyData[historyData.length-1]['name'] = configName
+        })
+        .catch((e) => {
+            console.log('error saving config')
+        });
+    }
 
     // renders the data in output accordions
     const renderFields = (fieldData) => {
@@ -78,6 +98,19 @@ export default function ConfigOutput(props) {
             {   
                 renderOutputAccordions()
             }
+            <Grid item xs={12}> 
+                <TextField
+                    required
+                    variant="standard"
+                    id="margin-none"
+                    label="Config Name"
+                    value={configName}
+                    onChange={handleChangeConfigName}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <Button onClick={handleSaveConfig}>Save Configuration</Button>
+            </Grid>
             </Grid>
         </>
          

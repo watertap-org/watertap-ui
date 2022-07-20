@@ -1,5 +1,6 @@
 import io
 import os
+import json
 from fastapi import Request, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
@@ -26,7 +27,6 @@ async def get_config(flowsheet_id: int):
     try:
         fs = fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
         config = fs.get_flowsheet_json()
-        fs_title = config['blocks']['fs']['display_name']
         return config
     except KeyError:
         raise HTTPException(status_code=404, detail="Flowsheet not found")
@@ -69,6 +69,16 @@ async def update(flowsheet_id: int, request: Request):
         updated_fs_config = await request.json()
         updated_fs_config = fs.update(updated_fs_config)
         return updated_fs_config
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Flowsheet not found")
+
+@router.post("/{flowsheet_id}/saveConfig")
+async def save_config(flowsheet_id: int, request: Request):
+    try:
+        fs = flowsheet_interfaces_handler.get_interface(flowsheet_id)
+        configName = await request.json()
+        history = fs.save_config(configName)
+        return history
     except KeyError:
         raise HTTPException(status_code=404, detail="Flowsheet not found")
 

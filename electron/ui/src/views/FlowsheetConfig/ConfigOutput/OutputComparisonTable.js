@@ -36,9 +36,6 @@ export default function OutputComparisonTable(props) {
       setRightConfigIndex(event.target.value)
     }
 
-    // const handleChangeDense = (event) => {
-    //     setDense(event.target.checked);
-    // };
 
     const renderConfigurationSelect = (index) => {
         return <FormControl >
@@ -52,7 +49,7 @@ export default function OutputComparisonTable(props) {
                 variant='standard'
             >
                 {historyData.map((value, index) => {
-                    return <MenuItem key={value+index} value={index}>{index===historyData.length-1 ? 'Most recent result' : 'Configuration #'+(index+1)}</MenuItem>
+                    return <MenuItem key={value+index} value={index}>{historyData[index].name}</MenuItem>
                 })}
             </Select>
         </FormControl>
@@ -96,7 +93,7 @@ export default function OutputComparisonTable(props) {
 
 
     const renderComparisonTable = () => {
-      return <Box>
+      return <Grid item xs={12}>
       <Paper>
         <Table style={{border:"1px solid #ddd"}} size={dense ? 'small' : 'medium'}>
           <TableHead>
@@ -114,13 +111,9 @@ export default function OutputComparisonTable(props) {
         </Table>
       </Paper>
       <Grid item xs={12}>
-      {/* <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      /> */}
       <Button variant="text" startIcon={<DownloadIcon />} onClick={downloadSheet}>Download Results</Button>
       </Grid>
-      </Box>
+      </Grid>
     }
 
   return (

@@ -79,12 +79,14 @@ class Flowsheet:
         try:
             with open(self.history_path, 'r') as f:
                 history = json.load(f)
-        except Exception as e:
+        except:
             history = []
+        results['name'] = "Most Recent Configuration"
         history.append(results)
-        # update history
-        with open(self.history_path, 'w') as f:
-            json.dump(history, f, indent=4)
+
+        # don't automatically update history
+        # with open(self.history_path, 'w') as f:
+        #     json.dump(history, f, indent=4)
      
         return results, history 
 
@@ -119,3 +121,25 @@ class Flowsheet:
 
     def get_graph(self):
         return self.graph
+
+    def save_config(self, configName):
+        # get current config
+        try:
+            with open(self.solve_path, 'r') as f:
+                current_config = json.load(f)
+        except:
+            print('error getting config')
+        current_config['name'] = configName
+        # read in history
+        try:
+            with open(self.history_path, 'r') as f:
+                history = json.load(f)
+        except:
+            history = []
+        history.append(current_config)
+
+        # update history
+        with open(self.history_path, 'w') as f:
+            json.dump(history, f, indent=4)
+     
+        return history 
