@@ -78,8 +78,7 @@ class Flowsheet:
         # read in history
         try:
             with open(self.history_path, 'r') as f:
-                history = f.read()
-                history = eval(history.replace('null','None').replace('false','False').replace('true','True'))
+                history = json.load(f)
         except Exception as e:
             history = []
         history.append(results)

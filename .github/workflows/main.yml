@@ -1,0 +1,80 @@
+name: App Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  component_e2e_testing:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        python-version: ['3.x' ]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: './electron/ui/package-lock.json'
+
+      # install node packages using a clean install for a deterministic, repeatable build
+      - name: install electron
+        working-directory: ./electron
+        run: npm clean-install
+
+      - name: npm install & test
+        working-directory: ./electron/ui
+        run: |
+          npm clean-install
+          npm test
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+          cache: 'pip'
+          cache-dependency-path: './backend/requirements.txt'  
+
+      - name: install backend
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: clone & install watertap
+        run: |
+          git clone https://github.com/watertap-org/watertap.git
+          cd watertap
+          git checkout workshop_tutorial
+          pip install .
+
+      - name: get idaes extensions
+        working-directory: backend/app
+        run: idaes get-extensions
+
+      - name: run backend server
+        working-directory: backend/app
+        run: uvicorn main:app --reload --host 0.0.0.0 --port 8001 &
+
+      - name: run frontend
+        working-directory: electron/ui
+        run: npm start &
+
+      - name: Cypress e2e tests
+        working-directory: electron
+        run: npx cypress run
+
+      - name: Upload artifact for screenshots & videos
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+            name: cypress_results
+            path: |
+              electron/cypress/screenshots/
+              electron/cypress/videos/
