@@ -126,9 +126,11 @@ export default function OutputComparisonTable(props) {
   return (
 
         <Grid container spacing={0} alignItems="flex-start"> 
+          <Grid item xs={12}>
             {   
                 renderComparisonTable()
             }
+        </Grid>
         </Grid>
       
   );
