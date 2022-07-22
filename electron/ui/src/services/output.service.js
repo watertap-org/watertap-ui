@@ -161,3 +161,11 @@ export const downloadCSV = (id,data) => {
         body: JSON.stringify(data)
     });
 }
+
+export const saveConfig = (id,data) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/saveConfig', {
+        method: 'POST', 
+        mode: 'cors',
+        body: JSON.stringify(data)
+    });
+}
