@@ -12,13 +12,12 @@ describe('Invalid Input Test', () => {
         recovery_textbox.click({force:true})
         recovery_textbox = cy.get('#outlined-basicRecovery')
         recovery_textbox.clear()
-        recovery_textbox.type('{backspace}{backspace}{backspace}-10')
-        cy.screenshot('negative, invalid input')
+        recovery_textbox = cy.get('#outlined-basicRecovery')
+        recovery_textbox.type('{backspace}{backspace}{backspace}-10',{force:true})
 
         //click on save
         cy.findAllByRole('button', {  name: /save/i}).eq(0).click()
         cy.wait(500)
-        cy.screenshot('saved')
 
         // for some reason it only works when I do this twice
         //enter negative value for recovery rate
@@ -26,13 +25,14 @@ describe('Invalid Input Test', () => {
         recovery_textbox.click({force:true})
         recovery_textbox = cy.get('#outlined-basicRecovery')
         recovery_textbox.clear()
-        recovery_textbox.type('{backspace}{backspace}{backspace}-10')
-        cy.screenshot('negative, invalid input2')
+        recovery_textbox = cy.get('#outlined-basicRecovery')
+        recovery_textbox.type('{backspace}{backspace}{backspace}-10',{force:true})
+        cy.screenshot('negative, invalid input')
 
         //click on save
         cy.findAllByRole('button', {  name: /save/i}).eq(0).click()
         cy.wait(500)
-        cy.screenshot('saved2')
+        cy.screenshot('saved')
 
         //click on solve
         cy.findAllByRole('button', {  name: /solve/i}).eq(0).click()
