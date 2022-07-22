@@ -139,6 +139,7 @@ export default function ConfigOutput(props) {
                                 value={configName}
                                 onChange={handleChangeConfigName}
                                 fullWidth
+                                className="modal-save-config"
                             />
                         </Grid>
                         <Grid item xs={8}></Grid>
