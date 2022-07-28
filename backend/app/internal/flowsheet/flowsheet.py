@@ -2,6 +2,7 @@ import os
 import app
 import json
 import shutil
+import datetime
 
 from watertap.ui.api import WorkflowActions
 
@@ -49,7 +50,10 @@ class Flowsheet:
         self.flowsheet_interface.run_action(WorkflowActions.build)
         self.flowsheet_interface_json = self.flowsheet_interface.dict()
         self.flowsheet_interface_json['id'] = self.id
-
+        try:
+            self.flowsheet_interface_json['lastRun'] = datetime.datetime.fromtimestamp(os.path.getmtime(self.history_path)).strftime('%Y-%m-%d %H:%M:%S')
+        except:
+            self.flowsheet_interface_json['lastRun'] = ""
     def update(self, flowsheet_config):
         self.flowsheet_interface.update(flowsheet_config)
         self.flowsheet_interface_json = self.flowsheet_interface.dict()
@@ -130,6 +134,7 @@ class Flowsheet:
         except:
             print('error getting config')
         current_config['name'] = configName
+        current_config['date'] = str(datetime.datetime.now()).split('.')[0]
         # read in history
         try:
             with open(self.history_path, 'r') as f:

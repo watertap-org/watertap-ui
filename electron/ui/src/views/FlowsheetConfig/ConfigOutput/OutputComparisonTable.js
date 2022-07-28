@@ -98,11 +98,11 @@ export default function OutputComparisonTable(props) {
         <Table style={{border:"1px solid #ddd"}} size={dense ? 'small' : 'medium'}>
           <TableHead>
             <TableRow key="tablehead">
-              <TableCell></TableCell>
-              <TableCell>Metric</TableCell>
-              <TableCell>{renderConfigurationSelect(0)}</TableCell>
-              <TableCell>{renderConfigurationSelect(1)}</TableCell>
-              <TableCell>Value Difference</TableCell>
+              <TableCell style={{ width: '15%' }}></TableCell>
+              <TableCell style={{ width: '20%' }}>Metric</TableCell>
+              <TableCell style={{ width: '25%' }}>{renderConfigurationSelect(0)}</TableCell>
+              <TableCell style={{ width: '25%' }}>{renderConfigurationSelect(1)}</TableCell>
+              <TableCell style={{ width: '15%' }}>Value Difference</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
