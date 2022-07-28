@@ -120,7 +120,7 @@ export default function ConfigOutput(props) {
                 renderOutputAccordions()
             }
             <Grid item xs={12}> 
-                <Button disabled={saved ? true : false} onClick={handleOpenSaveConfig}>
+                <Button disabled={saved ? true : false} variant="contained" onClick={handleOpenSaveConfig}>
                     Save Configuration
                 </Button> 
                 <Modal
