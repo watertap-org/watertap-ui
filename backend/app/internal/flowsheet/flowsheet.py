@@ -3,24 +3,24 @@ import app
 import json
 import shutil
 
-from watertap.ui.api import WorkflowActions
+from watertap.ui.api import WorkflowActions, FlowsheetInterface
 
 class Flowsheet:
-    def __init__(self, id: int, flowsheet_interface) -> None:
+    def __init__(self, id: int, flowsheet_interface: FlowsheetInterface) -> None:
         self.id = id
         self.flowsheet_interface = flowsheet_interface
         self.flowsheet_interface_json = None
-        self.default_data_path = None
+        #self.default_data_path = None
         self.data_path = None
         self.graph_path = None
         self.solve_path = None
         self.history_path = None
 
         self.prepare_env()
-        self.build()
-        self._save_default_flowsheet()
+        #self.build()
+        #self._save_default_flowsheet()
 
-        self.default_data = self.load_json(self.default_data_path)
+        #self.default_data = self.load_json(self.default_data_path)
         self.data = self.load_json(self.data_path)
         self.graph = self.load_graph(self.graph_path)
         self._cached_output = {}
@@ -39,7 +39,7 @@ class Flowsheet:
                 os.path.join(self.data_dir, 'graph.png') # dst
                 )
 
-        self.default_data_path = os.path.join(self.data_dir, 'default_data.json')
+        #self.default_data_path = os.path.join(self.data_dir, 'default_data.json')
         self.data_path = os.path.join(self.data_dir, 'data.json')
         self.graph_path = os.path.join(self.data_dir, 'graph.png')
         self.solve_path = os.path.join(self.data_dir, 'solve.txt')
@@ -115,7 +115,12 @@ class Flowsheet:
             return f.read()
 
     def get_flowsheet_json(self):
+        if self.flowsheet_interface_json is None:
+            self.build()
         return self.flowsheet_interface_json
+
+    def get_flowsheet_name(self):
+        return self.flowsheet_interface.name
 
     def get_graph(self):
         return self.graph

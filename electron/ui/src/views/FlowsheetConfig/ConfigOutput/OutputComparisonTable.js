@@ -59,7 +59,8 @@ export default function OutputComparisonTable(props) {
     }
 
     const downloadSheet = () => {
-      downloadCSV(params.id, [historyData[leftConfigIndex],historyData[rightConfigIndex]])
+        let merged_data = [historyData[leftConfigIndex],historyData[rightConfigIndex]]
+      downloadCSV(params.id, merged_data)
       .then(response => response.blob())
       .then((data)=>{
         const href = window.URL.createObjectURL(data);

@@ -58,18 +58,21 @@ export default function FlowsheetConfig() {
 
 
     useEffect(()=>{ 
-      //console.log("params.id",params.id);
+      console.log("params.id",params.id);
       if( !params.hasOwnProperty("id") || !params.id)
         return;
 
       getFlowsheet(params.id)
-      .then(response => response.json())
-      .then((data)=>{
-        console.log("Flowsheet Data:", data);
-        setFlowsheetData(data);
-        setTitle(getTitle(data)); 
-      });
-    }, [params.id]);
+       .then(response => {
+           console.debug("response:", response)
+           return response.json()
+       })
+       .then((data) => {
+           console.debug("Flowsheet Data:", data)
+           setFlowsheetData(data)
+           setTitle(getTitle(data))
+      })
+    }, [params.id])
 
 
     const handleTabChange = (event, newValue) => {
