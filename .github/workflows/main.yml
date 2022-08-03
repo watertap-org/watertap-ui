@@ -2,7 +2,15 @@ name: App Tests
 
 on:
   push:
+    branches:
+      - main
+      - rel_*
   pull_request:
+
+defaults:
+  run:
+    # -l: use login shell (required when using Conda)
+    shell: bash -l {0}
 
 jobs:
   component_e2e_testing:
@@ -11,6 +19,7 @@ jobs:
     runs-on: ${{ matrix.os-version }}
 
     strategy:
+      fail-fast: false
       matrix:
         os:
           - linux
