@@ -22,15 +22,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          cache-dependency-path: './electron/ui/package-lock.json'
+          cache-dependency-path: './electron/package-lock.json'
 
       # install node packages using a clean install for a deterministic, repeatable build
       - name: install electron
         working-directory: ./electron
-        run: npm clean-install
-
-      - name: npm install & test
-        working-directory: ./electron/ui
         run: |
           npm clean-install
           npm test
