@@ -16,9 +16,7 @@ export default function FlowsheetsListTable(props) {
             <TableHead>
             <TableRow>
                 <TableCell>Name</TableCell>
-                <TableCell>Treatment Train</TableCell>
                 <TableCell>Last Run</TableCell> 
-                <TableCell>Created</TableCell>
                 <TableCell></TableCell>
             </TableRow>
             </TableHead>
@@ -31,9 +29,7 @@ export default function FlowsheetsListTable(props) {
                 <TableCell>
                     <a href={"/flowsheet/" + row.id + "/config"}>{row.blocks.fs.display_name}</a>
                 </TableCell>
-                <TableCell>{row.train}</TableCell>
                 <TableCell>{row.lastRun}</TableCell>
-                <TableCell>{row.created}</TableCell>
                 <TableCell>
                     <IconButton color="primary" aria-label="Edit project">
                         <SettingsIcon />

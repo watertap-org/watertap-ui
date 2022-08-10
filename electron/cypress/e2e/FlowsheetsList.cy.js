@@ -11,9 +11,7 @@ describe('flowsheetslist', () => {
 
         //locate table headers
         cy.findByRole('columnheader', {  name: /name/i})
-        cy.findByRole('columnheader', {  name: /treatment train/i})
         cy.findByRole('columnheader', {  name: /last run/i})
-        cy.findByRole('columnheader', {  name: /created/i})
         
         cy.screenshot('end-test1')
     })

@@ -2,6 +2,7 @@ import os
 import app
 import json
 import shutil
+import datetime
 
 from watertap.ui.api import WorkflowActions
 
@@ -49,7 +50,10 @@ class Flowsheet:
         self.flowsheet_interface.run_action(WorkflowActions.build)
         self.flowsheet_interface_json = self.flowsheet_interface.dict()
         self.flowsheet_interface_json['id'] = self.id
-
+        try:
+            self.flowsheet_interface_json['lastRun'] = datetime.datetime.fromtimestamp(os.path.getmtime(self.history_path)).strftime('%Y-%m-%d %H:%M:%S')
+        except:
+            self.flowsheet_interface_json['lastRun'] = ""
     def update(self, flowsheet_config):
         self.flowsheet_interface.update(flowsheet_config)
         self.flowsheet_interface_json = self.flowsheet_interface.dict()
@@ -79,12 +83,14 @@ class Flowsheet:
         try:
             with open(self.history_path, 'r') as f:
                 history = json.load(f)
-        except Exception as e:
+        except:
             history = []
+        results['name'] = "Most Recent Configuration"
         history.append(results)
-        # update history
-        with open(self.history_path, 'w') as f:
-            json.dump(history, f, indent=4)
+
+        # don't automatically update history
+        # with open(self.history_path, 'w') as f:
+        #     json.dump(history, f, indent=4)
      
         return results, history 
 
@@ -119,3 +125,26 @@ class Flowsheet:
 
     def get_graph(self):
         return self.graph
+
+    def save_config(self, configName):
+        # get current config
+        try:
+            with open(self.solve_path, 'r') as f:
+                current_config = json.load(f)
+        except:
+            print('error getting config')
+        current_config['name'] = configName
+        current_config['date'] = str(datetime.datetime.now()).split('.')[0]
+        # read in history
+        try:
+            with open(self.history_path, 'r') as f:
+                history = json.load(f)
+        except:
+            history = []
+        history.append(current_config)
+
+        # update history
+        with open(self.history_path, 'w') as f:
+            json.dump(history, f, indent=4)
+     
+        return history 
