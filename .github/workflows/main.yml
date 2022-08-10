@@ -56,6 +56,7 @@ jobs:
 
       - name: Cypress e2e tests
         working-directory: electron
+        timeout-minutes: 15
         run: |
           $(npm bin)/cypress run
 
