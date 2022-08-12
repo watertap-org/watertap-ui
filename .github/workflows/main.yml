@@ -39,26 +39,24 @@ jobs:
           activate-environment: watertap-ui-env
 
       - name: Install JS dependencies
-        working-directory: ./electron
-        run: npm clean-install
+        run: |
+          npm --prefix electron clean-install
 
       - name: get idaes extensions
-        working-directory: backend/app
         run: idaes get-extensions
 
       - name: run backend server
-        working-directory: backend/app
-        run: uvicorn main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
+        run: uvicorn --app-dir backend/app main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
 
       - name: run frontend
-        working-directory: electron
-        run: npm start &
+        run: npm --prefix electron start &
 
       - name: Cypress e2e tests
         working-directory: electron
         timeout-minutes: 15
         run: |
-          $(npm bin)/cypress run
+          echo "$(npm bin)"
+          "$(npm bin)"/cypress run
 
       - name: Upload artifact for screenshots & videos
         uses: actions/upload-artifact@v3

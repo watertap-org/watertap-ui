@@ -26,7 +26,7 @@ This will install the correct runtime versions of both the backend (Python) and 
 Run the following command to install the JavaScript dependencies:
 
 ```sh
-bash -c "cd electron && npm clean-install"
+npm --prefix electron clean-install
 ```
 
 ### 3. Install the IDAES solver dependencies
@@ -74,8 +74,8 @@ bash -c "cd /path/to/my/watertap && pip install -r requirements-dev.txt"
 ### Run UI
 
 ```console
-cd <watertap-ui-path>/electron
-npm start
+uvicorn --app-dir backend/app main:app --host 127.0.0.1 --port 8000 --reload &
+npm --prefix electron start &
 ```
 
 ## Windows instructions
