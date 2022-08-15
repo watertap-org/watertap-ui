@@ -1,6 +1,7 @@
 import os
 import app
 import json
+from pathlib import Path
 import shutil
 
 from watertap.ui.api import WorkflowActions, FlowsheetInterface
@@ -17,11 +18,13 @@ class Flowsheet:
         self.history_path = None
 
         self.prepare_env()
-        #self.build()
-        #self._save_default_flowsheet()
 
-        #self.default_data = self.load_json(self.default_data_path)
-        self.data = self.load_json(self.data_path)
+        if os.path.exists(self.data_path):
+            self.data = self.load_json(self.data_path)
+        else:
+            self.build()
+            self._save_default_flowsheet()
+
         self.graph = self.load_graph(self.graph_path)
         self._cached_output = {}
         #self.solve_results = self.load_txt(self.solve_path)
