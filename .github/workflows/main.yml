@@ -48,7 +48,7 @@ jobs:
       - name: run pytest
         working-directory: backend
         env:
-          - PYTHONPATH: ${{ env.GITHUB_WORKSPACE }}/backend
+          PYTHONPATH: ${{ env.GITHUB_WORKSPACE }}/backend
         run: pytest tests
 
       - name: run backend server
