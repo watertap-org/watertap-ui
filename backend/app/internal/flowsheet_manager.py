@@ -19,7 +19,7 @@ _log = idaeslog.getLogger(__name__)
 class FlowsheetInfo(BaseModel):
     id_: str
     name: str
-    description: str
+    description: str = ""
 
     # Make sure name is lowercase
     @validator("name")
@@ -142,7 +142,3 @@ class FlowsheetManager:
             {"name": name, "id_": id_, "data": data},
             (fs_q.id_ == id_) & (fs_q.name == name),
         )
-
-
-# Create a single global instance
-flowsheet_manager = FlowsheetManager()

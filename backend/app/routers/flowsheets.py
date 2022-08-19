@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 import pandas as pd
 
 # package-local
-from app.internal.flowsheet_manager import flowsheet_manager
+from app.internal.flowsheet_manager import FlowsheetManager
 from watertap.ui.fsapi import FlowsheetInterface
 import idaes.logger as idaeslog
 
@@ -22,6 +22,8 @@ router = APIRouter(
     tags=["flowsheets"],
     responses={404: {"description": "Flowsheet not found"}},
 )
+
+flowsheet_manager = FlowsheetManager()
 
 
 @router.get("/")
