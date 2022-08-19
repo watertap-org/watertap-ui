@@ -14,6 +14,7 @@ from watertap.ui.fsapi import FlowsheetInterface
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
+print(f"@@name={__name__}")
 
 
 class FlowsheetInfo(BaseModel):
@@ -33,10 +34,17 @@ class FlowsheetManager:
     DIAGRAM_FILE = "graph.png"
     HISTORY_DB_FILE = "history.json"
 
-    def __init__(self):
-        self.app_settings = AppSettings()
+    def __init__(self, **kwargs):
+        """Constructor.
+
+        Args:
+            **kwargs: Passed as keywords to :class:`AppSettings`.
+        """
+        self.app_settings = AppSettings(**kwargs)
+        self.app_settings.create_data_basedir()
         self._objs, self._flowsheets = {}, {}
         for package in self.app_settings.packages:
+            _log.debug(f"Collect flowsheet interfaces from package '{package}'")
             try:
                 modules = FlowsheetInterface.find(package)
             except ImportError as err:
@@ -46,9 +54,11 @@ class FlowsheetManager:
                 _log.error(f"I/O error in package '{package}': {err}")
                 continue
             for module_name, obj in modules.items():
+                _log.debug(f"Create flowsheet interface for module '{module_name}'")
                 id_ = module_name
+                export = obj.fs_exp   # exported flowsheet
                 info = FlowsheetInfo(
-                    id_=id_, name=obj.name, description=obj.description
+                    id_=id_, name=export.name, description=export.description
                 )
                 self._flowsheets[id_] = info
                 self._objs[id_] = obj
