@@ -4,36 +4,78 @@ This repository is for work on the user interface(s) (UI) for the WaterTAP libra
 
 ## Getting started (developer)
 
-### Install Python
+### Prerequisites
 
-The Python code, and the PIP requirements, are in the `backend/` folder.
+The following steps assume that:
 
+1. `conda` is already installed and configured
+2. This repository (i.e. the WaterTAP UI repository, https://github.com/watertap-org/watertap-ui) has been cloned locally and the working directory is set to the root of the repository
+
+### 1. Creating the Conda environment
+
+Run the following command to create and activate a new Conda environment named `watertap-ui-env`:
+
+```sh
+conda env create --file environment.yml && conda activate watertap-ui-env
 ```
-cd <watertap-ui-path>/backend
-pip install -r requirements.txt
-idaes get-extensions
+
+This will install the correct runtime versions of both the backend (Python) and frontend (JavaScript/NodeJS/Electron) portions of the UI, as well as the backend (Python) dependencies.
+
+### 2. Install the JavaScript dependencies
+
+Run the following command to install the JavaScript dependencies:
+
+```sh
+npm --prefix electron clean-install
 ```
 
-### Install Javascript
+### 3. Install the IDAES solver dependencies
 
-Prerequisites: Node Package Manager (npm)
+```sh
+idaes get-extensions --verbose
+```
 
-See the [NPM install page](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for installation and the [NPM upgrade page](https://docs.npmjs.com/try-the-latest-stable-version-of-npm) for upgrading to the latest version.
-See the [NPM install page](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for installation and the [NPM upgrade page](https://docs.npmjs.com/try-the-latest-stable-version-of-npm) for upgrading to the latest version.
+### 4. (Optional) Install the developer version of WaterTAP
 
-```console
-cd <watertap-ui-path>/electron
-npm install
+By default, Step 1 above will install the `watertap` Python package from the current `main` branch of the watertap-org/watertap repository.
 
-cd <watertap-ui-path>/electron/ui
-npm install
+To use the WaterTAP UI with the development version of WaterTAP, run the following steps:
+
+#### 4.0. (Optional) Clone the `watertap-org/watertap` repository locally
+
+If you already have a local clone of the WaterTAP repository, you can skip this step.
+
+Otherwise, run the following command to create a local clone of the WaterTAP repository in a directory of your choice, e.g. `/path/to/my/watertap`:
+
+```sh
+git clone https://github.com/watertap-org/ /path/to/my/watertap
+```
+
+#### 4.1. Ensure that the `watertap-ui-env` Conda environment is active
+
+```sh
+conda activate watertap-ui-env
+```
+
+#### 4.2. Uninstall the currently installed version of WaterTAP
+
+```sh
+pip uninstall --yes watertap
+```
+
+#### 4.3. Install the development version of WaterTAP
+
+The following assumes that the `watertap-org/watertap` repository has been cloned to a directory named `/path/to/my/watertap`.
+
+```sh
+bash -c "cd /path/to/my/watertap && pip install -r requirements-dev.txt"
 ```
 
 ### Run UI
 
 ```console
-cd <watertap-ui-path>/electron
-npm start
+uvicorn --app-dir backend/app main:app --host 127.0.0.1 --port 8000 --reload &
+npm --prefix electron start &
 ```
 
 ## Windows instructions
