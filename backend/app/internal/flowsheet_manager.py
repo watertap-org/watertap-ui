@@ -1,7 +1,7 @@
 # stdlib
 from pathlib import Path
 import shutil
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 # third-party
 from fastapi import HTTPException
@@ -28,6 +28,10 @@ class FlowsheetInfo(BaseModel):
         return v.lower()
 
 
+class FlowsheetStatus(BaseModel):
+    built: bool = False
+    updated: bool = False
+
 class FlowsheetManager:
     """Manage the available flowsheets."""
 
@@ -42,7 +46,7 @@ class FlowsheetManager:
         """
         self.app_settings = AppSettings(**kwargs)
         self.app_settings.create_data_basedir()
-        self._objs, self._flowsheets = {}, {}
+        self._objs, self._flowsheets, self._status = {}, {}, {}
         for package in self.app_settings.packages:
             _log.debug(f"Collect flowsheet interfaces from package '{package}'")
             try:
@@ -61,6 +65,7 @@ class FlowsheetManager:
                     id_=id_, name=export.name, description=export.description
                 )
                 self._flowsheets[id_] = info
+                self._status[id_] = FlowsheetStatus()
                 self._objs[id_] = obj
                 self._add_data_dir(id_)
 
@@ -91,8 +96,8 @@ class FlowsheetManager:
         shutil.copyfile(src, dst)
 
     @property
-    def flowsheets(self):
-        return self._flowsheets
+    def flowsheets(self) -> List[FlowsheetInfo]:
+        return list(self._flowsheets.values())
 
     def get_diagram(self, id_: str):
         _ = self[id_]  # verifies the flowsheet exists
@@ -102,9 +107,36 @@ class FlowsheetManager:
         return data
 
     def __getitem__(self, id_: str) -> FlowsheetInterface:
-        """Get flowsheet object by its identifier."""
+        """Get flowsheet object by its identifier.
+
+        Args:
+            id_: Flowsheet identifier
+
+        Returns:
+              The flowsheet interface object
+
+        Raises:
+            HTTPException, if no such object
+        """
         try:
             return self._objs[id_]
+        except KeyError:
+            raise HTTPException(status_code=404, detail=f"Flowsheet {id_} not found")
+
+    def get_status(self, id_: str) -> FlowsheetStatus:
+        """Get flowsheet status by its identifier.
+
+        Args:
+            id_: Flowsheet identifier
+
+        Returns:
+            Status of the flowsheet
+
+        Raises:
+            Same as :meth:`__getitem__`
+        """
+        try:
+            return self._status[id_]
         except KeyError:
             raise HTTPException(status_code=404, detail=f"Flowsheet {id_} not found")
 

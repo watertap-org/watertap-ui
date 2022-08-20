@@ -3,6 +3,7 @@ Handle flowsheet-related API requests from web client.
 """
 # stdlib
 import io
+from typing import List
 
 # third-party
 from fastapi import Request, APIRouter, HTTPException
@@ -11,8 +12,8 @@ from fastapi.responses import FileResponse
 import pandas as pd
 
 # package-local
-from app.internal.flowsheet_manager import FlowsheetManager
-from watertap.ui.fsapi import FlowsheetInterface
+from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
+from watertap.ui.fsapi import FlowsheetInterface, FlowsheetExport
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
@@ -26,7 +27,7 @@ router = APIRouter(
 flowsheet_manager = FlowsheetManager()
 
 
-@router.get("/")
+@router.get("/", response_model=List[FlowsheetInfo])
 async def get_all():
     """Get basic information about all available flowsheets.
 
@@ -36,19 +37,17 @@ async def get_all():
     return flowsheet_manager.flowsheets
 
 
-@router.get("/{id_}/config")
-async def get_config(id_: str) -> dict:
+@router.get("/{id_}/config", response_model=FlowsheetExport)
+async def get_config(id_: str) -> FlowsheetExport:
     """Get flowsheet configuration.
 
     Args:
         id_: Flowsheet identifier
 
     Returns:
-        Flowsheet configuration
+        Flowsheet export model
     """
-    print(f"@@ in get_config: id={id_},"
-          f"known keys={list(flowsheet_manager._flowsheets.keys())}")
-    return flowsheet_manager[id_].dict()
+    return flowsheet_manager[id_].fs_exp
 
 
 @router.get("/{flowsheet_id}/diagram")
@@ -57,18 +56,24 @@ async def get_diagram(flowsheet_id: str):
     return StreamingResponse(io.BytesIO(data), media_type="image/png")
 
 
-@router.get("/{flowsheet_id}/solve")
+@router.get("/{flowsheet_id}/solve", response_model=FlowsheetExport)
 async def solve(flowsheet_id: str):
-    obj = flowsheet_manager[flowsheet_id]
-    obj.solve()
-    return obj.dict()
+    flowsheet = flowsheet_manager[flowsheet_id]
+    status = flowsheet_manager.get_status(flowsheet_id)
+    if not status.built or status.updated:
+        flowsheet.build()
+        status.built, status.updated = True, False
+    flowsheet.solve()
+    return flowsheet.fs_exp
 
 
-@router.post("/{flowsheet_id}/reset")
-async def reset(flowsheet_id: int):
-    obj = flowsheet_manager[flowsheet_id]
-    obj.build()
-    return obj.dict()
+@router.post("/{flowsheet_id}/reset", response_model=FlowsheetExport)
+async def reset(flowsheet_id: str):
+    flowsheet = flowsheet_manager[flowsheet_id]
+    flowsheet.build()
+    status = flowsheet_manager.get_status(flowsheet_id)
+    status.built, status.updated = True, False
+    return flowsheet.fs_exp
 
 
 @router.post("/{flowsheet_id}/update")
