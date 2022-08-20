@@ -36,7 +36,7 @@ async def get_all():
     return flowsheet_manager.flowsheets
 
 
-@router.get("/{flowsheet_id}/config")
+@router.get("/{id_}/config")
 async def get_config(id_: str) -> dict:
     """Get flowsheet configuration.
 
@@ -46,6 +46,8 @@ async def get_config(id_: str) -> dict:
     Returns:
         Flowsheet configuration
     """
+    print(f"@@ in get_config: id={id_},"
+          f"known keys={list(flowsheet_manager._flowsheets.keys())}")
     return flowsheet_manager[id_].dict()
 
 

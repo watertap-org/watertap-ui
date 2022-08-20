@@ -7,11 +7,11 @@ from app.internal import flowsheet_manager as fm
 from fastapi import HTTPException
 import logging
 
-logging.getLogger("idaes.app.internal.flowsheet_manager").setLevel(logging.DEBUG)
+# logging.getLogger("idaes.app.internal.flowsheet_manager").setLevel(logging.DEBUG)
 # logging.getLogger("idaes.watertap.ui.fsapi").setLevel(logging.DEBUG)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def mgr():
     return fm.FlowsheetManager(packages=["watertap", "examples"])
 
@@ -40,11 +40,6 @@ def test_mgr_get_flowsheet_dir(mgr: fm.FlowsheetManager):
 @pytest.mark.unit
 def test_mgr_flowsheets_property(mgr: fm.FlowsheetManager):
     assert mgr.flowsheets  # we found at least 1
-
-
-@pytest.mark.unit
-def test_mgr_x(mgr: fm.FlowsheetManager):
-    pass
 
 
 @pytest.mark.unit
