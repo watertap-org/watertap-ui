@@ -14,7 +14,6 @@ from watertap.ui.fsapi import FlowsheetInterface
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
-print(f"@@name={__name__}")
 
 
 class FlowsheetInfo(BaseModel):
@@ -31,6 +30,7 @@ class FlowsheetInfo(BaseModel):
 class FlowsheetStatus(BaseModel):
     built: bool = False
     updated: bool = False
+
 
 class FlowsheetManager:
     """Manage the available flowsheets."""

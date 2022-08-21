@@ -61,13 +61,19 @@ async def solve(flowsheet_id: str):
     flowsheet = flowsheet_manager[flowsheet_id]
     status = flowsheet_manager.get_status(flowsheet_id)
     if not status.built or status.updated:
-        flowsheet.build()
+        try:
+            flowsheet.build()
+        except Exception as err:
+            raise HTTPException(500, detail=f"Build failed: {err}")
         status.built, status.updated = True, False
-    flowsheet.solve()
+    try:
+        flowsheet.solve()
+    except Exception as err:
+        raise HTTPException(500, detail=f"Solve failed: {err}")
     return flowsheet.fs_exp
 
 
-@router.post("/{flowsheet_id}/reset", response_model=FlowsheetExport)
+@router.get("/{flowsheet_id}/reset", response_model=FlowsheetExport)
 async def reset(flowsheet_id: str):
     flowsheet = flowsheet_manager[flowsheet_id]
     flowsheet.build()
@@ -76,18 +82,18 @@ async def reset(flowsheet_id: str):
     return flowsheet.fs_exp
 
 
-@router.post("/{flowsheet_id}/update")
-async def update(flowsheet_id: int, request: Request):
-    obj = flowsheet_manager[flowsheet_id]
+@router.post("/{flowsheet_id}/update", response_model=FlowsheetExport)
+async def update(flowsheet_id: str, request: Request):
+    flowsheet = flowsheet_manager[flowsheet_id]
     input_data = await request.json()
     try:
-        obj.load(input_data)
+        flowsheet.load(input_data)
     except FlowsheetInterface.MissingObjectError as err:
         # this is unlikely, the model would need to change while running
         # (but could happen since 'build' and 'solve' can do anything they want)
         _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
         # XXX: return something about the error to caller
-    return obj.dict()
+    return flowsheet.fs_exp
 
 
 @router.post("/{flowsheet_id}/save")
