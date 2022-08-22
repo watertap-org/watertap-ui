@@ -3,7 +3,10 @@ Tests for app.routers.flowsheets module
 """
 import json
 import os
+from urllib.parse import quote
+
 from watertap.ui.fsapi import FlowsheetExport
+from fastapi.responses import FileResponse
 
 # add 'examples' to packages, *before* app starts
 os.environ["watertap_packages"] = '["watertap", "examples"]'
@@ -25,9 +28,12 @@ def flowsheet_id():
     return list(mgr._flowsheets.keys())[0]
 
 
-def get_flowsheet(client, flowsheet_id, r, get_body=True):
+def get_flowsheet(client, flowsheet_id, r, get_body=True, query_params=None):
     """Helper function for 'get' of a flowsheet"""
     url = f"/flowsheets/{flowsheet_id}/{r}"
+    if query_params:
+        url = _add_query_params(url, query_params)
+    print(f"get: url={url}")
     response = client.get(url)
     if get_body:
         body = response.json()
@@ -36,17 +42,27 @@ def get_flowsheet(client, flowsheet_id, r, get_body=True):
     return response, body
 
 
-def post_flowsheet(client: TestClient, flowsheet_id, r, data, get_body=True):
+def post_flowsheet(
+    client: TestClient, flowsheet_id, r, data, get_body=True, query_params=None
+):
     """Helper function for 'get' of a flowsheet"""
     url = f"/flowsheets/{flowsheet_id}/{r}"
-    if isinstance(data, dict):
+    if query_params:
+        url = _add_query_params(url, query_params)
+    if isinstance(data, dict) or isinstance(data, list):
         data = json.dumps(data)
+    print(f"post: url={url}")
     response = client.post(url, data=data)
     if get_body:
         body = response.json()
     else:
         body = None
     return response, body
+
+
+def _add_query_params(url, query_params):
+    qp = "&".join(f"{quote(n)}={quote(v)}" for n, v in query_params.items())
+    return f"{url}?{qp}"
 
 
 # ---------------------------------
@@ -65,14 +81,21 @@ def test_get_all(client):
 
 @pytest.mark.unit
 def test_get_config(client, flowsheet_id):
+    # get config, bare
     response, body = get_flowsheet(client, flowsheet_id, "config")
-    if response.status_code != 200:
-        print(f"response error: {body['detail']}")
-    assert response.status_code == 200
+    assert response.status_code == 200, body
     # make sure it's a non-empty valid response
     assert body != {}
     fs_exp = FlowsheetExport.parse_obj(body)
     assert fs_exp.name != ""
+
+    # this time build the model, make sure there is content
+    response, body = get_flowsheet(
+        client, flowsheet_id, "config", query_params={"build": "1"}
+    )
+    assert response.status_code == 200, body
+    config = body
+    assert len(config["model_objects"]) > 0
 
 
 @pytest.mark.unit
@@ -132,3 +155,109 @@ def test_update_missing(client, flowsheet_id):
     response, update_body = post_flowsheet(client, flowsheet_id, "update", new_body)
     assert response.status_code == 200, update_body
 
+
+@pytest.mark.unit
+def test_save_config(client, flowsheet_id):
+    response, body = get_flowsheet(client, flowsheet_id, "config")
+    assert response.status_code == 200, body
+    config = body
+    response, body = post_flowsheet(
+        client, flowsheet_id, "save", config, query_params={"name": "test name!"}
+    )
+    assert response.status_code == 200, body
+    assert body == "test name!"
+
+    response, body = post_flowsheet(client, flowsheet_id, "save", config)
+    assert response.status_code == 200, body
+    assert body == "current"
+
+
+@pytest.mark.unit
+def test_load_config(client, flowsheet_id):
+    # build/save a named config
+    response, body = get_flowsheet(
+        client, flowsheet_id, "config", query_params={"build": "1"}
+    )
+    assert response.status_code == 200
+    config = body
+    assert len(config["model_objects"]) > 0
+    # make recognizable values
+    for var_name, var_data in config["model_objects"].items():
+        var_data["value"] = 99
+    response, body = post_flowsheet(
+        client, flowsheet_id, "save", config, query_params={"name": "test name!"}
+    )
+    # fetch it back & check values
+    response, body = get_flowsheet(
+        client, flowsheet_id, "load", query_params={"name": "test name!"}
+    )
+    assert response.status_code == 200, body
+    config2 = body
+    for var_name, var_data in config2["model_objects"].items():
+        assert var_data["value"] == config["model_objects"][var_name]["value"]
+
+
+@pytest.mark.unit
+def test_download(client, flowsheet_id):
+    compare_data = [
+        {
+            "output": {
+                "category1": {
+                    "metric1": [1.0, "g/mol"],
+                    "metric2": [2.0, "g/mol"],
+                    "metric3": [3.0, "g/mol"],
+                },
+                "category2": {
+                    "metric1": [1.0, "g/mol"],
+                    "metric2": [2.0, "g/mol"],
+                    "metric3": [3.0, "g/mol"],
+                },
+            }
+        },
+        {
+            "output": {
+                "category1": {
+                    "metric1": [1.5, "g/mol"],
+                    "metric2": [2.5, "g/mol"],
+                    "metric3": [3.5, "g/mol"],
+                },
+                "category2": {
+                    "metric1": [1.5, "g/mol"],
+                    "metric2": [2.5, "g/mol"],
+                    "metric3": [3.5, "g/mol"],
+                },
+            }
+        },
+    ]
+    response, _ = post_flowsheet(
+        client, flowsheet_id, "download", compare_data, get_body=False
+    )
+    assert response.status_code == 200
+    csv_data = ""
+    for chunk in response.iter_content(65536):
+        csv_data += str(chunk, encoding="utf-8")
+    if "\r\n" in csv_data:
+        sep = "\r\n"
+    else:
+        sep = "\n"
+    for i, line in enumerate(csv_data.split(sep)):
+        print(line)
+        fields = line.split(",")
+        if i == 0:
+            assert fields[0] == "category"
+            assert fields[1] == "metric"
+        elif line.strip() == "":
+            pass
+        else:
+            # first column is category
+            cnum = (i - 1) // 3 + 1
+            assert fields[0] == f"category{cnum}"
+            # second column is metric
+            mnum = (i - 1) % 3 + 1
+            assert fields[1] == f"metric{mnum}"
+            # last column is difference between 1st and 2nd output values
+            assert (
+                float(fields[-1])
+                == compare_data[0]["output"][f"category{cnum}"][f"metric{mnum}"][0]
+                - compare_data[1]["output"][f"category{cnum}"][f"metric{mnum}"][0]
+            )

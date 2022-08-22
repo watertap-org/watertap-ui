@@ -16,6 +16,8 @@ from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
 from watertap.ui.fsapi import FlowsheetInterface, FlowsheetExport
 import idaes.logger as idaeslog
 
+CURRENT = "current"
+
 _log = idaeslog.getLogger(__name__)
 
 router = APIRouter(
@@ -38,16 +40,23 @@ async def get_all():
 
 
 @router.get("/{id_}/config", response_model=FlowsheetExport)
-async def get_config(id_: str) -> FlowsheetExport:
+async def get_config(id_: str, build: str = "0") -> FlowsheetExport:
     """Get flowsheet configuration.
 
     Args:
         id_: Flowsheet identifier
+        build: If true, make sure model is built before returning
 
     Returns:
         Flowsheet export model
     """
-    return flowsheet_manager[id_].fs_exp
+    flowsheet = flowsheet_manager[id_]
+    if build == "1":
+        status = flowsheet_manager.get_status(id_)
+        if not status.built:
+            flowsheet.build()
+            status.set_built()
+    return flowsheet.fs_exp
 
 
 @router.get("/{flowsheet_id}/diagram")
@@ -60,12 +69,12 @@ async def get_diagram(flowsheet_id: str):
 async def solve(flowsheet_id: str):
     flowsheet = flowsheet_manager[flowsheet_id]
     status = flowsheet_manager.get_status(flowsheet_id)
-    if not status.built or status.updated:
+    if not status.built:
         try:
             flowsheet.build()
         except Exception as err:
             raise HTTPException(500, detail=f"Build failed: {err}")
-        status.built, status.updated = True, False
+        status.set_built()
     try:
         flowsheet.solve()
     except Exception as err:
@@ -77,8 +86,7 @@ async def solve(flowsheet_id: str):
 async def reset(flowsheet_id: str):
     flowsheet = flowsheet_manager[flowsheet_id]
     flowsheet.build()
-    status = flowsheet_manager.get_status(flowsheet_id)
-    status.built, status.updated = True, False
+    flowsheet_manager.get_status(flowsheet_id).set_built()
     return flowsheet.fs_exp
 
 
@@ -93,11 +101,12 @@ async def update(flowsheet_id: str, request: Request):
         # (but could happen since 'build' and 'solve' can do anything they want)
         _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
         # XXX: return something about the error to caller
+    flowsheet_manager.get_status(flowsheet_id).set_updated()
     return flowsheet.fs_exp
 
 
 @router.post("/{flowsheet_id}/save")
-async def save_config(flowsheet_id: int, request: Request, name: str = "current"):
+async def save_config(flowsheet_id: str, request: Request, name: str = CURRENT) -> str:
     """Save flowsheet 'config' with a name. See also :func:`load_config`.
 
     The query parameter 'name' is the name to save under. If no name is
@@ -108,15 +117,19 @@ async def save_config(flowsheet_id: int, request: Request, name: str = "current"
 
     Args:
         flowsheet_id: Identifier for flowsheet (structure)
+        request: Request object
         name: Name under which to save this particular configuration
 
+    Returns:
+        name used to save record
     """
     data = await request.json()
-    flowsheet_manager.put_flowsheet_data(id_=flowsheet_id, name=name, data=data)
+    name = flowsheet_manager.put_flowsheet_data(id_=flowsheet_id, name=name, data=data)
+    return name
 
 
 @router.get("/{flowsheet_id}/load")
-async def load_config(id_: int, name: str = "current"):
+async def load_config(flowsheet_id: str, name: str = CURRENT):
     """Load and return a named flowsheet. See also :func:`save_config`.
 
     The name is optional. If not given it will default to the same
@@ -132,14 +145,17 @@ async def load_config(id_: int, name: str = "current"):
     Returns:
         Flowsheet contents, in standard form
     """
-    data = flowsheet_manager.get_flowsheet_data(id_=id_, name=name)
-    if data is None:
-        raise HTTPException(404, f"Cannot find flowsheet id='{id_}' " f"name='{name}'")
-    return data
+    result = flowsheet_manager.get_flowsheet_data(id_=flowsheet_id, name=name)
+    if not result:
+        raise HTTPException(404, f"Cannot find flowsheet id='{flowsheet_id}', name='{name}'")
+    elif len(result) > 1:
+        n = len(result)
+        raise HTTPException(404, f"Found {n} flowsheets for id='{flowsheet_id}', name='{name}'")
+    return result[0]
 
 
-@router.post("/{flowsheet_id}/download")
-async def download(id_: str, request: Request):
+@router.post("/{flowsheet_id}/download", response_class=FileResponse)
+async def download(flowsheet_id: str, request: Request):
     """Download the comparison of two solutions of the given flowsheet.
 
     The expected structure of the JSON data in `request` is::
@@ -167,7 +183,10 @@ async def download(id_: str, request: Request):
        the same for each output.
 
     Args:
-        id_: Identifier for flowsheet
+        flowsheet_id: Identifier for flowsheet
+
+    Returns:
+        File to download
     """
     # extract data from request
     data = await request.json()
@@ -185,15 +204,15 @@ async def download(id_: str, request: Request):
             try:
                 delta_v = v[0] - v[1]
             except Exception:
-                # don't crash if we can't subract values
+                # don't crash if we can't subtract values
                 delta_v = pd.NA
             # add row
             df.loc[idx] = [catg, metric, u[0], v[0], v[1], delta_v]
             idx += 1
 
     # Write to file
-    path = flowsheet_manager.get_flowsheet_dir(id_) / "comparison_results.csv"
+    path = flowsheet_manager.get_flowsheet_dir(flowsheet_id) / "comparison_results.csv"
     df.to_csv(path, index=False)
 
     # User can now download the contents of that file
-    return FileResponse(path)
+    return path

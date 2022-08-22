@@ -1,6 +1,7 @@
 # stdlib
 from pathlib import Path
 import shutil
+import time
 from typing import Optional, Dict, List
 
 # third-party
@@ -29,7 +30,16 @@ class FlowsheetInfo(BaseModel):
 
 class FlowsheetStatus(BaseModel):
     built: bool = False
-    updated: bool = False
+    updated: float = 0   # time last updated (including built)
+
+    def set_built(self):
+        """Call this after (re)building the flowsheet."""
+        self.built = True
+        self.updated = time.time()
+
+    def set_updated(self):
+        """Call this after updating values in the flowsheet."""
+        self.updated = time.time()
 
 
 class FlowsheetManager:
@@ -60,7 +70,7 @@ class FlowsheetManager:
             for module_name, obj in modules.items():
                 _log.debug(f"Create flowsheet interface for module '{module_name}'")
                 id_ = module_name
-                export = obj.fs_exp   # exported flowsheet
+                export = obj.fs_exp  # exported flowsheet
                 info = FlowsheetInfo(
                     id_=id_, name=export.name, description=export.description
                 )
@@ -140,7 +150,7 @@ class FlowsheetManager:
         except KeyError:
             raise HTTPException(status_code=404, detail=f"Flowsheet {id_} not found")
 
-    def get_flowsheet_data(self, id_: str = None, name: str = None) -> Optional[Dict]:
+    def get_flowsheet_data(self, id_: str = None, name: str = None) -> list:
         """Find a history item matching the flowsheet name and id, and return
            its data.
 
@@ -149,26 +159,18 @@ class FlowsheetManager:
             name:  Flowsheet name to match
 
         Returns:
-            The data if found, else None
+            List of found data (may be empty)
 
         Raises:
             HTTPException: code 500 if there are more than one matching flowsheets
         """
-        fs_q = tinydb.Query()
-        items = self._histdb.search((fs_q.id_ == id_) & (fs_q.name == name))
-        n = len(items)
-        if n > 1:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Expected 1, but {n} flowsheets matched "
-                f"id='{id_}' and name='{name}'",
-            )
-        if n == 0:
-            return None
+        query = tinydb.Query()
+        items = self._histdb.search(query.fragment({"id_": id_, "name": name}))
+        return [item["data"] for item in items]
 
-        return items[0]["data"]
-
-    def put_flowsheet_data(self, id_: str = None, name: str = None, data: Dict = None):
+    def put_flowsheet_data(
+        self, id_: str = None, name: str = None, data: Dict = None
+    ) -> str:
         """Create or update the data for the flowsheet with given identifier + name.
 
         Args:
@@ -177,10 +179,14 @@ class FlowsheetManager:
             data: New data for the record
 
         Returns:
-            None
+            Exact name used in DB record
         """
+        status = self.get_status(id_)
         fs_q = tinydb.Query()
+        _log.debug(f"Saving/replacing name='{name}' for id='{id_}'")
         self._histdb.upsert(
-            {"name": name, "id_": id_, "data": data},
+            {"name": name, "id_": id_, "ts": status.updated,
+             "data": data},
             (fs_q.id_ == id_) & (fs_q.name == name),
         )
+        return name
