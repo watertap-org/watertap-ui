@@ -161,6 +161,20 @@ async def load_config(flowsheet_id: str, name: str = CURRENT):
     return result[0]
 
 
+@router.get("/{flowsheet_id}/list")
+async def list_config_names(flowsheet_id: str) -> List[str]:
+    """Get names of all currently saved configs for a given flowsheet.
+
+    Args:
+        flowsheet_id: Identifier for flowsheet (structure)
+
+    Returns:
+        List of names (may be empty)
+    """
+    result = flowsheet_manager.list_flowsheet_names(flowsheet_id)
+    return result
+
+
 @router.post("/{flowsheet_id}/download", response_class=FileResponse)
 async def download(flowsheet_id: str, request: Request) -> Path:
     """Download the comparison of two solutions of the given flowsheet.

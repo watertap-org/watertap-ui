@@ -198,6 +198,27 @@ def test_load_config(client, flowsheet_id):
 
 
 @pytest.mark.unit
+def test_list_configs(client, flowsheet_id):
+    # get current list of names
+    response, body = get_flowsheet(client, flowsheet_id, "list")
+    assert response.status_code == 200
+    current_names = body
+    # add some more names
+    response, body = get_flowsheet(client, flowsheet_id, "config")
+    assert response.status_code == 200, body
+    config = body
+    add_names = [f"name{i}" for i in range(1, 5)]
+    for name in add_names:
+        response, body = post_flowsheet(
+            client, flowsheet_id, "save", config, query_params={"name": name}
+        )
+    # check that all names are present
+    response, body = get_flowsheet(client, flowsheet_id, "list")
+    assert response.status_code == 200
+    assert set(body) == set(current_names + add_names)
+
+
+@pytest.mark.unit
 def test_download(client, flowsheet_id):
     compare_data = {
         "values": [

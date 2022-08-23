@@ -188,3 +188,16 @@ class FlowsheetManager:
             (fs_q.id_ == id_) & (fs_q.name == name),
         )
         return name
+
+    def list_flowsheet_names(self, id_: str = None) -> list[str]:
+        """Get a list of all flowsheet names saved for this identifier.
+
+        Args:
+            id_: Flowsheet ID to match
+
+        Returns:
+            List of names (may be empty)
+        """
+        query = tinydb.Query()
+        items = self._histdb.search(query.fragment({"id_": id_}))
+        return [item["name"] for item in items]
