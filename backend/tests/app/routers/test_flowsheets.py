@@ -45,7 +45,7 @@ def get_flowsheet(client, flowsheet_id, r, get_body=True, query_params=None):
 def post_flowsheet(
     client: TestClient, flowsheet_id, r, data, get_body=True, query_params=None
 ):
-    """Helper function for 'get' of a flowsheet"""
+    """Helper function for 'post' of a flowsheet"""
     url = f"/flowsheets/{flowsheet_id}/{r}"
     if query_params:
         url = _add_query_params(url, query_params)
