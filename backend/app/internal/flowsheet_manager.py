@@ -18,19 +18,19 @@ _log = idaeslog.getLogger(__name__)
 
 
 class FlowsheetInfo(BaseModel):
+    """Information about a flowsheet."""
+    # static information
     id_: str
     name: str
     description: str = ""
+    # current status of flowsheet
+    built: bool = False
+    updated: float = 0  # time last updated (including built)
 
     # Make sure name is lowercase
     @validator("name")
     def normalize_name(cls, v: str, values):
         return v.lower()
-
-
-class FlowsheetStatus(BaseModel):
-    built: bool = False
-    updated: float = 0   # time last updated (including built)
 
     def set_built(self):
         """Call this after (re)building the flowsheet."""
@@ -56,7 +56,7 @@ class FlowsheetManager:
         """
         self.app_settings = AppSettings(**kwargs)
         self.app_settings.create_data_basedir()
-        self._objs, self._flowsheets, self._status = {}, {}, {}
+        self._objs, self._flowsheets = {}, {}
         for package in self.app_settings.packages:
             _log.debug(f"Collect flowsheet interfaces from package '{package}'")
             try:
@@ -75,7 +75,6 @@ class FlowsheetManager:
                     id_=id_, name=export.name, description=export.description
                 )
                 self._flowsheets[id_] = info
-                self._status[id_] = FlowsheetStatus()
                 self._objs[id_] = obj
                 self._add_data_dir(id_)
 
@@ -110,13 +109,13 @@ class FlowsheetManager:
         return list(self._flowsheets.values())
 
     def get_diagram(self, id_: str):
-        _ = self[id_]  # verifies the flowsheet exists
+        _ = self.get_obj(id_)  # verifies the flowsheet exists
         path = self.get_flowsheet_dir(id_) / self.DIAGRAM_FILE
         with path.open(mode="rb") as f:
             data = f.read()
         return data
 
-    def __getitem__(self, id_: str) -> FlowsheetInterface:
+    def get_obj(self, id_: str) -> FlowsheetInterface:
         """Get flowsheet object by its identifier.
 
         Args:
@@ -133,20 +132,20 @@ class FlowsheetManager:
         except KeyError:
             raise HTTPException(status_code=404, detail=f"Flowsheet {id_} not found")
 
-    def get_status(self, id_: str) -> FlowsheetStatus:
+    def get_info(self, id_: str) -> FlowsheetInfo:
         """Get flowsheet status by its identifier.
 
         Args:
             id_: Flowsheet identifier
 
         Returns:
-            Status of the flowsheet
+            Status of the flowsheet (part of its info)
 
         Raises:
-            Same as :meth:`__getitem__`
+            Same as :meth:`get_obj`
         """
         try:
-            return self._status[id_]
+            return self._flowsheets[id_]
         except KeyError:
             raise HTTPException(status_code=404, detail=f"Flowsheet {id_} not found")
 
@@ -181,12 +180,11 @@ class FlowsheetManager:
         Returns:
             Exact name used in DB record
         """
-        status = self.get_status(id_)
+        info = self.get_info(id_)
         fs_q = tinydb.Query()
         _log.debug(f"Saving/replacing name='{name}' for id='{id_}'")
         self._histdb.upsert(
-            {"name": name, "id_": id_, "ts": status.updated,
-             "data": data},
+            {"name": name, "id_": id_, "ts": info.updated, "data": data},
             (fs_q.id_ == id_) & (fs_q.name == name),
         )
         return name

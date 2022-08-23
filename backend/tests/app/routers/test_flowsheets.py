@@ -199,36 +199,39 @@ def test_load_config(client, flowsheet_id):
 
 @pytest.mark.unit
 def test_download(client, flowsheet_id):
-    compare_data = [
-        {
-            "output": {
+    compare_data = {
+        "values": [
+            {
                 "category1": {
                     "metric1": [1.0, "g/mol"],
                     "metric2": [2.0, "g/mol"],
                     "metric3": [3.0, "g/mol"],
+                    "metric4": ["banana", "g/mol"],
                 },
                 "category2": {
                     "metric1": [1.0, "g/mol"],
                     "metric2": [2.0, "g/mol"],
                     "metric3": [3.0, "g/mol"],
+                    "metric4": ["avocado", "g/mol"],
                 },
-            }
-        },
-        {
-            "output": {
+            },
+            {
                 "category1": {
                     "metric1": [1.5, "g/mol"],
                     "metric2": [2.5, "g/mol"],
                     "metric3": [3.5, "g/mol"],
+                    "metric4": [-1, "g/mol"],
                 },
                 "category2": {
                     "metric1": [1.5, "g/mol"],
                     "metric2": [2.5, "g/mol"],
                     "metric3": [3.5, "g/mol"],
+                    "metric4": [-2, "g/mol"],
                 },
-            }
-        },
-    ]
+            },
+        ]
+    }
+
     response, _ = post_flowsheet(
         client, flowsheet_id, "download", compare_data, get_body=False
     )
@@ -240,6 +243,7 @@ def test_download(client, flowsheet_id):
         sep = "\r\n"
     else:
         sep = "\n"
+    NUM_ROWS = 4
     for i, line in enumerate(csv_data.split(sep)):
         print(line)
         fields = line.split(",")
@@ -250,14 +254,19 @@ def test_download(client, flowsheet_id):
             pass
         else:
             # first column is category
-            cnum = (i - 1) // 3 + 1
-            assert fields[0] == f"category{cnum}"
+            cnum = (i - 1) // NUM_ROWS + 1
+            category = f"category{cnum}"
+            assert fields[0] == category
             # second column is metric
-            mnum = (i - 1) % 3 + 1
-            assert fields[1] == f"metric{mnum}"
+            mnum = (i - 1) % NUM_ROWS + 1
+            metric = f"metric{mnum}"
+            assert fields[1] == metric
             # last column is difference between 1st and 2nd output values
-            assert (
-                float(fields[-1])
-                == compare_data[0]["output"][f"category{cnum}"][f"metric{mnum}"][0]
-                - compare_data[1]["output"][f"category{cnum}"][f"metric{mnum}"][0]
-            )
+            if mnum == 4:
+                assert fields[-1] == "NA"
+            else:
+                assert (
+                    float(fields[-1])
+                    == compare_data["values"][0][category][metric][0]
+                    - compare_data["values"][1][category][metric][0]
+                )

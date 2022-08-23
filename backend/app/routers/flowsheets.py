@@ -2,7 +2,9 @@
 Handle flowsheet-related API requests from web client.
 """
 # stdlib
+import csv
 import io
+from pathlib import Path
 from typing import List
 
 # third-party
@@ -10,6 +12,7 @@ from fastapi import Request, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
 import pandas as pd
+from pydantic import BaseModel
 
 # package-local
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
@@ -50,12 +53,12 @@ async def get_config(id_: str, build: str = "0") -> FlowsheetExport:
     Returns:
         Flowsheet export model
     """
-    flowsheet = flowsheet_manager[id_]
+    flowsheet = flowsheet_manager.get_obj(id_)
     if build == "1":
-        status = flowsheet_manager.get_status(id_)
-        if not status.built:
+        info = flowsheet_manager.get_info(id_)
+        if not info.built:
             flowsheet.build()
-            status.set_built()
+            info.set_built()
     return flowsheet.fs_exp
 
 
@@ -67,14 +70,14 @@ async def get_diagram(flowsheet_id: str):
 
 @router.get("/{flowsheet_id}/solve", response_model=FlowsheetExport)
 async def solve(flowsheet_id: str):
-    flowsheet = flowsheet_manager[flowsheet_id]
-    status = flowsheet_manager.get_status(flowsheet_id)
-    if not status.built:
+    flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+    info = flowsheet_manager.get_info(flowsheet_id)
+    if not info.built:
         try:
             flowsheet.build()
         except Exception as err:
             raise HTTPException(500, detail=f"Build failed: {err}")
-        status.set_built()
+        info.set_built()
     try:
         flowsheet.solve()
     except Exception as err:
@@ -84,15 +87,15 @@ async def solve(flowsheet_id: str):
 
 @router.get("/{flowsheet_id}/reset", response_model=FlowsheetExport)
 async def reset(flowsheet_id: str):
-    flowsheet = flowsheet_manager[flowsheet_id]
+    flowsheet = flowsheet_manager.get_obj(flowsheet_id)
     flowsheet.build()
-    flowsheet_manager.get_status(flowsheet_id).set_built()
+    flowsheet_manager.get_info(flowsheet_id).set_built()
     return flowsheet.fs_exp
 
 
 @router.post("/{flowsheet_id}/update", response_model=FlowsheetExport)
 async def update(flowsheet_id: str, request: Request):
-    flowsheet = flowsheet_manager[flowsheet_id]
+    flowsheet = flowsheet_manager.get_obj(flowsheet_id)
     input_data = await request.json()
     try:
         flowsheet.load(input_data)
@@ -101,7 +104,7 @@ async def update(flowsheet_id: str, request: Request):
         # (but could happen since 'build' and 'solve' can do anything they want)
         _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
         # XXX: return something about the error to caller
-    flowsheet_manager.get_status(flowsheet_id).set_updated()
+    flowsheet_manager.get_info(flowsheet_id).set_updated()
     return flowsheet.fs_exp
 
 
@@ -139,7 +142,7 @@ async def load_config(flowsheet_id: str, name: str = CURRENT):
         /1/load  -- use default name
 
     Args:
-        id_: Identifier for flowsheet (structure)
+        flowsheet_id: Identifier for flowsheet (structure)
         name: Name under which this particular configuration was saved
 
     Returns:
@@ -147,50 +150,59 @@ async def load_config(flowsheet_id: str, name: str = CURRENT):
     """
     result = flowsheet_manager.get_flowsheet_data(id_=flowsheet_id, name=name)
     if not result:
-        raise HTTPException(404, f"Cannot find flowsheet id='{flowsheet_id}', name='{name}'")
+        raise HTTPException(
+            404, f"Cannot find flowsheet id='{flowsheet_id}', name='{name}'"
+        )
     elif len(result) > 1:
         n = len(result)
-        raise HTTPException(404, f"Found {n} flowsheets for id='{flowsheet_id}', name='{name}'")
+        raise HTTPException(
+            404, f"Found {n} flowsheets for id='{flowsheet_id}', name='{name}'"
+        )
     return result[0]
 
 
 @router.post("/{flowsheet_id}/download", response_class=FileResponse)
-async def download(flowsheet_id: str, request: Request):
+async def download(flowsheet_id: str, request: Request) -> Path:
     """Download the comparison of two solutions of the given flowsheet.
 
-    The expected structure of the JSON data in `request` is::
-        [
-          // first set of outputs
-          {"output": {
-             "<category-name-1>": {
-               "<metric-name-1>": [<value>, "<units>"],
-               "<metric-name-2>": [<value>, "<units>"],
+    The expected structure of the JSON data in ``request`` is::
+
+        { "values":
+            [
+              // first set of values
+              {
+                 "<category-name-1>": {
+                   "<metric-name-1>": [<value>, "<units>"],
+                   "<metric-name-2>": [<value>, "<units>"],
+                   ...
+                }
+                 "<category-name-2>": {
+                   "<metric-name-1>": [<value>, "<units>"],
+                   "<metric-name-2>": [<value>, "<units>"],
+                   ...
+                },
+                ...
+              },
+              // repeat for second set of values
+              {
                ...
-            }
-             "<category-name-2>": {
-               "<metric-name-1>": [<value>, "<units>"],
-               "<metric-name-2>": [<value>, "<units>"],
-               ...
-            },
-            ...
-          },
-          // repeat for second set of outputs
-          {"output": {
-             ...
-          }
-        ]
-       The assumption is that the categories, and metrics in each category, are
-       the same for each output.
+               }
+            ]
+        }
+
+   The assumption is that the categories, and metrics in each category, are
+   the same for each output.
 
     Args:
         flowsheet_id: Identifier for flowsheet
+        request: Request object with data in JSON form given above
 
     Returns:
-        File to download
+        File to download (path converted to FileResponse by FastAPI)
     """
     # extract data from request
     data = await request.json()
-    values = data[0]["output"], data[1]["output"]
+    values = data["values"]
 
     # build dataframe for export
     df = pd.DataFrame({}, columns=["category", "metric", "units", "v1", "v2", "v1-v2"])
@@ -203,10 +215,10 @@ async def download(flowsheet_id: str, request: Request):
             assert u[0] == u[1]  # front-end should guarantee this
             try:
                 delta_v = v[0] - v[1]
-            except Exception:
+            except (TypeError, ValueError):
                 # don't crash if we can't subtract values
-                delta_v = pd.NA
-            # add row
+                delta_v = "NA"
+            # add row to dataframe
             df.loc[idx] = [catg, metric, u[0], v[0], v[1], delta_v]
             idx += 1
 
