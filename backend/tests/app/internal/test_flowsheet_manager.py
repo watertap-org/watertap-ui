@@ -50,10 +50,10 @@ def test_mgr_get_diagram(mgr: fm.FlowsheetManager):
 
 @pytest.mark.unit
 def test_mgr_getitem(mgr: fm.FlowsheetManager):
-    fs = mgr[one_id(mgr)]
+    fs = mgr.get_obj(one_id(mgr))
     assert fs
     with pytest.raises(HTTPException):
-        _ = mgr["this is not a valid flowsheet id"]
+        _ = mgr.get_obj("this is not a valid flowsheet id")
 
 
 @pytest.mark.component
@@ -64,8 +64,10 @@ def test_mgr_history(mgr: fm.FlowsheetManager):
     # put initial data and check it is returned
     mgr.put_flowsheet_data(id_=fsid, name=save_name, data=data1)
     data = mgr.get_flowsheet_data(id_=fsid, name=save_name)
-    assert data == data1
+    assert len(data) == 1
+    assert data[0] == data1
     # change data and check it is returned
     mgr.put_flowsheet_data(id_=fsid, name=save_name, data=data2)
     data = mgr.get_flowsheet_data(id_=fsid, name=save_name)
-    assert data == data2
+    assert len(data) == 1
+    assert data[0] == data2
