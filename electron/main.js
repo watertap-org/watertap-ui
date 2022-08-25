@@ -1,5 +1,7 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
+const Store = require("electron-store")
+const storage = new Store();
 require('dotenv').config()
 
 const axios = require('axios').default;
@@ -18,18 +20,45 @@ const uiURL = `http://localhost:${UI_PORT}`
 
 require('@electron/remote/main').initialize()
 
+// needs error handling?
+function getWindowSettings () {
+  const default_bounds = [800, 600]
+
+  const size = storage.get('win-size');
+
+  if (size) return size;
+  else {
+    storage.set("win-size", default_bounds);
+    return default_bounds;
+  }
+}
+
+function saveBounds (bounds) {
+  storage.set("win-size", bounds)
+}
 
 
 function createWindow() {
+  //get window size
+  const bounds = getWindowSettings();
+  console.log('bounds:',bounds)
+
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: bounds[0],
+    height: bounds[1],
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true
     }
   })
+
+  console.log("storing user preferences in: ",app.getPath('userData'));
+  
+  // save size of window when resized
+  win.on("resized", () => saveBounds(win.getSize()));
+  // win.on("moved", () => saveBounds(win.getSize()));
+
   win.webContents.openDevTools()
   win.loadURL(
     isDev
