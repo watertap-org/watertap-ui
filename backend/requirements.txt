@@ -10,4 +10,5 @@ sniffio==1.2.0
 starlette==0.19.1
 typing_extensions==4.2.0
 uvicorn==0.17.6
+git+https://github.com/watertap-org/watertap.git
 
