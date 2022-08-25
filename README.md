@@ -86,3 +86,9 @@ The JS spawning doesn't work on Windows, so in order to start the app there you 
 1. From the repo root: `cd backend/app` and run `uvicorn main:app --host 127.0.0.1 --port 8000 --reload &`
 2. Next `cd ../../electron/ui` and run `npm start &`. 
 3. Finally: `cd ..` (now in 'electron' subdir) and run `npm start`
+
+# Running developer tests
+
+To run the Python tests, make sure you have the appropriate version of watertap in your conda env.  Then from the repository root directory run:
+
+`pytest backend/tests`
