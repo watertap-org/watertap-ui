@@ -19,7 +19,9 @@ export default function FlowsheetsList() {
       .then((data)=>{
         console.log("f list:",data);
           setRows(data);
-      });
+      }).catch(e => {
+        console.log("error getting flowsheets list: "+e)
+    });
   }, []);
 
   const handleNewFlowsheetDialogClickOpen = () => {

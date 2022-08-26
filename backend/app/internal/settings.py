@@ -12,7 +12,7 @@ from pydantic import (
 
 class AppSettings(BaseSettings):
     #: List of package names in which to look for flowsheets
-    packages: list[str] = ["watertap"]
+    packages: list[str] = ["watertap", "examples"]
     data_basedir: Path = Path(app.__file__).parent.parent / "data" / "flowsheets"
 
     def create_data_basedir(self):

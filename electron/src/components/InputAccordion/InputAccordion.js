@@ -10,7 +10,7 @@ import InputWrapper from "../InputWrapper/InputWrapper";
 
 export default function InputAccordion(props) {
 
-    const {dataKey, data} = props;
+    const { data} = props;
     const [expanded1, setExpanded1] = useState('panel1'); 
     const [value, setValue] = useState("");
 
@@ -27,10 +27,12 @@ export default function InputAccordion(props) {
     };
 
     const renderFields = () => {
-        console.debug("renderFields, data=", data)
         return Object.keys(data.variables).map((key)=>{
             let vItem = data.variables[key];
-            return <InputWrapper key={key} fieldData={vItem} />
+            if(vItem.is_input) {
+                return <InputWrapper key={key} fieldData={vItem} />
+            }
+            
         });
     };
 

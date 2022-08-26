@@ -6,7 +6,7 @@ import csv
 import io
 from pathlib import Path
 from typing import List
-
+import logging
 # third-party
 from fastapi import Request, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
@@ -22,7 +22,7 @@ import idaes.logger as idaeslog
 CURRENT = "current"
 
 _log = idaeslog.getLogger(__name__)
-
+_log.setLevel(logging.DEBUG)
 router = APIRouter(
     prefix="/flowsheets",
     tags=["flowsheets"],
@@ -99,6 +99,7 @@ async def update(flowsheet_id: str, request: Request):
     input_data = await request.json()
     try:
         flowsheet.load(input_data)
+        _log.debug(f"Loading new data {input_data} into flowsheet {flowsheet_id}")
     except FlowsheetInterface.MissingObjectError as err:
         # this is unlikely, the model would need to change while running
         # (but could happen since 'build' and 'solve' can do anything they want)

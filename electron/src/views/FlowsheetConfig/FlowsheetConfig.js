@@ -52,7 +52,8 @@ export default function FlowsheetConfig() {
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
     const [outputData, setOutputData] = useState(null);
-    const [historyData, setHistoryData] = useState(null);
+    const [pastConfigs, setPastConfigs] = useState(null)
+    const [historyData, setHistoryData] = useState([]);
     const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
 
@@ -71,6 +72,7 @@ export default function FlowsheetConfig() {
       });
     }, [params.id]);
 
+  
 
     const handleTabChange = (event, newValue) => {
       setTabValue(newValue);
@@ -107,14 +109,12 @@ export default function FlowsheetConfig() {
         handleReset();
       }
     };
-  
 
     const handleSolved = (data) => {
       console.log("handle solved.....",data);
-      console.log('history amount: ', data.length)
-      setHistoryData(data)
-      data = data[data.length - 1]
-      setOutputData(data);
+      // data = data[data.length - 1]
+      
+      setOutputData({name: data.name, data: data});
       
       if(data.hasOwnProperty("input") && data.input)
       {console.log("iiiiiiii:",data.input);
@@ -185,11 +185,11 @@ export default function FlowsheetConfig() {
               </ConfigInput>
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-              <ConfigOutput outputData={outputData} historyData={historyData}>
+              <ConfigOutput outputData={outputData}  setPastConfigs={setPastConfigs}>
               </ConfigOutput>
             </TabPanel> 
             <TabPanel value={tabValue} index={2}>
-              <ConfigOutputComparisonTable outputData={outputData} historyData={historyData}>
+              <ConfigOutputComparisonTable outputData={outputData} pastConfigs={pastConfigs}>
               </ConfigOutputComparisonTable>
             </TabPanel> 
           </Box>

@@ -15,7 +15,7 @@ export default function InputWrapper(props) {
 
     const handleFieldChange = (event) => {
         setValue(event.target.value);
-        fieldData.value.value = event.target.value;
+        fieldData.value = event.target.value;
     };
 
     const displayUnits = (d) => {
@@ -27,12 +27,12 @@ export default function InputWrapper(props) {
         return {__html: u}
     }
 
-    return  <Tooltip title={fieldData.description}>
-                <TextField id={"outlined-basic"+fieldData.display_name} 
-                        label={fieldData.display_name}
+    return  <Tooltip title={fieldData.description+"adding this because description is empty"}>
+                <TextField id={"outlined-basic"+fieldData.name} 
+                        label={fieldData.name}
                         variant="outlined" 
                         size="small"
-                        value={fieldData.value.value}
+                        value={fieldData.value}
                         onChange={handleFieldChange}
                         fullWidth 
                         InputProps={{
