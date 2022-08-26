@@ -21,25 +21,11 @@ export default function OutputComparisonTable(props) {
     const [ pastConfigs, setPastConfigs ] = useState([])
     const [ historyData, setHistoryData ] = useState([])
     const [ historyDataOrganized, setHistoryDataOrganized ] = useState([])
-    const [ configData, setConfigData ] = React.useState([])
     const [leftConfigIndex, setLeftConfigIndex]  = React.useState(0)
     const [rightConfigIndex, setRightConfigIndex]  = React.useState(0)
     const [dense, setDense] = React.useState(true);
     const [ showTable, setShowTable ] = React.useState(false)
 
-    
-//   useEffect(()=>{   
-//     console.log("in comparison table")
-//     if (!showTable){
-//       let temp = [...historyDataOrganized]
-//       // temp.push(organizeOutput(outputData))
-//       setConfigData(temp)
-//       // console.log('configData', temp)
-//       // console.log("historyDataOrganized", historyDataOrganized)
-//       setShowTable(true)
-//     }
-
-// }, []);
 
 useEffect(() => {
 organizeVariables()
@@ -104,27 +90,6 @@ const organizeVariables = () => {
     const handleRightConfigSelection = (event) => {
       setRightConfigIndex(event.target.value)
     }
-
-    // const organizeOutput = (data) => {
-    //   let var_sections = {}
-    //   let tempVariables = []
-    //   let tempName = data.name
-    //   // console.log('bvars',bvars)
-    //   for (const [key, v] of Object.entries(data.data.model_objects)) {
-          
-    //       let catg = v.input_category
-    //       if (catg === null) {
-    //           catg = "Uncategorized"
-    //       }
-    //       if (!Object.hasOwn(var_sections, catg)) {
-    //           var_sections[catg] = {display_name: catg, variables: {}}
-    //       }
-    //       tempVariables.push(v)
-    //       // console.log('tempVariables', tempVariables)
-    //       var_sections[catg]["variables"] = [...tempVariables]
-    //   }
-    //   return {name: tempName, data: var_sections}
-    // }
 
     const renderConfigurationSelect = (index) => {
         return <FormControl >
@@ -208,7 +173,7 @@ const organizeVariables = () => {
   return (
 
         <Grid container spacing={0} alignItems="flex-start"> 
-          <Grid item xs={12}>
+          <Grid aria-label="output-table-grid" item xs={12}>
             {  showTable &&
                 renderComparisonTable()
             }

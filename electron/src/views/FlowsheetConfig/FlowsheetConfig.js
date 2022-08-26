@@ -189,7 +189,7 @@ export default function FlowsheetConfig() {
               </ConfigOutput>
             </TabPanel> 
             <TabPanel value={tabValue} index={2}>
-              <ConfigOutputComparisonTable outputData={outputData} pastConfigs={pastConfigs}>
+              <ConfigOutputComparisonTable outputData={outputData}>
               </ConfigOutputComparisonTable>
             </TabPanel> 
           </Box>

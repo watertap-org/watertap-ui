@@ -7,12 +7,12 @@ describe('Flowsheet Output Test', () => {
         cy.screenshot(sc_count+'_loaded homepage')
         sc_count+=1
 
-        //click example ro flowsheet and wait for api response
+        //click foo and wait for api response
         cy.intercept({
             method: "GET",
             url: "http://localhost:8001/flowsheets/**",
         }).as("loadFlowsheet");
-        cy.findByRole('link', {  name: /example ro flowsheet/i}).click()
+        cy.findByRole('link', {  name: /foo/i}).click()
         cy.wait("@loadFlowsheet");
         cy.screenshot(sc_count+'_loaded flowsheet')
         sc_count+=1
