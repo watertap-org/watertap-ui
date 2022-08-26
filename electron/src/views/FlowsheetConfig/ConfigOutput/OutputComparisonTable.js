@@ -28,7 +28,12 @@ export default function OutputComparisonTable(props) {
 
 
 useEffect(() => {
-organizeVariables()
+  try{
+    organizeVariables()
+  } catch {
+    console.error("unable to organize variables")
+  }
+
 }, [historyData])
 
 useEffect(()=>{   
@@ -110,7 +115,27 @@ const organizeVariables = () => {
     }
 
     const downloadSheet = () => {
-      downloadCSV(params.id, [historyData[leftConfigIndex],historyData[rightConfigIndex]])
+      var arg = {"values": []}
+      var cat1 = {}
+      var cat2 = {}
+      for(const cat of Object.keys(historyDataOrganized[leftConfigIndex].data)) {
+        // console.log(cat)
+        cat1[cat] = {}
+        cat2[cat] = {}
+        for (var i = 0; i < historyDataOrganized[leftConfigIndex].data[cat].variables.length; i++) {
+          var metricName = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["name"]
+          var leftValue = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["value"]
+          var rightValue = historyDataOrganized[rightConfigIndex].data[cat].variables[i]["value"]
+          var units = historyDataOrganized[rightConfigIndex].data[cat].variables[i]["display_units"]
+          cat1[cat][metricName] = [leftValue,units]
+          cat2[cat][metricName] = [rightValue,units]
+        }
+
+      }
+      arg.values.push(cat1)
+      arg.values.push(cat2)
+      console.log(arg)
+      downloadCSV(params.id, arg)
       .then(response => response.blob())
       .then((data)=>{
         const href = window.URL.createObjectURL(data);
@@ -165,7 +190,7 @@ const organizeVariables = () => {
         </Table>
       </Paper>
       <Grid item xs={12}>
-      {/* <Button variant="text" startIcon={<DownloadIcon />} onClick={downloadSheet}>Download Results</Button> */}
+      <Button variant="text" startIcon={<DownloadIcon />} onClick={downloadSheet}>Download Results</Button>
       </Grid>
       </Grid>
     }
