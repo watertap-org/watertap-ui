@@ -92,3 +92,6 @@ The JS spawning doesn't work on Windows, so in order to start the app there you 
 To run the Python tests, make sure you have the appropriate version of watertap in your conda env.  Then from the repository root directory run:
 
 `pytest backend/tests`
+
+
+Last merged PR: : graph_settings-issue53
