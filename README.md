@@ -94,4 +94,5 @@ To run the Python tests, make sure you have the appropriate version of watertap 
 `pytest backend/tests`
 
 
-Last merged PR: : graph_settings-issue53
+Last merged PR: : test-issue55
+
