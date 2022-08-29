@@ -36,12 +36,17 @@
     "start": "react-scripts start",
     "electron-start": "concurrently -k \"cross-env npm run app-start-nob\" \"wait-on http://localhost:3000 && npx electron .\"",
     "start-nob": "BROWSER=none npm start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
     "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
     "app-start": "concurrently -k \"cross-env npm run start-backend\" \"react-scripts start\"",
-    "app-start-nob": "concurrently -k \"cross-env npm run start-backend\" \"npm run start-nob\""
+    "app-start-nob": "concurrently -k \"cross-env npm run start-backend\" \"npm run start-nob\"",
+    "build": "react-scripts build",
+    "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
+    "electron-build": "npm run remove-previous-dist && electron-builder -m -c.extraMetadata.main=build/main.js || electron-builder -m -c.extraMetadata.main=build/main.js",
+    "dist:mac": "npm run build-backend && npm run build && electron-builder -m -c.extraMetadata.main=build/main.js",
+    "remove-previous-backend-build": "rm -r py_dist/*",
+    "remove-previous-dist": "rm -r dist/*",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
