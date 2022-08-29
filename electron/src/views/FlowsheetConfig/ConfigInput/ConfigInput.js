@@ -15,13 +15,12 @@ import Stack from '@mui/material/Stack';
 
 export default function ConfigInput(props) {
     const { flowsheetData, updateFlowsheetData } = props;  
-    const [costingBlocks, setCostingBlocks] = useState({});
-    const [parametersBlocks, setParametersBlocks] = useState({}); 
-    const [inputBlocks, setInputBlocks] = useState({});
+    // const [costingBlocks, setCostingBlocks] = useState({});
+    // const [parametersBlocks, setParametersBlocks] = useState({}); 
+    // const [inputBlocks, setInputBlocks] = useState({});
 
     useEffect(()=>{   
-        //splitData(flowsheetData); 
-        //console.log("changed");
+
     }, [flowsheetData]);
  
 

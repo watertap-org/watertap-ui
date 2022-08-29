@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { saveConfig, listConfigNames, loadConfig }  from '../../../services/output.service.js'
 import Modal from '@mui/material/Modal';
+import { ConstructionOutlined } from '@mui/icons-material';
 
 
 export default function ConfigOutput(props) {
@@ -73,13 +74,16 @@ export default function ConfigOutput(props) {
 
     // renders the data in output accordions
     const renderFields = (fieldData) => {
+        console.log("field data", fieldData)
         return Object.keys(fieldData).map((key)=>{ 
+            if(fieldData[key].is_output) {
             let _key = key + Math.floor(Math.random() * 100001); 
             return (<div key={_key}>
                            <span>{fieldData[key].name+" "}</span>
                            <span style={{color:"#68c3e4",fontWeight:"bold"}}>{fieldData[key].value}</span>
                            <span>{" "+fieldData[key].display_units}</span>
                     </div>)
+            }
         })
     };
 

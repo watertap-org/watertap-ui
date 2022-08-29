@@ -42,6 +42,7 @@ export default function InputWrapper(props) {
                                 </span>
                                 </InputAdornment>
                         }}
+                        disabled={fieldData.is_readonly ? true : false}
                 />
             </Tooltip>
 
