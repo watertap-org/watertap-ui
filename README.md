@@ -71,11 +71,20 @@ The following assumes that the `watertap-org/watertap` repository has been clone
 bash -c "cd /path/to/my/watertap && pip install -r requirements-dev.txt"
 ```
 
-### Run UI
+### Run UI in browser
 
 ```console
-uvicorn --app-dir backend/app main:app --host 127.0.0.1 --port 8000 --reload &
-npm --prefix electron start &
+conda activate watertap-ui-env
+cd <watertap-ui-path>/electron
+npm run app-start
+```
+
+### Run UI with electron
+
+```console
+conda activate watertap-ui-env
+cd <watertap-ui-path>/electron
+npm run electron-start
 ```
 
 ## Windows instructions
