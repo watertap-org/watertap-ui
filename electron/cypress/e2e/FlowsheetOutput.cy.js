@@ -110,8 +110,8 @@ describe('Flowsheet Output Test', () => {
         cy.wait(5000)
 
         //verify that new name is shown in comparison table
-        cy.findAllByRole('button', {name: /new_test_configuration/i})
-        // find.. ?
+        // cy.findAllByRole('button', {name: /new_test_configuration/i})
+        cy.findAllByRole('tabpanel', {name: /compare/i})
 
         cy.screenshot(sc_count+'_end-test')
     })
