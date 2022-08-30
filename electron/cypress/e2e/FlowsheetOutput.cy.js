@@ -8,7 +8,7 @@ describe('Flowsheet Output Test', () => {
         sc_count+=1
 
         //click flowsheet and wait for api response
-        var flowsheet_name = "foo"
+        var flowsheet_name = "metab"
         cy.intercept({
             method: "GET",
             url: "http://localhost:8001/flowsheets/**",
@@ -19,16 +19,16 @@ describe('Flowsheet Output Test', () => {
         sc_count+=1
 
         //enter valid value for recovery rate twice to ensure it registers
-        var input_textbox_name = "Tank 1 inlet flowrate"
+        var input_textbox_name = "COD concentration"
         var input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
-        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}25')
+        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}6')
         cy.wait(500)
         var input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
-        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}25')
+        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}6')
         cy.screenshot(sc_count+'_input1')
         sc_count+=1
 
@@ -47,12 +47,12 @@ describe('Flowsheet Output Test', () => {
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
-        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}25')
+        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}6')
         cy.wait(500)
         var input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
-        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}25')
+        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}6')
         cy.screenshot(sc_count+'_input2')
         sc_count+=1
 
@@ -77,7 +77,7 @@ describe('Flowsheet Output Test', () => {
         sc_count+=1
 
         //find output categories
-        cy.findByRole('button', {name: /uncategorized/i})
+        cy.findByRole('button', {name: /feed/i})
 
         //click save configuration button
         cy.findByRole('button', {name: /save configuration/i}).click()
@@ -108,7 +108,7 @@ describe('Flowsheet Output Test', () => {
         cy.wait(5000)
 
         //verify that new name is shown in comparison table
-        // cy.findAllByRole('button', {name: /new_test_configuration/i})
+        cy.findAllByRole('button', {name: /new_test_configuration/i})
         // find.. ?
 
         cy.screenshot(sc_count+'_end-test')
