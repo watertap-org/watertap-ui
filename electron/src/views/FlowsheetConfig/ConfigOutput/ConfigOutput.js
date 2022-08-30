@@ -59,7 +59,7 @@ export default function ConfigOutput(props) {
     const organizeVariables = (bvars) => {
         let var_sections = {}
         for (const [key, v] of Object.entries(bvars)) {
-            let catg = v.input_category
+            let catg = v.output_category
             let is_input = v.is_input
             let is_output = v.is_output
             if (catg === null) {
