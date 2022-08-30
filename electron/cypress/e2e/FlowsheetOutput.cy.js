@@ -8,7 +8,7 @@ describe('Flowsheet Output Test', () => {
         sc_count+=1
 
         //click flowsheet and wait for api response
-        var flowsheet_name = "metab"
+        var flowsheet_name = "foo"
         cy.intercept({
             method: "GET",
             url: "http://localhost:8001/flowsheets/**",
@@ -19,7 +19,8 @@ describe('Flowsheet Output Test', () => {
         sc_count+=1
 
         //enter valid value for recovery rate twice to ensure it registers
-        var input_textbox_name = "COD concentration"
+        // var input_textbox_name = "COD concentration"
+        var input_textbox_name = "Tank 1 inlet flowrate"
         var input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
@@ -77,7 +78,8 @@ describe('Flowsheet Output Test', () => {
         sc_count+=1
 
         //find output categories
-        cy.findByRole('button', {name: /feed/i})
+        // cy.findByRole('button', {name: /feed/i})
+        cy.findByRole('button', {name: ""})
 
         //click save configuration button
         cy.findByRole('button', {name: /save configuration/i}).click()
