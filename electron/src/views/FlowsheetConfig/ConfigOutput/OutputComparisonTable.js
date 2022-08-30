@@ -70,7 +70,7 @@ const organizeVariables = () => {
         
         let catg = v.input_category
         if (catg === null) {
-            catg = "Uncategorized"
+            catg = ""
         }
         if (!Object.hasOwn(var_sections, catg)) {
             var_sections[catg] = {display_name: catg, variables: {}}
@@ -121,9 +121,16 @@ const organizeVariables = () => {
         cat1[cat] = {}
         cat2[cat] = {}
         for (var i = 0; i < historyDataOrganized[leftConfigIndex].data[cat].variables.length; i++) {
+          var rounding
+          if (historyDataOrganized[leftConfigIndex].data[cat].variables[i]["rounding"]) {
+            rounding = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["rounding"]
+          } else {
+            rounding = 5
+          }
+          
           var metricName = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["name"]
-          var leftValue = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["value"]
-          var rightValue = historyDataOrganized[rightConfigIndex].data[cat].variables[i]["value"]
+          var leftValue = parseFloat((historyDataOrganized[leftConfigIndex].data[cat].variables[i]["value"]).toFixed(rounding))
+          var rightValue = parseFloat((historyDataOrganized[rightConfigIndex].data[cat].variables[i]["value"]).toFixed(rounding))
           var units = historyDataOrganized[rightConfigIndex].data[cat].variables[i]["display_units"]
           cat1[cat][metricName] = [leftValue,units]
           cat2[cat][metricName] = [rightValue,units]
@@ -149,16 +156,23 @@ const organizeVariables = () => {
     const renderRows = () => {
 
 
-      return Object.keys(historyDataOrganized[leftConfigIndex].data).map((category,index)=>{ return ( <Fragment>
+      return Object.keys(historyDataOrganized[leftConfigIndex].data).map((category,index)=>{  return ( <Fragment>
         <TableRow key={category+index}>
           <TableCell rowSpan={Object.keys(historyDataOrganized[leftConfigIndex].data[category].variables).length + 1}>
             <b>{category}</b>
           </TableCell>
         </TableRow>
-        {historyDataOrganized[leftConfigIndex].data[category].variables.map((metric, index) => { return <TableRow key={index}>
+        {historyDataOrganized[leftConfigIndex].data[category].variables.map((metric, index) => { 
+          var rounding
+          if (metric.rounding) {
+            rounding = metric.rounding
+          } else {
+            rounding = 5
+          }
+          return <TableRow key={index}>
             <TableCell>{metric.name}</TableCell>
-            <TableCell>{metric.value+" "+metric.display_units}</TableCell>
-            <TableCell>{historyDataOrganized[rightConfigIndex].data[category].variables[index].value+" "+historyDataOrganized[rightConfigIndex].data[category].variables[index].display_units}</TableCell>
+            <TableCell>{parseFloat((metric.value).toFixed(rounding))+" "+metric.display_units}</TableCell>
+            <TableCell>{parseFloat((historyDataOrganized[rightConfigIndex].data[category].variables[index].value).toFixed(rounding))+" "+historyDataOrganized[rightConfigIndex].data[category].variables[index].display_units}</TableCell>
             <TableCell align='right'>
               {(Math.round((metric.value-historyDataOrganized[rightConfigIndex].data[category].variables[index].value) * 100) / 100).toFixed(2)}</TableCell>
           </TableRow>

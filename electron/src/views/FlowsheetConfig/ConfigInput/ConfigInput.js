@@ -33,13 +33,19 @@ export default function ConfigInput(props) {
         let var_sections = {}
         for (const [key, v] of Object.entries(bvars)) {
             let catg = v.input_category
+            let is_input = v.is_input
+            let is_output = v.is_output
+            // console.log("key",key)
+            // console.log("v",v)
             if (catg === null) {
-                catg = "Uncategorized"
+                catg = ""
             }
             if (!Object.hasOwn(var_sections, catg)) {
-                var_sections[catg] = {display_name: catg, variables: {}}
+                var_sections[catg] = {display_name: catg, variables: {}, input_variables:{}, output_variables:{} }
             }
             var_sections[catg]["variables"][key] = v
+            if(is_input) var_sections[catg]["input_variables"][key] = v;
+            if(is_output) var_sections[catg]["output_variables"][key] = v
         }
         return var_sections
     }
@@ -48,10 +54,11 @@ export default function ConfigInput(props) {
         let var_sections = organizeVariables(flowsheetData.model_objects)
         return Object.entries(var_sections).map(([key, value])=>{
             let _key = key + Math.floor(Math.random() * 100001);
-            return (<Grid item xs={6} key={_key}>
-                <InputAccordion data={value}></InputAccordion>
-            </Grid>)
-            
+            if(Object.keys(value.input_variables).length > 0) {
+                return (<Grid item xs={6} key={_key}>
+                    <InputAccordion data={value}></InputAccordion>
+                </Grid>)
+            }
         })
     };
     

@@ -11,9 +11,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { saveConfig, listConfigNames, loadConfig }  from '../../../services/output.service.js'
+import { saveConfig }  from '../../../services/output.service.js'
 import Modal from '@mui/material/Modal';
-import { ConstructionOutlined } from '@mui/icons-material';
 
 
 export default function ConfigOutput(props) {
@@ -61,29 +60,37 @@ export default function ConfigOutput(props) {
         let var_sections = {}
         for (const [key, v] of Object.entries(bvars)) {
             let catg = v.input_category
+            let is_input = v.is_input
+            let is_output = v.is_output
             if (catg === null) {
-                catg = "Uncategorized"
+                catg = ""
             }
             if (!Object.hasOwn(var_sections, catg)) {
-                var_sections[catg] = {display_name: catg, variables: {}}
+                var_sections[catg] = {display_name: catg, variables: {}, input_variables:{}, output_variables:{}}
             }
             var_sections[catg]["variables"][key] = v
+            if(is_input) var_sections[catg]["input_variables"][key] = v;
+            if(is_output) var_sections[catg]["output_variables"][key] = v
         }
         return var_sections
     }
 
     // renders the data in output accordions
     const renderFields = (fieldData) => {
-        console.log("field data", fieldData)
+        // console.log("field data", fieldData)
         return Object.keys(fieldData).map((key)=>{ 
-            if(fieldData[key].is_output) {
             let _key = key + Math.floor(Math.random() * 100001); 
+            let rounding
+            if(fieldData[key].rounding) {
+                rounding = fieldData[key].rounding
+            }else {
+                rounding = 5
+            }
             return (<div key={_key}>
                            <span>{fieldData[key].name+" "}</span>
-                           <span style={{color:"#68c3e4",fontWeight:"bold"}}>{fieldData[key].value}</span>
+                           <span style={{color:"#68c3e4",fontWeight:"bold"}}>{parseFloat((fieldData[key].value).toFixed(rounding))}</span>
                            <span>{" "+fieldData[key].display_units}</span>
                     </div>)
-            }
         })
     };
 
@@ -96,6 +103,7 @@ export default function ConfigOutput(props) {
         //             </Grid>);
         // }
         let var_sections = organizeVariables(outputData.data.model_objects)
+        console.log("var_sections",var_sections)
         return Object.entries(var_sections).map(([key,value])=>{
             //console.log("O key:",key);
             let gridSize = 4;
@@ -103,26 +111,29 @@ export default function ConfigOutput(props) {
             //     gridSize = 12;
             
             let _key = key + Math.floor(Math.random() * 100001); 
-            return (<Grid item xs={gridSize} key={_key}>
-                        <Accordion expanded={true} style={{border:"1px solid #ddd"}}>
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-                                {value.display_name}
-                            </AccordionSummary>
-                            <AccordionDetails>  
-                                <Box
-                                    component="form"
-                                    sx={{
-                                        '& > :not(style)': { m: 1 },
-                                    }}
-                                    autoComplete="off"
-                                >
-                                {
-                                    renderFields(value.variables)
-                                }
-                                </Box>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid>)
+            if(Object.keys(value.output_variables).length > 0) {
+                return (<Grid item xs={gridSize} key={_key}>
+                    <Accordion expanded={true} style={{border:"1px solid #ddd"}}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} >
+                            {value.display_name}
+                        </AccordionSummary>
+                        <AccordionDetails>  
+                            <Box
+                                component="form"
+                                sx={{
+                                    '& > :not(style)': { m: 1 },
+                                }}
+                                autoComplete="off"
+                            >
+                            {
+                                renderFields(value.output_variables)
+                            }
+                            </Box>
+                        </AccordionDetails>
+                    </Accordion>
+                </Grid>)
+            }
+
         })
     };
     
