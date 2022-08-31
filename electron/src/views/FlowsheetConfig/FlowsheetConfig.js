@@ -53,9 +53,9 @@ export default function FlowsheetConfig() {
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
     const [outputData, setOutputData] = useState(null);
     const [pastConfigs, setPastConfigs] = useState(null)
-    const [historyData, setHistoryData] = useState([]);
     const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("")
 
 
     useEffect(()=>{ 
@@ -125,9 +125,9 @@ export default function FlowsheetConfig() {
       setSolveDialogOpen(false);
     };
 
-    const handleError = () => {
+    const handleError = (msg) => {
       console.log("handle error");
-      
+      setErrorMessage(msg)
       setOpenErrorMessage(true);
       setSolveDialogOpen(false);
     };
@@ -211,7 +211,7 @@ export default function FlowsheetConfig() {
       />
       <Snackbar open={openErrorMessage} autoHideDuration={3000} onClose={handleErrorClose}>
         <Alert onClose={handleErrorClose} severity="error">
-          Error: Invalid Data Input
+          {errorMessage}
         </Alert>
       </Snackbar>
       </Container>  

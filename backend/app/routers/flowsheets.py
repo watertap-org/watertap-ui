@@ -13,6 +13,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
 import pandas as pd
 from pydantic import BaseModel
+from pydantic.error_wrappers import ValidationError
 
 # package-local
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
@@ -105,6 +106,11 @@ async def update(flowsheet_id: str, request: Request):
         # (but could happen since 'build' and 'solve' can do anything they want)
         _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
         # XXX: return something about the error to caller
+    except ValidationError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        raise HTTPException(
+            400, f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input"
+        )
     flowsheet_manager.get_info(flowsheet_id).set_updated()
     return flowsheet.fs_exp
 

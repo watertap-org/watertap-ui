@@ -63,26 +63,36 @@ const organizeVariables = () => {
   var tempHistory = []
   for (const bvars of historyData) {
     let var_sections = {}
-    let tempVariables = []
+    let tempVariables = {}
     let tempName = bvars.name
-    // console.log('bvars',bvars)
     for (const [key, v] of Object.entries(bvars.data.model_objects)) {
         
-        let catg = v.input_category
+        let catg
+        let is_input = v.is_input
+        let is_output = v.is_output
+        if (is_input) catg = v.input_category
+        if (is_output) catg = v.output_category
         if (catg === null) {
-            catg = "Uncategorized"
+            catg = ""
         }
         if (!Object.hasOwn(var_sections, catg)) {
-            var_sections[catg] = {display_name: catg, variables: {}}
+            var_sections[catg] = {display_name: catg, variables: [], input_variables:[], output_variables:[]}
         }
-        tempVariables.push(v)
-        // console.log('tempVariables', tempVariables)
-        var_sections[catg]["variables"] = [...tempVariables]
+        if (!Object.hasOwn(tempVariables, catg)) {
+          tempVariables[catg] = {variables: [], input_variables:[], output_variables:[]}
+      }
+      tempVariables[catg].variables.push(v)
+      var_sections[catg]["variables"] = [...tempVariables[catg].variables];
+        if(is_output) {
+          tempVariables[catg].output_variables.push(v)
+          var_sections[catg]["output_variables"] = [...tempVariables[catg].output_variables];
+        }
     }
     tempHistory.push({name: tempName, data: var_sections})
     setHistoryDataOrganized([...tempHistory])
     setLeftConfigIndex(tempHistory.length-1)
     setShowTable(true)
+    console.log("historyDataOrganized",tempHistory)
   }
   
 }
@@ -121,9 +131,16 @@ const organizeVariables = () => {
         cat1[cat] = {}
         cat2[cat] = {}
         for (var i = 0; i < historyDataOrganized[leftConfigIndex].data[cat].variables.length; i++) {
+          var rounding
+          if (historyDataOrganized[leftConfigIndex].data[cat].variables[i]["rounding"]) {
+            rounding = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["rounding"]
+          } else {
+            rounding = 5
+          }
+          
           var metricName = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["name"]
-          var leftValue = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["value"]
-          var rightValue = historyDataOrganized[rightConfigIndex].data[cat].variables[i]["value"]
+          var leftValue = parseFloat((historyDataOrganized[leftConfigIndex].data[cat].variables[i]["value"]).toFixed(rounding))
+          var rightValue = parseFloat((historyDataOrganized[rightConfigIndex].data[cat].variables[i]["value"]).toFixed(rounding))
           var units = historyDataOrganized[rightConfigIndex].data[cat].variables[i]["display_units"]
           cat1[cat][metricName] = [leftValue,units]
           cat2[cat][metricName] = [rightValue,units]
@@ -149,48 +166,61 @@ const organizeVariables = () => {
     const renderRows = () => {
 
 
-      return Object.keys(historyDataOrganized[leftConfigIndex].data).map((category,index)=>{ return ( <Fragment>
-        <TableRow key={category+index}>
-          <TableCell rowSpan={Object.keys(historyDataOrganized[leftConfigIndex].data[category].variables).length + 1}>
-            <b>{category}</b>
-          </TableCell>
-        </TableRow>
-        {historyDataOrganized[leftConfigIndex].data[category].variables.map((metric, index) => { return <TableRow key={index}>
-            <TableCell>{metric.name}</TableCell>
-            <TableCell>{metric.value+" "+metric.display_units}</TableCell>
-            <TableCell>{historyDataOrganized[rightConfigIndex].data[category].variables[index].value+" "+historyDataOrganized[rightConfigIndex].data[category].variables[index].display_units}</TableCell>
-            <TableCell align='right'>
-              {(Math.round((metric.value-historyDataOrganized[rightConfigIndex].data[category].variables[index].value) * 100) / 100).toFixed(2)}</TableCell>
-          </TableRow>
-        })}
-      </Fragment>
-        )
+      return Object.keys(historyDataOrganized[leftConfigIndex].data).map((category,index)=>{  
+        if (historyDataOrganized[leftConfigIndex].data[category].variables.length > 0) {
+          return ( <Fragment>
+            <TableRow key={category+index}>
+              <TableCell rowSpan={historyDataOrganized[leftConfigIndex].data[category].variables.length + 1}>
+                <b>{category}</b>
+              </TableCell>
+            </TableRow>
+            {historyDataOrganized[leftConfigIndex].data[category].variables.map((metric, index) => { 
+              var rounding
+              if (metric.rounding) {
+                rounding = metric.rounding
+              } else {
+                rounding = 5
+              }
+              return <TableRow key={index}>
+                <TableCell>{metric.name}</TableCell>
+                <TableCell>{parseFloat((metric.value).toFixed(rounding))+" "+metric.display_units}</TableCell>
+                <TableCell>{parseFloat((historyDataOrganized[rightConfigIndex].data[category].variables[index].value).toFixed(rounding))+" "+historyDataOrganized[rightConfigIndex].data[category].variables[index].display_units}</TableCell>
+                <TableCell align='right'>
+                  {(Math.round((metric.value-historyDataOrganized[rightConfigIndex].data[category].variables[index].value) * 100) / 100).toFixed(2)}</TableCell>
+              </TableRow>
+            })}
+          </Fragment>
+            )
+        }
+       
         })
     }
 
 
     const renderComparisonTable = () => {
-      return <Grid item xs={12}>
-      <Paper>
-        <Table style={{border:"1px solid #ddd"}} size={dense ? 'small' : 'medium'}>
-          <TableHead>
-            <TableRow key="tablehead">
-              <TableCell style={{ width: '15%' }}></TableCell>
-              <TableCell style={{ width: '20%' }}>Metric</TableCell>
-              <TableCell style={{ width: '25%' }}>{renderConfigurationSelect(0)}</TableCell>
-              <TableCell style={{ width: '25%' }}>{renderConfigurationSelect(1)}</TableCell>
-              <TableCell style={{ width: '15%' }}>Value Difference</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {renderRows()}
-          </TableBody>
-        </Table>
-      </Paper>
-      <Grid item xs={12}>
-      <Button variant="text" startIcon={<DownloadIcon />} onClick={downloadSheet}>Download Results</Button>
-      </Grid>
-      </Grid>
+
+        return <Grid item xs={12}>
+        <Paper>
+          <Table style={{border:"1px solid #ddd"}} size={dense ? 'small' : 'medium'}>
+            <TableHead>
+              <TableRow key="tablehead">
+                <TableCell style={{ width: '15%' }}></TableCell>
+                <TableCell style={{ width: '20%' }}>Metric</TableCell>
+                <TableCell style={{ width: '25%' }}>{renderConfigurationSelect(0)}</TableCell>
+                <TableCell style={{ width: '25%' }}>{renderConfigurationSelect(1)}</TableCell>
+                <TableCell style={{ width: '15%' }}>Value Difference</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {renderRows()}
+            </TableBody>
+          </Table>
+        </Paper>
+        <Grid item xs={12}>
+        <Button variant="text" startIcon={<DownloadIcon />} onClick={downloadSheet}>Download Results</Button>
+        </Grid>
+        </Grid>
+      
     }
 
   return (

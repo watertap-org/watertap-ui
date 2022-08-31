@@ -9,8 +9,9 @@ test('test input accordion', () => {
     render( <InputAccordion data={mockData}></InputAccordion> )
 
     //test for component elements
-    screen.getByRole('button', {  name: /uncategorized/i});
+    screen.getByRole('button', {  name: /feed/i});
     screen.getByRole('region', {  name: ""});
-    screen.getByRole('textbox', {  name: /Tank 1 inlet flowrate/i});
+    screen.getByRole('textbox', {  name: /Volumetric flow rate/i});
+    screen.getByRole('textbox', {  name: /COD concentration/i});
 
 })
