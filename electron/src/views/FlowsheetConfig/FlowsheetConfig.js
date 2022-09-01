@@ -52,9 +52,10 @@ export default function FlowsheetConfig() {
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
     const [outputData, setOutputData] = useState(null);
-    const [historyData, setHistoryData] = useState(null);
+    const [pastConfigs, setPastConfigs] = useState(null)
     const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("")
 
 
     useEffect(()=>{ 
@@ -71,6 +72,7 @@ export default function FlowsheetConfig() {
       });
     }, [params.id]);
 
+  
 
     const handleTabChange = (event, newValue) => {
       setTabValue(newValue);
@@ -107,14 +109,12 @@ export default function FlowsheetConfig() {
         handleReset();
       }
     };
-  
 
     const handleSolved = (data) => {
       console.log("handle solved.....",data);
-      console.log('history amount: ', data.length)
-      setHistoryData(data)
-      data = data[data.length - 1]
-      setOutputData(data);
+      // data = data[data.length - 1]
+      
+      setOutputData({name: data.name, data: data});
       
       if(data.hasOwnProperty("input") && data.input)
       {console.log("iiiiiiii:",data.input);
@@ -125,9 +125,9 @@ export default function FlowsheetConfig() {
       setSolveDialogOpen(false);
     };
 
-    const handleError = () => {
+    const handleError = (msg) => {
       console.log("handle error");
-      
+      setErrorMessage(msg)
       setOpenErrorMessage(true);
       setSolveDialogOpen(false);
     };
@@ -185,11 +185,11 @@ export default function FlowsheetConfig() {
               </ConfigInput>
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-              <ConfigOutput outputData={outputData} historyData={historyData}>
+              <ConfigOutput outputData={outputData}  setPastConfigs={setPastConfigs}>
               </ConfigOutput>
             </TabPanel> 
             <TabPanel value={tabValue} index={2}>
-              <ConfigOutputComparisonTable outputData={outputData} historyData={historyData}>
+              <ConfigOutputComparisonTable outputData={outputData}>
               </ConfigOutputComparisonTable>
             </TabPanel> 
           </Box>
@@ -211,7 +211,7 @@ export default function FlowsheetConfig() {
       />
       <Snackbar open={openErrorMessage} autoHideDuration={3000} onClose={handleErrorClose}>
         <Alert onClose={handleErrorClose} severity="error">
-          Error: Invalid Data Input
+          {errorMessage}
         </Alert>
       </Snackbar>
       </Container>  

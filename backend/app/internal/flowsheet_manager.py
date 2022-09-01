@@ -3,6 +3,7 @@ from pathlib import Path
 import shutil
 import time
 from typing import Optional, Dict, List
+import logging
 
 # third-party
 from fastapi import HTTPException
@@ -15,7 +16,7 @@ from watertap.ui.fsapi import FlowsheetInterface
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
-
+_log.setLevel(logging.DEBUG)
 
 class FlowsheetInfo(BaseModel):
     """Information about a flowsheet."""

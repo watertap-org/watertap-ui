@@ -20,6 +20,7 @@
     "cypress": "^10.4.0",
     "dotenv": "^16.0.1",
     "electron-is-dev": "^2.0.0",
+    "electron-store": "^8.1.0",
     "jointjs": "^3.5.5",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
@@ -33,14 +34,14 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "electron-start": "concurrently -k \"cross-env npm run start-app-nob\" \"wait-on http://localhost:3000 && npx electron .\"",
-    "start-nob": "BROWSER=none npm start",
+    "electron-start": "concurrently -k \"npm run start-backend\" \"npm run start-nob\" \"wait-on http://127.0.0.1:3000 && npx electron .\"",
+    "start-nob": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
-    "start-app": "concurrently -k \"cross-env npm run start-backend\" \"react-scripts start\"",
-    "start-app-nob": "concurrently -k \"cross-env npm run start-backend\" \"npm run start-nob\""
+    "app-start": "concurrently -k \"cross-env npm run start-backend\" \"react-scripts start\"",
+    "app-start-nob": "concurrently -k \"cross-env npm run start-backend\" \"npm run start-nob\""
   },
   "eslintConfig": {
     "extends": [
