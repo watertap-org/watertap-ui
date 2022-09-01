@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';   
+import { useEffect } from 'react';   
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog'; 
 import DialogActions from '@mui/material/DialogActions';
@@ -11,12 +11,19 @@ export default function SolveDialog(props) {
 
   useEffect(()=>{  
     if(open)
-    {
+    { 
         solve(id)
-        .then(response => response.json())
-        .then((outputData)=>{ 
-            console.log("outputData",outputData);
-            handleSolved(outputData);
+        .then(r =>  r.json().then(data => ({status: r.status, body: data})))
+        .then(data => {
+          // console.log(data)
+            let status = data.status
+            let outputData = data.body
+            if(status===200) {
+              handleSolved(outputData);
+            } else if (status===500) {
+              handleError(outputData.detail)
+            }
+            
         }).catch(e => {
           console.log("caught error: "+e)
           handleError()

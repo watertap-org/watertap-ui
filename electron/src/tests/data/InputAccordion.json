@@ -1,33 +1,81 @@
 {
-    "": {
-      "display_name": "",
-      "variables": {
-        "flow_vol": {
-          "value": {
-            "index": [
-              [
-                0
-              ]
-            ],
-            "value": [
-              0.0003286
-            ],
-            "bounds": [
-              [
-                null,
-                null
-              ]
-            ]
-          },
-          "display_name": "flow_vol",
-          "description": "Volumetric flowrate in feed",
-          "display_units": "m<sup>3</sup>/s",
-          "indices": [],
-          "scale_factor": 0,
-          "to_units": "",
-          "readonly": false,
-          "category": ""
+    "display_name": "Feed",
+    "variables": {
+        "0c57aaa513584127ac315f52223583d3": {
+            "name": "Volumetric flow rate",
+            "value": 0.0004,
+            "display_units": "L/h",
+            "rounding": 0,
+            "description": "Inlet volumetric flow rate",
+            "is_input": true,
+            "is_output": true,
+            "is_readonly": false,
+            "input_category": "Feed",
+            "output_category": "Feed"
+        },
+        "5f28c741ac0f4011b97c5c7788c00a3c": {
+            "name": "COD concentration",
+            "value": 6.76,
+            "display_units": "g/L",
+            "rounding": 2,
+            "description": "Inlet chemical oxygen demand (COD) concentration",
+            "is_input": true,
+            "is_output": true,
+            "is_readonly": false,
+            "input_category": "Feed",
+            "output_category": "Feed"
         }
-      }
+    },
+    "input_variables": {
+        "0c57aaa513584127ac315f52223583d3": {
+            "name": "Volumetric flow rate",
+            "value": 0.0004,
+            "display_units": "L/h",
+            "rounding": 0,
+            "description": "Inlet volumetric flow rate",
+            "is_input": true,
+            "is_output": true,
+            "is_readonly": false,
+            "input_category": "Feed",
+            "output_category": "Feed"
+        },
+        "5f28c741ac0f4011b97c5c7788c00a3c": {
+            "name": "COD concentration",
+            "value": 6.76,
+            "display_units": "g/L",
+            "rounding": 2,
+            "description": "Inlet chemical oxygen demand (COD) concentration",
+            "is_input": true,
+            "is_output": true,
+            "is_readonly": false,
+            "input_category": "Feed",
+            "output_category": "Feed"
+        }
+    },
+    "output_variables": {
+        "0c57aaa513584127ac315f52223583d3": {
+            "name": "Volumetric flow rate",
+            "value": 0.0004,
+            "display_units": "L/h",
+            "rounding": 0,
+            "description": "Inlet volumetric flow rate",
+            "is_input": true,
+            "is_output": true,
+            "is_readonly": false,
+            "input_category": "Feed",
+            "output_category": "Feed"
+        },
+        "5f28c741ac0f4011b97c5c7788c00a3c": {
+            "name": "COD concentration",
+            "value": 6.76,
+            "display_units": "g/L",
+            "rounding": 2,
+            "description": "Inlet chemical oxygen demand (COD) concentration",
+            "is_input": true,
+            "is_output": true,
+            "is_readonly": false,
+            "input_category": "Feed",
+            "output_category": "Feed"
+        }
     }
-  }
+}

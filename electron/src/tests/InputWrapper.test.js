@@ -11,7 +11,7 @@ test('test input wrapper', () => {
     render( <InputWrapper key={key} fieldData={fieldData}></InputWrapper> )
 
     //test for component elements
-    screen.getByRole('textbox', {  name: /flow_vol/i});
+    screen.getByRole('textbox', {  name: /Tank 1 inlet flowrate/i});
 
 
 })

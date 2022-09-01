@@ -1,6 +1,6 @@
  
 import React from 'react'; 
-import {useEffect, useState, useContext} from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -17,8 +17,8 @@ import Modal from '@mui/material/Modal';
 
 export default function ConfigOutput(props) {
     let params = useParams(); 
-    const { outputData, historyData } = props;
-    const [ configName, setConfigName ] = useState("Configuration #"+props.historyData.length)
+    const { outputData } = props;
+    const [ configName, setConfigName ] = useState(outputData.name)
     const [ openSaveConfig, setOpenSaveConfig ] = React.useState(false);
     const [ saved, setSaved ] = React.useState(false);
 
@@ -38,20 +38,15 @@ export default function ConfigOutput(props) {
       };
       
 
-    useEffect(()=>{   
-        // console.log(outputData)
-    }, [outputData]);
-
     const handleChangeConfigName = (event) => {
         setConfigName(event.target.value)
     }
 
     const handleSaveConfig = () => {
-        saveConfig(params.id,configName)
+        saveConfig(params.id,outputData.data,configName)
         .then(response => response.json())
         .then((data)=>{
             console.log('successfully saved config')
-            historyData[historyData.length-1]['name'] = configName
             handleCloseSaveConfig()
             setSaved(true)
         })
@@ -61,55 +56,84 @@ export default function ConfigOutput(props) {
         });
     }
 
+    const organizeVariables = (bvars) => {
+        let var_sections = {}
+        for (const [key, v] of Object.entries(bvars)) {
+            let catg = v.output_category
+            let is_input = v.is_input
+            let is_output = v.is_output
+            if (catg === null) {
+                catg = ""
+            }
+            if (!Object.hasOwn(var_sections, catg)) {
+                var_sections[catg] = {display_name: catg, variables: {}, input_variables:{}, output_variables:{}}
+            }
+            var_sections[catg]["variables"][key] = v
+            if(is_input) var_sections[catg]["input_variables"][key] = v;
+            if(is_output) var_sections[catg]["output_variables"][key] = v
+        }
+        return var_sections
+    }
+
     // renders the data in output accordions
     const renderFields = (fieldData) => {
-        // console.log("F:",fieldData);
+        // console.log("field data", fieldData)
         return Object.keys(fieldData).map((key)=>{ 
             let _key = key + Math.floor(Math.random() * 100001); 
+            let rounding
+            if(fieldData[key].rounding) {
+                rounding = fieldData[key].rounding
+            }else {
+                rounding = 5
+            }
             return (<div key={_key}>
-                           <span>{key+" "}</span>
-                           <span style={{color:"#68c3e4",fontWeight:"bold"}}>{fieldData[key][0]}</span>
-                           <span>{" "+fieldData[key][1]}</span>
+                           <span>{fieldData[key].name+" "}</span>
+                           <span style={{color:"#68c3e4",fontWeight:"bold"}}>{parseFloat((fieldData[key].value).toFixed(rounding))}</span>
+                           <span>{" "+fieldData[key].display_units}</span>
                     </div>)
         })
     };
 
 
     const renderOutputAccordions = () => { 
-        if(!outputData.hasOwnProperty("output") || !outputData.output)
-        {
-            return (<Grid item xs={12} >
-                        <Alert severity="info">No soluction found!</Alert>
-                    </Grid>);
-        }
-
-        return Object.keys(outputData.output).map((key,index)=>{
+        // if(!outputData.hasOwnProperty("output") || !outputData.output)
+        // {
+        //     return (<Grid item xs={12} >
+        //                 <Alert severity="info">No soluction found!</Alert>
+        //             </Grid>);
+        // }
+        let var_sections = organizeVariables(outputData.data.model_objects)
+        console.log("var_sections",var_sections)
+        return Object.entries(var_sections).map(([key,value])=>{
             //console.log("O key:",key);
             let gridSize = 4;
-            if(index===0)
-                gridSize = 12;
+            // if(index===0)
+            //     gridSize = 12;
             
             let _key = key + Math.floor(Math.random() * 100001); 
-            return (<Grid item xs={gridSize} key={_key}>
-                        <Accordion expanded={true} style={{border:"1px solid #ddd"}}>
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-                                {key}
-                            </AccordionSummary>
-                            <AccordionDetails>  
-                                <Box
-                                    component="form"
-                                    sx={{
-                                        '& > :not(style)': { m: 1 },
-                                    }}
-                                    autoComplete="off"
-                                >
-                                {
-                                    renderFields(outputData.output[key])
-                                }
-                                </Box>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid>)
+            if(Object.keys(value.output_variables).length > 0) {
+                return (<Grid item xs={gridSize} key={_key}>
+                    <Accordion expanded={true} style={{border:"1px solid #ddd"}}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} >
+                            {value.display_name}
+                        </AccordionSummary>
+                        <AccordionDetails>  
+                            <Box
+                                component="form"
+                                sx={{
+                                    '& > :not(style)': { m: 1 },
+                                }}
+                                autoComplete="off"
+                            >
+                            {
+                                renderFields(value.output_variables)
+                            }
+                            </Box>
+                        </AccordionDetails>
+                    </Accordion>
+                </Grid>)
+            }
+
         })
     };
     

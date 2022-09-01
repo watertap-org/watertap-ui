@@ -71,21 +71,27 @@ The following assumes that the `watertap-org/watertap` repository has been clone
 bash -c "cd /path/to/my/watertap && pip install -r requirements-dev.txt"
 ```
 
-### Run UI
+## Running the UI
+
+#### Ensure that the `watertap-ui-env` Conda environment is active
 
 ```console
-uvicorn --app-dir backend/app main:app --host 127.0.0.1 --port 8000 --reload &
-npm --prefix electron start &
+conda activate watertap-ui-env
 ```
 
-## Windows instructions
+### Run UI in browser
 
-The JS spawning doesn't work on Windows, so in order to start the app there you need to start things by hand using the following commands:
+```console
+cd <watertap-ui-path>/electron
+npm run app-start
+```
 
-0. Turn off default browser opening with `$Env:Browser="none"`
-1. From the repo root: `cd backend/app` and run `uvicorn main:app --host 127.0.0.1 --port 8000 --reload &`
-2. Next `cd ../../electron/ui` and run `npm start &`. 
-3. Finally: `cd ..` (now in 'electron' subdir) and run `npm start`
+### Run UI with electron
+
+```console
+cd <watertap-ui-path>/electron
+npm run electron-start
+```
 
 # Running developer tests
 

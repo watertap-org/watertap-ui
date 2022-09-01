@@ -6,13 +6,14 @@ import csv
 import io
 from pathlib import Path
 from typing import List
-
+import logging
 # third-party
 from fastapi import Request, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
 import pandas as pd
 from pydantic import BaseModel
+from pydantic.error_wrappers import ValidationError
 
 # package-local
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
@@ -22,7 +23,7 @@ import idaes.logger as idaeslog
 CURRENT = "current"
 
 _log = idaeslog.getLogger(__name__)
-
+_log.setLevel(logging.DEBUG)
 router = APIRouter(
     prefix="/flowsheets",
     tags=["flowsheets"],
@@ -99,11 +100,17 @@ async def update(flowsheet_id: str, request: Request):
     input_data = await request.json()
     try:
         flowsheet.load(input_data)
+        _log.debug(f"Loading new data {input_data} into flowsheet {flowsheet_id}")
     except FlowsheetInterface.MissingObjectError as err:
         # this is unlikely, the model would need to change while running
         # (but could happen since 'build' and 'solve' can do anything they want)
         _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
         # XXX: return something about the error to caller
+    except ValidationError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        raise HTTPException(
+            400, f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input"
+        )
     flowsheet_manager.get_info(flowsheet_id).set_updated()
     return flowsheet.fs_exp
 
