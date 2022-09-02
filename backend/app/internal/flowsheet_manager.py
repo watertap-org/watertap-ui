@@ -35,7 +35,7 @@ class FlowsheetInfo(BaseModel):
     module: str = ""
     # current status of flowsheet
     built: bool = False
-    updated: float = 0  # time last updated (including built)
+    ts: float = 0  # time last updated (including built)
 
     # Make sure name is lowercase
     @validator("name")
@@ -45,11 +45,7 @@ class FlowsheetInfo(BaseModel):
     def set_built(self):
         """Call this after (re)building the flowsheet."""
         self.built = True
-        self.updated = time.time()
-
-    def set_updated(self):
-        """Call this after updating values in the flowsheet."""
-        self.updated = time.time()
+        self.ts = time.time()
 
 
 class FlowsheetManager:
@@ -102,9 +98,7 @@ class FlowsheetManager:
         Returns:
             Path to data directory
         """
-        # replace non-alphanumeric chars with underscore
-        id_filename = str(id_)
-        return self.app_settings.data_basedir / id_filename
+        return self.app_settings.data_basedir / self.get_info(id_).module
 
     def _add_data_dir(self, id_: str):
         path = self.get_flowsheet_dir(id_)
@@ -204,10 +198,11 @@ class FlowsheetManager:
             Exact name used in DB record
         """
         info = self.get_info(id_)
+        info.ts = time.time()
         fs_q = tinydb.Query()
         _log.debug(f"Saving/replacing name='{name}' for id='{id_}'")
         self._histdb.upsert(
-            {"name": name, "id_": id_, "ts": info.updated, "data": data},
+            {"name": name, "id_": id_, "ts": info.ts, "data": data},
             (fs_q.id_ == id_) & (fs_q.name == name),
         )
         return name
