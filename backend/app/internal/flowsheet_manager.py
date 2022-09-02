@@ -111,13 +111,26 @@ class FlowsheetManager:
     def flowsheets(self) -> List[FlowsheetInfo]:
         return list(self._flowsheets.values())
 
-    def get_diagram(self, id_: str):
+    def get_diagram(self, id_: str) -> bytes:
+        """Get diagram for a given flowsheet.
+
+        Args:
+            id_: Flowsheet identifier
+
+        Returns:
+            Diagram image data, which may be empty if none is found.
+        """
         info = self.get_info(id_)
         dot = info.module.rfind(".")
         if dot < 0:
             raise HTTPException(403, f"Cannot get diagram for package '{info.module}'")
         p, m = info.module[:dot], info.module[dot + 1:]
-        return files(p).joinpath(f"{m}.png").read_bytes()
+        try:
+            data = files(p).joinpath(f"{m}.png").read_bytes()
+        except FileNotFoundError:
+            _log.error(f"Diagram not found for flowsheet '{id_}'")
+            data = b""
+        return data
 
     def get_obj(self, id_: str) -> FlowsheetInterface:
         """Get flowsheet object by its identifier.

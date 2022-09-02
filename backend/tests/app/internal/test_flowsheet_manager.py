@@ -66,9 +66,8 @@ def test_mgr_get_diagram(mgr: fm.FlowsheetManager):
     with pytest.raises(HTTPException):
         mgr.get_diagram("examples")
 
-    # XXX: test with a module that has an export, but no diagram, in examples
-    # b = mgr.get_diagram(f"examples.ui.api_example_{no_diagram}")
-
+    b = mgr.get_diagram(f"examples.ui.api_example_{no_diagram}")
+    assert len(b) == 0
 
 @pytest.mark.unit
 def test_mgr_getitem(mgr: fm.FlowsheetManager):
