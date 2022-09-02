@@ -69,6 +69,7 @@ def test_mgr_get_diagram(mgr: fm.FlowsheetManager):
     b = mgr.get_diagram(f"examples.ui.api_example_{no_diagram}")
     assert len(b) == 0
 
+
 @pytest.mark.unit
 def test_mgr_getitem(mgr: fm.FlowsheetManager):
     fs = mgr.get_obj(one_id(mgr))

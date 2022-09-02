@@ -120,16 +120,19 @@ class FlowsheetManager:
         Returns:
             Diagram image data, which may be empty if none is found.
         """
+        data = b""
         info = self.get_info(id_)
+
         dot = info.module.rfind(".")
         if dot < 0:
-            raise HTTPException(403, f"Cannot get diagram for package '{info.module}'")
-        p, m = info.module[:dot], info.module[dot + 1:]
-        try:
-            data = files(p).joinpath(f"{m}.png").read_bytes()
-        except FileNotFoundError:
-            _log.error(f"Diagram not found for flowsheet '{id_}'")
-            data = b""
+            _log.error(f"Cannot get diagram for a package ({info.module})")
+        else:
+            p, m = info.module[:dot], info.module[dot + 1:]
+            try:
+                data = files(p).joinpath(f"{m}.png").read_bytes()
+            except FileNotFoundError:
+                _log.error(f"Diagram not found for flowsheet '{id_}'")
+
         return data
 
     def get_obj(self, id_: str) -> FlowsheetInterface:
