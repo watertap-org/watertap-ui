@@ -16,8 +16,11 @@ def mgr():
     return fm.FlowsheetManager(packages=["watertap", "examples"])
 
 
-def one_id(fm):
-    return list(fm._flowsheets.keys())[0]
+def one_id(fm, filter_func=None):
+    for key in fm._flowsheets:
+        if filter_func is None or filter_func(key):
+            return key
+    return None
 
 
 @pytest.mark.unit
@@ -44,8 +47,27 @@ def test_mgr_flowsheets_property(mgr: fm.FlowsheetManager):
 
 @pytest.mark.unit
 def test_mgr_get_diagram(mgr: fm.FlowsheetManager):
-    d = mgr.get_diagram(one_id(mgr))
+    no_diagram = "nodiagram"
+
+    # get an examples module
+    mod_id = one_id(
+        mgr, filter_func=lambda k: (k.startswith("examples") and no_diagram not in k)
+    )
+    d = mgr.get_diagram(mod_id)
     assert d
+    # known size of "diagram"
+    assert 18000 < len(d) < 19000
+
+    # module has no API fails
+    with pytest.raises(HTTPException):
+        mgr.get_diagram("watertap.core.wt_database")
+
+    # raw pkg fails
+    with pytest.raises(HTTPException):
+        mgr.get_diagram("examples")
+
+    # XXX: test with a module that has an export, but no diagram, in examples
+    # b = mgr.get_diagram(f"examples.ui.api_example_{no_diagram}")
 
 
 @pytest.mark.unit

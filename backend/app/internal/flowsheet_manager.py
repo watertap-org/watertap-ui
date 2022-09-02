@@ -18,6 +18,7 @@ import idaes.logger as idaeslog
 _log = idaeslog.getLogger(__name__)
 _log.setLevel(logging.DEBUG)
 
+
 class FlowsheetInfo(BaseModel):
     """Information about a flowsheet."""
     # static information
