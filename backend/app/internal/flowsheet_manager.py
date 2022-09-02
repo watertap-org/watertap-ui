@@ -1,4 +1,10 @@
+
 # stdlib
+import sys
+if sys.version_info < (3, 10):
+    from importlib_resources import files
+else:
+    from importlib.resources import files
 from pathlib import Path
 import shutil
 import time
@@ -25,6 +31,7 @@ class FlowsheetInfo(BaseModel):
     id_: str
     name: str
     description: str = ""
+    module: str = ""
     # current status of flowsheet
     built: bool = False
     updated: float = 0  # time last updated (including built)
@@ -47,7 +54,6 @@ class FlowsheetInfo(BaseModel):
 class FlowsheetManager:
     """Manage the available flowsheets."""
 
-    DIAGRAM_FILE = "graph.png"
     HISTORY_DB_FILE = "history.json"
 
     def __init__(self, **kwargs):
@@ -57,7 +63,6 @@ class FlowsheetManager:
             **kwargs: Passed as keywords to :class:`AppSettings`.
         """
         self.app_settings = AppSettings(**kwargs)
-        self.app_settings.create_data_basedir()
         self._objs, self._flowsheets = {}, {}
         for package in self.app_settings.packages:
             _log.debug(f"Collect flowsheet interfaces from package '{package}'")
@@ -74,7 +79,8 @@ class FlowsheetManager:
                 id_ = module_name
                 export = obj.fs_exp  # exported flowsheet
                 info = FlowsheetInfo(
-                    id_=id_, name=export.name, description=export.description
+                    id_=id_, name=export.name, description=export.description,
+                    module=id_
                 )
                 self._flowsheets[id_] = info
                 self._objs[id_] = obj
@@ -99,23 +105,19 @@ class FlowsheetManager:
 
     def _add_data_dir(self, id_: str):
         path = self.get_flowsheet_dir(id_)
-        if not path.exists():
-            path.mkdir()
-        # XXX: remove this when we have a real way to get the diagrams
-        src = self.get_flowsheet_dir("fake") / self.DIAGRAM_FILE
-        dst = path / self.DIAGRAM_FILE
-        shutil.copyfile(src, dst)
+        path.mkdir(exist_ok=True)
 
     @property
     def flowsheets(self) -> List[FlowsheetInfo]:
         return list(self._flowsheets.values())
 
     def get_diagram(self, id_: str):
-        _ = self.get_obj(id_)  # verifies the flowsheet exists
-        path = self.get_flowsheet_dir(id_) / self.DIAGRAM_FILE
-        with path.open(mode="rb") as f:
-            data = f.read()
-        return data
+        info = self.get_info(id_)
+        dot = info.module.rfind(".")
+        if dot < 0:
+            raise HTTPException(403, f"Cannot get diagram for package '{info.module}'")
+        p, m = info.module[:dot], info.module[dot + 1:]
+        return files(p).joinpath(f"{m}.png").read_bytes()
 
     def get_obj(self, id_: str) -> FlowsheetInterface:
         """Get flowsheet object by its identifier.
