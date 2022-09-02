@@ -1,6 +1,6 @@
-
 # stdlib
 import sys
+
 if sys.version_info < (3, 10):
     from importlib_resources import files
 else:
@@ -27,6 +27,7 @@ _log.setLevel(logging.DEBUG)
 
 class FlowsheetInfo(BaseModel):
     """Information about a flowsheet."""
+
     # static information
     id_: str
     name: str
@@ -79,8 +80,10 @@ class FlowsheetManager:
                 id_ = module_name
                 export = obj.fs_exp  # exported flowsheet
                 info = FlowsheetInfo(
-                    id_=id_, name=export.name, description=export.description,
-                    module=id_
+                    id_=id_,
+                    name=export.name,
+                    description=export.description,
+                    module=id_,
                 )
                 self._flowsheets[id_] = info
                 self._objs[id_] = obj
@@ -118,7 +121,7 @@ class FlowsheetManager:
             id_: Flowsheet identifier
 
         Returns:
-            Diagram image data, which may be empty if none is found.
+            Diagram image data, which will be empty if none is found.
         """
         data = b""
         info = self.get_info(id_)
@@ -127,11 +130,11 @@ class FlowsheetManager:
         if dot < 0:
             _log.error(f"Cannot get diagram for a package ({info.module})")
         else:
-            p, m = info.module[:dot], info.module[dot + 1:]
+            p, m = info.module[:dot], info.module[dot + 1 :]
             try:
                 data = files(p).joinpath(f"{m}.png").read_bytes()
-            except FileNotFoundError:
-                _log.error(f"Diagram not found for flowsheet '{id_}'")
+            except (FileNotFoundError, IOError) as err:
+                _log.error(f"Cannot read diagram for flowsheet '{id_}': {err}")
 
         return data
 
