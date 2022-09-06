@@ -1,5 +1,6 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, protocol } = require('electron')
 const path = require('path')
+const log = require('electron-log');
 const Store = require("electron-store")
 const storage = new Store();
 require('dotenv').config()
@@ -17,6 +18,11 @@ let uiReady = false
 
 const serverURL = `http://localhost:${PY_PORT}`
 const uiURL = `http://localhost:${UI_PORT}`
+
+log.transports.file.resolvePath = () => path.join(__dirname, '/logsmain.log');
+log.transports.file.level = "info";
+
+exports.log = (entry) => log.info(entry)
 
 require('@electron/remote/main').initialize()
 
@@ -49,7 +55,8 @@ function createWindow() {
     height: bounds[1],
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      webSecurity: false,
     }
   })
 
@@ -59,7 +66,9 @@ function createWindow() {
   win.on("resized", () => saveBounds(win.getSize()));
   // win.on("moved", () => saveBounds(win.getSize()));
 
-  win.webContents.openDevTools()
+  if (isDev) {
+    win.webContents.openDevTools()
+  } 
   win.loadURL(
     isDev
       ? uiURL
@@ -81,20 +90,40 @@ const startServer = () => {
             cwd: '../backend/app'
         }
     );
+      log.info("Python process started in dev mode");
       console.log("Python process started in dev mode");
     } else {
-      backendProcess = execFile(
-        path.join(__dirname, "../../py_dist/run_server/run_server"),
+      try {
+      backendProcess = spawn(
+        path.join(__dirname, "../py_dist/main/main"),
         [
-          "--host",
-          PY_HOST,
-          "--port",
-          PY_PORT,
-          "--log-level",
-          PY_LOG_LEVEL,
+          ""
         ]
       );
+      var scriptOutput = "";
+        backendProcess.stdout.setEncoding('utf8');
+        backendProcess.stdout.on('data', function(data) {
+            console.log('stdout: ' + data);
+            log.info('stdout: ' + data);
+            data=data.toString();
+            scriptOutput+=data;
+        });
+
+        backendProcess.stderr.setEncoding('utf8');
+        backendProcess.stderr.on('data', function(data) {
+            console.log('stderr: ' + data);
+            log.info('stderr: ' + data);
+            data=data.toString();
+            scriptOutput+=data;
+        });
+      log.info("Python process started in built mode");
       console.log("Python process started in built mode");
+    } catch (error) {
+      log.info("unable to start python process in build mode: ");
+      log.info(error)
+      console.error("unable to start python process in build mode: ");
+      console.error(error)
+    }
     }
     return backendProcess;
 }
@@ -103,7 +132,10 @@ const startServer = () => {
 
 app.whenReady().then(() => {
     // Entry point
-
+    protocol.registerFileProtocol('file', (request, callback) => {
+      const pathname = request.url.replace('file:///', '');
+      callback(pathname);
+    });
     let serverProcess = startServer()
 
     let noTrails = 0
@@ -119,6 +151,7 @@ app.whenReady().then(() => {
         })
         .catch(async () => {
             console.log(`Waiting to be able to connect ${appName} at ${url}...`)
+            log.info(`Waiting to be able to connect ${appName} at ${url}...`)
             await new Promise(resolve => setTimeout(resolve, 2000))
             noTrails += 1
             if (noTrails < maxTrials) {
@@ -126,12 +159,17 @@ app.whenReady().then(() => {
             }
             else {
                 console.error(`Exceeded maximum trials to connect to ${appName}`)
+                log.error(`Exceeded maximum trials to connect to ${appName}`)
                 spawnedProcess.kill('SIGINT')
             }
         });
     };
     startUp(serverURL, 'FastAPI Server', serverProcess, createWindow)
-
+    app.on('quit', () => {
+      console.log('shutting down backend server')
+      log.info('shutting down backend server')
+      serverProcess.kill()
+    })
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })

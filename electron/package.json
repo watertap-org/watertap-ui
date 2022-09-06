@@ -2,7 +2,7 @@
   "name": "nawi-ui",
   "version": "0.1.0",
   "private": true,
-  "main": "main.js",
+  "main": "public/main.js",
   "dependencies": {
     "@electron/remote": "^2.0.8",
     "@emotion/react": "^11.9.3",
@@ -20,6 +20,7 @@
     "cypress": "^10.4.0",
     "dotenv": "^16.0.1",
     "electron-is-dev": "^2.0.0",
+    "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
     "jointjs": "^3.5.5",
     "react": "^18.1.0",
@@ -30,7 +31,8 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "electron": "^20.0.0"
+    "electron": "^20.0.0",
+    "electron-builder": "^23.3.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -42,14 +44,11 @@
     "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
     "app-start": "concurrently -k \"cross-env npm run start-backend\" \"react-scripts start\"",
     "app-start-nob": "concurrently -k \"cross-env npm run start-backend\" \"npm run start-nob\"",
-    "build": "react-scripts build",
     "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
     "electron-build": "npm run remove-previous-dist && electron-builder -m -c.extraMetadata.main=build/main.js || electron-builder -m -c.extraMetadata.main=build/main.js",
     "dist:mac": "npm run build-backend && npm run build && electron-builder -m -c.extraMetadata.main=build/main.js",
     "remove-previous-backend-build": "rm -r py_dist/*",
-    "remove-previous-dist": "rm -r dist/*",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "remove-previous-dist": "rm -r dist/*"
   },
   "eslintConfig": {
     "extends": [
@@ -74,10 +73,11 @@
     "appId": "com.electron.pareto-ui",
     "extends": null,
     "asar": false,
-    "productName": "ParetoUI",
+    "productName": "WatertapUI",
     "files": [
       "dist/**/*",
       "build/**/*",
+      "py_dist/**/*",
       "node_modules/**/*",
       "package.json",
       "backend/**/*"

@@ -18,6 +18,7 @@ node_modules/
 build/
 develop-eggs/
 dist/
+py_dist/
 downloads/
 eggs/
 .eggs/
