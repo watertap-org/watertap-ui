@@ -66,9 +66,9 @@ function createWindow() {
   win.on("resized", () => saveBounds(win.getSize()));
   // win.on("moved", () => saveBounds(win.getSize()));
 
-  if (isDev) {
+ if (isDev) {
     win.webContents.openDevTools()
-  } 
+ } 
   win.loadURL(
     isDev
       ? uiURL

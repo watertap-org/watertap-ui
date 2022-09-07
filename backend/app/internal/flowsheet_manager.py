@@ -4,6 +4,7 @@ import shutil
 import time
 from typing import Optional, Dict, List
 import logging
+import app
 
 # third-party
 from fastapi import HTTPException
@@ -101,9 +102,19 @@ class FlowsheetManager:
         if not path.exists():
             path.mkdir()
         # XXX: remove this when we have a real way to get the diagrams
-        src = self.get_flowsheet_dir("fake") / self.DIAGRAM_FILE
-        dst = path / self.DIAGRAM_FILE
-        shutil.copyfile(src, dst)
+        # src = self.get_flowsheet_dir("fake") / self.DIAGRAM_FILE
+        try:
+            _log.info('trying to get graph png from first src')
+            src = Path(app.__file__).parent.parent / "data" / "flowsheets" / "fake" / self.DIAGRAM_FILE
+            dst = path / self.DIAGRAM_FILE
+            _log.info(f'moving diagram from {src} to {dst}')
+            shutil.copyfile(src, dst)
+        except:
+            _log.info('trying to get graph png from second src')
+            src = Path(app.__file__) / "data" / "flowsheets" / "fake" / self.DIAGRAM_FILE
+            dst = path / self.DIAGRAM_FILE
+            _log.info(f'moving diagram from {src} to {dst}')
+            shutil.copyfile(src, dst)
 
     @property
     def flowsheets(self) -> List[FlowsheetInfo]:

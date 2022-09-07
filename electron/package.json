@@ -47,6 +47,7 @@
     "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
     "electron-build": "npm run remove-previous-dist && electron-builder -m -c.extraMetadata.main=build/main.js || electron-builder -m -c.extraMetadata.main=build/main.js",
     "dist:mac": "npm run build-backend && npm run build && electron-builder -m -c.extraMetadata.main=build/main.js",
+    "dist:win": "npm run build-backend && npm run build && electron-builder -w -c.extraMetadata.main=build/main.js",
     "remove-previous-backend-build": "rm -r py_dist/*",
     "remove-previous-dist": "rm -r dist/*"
   },
@@ -68,7 +69,7 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "./",
+  "homepage": ".",
   "build": {
     "appId": "com.electron.pareto-ui",
     "extends": null,
@@ -85,6 +86,9 @@
     "directories": {
       "buildResources": "assets"
     },
+    "extraResources": [
+      "public/**/*"
+    ],
     "mac": {
       "target": "dmg",
       "category": "utilities",
@@ -92,7 +96,7 @@
     },
     "win": {
       "target": "portable",
-      "icon": "./src/assets/pareto-logo-2.png"
+      "icon": "./favicon.ico"
     },
     "linux": {
       "target": "deb",
