@@ -15,7 +15,7 @@ import time
 
 @pytest.fixture(scope="module")
 def mgr():
-    return fm.FlowsheetManager(packages=["watertap", "examples"])
+    return fm.FlowsheetManager(packages=["watertap", "tests.app.internal.examples"])
 
 
 def one_id(fm, filter_func=None):
@@ -53,7 +53,7 @@ def test_mgr_get_diagram(mgr: fm.FlowsheetManager):
 
     # get an examples module
     mod_id = one_id(
-        mgr, filter_func=lambda k: (k.startswith("examples") and no_diagram not in k)
+        mgr, filter_func=lambda k: (k.startswith("tests") and no_diagram not in k)
     )
     print(f"Getting diagram: {mod_id}")
     d = mgr.get_diagram(mod_id)
@@ -69,7 +69,9 @@ def test_mgr_get_diagram(mgr: fm.FlowsheetManager):
     with pytest.raises(HTTPException):
         mgr.get_diagram("examples")
 
-    b = mgr.get_diagram(f"examples.ui.api_example_{no_diagram}")
+    mod_id2 = mod_id.replace("api_example", f"api_example_{no_diagram}")
+    print(f"Getting diagram: {mod_id2}")
+    b = mgr.get_diagram(mod_id2)
     assert len(b) == 0
 
 

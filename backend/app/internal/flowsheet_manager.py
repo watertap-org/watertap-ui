@@ -113,6 +113,9 @@ class FlowsheetManager:
 
         Returns:
             Diagram image data, which will be empty if none is found.
+
+        Raises:
+            HTTPException: if the flowsheet itself cannot be found
         """
         data = b""
         info = self.get_info(id_)
