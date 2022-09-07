@@ -59,7 +59,7 @@ async def get_config(id_: str, build: str = "0") -> FlowsheetExport:
         info = flowsheet_manager.get_info(id_)
         if not info.built:
             flowsheet.build()
-            info.set_built()
+            info.updated(built=True)
     return flowsheet.fs_exp
 
 
@@ -78,7 +78,7 @@ async def solve(flowsheet_id: str):
             flowsheet.build()
         except Exception as err:
             raise HTTPException(500, detail=f"Build failed: {err}")
-        info.set_built()
+        info.updated(built=True)
     try:
         flowsheet.solve()
     except Exception as err:
@@ -90,7 +90,7 @@ async def solve(flowsheet_id: str):
 async def reset(flowsheet_id: str):
     flowsheet = flowsheet_manager.get_obj(flowsheet_id)
     flowsheet.build()
-    flowsheet_manager.get_info(flowsheet_id).set_built()
+    flowsheet_manager.get_info(flowsheet_id).updated(built=True)
     return flowsheet.fs_exp
 
 
@@ -111,7 +111,7 @@ async def update(flowsheet_id: str, request: Request):
         raise HTTPException(
             400, f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input"
         )
-    flowsheet_manager.get_info(flowsheet_id).set_updated()
+    flowsheet_manager.get_info(flowsheet_id).updated()
     return flowsheet.fs_exp
 
 

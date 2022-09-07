@@ -4,20 +4,22 @@ Configuration for the backend
 import app
 from pathlib import Path
 from pydantic import (
-    BaseModel,
     BaseSettings,
-    Field,
+    validator
 )
 
 
 class AppSettings(BaseSettings):
     #: List of package names in which to look for flowsheets
-    packages: list[str] = ["watertap", "examples"]
-    data_basedir: Path = Path(app.__file__).parent.parent / "data" / "flowsheets"
+    packages: list[str] = ["watertap"]
+    data_basedir: Path = None
 
-    def create_data_basedir(self):
-        if not self.data_basedir.exists():
-            self.data_basedir.mkdir()
+    @validator("data_basedir", always=True)
+    def validate_data_basedir(cls, v):
+        if v is None:
+            v = Path.home() / ".watertap" / "flowsheets"
+        v.mkdir(parents=True, exist_ok=True)
+        return v
 
     class Config:
         env_prefix = "watertap_"
