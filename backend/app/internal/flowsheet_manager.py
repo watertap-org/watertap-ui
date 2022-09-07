@@ -42,10 +42,10 @@ class FlowsheetInfo(BaseModel):
     def normalize_name(cls, v: str, values):
         return v.lower()
 
-    def set_built(self):
-        """Call this after (re)building the flowsheet."""
-        self.built = True
+    def updated(self, built: Optional[bool] = None):
         self.ts = time.time()
+        if built is not None:
+            self.built = built
 
 
 class FlowsheetManager:
@@ -83,7 +83,8 @@ class FlowsheetManager:
                 )
                 self._flowsheets[id_] = info
                 self._objs[id_] = obj
-                self._add_data_dir(id_)
+                path = self.get_flowsheet_dir(id_)
+                path.mkdir(exist_ok=True)
 
         # Connect to history DB
         path = self.app_settings.data_basedir / self.HISTORY_DB_FILE
@@ -99,10 +100,6 @@ class FlowsheetManager:
             Path to data directory
         """
         return self.app_settings.data_basedir / self.get_info(id_).module
-
-    def _add_data_dir(self, id_: str):
-        path = self.get_flowsheet_dir(id_)
-        path.mkdir(exist_ok=True)
 
     @property
     def flowsheets(self) -> List[FlowsheetInfo]:
