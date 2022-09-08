@@ -80,9 +80,9 @@ const installExtensions = () => {
 
   try{
   installationProcess = spawn(
-    path.join(__dirname, "../py_dist/main/main"),
+    path.join(__dirname, "../get-idaes-extensions-dist/get-idaes-extensions/get-idaes-extensions"),
     [
-      "install"
+      ""
     ]
   );
 

@@ -81,7 +81,8 @@
       "py_dist/**/*",
       "node_modules/**/*",
       "package.json",
-      "backend/**/*"
+      "backend/**/*",
+      "get-idaes-extensions-dist/**/*"
     ],
     "directories": {
       "buildResources": "assets"
