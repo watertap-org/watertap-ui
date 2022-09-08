@@ -15,7 +15,7 @@ function App() {
 
   useEffect(
     () => {
-      console.log('location : ',location)
+      // console.log('location : ',location)
     },
     [location]
   )
