@@ -1,0 +1,1 @@
+hiddenimports = ['idaes.commands', 'idaes.util.download_bin','idaes.config','idaes.logger','idaes.commands.util.download_bin']
