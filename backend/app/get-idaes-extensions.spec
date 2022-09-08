@@ -2,7 +2,7 @@
 
 
 block_cipher = None
-
+exclude_modules = ['notebook','matplotlib','lxml','jedi','share','scipy','numpy','libopenblas']
 
 a = Analysis(
     ['get-idaes-extensions.py'],
@@ -13,7 +13,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=[exclude_modules],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
