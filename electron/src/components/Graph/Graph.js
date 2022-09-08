@@ -13,10 +13,7 @@ export default function Graph() {
       .then(response => response.blob())
       .then((data)=>{
         if(data.size > 0) {
-          console.log('found diagram: ',data)
           setGraphImage(URL.createObjectURL(data))
-        } else {
-          console.log('diagram size 0')
         }
         }).catch((e) => {
           console.error('error fetching diagram: ',e)

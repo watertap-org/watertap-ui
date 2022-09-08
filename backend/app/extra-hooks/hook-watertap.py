@@ -10,6 +10,7 @@ from uuid import uuid4
 import sys
 
 imports = set()
+datas = []
 
 for package in ["watertap","examples"]:
     pkg = importlib.import_module(package)
@@ -30,7 +31,6 @@ for package in ["watertap","examples"]:
     # Find modules and import
 
     skip_expr = re.compile(r"_test|test_|__")
-    result = {}
 
     for python_file in pkg_path.glob("**/*.py"):
         if skip_expr.search(str(python_file)):
@@ -57,5 +57,21 @@ for package in ["watertap","examples"]:
                 relative_path=relative_path.parent
                 print('error on my part')
                 continue
+
+    for png_file in pkg_path.glob("**/*.png"):
+        file_name = '/' + png_file.as_posix().split('/')[-1]
+        print(file_name)
+        if skip_expr.search(str(png_file)):
+            continue
+        relative_path = png_file.relative_to(pkg_path)
+        dotted_name = relative_path.as_posix()
+        src_name = "../../../watertap/" + package + "/" + dotted_name
+        dst_name = package + "/" + dotted_name.replace(file_name,'')
+        try:
+            datas.append((src_name,dst_name))
+        except Exception as err:  # assume the import could do bad things
+            print(f"Import of file '{png_file}' failed: {err}")
+            continue
+
 
 hiddenimports = list(imports)
