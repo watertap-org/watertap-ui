@@ -98,3 +98,6 @@ npm run electron-start
 To run the Python tests, make sure you have the appropriate version of watertap in your conda env.  Then from the repository root directory run:
 
 `pytest backend/tests`
+
+
+Last merged PR: : graph_settings-issue53
