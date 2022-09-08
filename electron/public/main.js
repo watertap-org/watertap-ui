@@ -76,6 +76,42 @@ function createWindow() {
   )
 }
 
+const installExtensions = () => {
+
+  try{
+  installationProcess = spawn(
+    path.join(__dirname, "../py_dist/main/main"),
+    [
+      "install"
+    ]
+  );
+
+  log.info("installation started");
+  console.log("installation started");
+
+    var scriptOutput = "";
+    installationProcess.stdout.setEncoding('utf8');
+    installationProcess.stdout.on('data', function(data) {
+        // console.log('stdout: ' + data);
+        log.info('stdout: ' + data);
+        data=data.toString();
+        scriptOutput+=data;
+    });
+
+    installationProcess.stderr.setEncoding('utf8');
+    installationProcess.stderr.on('data', function(data) {
+        // console.log('stderr: ' + data);
+        log.info('stderr: ' + data);
+        data=data.toString();
+        scriptOutput+=data;
+    });
+  } catch (error) {
+    log.info("unable to get extensions: ",error);
+    console.error("unable to get extensions: ",error);
+  }
+  return installationProcess;
+}
+
 const startServer = () => {
     if (isDev) {
       backendProcess = spawn("uvicorn", 
@@ -136,7 +172,14 @@ app.whenReady().then(() => {
     //   const pathname = request.url.replace('file:///', '');
     //   callback(pathname);
     // });
-    let serverProcess = startServer()
+    let serverProcess
+    let installationProcess = installExtensions()
+    installationProcess.on('exit', code => {
+      log.info('installation exit code is', code)
+      console.log('installation exit code is', code)
+      log.info('starting server')
+      console.log('starting server')
+      serverProcess = startServer()
 
     let noTrails = 0
     
@@ -170,6 +213,7 @@ app.whenReady().then(() => {
       log.info('shutting down backend server')
       serverProcess.kill()
     })
+  })
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })

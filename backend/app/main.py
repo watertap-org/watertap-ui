@@ -14,7 +14,15 @@ from fastapi import FastAPI
 from app.routers import flowsheets
 from fastapi.middleware.cors import CORSMiddleware
 
-_log = idaeslog.getLogger(__name__)
+# _log = idaeslog.getLogger(__name__)
+_log = logging.getLogger(__name__)
+
+_h = logging.StreamHandler()
+_h.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+_f = logging.FileHandler('watertapui-backendlogs.log')
+_f.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+_log.addHandler(_h)
+_log.addHandler(_f)
 _log.setLevel(logging.DEBUG)
 
 app = FastAPI()
