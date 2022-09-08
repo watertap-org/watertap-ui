@@ -69,6 +69,9 @@ export default function FlowsheetConfig() {
         console.log("Flowsheet Data:", data);
         setFlowsheetData(data);
         setTitle(getTitle(data)); 
+      }).catch((e) => {
+        console.error('error getting flowsheet: ',e)
+        // return to list page?
       });
     }, [params.id]);
 

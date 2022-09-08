@@ -8,13 +8,19 @@ export default function Graph() {
   const [ graphImage, setGraphImage ] = useState(null)
   let params = useParams();
     useEffect(() => {
+      
       getDiagram(params.id)
       .then(response => response.blob())
       .then((data)=>{
         if(data.size > 0) {
-          setGraphImage(data)
+          console.log('found diagram: ',data)
+          setGraphImage(URL.createObjectURL(data))
+        } else {
+          console.log('diagram size 0')
         }
-      });
+        }).catch((e) => {
+          console.error('error fetching diagram: ',e)
+      }); 
     },[])
     return (
       <div id="Graph">
