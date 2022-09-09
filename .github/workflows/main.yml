@@ -55,14 +55,14 @@ jobs:
         run: uvicorn --app-dir backend/app main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
 
       - name: run frontend
-        run: npm --prefix electron start & sleep 30
+        run: npm --prefix electron/ui start & sleep 30
 
       - name: run component tests
-        working-directory: electron
+        working-directory: electron/ui
         run: npm run test
 
       - name: Cypress e2e tests
-        working-directory: electron
+        working-directory: electron/ui
         timeout-minutes: 15
         run: |
           echo "$(npm bin)"

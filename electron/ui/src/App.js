@@ -6,9 +6,9 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
-import Header from 'components/Boilerplate/Header/Header'; 
-import FlowsheetsList from 'views/FlowsheetsList/FlowsheetsList';
-import FlowsheetConfig from 'views/FlowsheetConfig/FlowsheetConfig';
+import Header from './components/Boilerplate/Header/Header'; 
+import FlowsheetsList from './views/FlowsheetsList/FlowsheetsList';
+import FlowsheetConfig from './views/FlowsheetConfig/FlowsheetConfig';
 
 function App() {
   let location = useLocation()

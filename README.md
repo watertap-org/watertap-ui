@@ -25,10 +25,14 @@ This will install the correct runtime versions of both the backend (Python) and 
 
 ### 2. Install the JavaScript dependencies
 
-Run the following command to install the JavaScript dependencies:
+Run the following commands to install the JavaScript dependencies:
 
 ```sh
 npm --prefix electron clean-install
+```
+
+```sh
+npm --prefix electron/ui clean-install
 ```
 
 ### 3. Install the IDAES solver dependencies
@@ -84,14 +88,14 @@ conda activate watertap-ui-env
 ### Run UI in browser
 
 ```console
-cd <watertap-ui-path>/electron
+cd <watertap-ui-path>/electron/ui
 npm run app-start
 ```
 
 ### Run UI with electron (work in progress)
 
 ```console
-cd <watertap-ui-path>/electron
+cd <watertap-ui-path>/electron/ui
 npm run electron-start
 ```
 
