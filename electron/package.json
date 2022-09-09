@@ -96,7 +96,7 @@
       "type": "development"
     },
     "win": {
-      "target": "portable",
+      "target": "zip",
       "icon": "./favicon.ico"
     },
     "linux": {
