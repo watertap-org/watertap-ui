@@ -1,5 +1,6 @@
 {
   "name": "nawi-ui",
+  "author": "Michael Pesce",
   "version": "0.1.0",
   "private": true,
   "main": "public/main.js",
@@ -93,11 +94,12 @@
     "mac": {
       "target": "dmg",
       "category": "utilities",
-      "type": "development"
+      "type": "development",
+      "icon": "build/watertap-logo.ico"
     },
     "win": {
-      "target": "zip",
-      "icon": "./favicon.ico"
+      "target": "msi",
+      "icon": "build/watertap-logo.ico"
     },
     "linux": {
       "target": "deb",
