@@ -7,8 +7,7 @@ added_files = [
         ('../../../watertap/watertap/data/techno_economic/*.yaml', 'watertap/data/techno_economic'), 
         ('../../../watertap/watertap/data/techno_economic/metab.yaml', 'watertap/core'), 
         ('../../../watertap/watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/metab/metab_global_costing.yaml','watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/metab'),
-        ('../data/flowsheets/fake/graph.png', 'data/flowsheets/fake'),
-        ('idaes-extensions/*.tar.gz', 'idaes-extensions') ]
+        ('../data/flowsheets/fake/graph.png', 'data/flowsheets/fake')]
 a = Analysis(
     ['main.py'],
     pathex=[],
