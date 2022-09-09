@@ -30,7 +30,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "electron-start": "concurrently -k \"npm run start-backend\" \"npm run start-nob\" \"wait-on http://127.0.0.1:3000 && npx --prefix ../ electron .\"",
+    "electron-start": "concurrently -k \"npm run start-nob\" \"wait-on http://127.0.0.1:3000 && npx --prefix ../ electron .\"",
     "start-nob": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "postbuild": "rm -r ../build && mv build ../ || mv build ../",
