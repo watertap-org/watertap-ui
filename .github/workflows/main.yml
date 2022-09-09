@@ -81,17 +81,12 @@ jobs:
               electron/cypress/videos/
 
   pytest:
-    name: pytest (${{ matrix.python-version }}/${{ matrix.os }})
+    name: pytest (${{ matrix.os }})
     runs-on: ${{ matrix.os-version }}
 
     strategy:
       fail-fast: false
       matrix:
-        python-version:
-          - "3.7"
-          - "3.8"
-          - "3.9"
-          - "3.10"
         os:
           - linux
           - win64
@@ -108,7 +103,6 @@ jobs:
         with:
           environment-file: environment.yml
           activate-environment: watertap-ui-env
-          python-version: ${{ matrix.python-version }}
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
