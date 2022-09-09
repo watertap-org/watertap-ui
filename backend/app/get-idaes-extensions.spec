@@ -8,7 +8,7 @@ a = Analysis(
     ['get-idaes-extensions.py'],
     pathex=[],
     binaries=[],
-    datas=[('idaes-extensions/*.tar.gz', 'idaes-extensions')],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
