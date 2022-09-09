@@ -65,8 +65,11 @@ jobs:
         run: npm --prefix electron/ui run test
 
       - name: Cypress e2e tests
+        working-directory: electron/ui
         timeout-minutes: 15
-        run: npx --prefix electron/ui cypress run
+        run: |
+          echo "$(npm bin)"
+          "$(npm bin)"/cypress run
 
       - name: Upload artifact for screenshots & videos
         uses: actions/upload-artifact@v3
