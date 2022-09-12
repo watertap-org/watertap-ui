@@ -36,7 +36,7 @@ export default function ConfigInput(props) {
             let is_input = v.is_input
             let is_output = v.is_output
             // console.log("key",key)
-            // console.log("v",v)
+
             if (catg === null) {
                 catg = ""
             }
@@ -45,7 +45,43 @@ export default function ConfigInput(props) {
             }
             var_sections[catg]["variables"][key] = v
             if(is_input) var_sections[catg]["input_variables"][key] = v;
-            if(is_output) var_sections[catg]["output_variables"][key] = v
+            if(is_output) var_sections[catg]["output_variables"][key] = v;
+
+            //round values for input 
+            try {
+                let roundedValue
+                if(v.rounding != null) {
+                    if (v.rounding > 0) {
+                        roundedValue = parseFloat((Number(v.value)).toFixed(v.rounding))
+                    } else if (v.rounding === 0) 
+                    {
+                        roundedValue = Math.round(Number(v.value))
+                    }
+                    else // if rounding is negative
+                    {
+                        let factor = 1
+                        let tempRounding = v.rounding
+                        console.log('rounding is negative : ',v.rounding)
+                        while (tempRounding < 0) {
+                            factor = factor * 10
+                            tempRounding  = tempRounding + 1
+                        }
+                        roundedValue = Math.round((Number(v.value) / factor)) * factor
+                        console.log("old value is: ", v.value)
+                        console.log('new value is: ', roundedValue)
+                    }
+                }else // if rounding is not provided, just use given value 
+                {
+                    roundedValue = v.value
+                }
+                var_sections[catg]["variables"][key].value = roundedValue
+                if(is_input) var_sections[catg]["input_variables"][key].value = roundedValue;
+                if(is_output) var_sections[catg]["output_variables"][key].value = roundedValue;
+            } catch (e) {
+                console.error('error rounding input for: ',v)
+                console.error(e)
+            }
+            
         }
         return var_sections
     }
