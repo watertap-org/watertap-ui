@@ -1,7 +1,7 @@
 {
   "name": "nawi-ui",
   "author": "Michael Pesce",
-  "version": "0.1.0",
+  "version": "0.1.0v2",
   "private": true,
   "main": "build/main.js",
   "dependencies": {
@@ -13,7 +13,7 @@
     "electron-store": "^8.1.0"
   },
   "devDependencies": {
-    "electron": "^20.0.0",
+    "electron": "^20.1.3",
     "electron-builder": "^23.3.3"
   },
   "scripts": {
@@ -21,9 +21,9 @@
     "build-frontend": "npm --prefix ui run build",
     "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
     "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
-    "electron-build-mac": "npm run remove-previous-dist && electron-builder -m -c.extraMetadata.main=build/main.js || electron-builder -m -c.extraMetadata.main=build/main.js",
-    "dist:mac": "npm run build-backend && npm run build-frontend && electron-builder -m -c.extraMetadata.main=build/main.js",
-    "dist:win": "npm run build-backend && npm run build-frontend && electron-builder -w -c.extraMetadata.main=build/main.js",
+    "electron-build-mac": "npm run remove-previous-dist && electron-builder -m || electron-builder -m",
+    "dist:mac": "npm run build-backend && npm run build-frontend && electron-builder -m",
+    "dist:win": "npm run build-backend && npm run build-frontend && electron-builder -w",
     "remove-previous-backend-build": "rm -r py_dist/*",
     "remove-previous-dist": "rm -r dist/*"
   },
@@ -67,7 +67,8 @@
     "mac": {
       "target": "dmg",
       "category": "utilities",
-      "type": "development",
+      "gatekeeperAssess" : false,
+      "hardenedRuntime": true,
       "icon": "build/watertap-logo.ico"
     },
     "win": {
