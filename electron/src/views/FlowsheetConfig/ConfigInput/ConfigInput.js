@@ -59,16 +59,8 @@ export default function ConfigInput(props) {
                     }
                     else // if rounding is negative
                     {
-                        let factor = 1
-                        let tempRounding = v.rounding
-                        console.log('rounding is negative : ',v.rounding)
-                        while (tempRounding < 0) {
-                            factor = factor * 10
-                            tempRounding  = tempRounding + 1
-                        }
+                        let factor = 10 ** (-v.rounding)
                         roundedValue = Math.round((Number(v.value) / factor)) * factor
-                        console.log("old value is: ", v.value)
-                        console.log('new value is: ', roundedValue)
                     }
                 }else // if rounding is not provided, just use given value 
                 {
