@@ -11,7 +11,7 @@ from pydantic import (
 
 class AppSettings(BaseSettings):
     #: List of package names in which to look for flowsheets
-    packages: list[str] = ["watertap"]
+    packages: list[str] = ["watertap", "examples"]
     data_basedir: Path = None
 
     @validator("data_basedir", always=True)

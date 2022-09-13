@@ -80,15 +80,36 @@ export default function ConfigOutput(props) {
         // console.log("field data", fieldData)
         return Object.keys(fieldData).map((key)=>{ 
             let _key = key + Math.floor(Math.random() * 100001); 
-            let rounding
-            if(fieldData[key].rounding) {
-                rounding = fieldData[key].rounding
-            }else {
-                rounding = 5
+
+            // handle rounding
+            let roundedValue
+            if(fieldData[key].rounding != null) {
+                if (fieldData[key].rounding > 0) {
+                    roundedValue = parseFloat((fieldData[key].value).toFixed(fieldData[key].rounding))
+                } else if (fieldData[key].rounding === 0) 
+                {
+                    roundedValue = Math.round(fieldData[key].value)
+                }
+                else // if rounding is negative
+                {
+                    let factor = 1
+                    let tempRounding = fieldData[key].rounding
+                    console.log('rounding is negative : ',fieldData[key].rounding)
+                    while (tempRounding < 0) {
+                        factor *= 10
+                        tempRounding += 1
+                    }
+                    roundedValue = Math.round((fieldData[key].value / factor)) * factor
+                    console.log("old value is: ", fieldData[key].value)
+                    console.log('new value is: ', roundedValue)
+                }
+            }else // if rounding is not provided, just use given value 
+            {
+                roundedValue = fieldData[key].value
             }
             return (<div key={_key}>
                            <span>{fieldData[key].name+" "}</span>
-                           <span style={{color:"#68c3e4",fontWeight:"bold"}}>{parseFloat((fieldData[key].value).toFixed(rounding))}</span>
+                           <span style={{color:"#68c3e4",fontWeight:"bold"}}>{roundedValue}</span>
                            <span>{" "+fieldData[key].display_units}</span>
                     </div>)
         })
@@ -103,7 +124,7 @@ export default function ConfigOutput(props) {
         //             </Grid>);
         // }
         let var_sections = organizeVariables(outputData.data.model_objects)
-        console.log("var_sections",var_sections)
+        // console.log("var_sections",var_sections)
         return Object.entries(var_sections).map(([key,value])=>{
             //console.log("O key:",key);
             let gridSize = 4;

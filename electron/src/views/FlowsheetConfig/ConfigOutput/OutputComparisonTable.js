@@ -167,6 +167,7 @@ const organizeVariables = () => {
 
 
       return Object.keys(historyDataOrganized[leftConfigIndex].data).map((category,index)=>{  
+        if (historyDataOrganized[leftConfigIndex].data[category] && historyDataOrganized[rightConfigIndex].data[category]) {
         if (historyDataOrganized[leftConfigIndex].data[category].variables.length > 0) {
           return ( <Fragment>
             <TableRow key={category+index}>
@@ -176,7 +177,7 @@ const organizeVariables = () => {
             </TableRow>
             {historyDataOrganized[leftConfigIndex].data[category].variables.map((metric, index) => { 
               var rounding
-              if (metric.rounding) {
+              if (metric.rounding != null) {
                 rounding = metric.rounding
               } else {
                 rounding = 5
@@ -192,7 +193,15 @@ const organizeVariables = () => {
           </Fragment>
             )
         }
-       
+      }
+      else {
+        if (!historyDataOrganized[leftConfigIndex].data[category]) {
+          console.error('category '+category+' not found for left column')
+        }
+        if (!historyDataOrganized[rightConfigIndex].data[category]) {
+          console.error('category '+category+' not found for right column')
+        }
+      }
         })
     }
 
