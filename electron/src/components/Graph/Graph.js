@@ -13,18 +13,22 @@ export default function Graph() {
       .then(response => response.blob())
       .then((data)=>{
         if(data.size > 0) {
-          console.log('found diagram: ',data)
           setGraphImage(URL.createObjectURL(data))
-        } else {
-          console.log('diagram size 0')
         }
         }).catch((e) => {
           console.error('error fetching diagram: ',e)
       }); 
     },[])
+
+    const noImage = () => {
+      return <h1 style={{marginTop:'50px'}}>No Diagram Found</h1>
+    }
     return (
       <div id="Graph">
-          <img src={graphImage ? graphImage : demoImage} alt="flowsheet"/>
+        {graphImage ? 
+        <img src={graphImage} alt="flowsheet"/>
+         : 
+        noImage()}
       </div>
     );
 
