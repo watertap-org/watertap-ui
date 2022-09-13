@@ -8,5 +8,5 @@ test('test input accordion', () => {
     render( <Graph></Graph> )
 
     //test for component elements
-    screen.getByRole('img', {  name: /flowsheet/i});
+    screen.getByRole('heading', {  name: /no diagram found/i});
 })

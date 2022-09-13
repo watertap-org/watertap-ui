@@ -19,9 +19,16 @@ export default function Graph() {
           console.error('error fetching diagram: ',e)
       }); 
     },[])
+
+    const noImage = () => {
+      return <h1 style={{marginTop:'50px'}}>No Diagram Found</h1>
+    }
     return (
       <div id="Graph">
-          <img src={graphImage ? graphImage : demoImage} alt="flowsheet"/>
+        {graphImage ? 
+        <img src={graphImage} alt="flowsheet"/>
+         : 
+        noImage()}
       </div>
     );
 
