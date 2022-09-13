@@ -14,7 +14,8 @@
   },
   "devDependencies": {
     "electron": "^20.1.3",
-    "electron-builder": "^23.3.3"
+    "electron-builder": "^23.3.3",
+    "electron-notarize": "^1.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -67,12 +68,12 @@
     "mac": {
       "target": "dmg",
       "category": "utilities",
-      "gatekeeperAssess" : false,
+      "gatekeeperAssess": false,
       "hardenedRuntime": true,
       "icon": "build/watertap-logo.ico"
     },
     "win": {
-      "target": "msi",
+      "target": "zip",
       "icon": "build/watertap-logo.ico"
     },
     "linux": {
