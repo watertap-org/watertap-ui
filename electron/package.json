@@ -18,7 +18,6 @@
     "electron-notarize": "^1.2.1"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build-frontend": "npm --prefix ui run build",
     "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
     "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
@@ -70,6 +69,8 @@
       "category": "utilities",
       "gatekeeperAssess": false,
       "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.inherit.plist",
+      "entitlementsInherit": "build/entitlements.mac.inherit.plist",
       "icon": "build/watertap-logo.ico"
     },
     "win": {
