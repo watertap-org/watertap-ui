@@ -2,6 +2,7 @@
 Configuration for the backend
 """
 import app
+import os
 from pathlib import Path
 from pydantic import (
     BaseSettings,

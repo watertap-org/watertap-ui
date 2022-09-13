@@ -1,7 +1,7 @@
 //import './Page.css';
 import React from 'react'; 
 import {useEffect, useState } from 'react';   
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
 import Container from '@mui/material/Container';
 import Graph from "../../components/Graph/Graph";
@@ -14,6 +14,11 @@ import Alert from '@mui/material/Alert';
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
 import Snackbar from '@mui/material/Snackbar';
 import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog'; 
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent'; 
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 function TabPanel(props) {
@@ -45,9 +50,10 @@ function a11yProps(index) {
 }
 
 export default function FlowsheetConfig() {
-  
+    let navigate = useNavigate();
     let params = useParams(); 
     const [flowsheetData, setFlowsheetData] = useState(null); 
+    const [loadingFlowsheetData, setLoadingFlowsheetData] = useState(true);
     const [tabValue, setTabValue] = useState(0);
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
@@ -67,15 +73,19 @@ export default function FlowsheetConfig() {
       .then(response => response.json())
       .then((data)=>{
         console.log("Flowsheet Data:", data);
+        setLoadingFlowsheetData(false)
         setFlowsheetData(data);
         setTitle(getTitle(data)); 
       }).catch((e) => {
         console.error('error getting flowsheet: ',e)
         // return to list page?
+        navigateHome(e)
       });
     }, [params.id]);
 
-  
+    const navigateHome = (e) => {
+      navigate("/", {replace: true, state:{error:e}})
+    }
 
     const handleTabChange = (event, newValue) => {
       setTabValue(newValue);
@@ -167,43 +177,49 @@ export default function FlowsheetConfig() {
 
     return ( 
       <Container>
-      {(flowsheetData) ? (
-        
-        <>
-          <h2 style={{textAlign:"left"}}>
-          {title}
-          </h2>
+      {(loadingFlowsheetData) ? 
+          (
+            <Dialog open={loadingFlowsheetData} fullWidth={true} maxWidth="md">
+              <DialogTitle></DialogTitle>
+              <DialogContent>  
+              <div style={{display:"flex", alignItems: "center", justifyContent: "center", gap:"10px"}}>
+                  <CircularProgress /> <h3>Building flowsheet...</h3>
+              </div>
+              </DialogContent>
+              <DialogActions></DialogActions>
+          </Dialog>
+          )
+          :
+          (
+          <>
+            <h2 style={{textAlign:"left"}}>
+            {title}
+            </h2>
 
-          <Graph/>
+            <Graph/>
 
-          <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
-            <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
-              <Tab label="Input" {...a11yProps(0)} />
-              <Tab label="Output" disabled={!outputData} {...a11yProps(1)} /> 
-              <Tab label="Compare" disabled={!outputData} {...a11yProps(2)} /> 
-            </Tabs>
-            <TabPanel value={tabValue} index={0}>
-              <ConfigInput flowsheetData={flowsheetData} 
-                          updateFlowsheetData={updateFlowsheetData}>
-              </ConfigInput>
-            </TabPanel>
-            <TabPanel value={tabValue} index={1}>
-              <ConfigOutput outputData={outputData}  setPastConfigs={setPastConfigs}>
-              </ConfigOutput>
-            </TabPanel> 
-            <TabPanel value={tabValue} index={2}>
-              <ConfigOutputComparisonTable outputData={outputData}>
-              </ConfigOutputComparisonTable>
-            </TabPanel> 
-          </Box>
-        </>
-        )
-        :
-        (
-          <Box>
-            <Alert severity="error">No data found!</Alert>
-          </Box>
-        )
+            <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
+              <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
+                <Tab label="Input" {...a11yProps(0)} />
+                <Tab label="Output" disabled={!outputData} {...a11yProps(1)} /> 
+                <Tab label="Compare" disabled={!outputData} {...a11yProps(2)} /> 
+              </Tabs>
+              <TabPanel value={tabValue} index={0}>
+                <ConfigInput flowsheetData={flowsheetData} 
+                            updateFlowsheetData={updateFlowsheetData}>
+                </ConfigInput>
+              </TabPanel>
+              <TabPanel value={tabValue} index={1}>
+                <ConfigOutput outputData={outputData}  setPastConfigs={setPastConfigs}>
+                </ConfigOutput>
+              </TabPanel> 
+              <TabPanel value={tabValue} index={2}>
+                <ConfigOutputComparisonTable outputData={outputData}>
+                </ConfigOutputComparisonTable>
+              </TabPanel> 
+            </Box>
+          </>
+          )
       }  
       <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id}></SolveDialog>
       <Snackbar

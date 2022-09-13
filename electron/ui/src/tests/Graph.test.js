@@ -1,12 +1,11 @@
 import { render, screen } from '@testing-library/react';
-import Page from "../components/Page/Page"
+import Graph from "../components/Graph/Graph"
 import * as React from 'react'
-
 //mock props
 
 test('test input accordion', () => {
 
-    render( <Page></Page> )
+    render( <Graph></Graph> )
 
     //test for component elements
     screen.getByRole('heading', {  name: /no diagram found/i});

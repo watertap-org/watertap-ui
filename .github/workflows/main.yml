@@ -41,9 +41,13 @@ jobs:
           environment-file: environment.yml
           activate-environment: watertap-ui-env
 
-      - name: Install JS dependencies
+      - name: Install Electron JS dependencies
         run: |
           npm --prefix electron clean-install
+
+      - name: Install frontend JS dependencies
+        run: |
+          npm --prefix electron/ui clean-install
 
       - name: get idaes extensions
         run: idaes get-extensions
@@ -58,14 +62,13 @@ jobs:
         run: uvicorn --app-dir backend/app main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
 
       - name: run frontend
-        run: npm --prefix electron start & sleep 30
+        run: npm --prefix electron/ui start & sleep 30
 
       - name: run component tests
-        working-directory: electron
-        run: npm run test
+        run: npm --prefix electron/ui run test
 
       - name: Cypress e2e tests
-        working-directory: electron
+        working-directory: electron/ui
         timeout-minutes: 15
         run: |
           echo "$(npm bin)"

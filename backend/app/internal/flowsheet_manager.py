@@ -10,6 +10,7 @@ import shutil
 import time
 from typing import Optional, Dict, List
 import logging
+import app
 
 # third-party
 from fastapi import HTTPException
