@@ -1,47 +1,31 @@
 {
   "name": "nawi-ui",
-  "version": "0.1.0",
+  "author": "Michael Pesce",
+  "version": "0.1.0v2",
   "private": true,
-  "main": "main.js",
+  "main": "build/main.js",
   "dependencies": {
     "@electron/remote": "^2.0.8",
-    "@emotion/react": "^11.9.3",
-    "@emotion/styled": "^11.9.3",
-    "@fontsource/roboto": "^4.5.7",
-    "@mui/icons-material": "^5.8.3",
-    "@mui/material": "^5.8.3",
-    "@testing-library/cypress": "^8.0.3",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.2.0",
-    "@testing-library/user-event": "^13.5.0",
     "axios": "^0.27.2",
-    "concurrently": "^7.3.0",
-    "cross-env": "^7.0.3",
-    "cypress": "^10.4.0",
     "dotenv": "^16.0.1",
     "electron-is-dev": "^2.0.0",
-    "electron-store": "^8.1.0",
-    "jointjs": "^3.5.5",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "react-router-dom": "^6.3.0",
-    "react-scripts": "5.0.1",
-    "wait-on": "^6.0.1",
-    "web-vitals": "^2.1.4"
+    "electron-log": "^4.4.8",
+    "electron-store": "^8.1.0"
   },
   "devDependencies": {
-    "electron": "^20.0.0"
+    "electron": "^20.1.3",
+    "electron-builder": "^23.3.3"
   },
   "scripts": {
     "start": "react-scripts start",
-    "electron-start": "concurrently -k \"npm run start-backend\" \"npm run start-nob\" \"wait-on http://127.0.0.1:3000 && npx electron .\"",
-    "start-nob": "cross-env BROWSER=none react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "build-frontend": "npm --prefix ui run build",
     "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
-    "app-start": "concurrently -k \"cross-env npm run start-backend\" \"react-scripts start\"",
-    "app-start-nob": "concurrently -k \"cross-env npm run start-backend\" \"npm run start-nob\""
+    "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
+    "electron-build-mac": "npm run remove-previous-dist && electron-builder -m || electron-builder -m",
+    "dist:mac": "npm run build-backend && npm run build-frontend && electron-builder -m",
+    "dist:win": "npm run build-backend && npm run build-frontend && electron-builder -w",
+    "remove-previous-backend-build": "rm -r py_dist/*",
+    "remove-previous-dist": "rm -r dist/*"
   },
   "eslintConfig": {
     "extends": [
@@ -61,30 +45,35 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "./",
+  "homepage": ".",
   "build": {
-    "appId": "com.electron.pareto-ui",
+    "appId": "com.electron.watertap-ui",
     "extends": null,
     "asar": false,
-    "productName": "ParetoUI",
+    "productName": "WaterTAP-UI",
     "files": [
       "dist/**/*",
       "build/**/*",
-      "node_modules/**/*",
+      "py_dist/**/*",
       "package.json",
-      "backend/**/*"
+      "get-idaes-extensions-dist/**/*"
     ],
     "directories": {
       "buildResources": "assets"
     },
+    "extraResources": [
+      "public/**/*"
+    ],
     "mac": {
       "target": "dmg",
       "category": "utilities",
-      "type": "development"
+      "gatekeeperAssess" : false,
+      "hardenedRuntime": true,
+      "icon": "build/watertap-logo.ico"
     },
     "win": {
-      "target": "portable",
-      "icon": "./src/assets/pareto-logo-2.png"
+      "target": "msi",
+      "icon": "build/watertap-logo.ico"
     },
     "linux": {
       "target": "deb",

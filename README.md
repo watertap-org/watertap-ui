@@ -11,6 +11,8 @@ The following steps assume that:
 1. `conda` is already installed and configured
 2. This repository (i.e. the WaterTAP UI repository, https://github.com/watertap-org/watertap-ui) has been cloned locally and the working directory is set to the root of the repository
 
+## Installation
+
 ### 1. Creating the Conda environment
 
 Run the following command to create and activate a new Conda environment named `watertap-ui-env`:
@@ -23,10 +25,14 @@ This will install the correct runtime versions of both the backend (Python) and 
 
 ### 2. Install the JavaScript dependencies
 
-Run the following command to install the JavaScript dependencies:
+Run the following commands to install the JavaScript dependencies:
 
 ```sh
 npm --prefix electron clean-install
+```
+
+```sh
+npm --prefix electron/ui clean-install
 ```
 
 ### 3. Install the IDAES solver dependencies
@@ -71,9 +77,9 @@ The following assumes that the `watertap-org/watertap` repository has been clone
 bash -c "cd /path/to/my/watertap && pip install -r requirements-dev.txt"
 ```
 
-## Running the UI
+# Running the UI
 
-#### Ensure that the `watertap-ui-env` Conda environment is active
+### Ensure that the `watertap-ui-env` Conda environment is active and all dependencies are installed
 
 ```console
 conda activate watertap-ui-env
@@ -82,14 +88,14 @@ conda activate watertap-ui-env
 ### Run UI in browser
 
 ```console
-cd <watertap-ui-path>/electron
+cd <watertap-ui-path>/electron/ui
 npm run app-start
 ```
 
-### Run UI with electron
+### Run UI with electron (work in progress)
 
 ```console
-cd <watertap-ui-path>/electron
+cd <watertap-ui-path>/electron/ui
 npm run electron-start
 ```
 
@@ -101,3 +107,20 @@ To run the Python tests, make sure you have the appropriate version of watertap 
 
 
 Last merged PR: : graph_settings-issue53
+
+
+# Building production Electron app (experimental)
+
+### Windows (requires Windows OS):
+
+```console
+cd <watertap-ui-path>/electron
+npm run dist:win
+```
+
+### MacOS - (requires Mac OS):
+
+```console
+cd <watertap-ui-path>/electron
+npm run dist:mac
+```

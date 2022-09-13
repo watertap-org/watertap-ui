@@ -13,7 +13,8 @@ describe('Invalid Input Test', () => {
              method: "GET",
              url: "http://localhost:8001/flowsheets/**",
          }).as("loadFlowsheet");
-         cy.findByRole('link', {  name: flowsheet_name}).click()
+        //  cy.findByRole('link', {  name: flowsheet_name}).click()
+         cy.findByText(flowsheet_name).click()
          cy.wait("@loadFlowsheet");
          cy.screenshot(sc_count+'_loaded flowsheet')
          sc_count+=1
