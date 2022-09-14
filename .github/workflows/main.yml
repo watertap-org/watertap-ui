@@ -52,6 +52,10 @@ jobs:
       - name: get idaes extensions
         run: idaes get-extensions
 
+      - name: Install watertap-ui Python package
+        run: |
+          pip install --progress-bar off .
+
       - name: run pytest
         working-directory: backend
         env:
