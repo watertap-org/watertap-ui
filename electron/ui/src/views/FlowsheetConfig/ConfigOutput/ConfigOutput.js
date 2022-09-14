@@ -47,11 +47,12 @@ export default function ConfigOutput(props) {
         .then(response => response.json())
         .then((data)=>{
             console.log('successfully saved config')
+            props.updateFlowsheetData({solved:outputData.solved, data: outputData.data, name:configName}, "UPDATE_CONFIG")
             handleCloseSaveConfig()
             setSaved(true)
         })
         .catch((e) => {
-            console.log('error saving config')
+            console.log('error saving config',e)
             handleCloseSaveConfig()
         });
     }

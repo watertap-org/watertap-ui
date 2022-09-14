@@ -9,19 +9,52 @@ import Toolbar from '@mui/material/Toolbar';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SaveIcon from '@mui/icons-material/Save';
 import Stack from '@mui/material/Stack';
+import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
+import { useParams } from "react-router-dom";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+
 
 
 
 
 export default function ConfigInput(props) {
-    const { flowsheetData, updateFlowsheetData } = props;  
-    // const [costingBlocks, setCostingBlocks] = useState({});
-    // const [parametersBlocks, setParametersBlocks] = useState({}); 
-    // const [inputBlocks, setInputBlocks] = useState({});
+    let params = useParams(); 
+    const { flowsheetData, updateFlowsheetData } = props; 
+    const [ previousConfigs, setPreviousConfigs ] = useState([]) 
+    const [ configName, setConfigName ] = React.useState("");
+
+    const handleConfigSelection = (event) => {
+      const {
+        target: { value },
+      } = event;
+
+      loadConfig(params.id, value)
+      .then(response => response.json())
+      .then((data)=>{
+        updateFlowsheetData({name:value, solved: true, data:data},"UPDATE_CONFIG")
+        setConfigName(value);
+      }).catch((err)=>{
+          console.error("unable to get load config: ",err)
+      });
+      
+    };
 
     useEffect(()=>{   
-
-    }, [flowsheetData]);
+        listConfigNames(params.id)
+        .then(response => response.json())
+        .then((data)=>{
+          setPreviousConfigs(data)
+          if(data.includes(flowsheetData.name)) {
+            setConfigName(flowsheetData.name)
+          }
+        }).catch((err)=>{
+            console.error("unable to get list of config names: ",err)
+        })
+    }, []);
  
 
     /**
@@ -79,7 +112,7 @@ export default function ConfigInput(props) {
     }
 
     const renderInputAccordions = () => {
-        let var_sections = organizeVariables(flowsheetData.model_objects)
+        let var_sections = organizeVariables(flowsheetData.data.model_objects)
         return Object.entries(var_sections).map(([key, value])=>{
             let _key = key + Math.floor(Math.random() * 100001);
             if(Object.keys(value.input_variables).length > 0) {
@@ -94,11 +127,41 @@ export default function ConfigInput(props) {
     return ( 
         <>
             <Toolbar spacing={2}>
+            <Stack direction="row" spacing={2}>
+                {previousConfigs.length > 0 && 
+                <>
+                <InputLabel style={{paddingTop:"8px"}} id="previous-configs-label">Previous Configurations:</InputLabel>
+                <FormControl sx={{ width: 200 }}>
+                    {/* <InputLabel id="previous-configs-label">Previous Configs</InputLabel> */}
+                    <Select
+                    labelId="previous-configs-label"
+                    id="previous-configs-select"
+                    value={configName}
+                    onChange={handleConfigSelection}
+                    // MenuProps={MenuProps}
+                    size="small"
+                    >
+                    {previousConfigs.map((name) => (
+                        <MenuItem
+                        key={name}
+                        value={name}
+                        // style={getStyles(name, personName, theme)}
+                        >
+                        {name}
+                        </MenuItem>
+                    ))}
+                    </Select>
+                </FormControl>
+                </>
+                }
+                
+
+                </Stack>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData,null)}>SAVE</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData,"SOLVE")}>SOLVE</Button>
+                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.data,null)}>SAVE</Button>
+                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.data,"SOLVE")}>SOLVE</Button>
                 </Stack>
             </Toolbar>
 
@@ -127,8 +190,8 @@ export default function ConfigInput(props) {
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData,null)}>SAVE</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData,"SOLVE")}>SOLVE</Button>
+                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.data,null)}>SAVE</Button>
+                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.data,"SOLVE")}>SOLVE</Button>
                 </Stack>
             </Toolbar>
         </>
