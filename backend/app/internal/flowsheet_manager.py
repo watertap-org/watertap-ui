@@ -15,6 +15,7 @@ import time
 from types import ModuleType
 from typing import Optional, Dict, List
 import logging
+import app
 
 # third-party
 from fastapi import HTTPException
