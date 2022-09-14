@@ -1,13 +1,18 @@
 # stdlib
 import sys
+import types
 
 if sys.version_info < (3, 10):
     from importlib_resources import files
 else:
     from importlib.resources import files
+try:
+    from importlib import metadata
+except ImportError:
+    from importlib_metadata import metadata
 from pathlib import Path
-import shutil
 import time
+from types import ModuleType
 from typing import Optional, Dict, List
 import logging
 import app
@@ -62,34 +67,50 @@ class FlowsheetManager:
         """
         self.app_settings = AppSettings(**kwargs)
         self._objs, self._flowsheets = {}, {}
+
         for package in self.app_settings.packages:
             _log.debug(f"Collect flowsheet interfaces from package '{package}'")
-            try:
-                modules = FlowsheetInterface.find(package)
-            except ImportError as err:
-                _log.error(f"Import error in package '{package}': {err}")
-                continue
-            except IOError as err:
-                _log.error(f"I/O error in package '{package}': {err}")
-                continue
-            for module_name, obj in modules.items():
-                _log.debug(f"Create flowsheet interface for module '{module_name}'")
-                id_ = module_name
-                export = obj.fs_exp  # exported flowsheet
-                info = FlowsheetInfo(
-                    id_=id_,
-                    name=export.name,
-                    description=export.description,
-                    module=id_,
-                )
-                self._flowsheets[id_] = info
-                self._objs[id_] = obj
-                path = self.get_flowsheet_dir(id_)
-                path.mkdir(exist_ok=True)
+            for name, fsi in self._get_flowsheet_interfaces(package).items():
+                _log.debug(f"Add flowsheet interface '{fsi.fs_exp.name}' "
+                           f"for module '{name}'")
+                self.add_flowsheet_interface(name, fsi)
 
         # Connect to history DB
         path = self.app_settings.data_basedir / self.HISTORY_DB_FILE
         self._histdb = tinydb.TinyDB(path)
+
+    def add_flowsheet_interface(self, module_name: str, fsi: FlowsheetInterface):
+        """Add a flowsheet interface associated with the given module (full dotted
+        module path). This will replace any existing interface for this module.
+
+        Side-effects:
+            - A directory will be created for saving state, named after the module.
+            - The module is not checked here, but when the module diagram is needed
+              the path to the module determines where the associated image resource
+              is located (see :meth:`get_diagram`).
+
+        Args:
+            module_name: Name of module
+            fsi: FlowsheetInterface object.
+
+        Returns:
+            None
+        """
+        if module_name in self._flowsheets:
+            _log.warning(f"Replacing existing flowsheet interface for module "
+                         f"'{module_name}'")
+
+        export = fsi.fs_exp  # exported flowsheet
+        info = FlowsheetInfo(
+            id_=module_name,
+            name=export.name,
+            description=export.description,
+            module=module_name,
+        )
+        self._flowsheets[module_name] = info
+        self._objs[module_name] = fsi
+        path = self.get_flowsheet_dir(module_name)
+        path.mkdir(exist_ok=True)
 
     def get_flowsheet_dir(self, id_: str) -> Path:
         """Get directory to read/write flowsheet-specific data.
@@ -208,7 +229,7 @@ class FlowsheetManager:
         )
         return name
 
-    def list_flowsheet_names(self, id_: str = None) -> list[str]:
+    def list_flowsheet_names(self, id_: str = None) -> List[str]:
         """Get a list of all flowsheet names saved for this identifier.
 
         Args:
@@ -220,3 +241,76 @@ class FlowsheetManager:
         query = tinydb.Query()
         items = self._histdb.search(query.fragment({"id_": id_}))
         return [item["name"] for item in items]
+
+    def _get_flowsheet_interfaces(
+        self, package_name: str
+    ) -> Dict[str, FlowsheetInterface]:
+        """Get all flowsheet interfaces for a package.
+
+        This uses the importlib ``metadata.entry_points()`` function to fetch the
+        list of declared flowsheets for a given package from the setup.py for this
+        package.
+
+        There is no current mechanism for discovering flowsheet interfaces from
+        external packages, though :meth:`add_flowsheet_interface` can be used if
+        the module containing the interface is known.
+
+        Args:
+            package_name: Package
+
+        Returns:
+            Mapping with keys the module names and values FlowsheetInterface objects
+        """
+        group_name = package_name + ".flowsheets"
+        try:
+            entry_points = metadata.entry_points()[group_name]
+        except KeyError:
+            _log.error(f"No interfaces found for package: {package_name}")
+            return {}
+
+        interfaces = {}
+        for ep in entry_points:
+            _log.debug(f"ep = {ep}")
+            module_name = ep.value
+            try:
+                module = ep.load()
+            except ImportError as err:
+                _log.error(f"Cannot import module '{module_name}': {err}")
+                continue
+            interface = self._get_flowsheet_interface(module)
+            if interface:
+                interfaces[module_name] = interface
+
+        return interfaces
+
+    @staticmethod
+    def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:
+        """Get a a flowsheet interface for module.
+
+        Args:
+            module: The module
+
+        Returns:
+            A flowsheet interface or None if it failed
+        """
+
+        # Get function that creates the FlowsheetInterface
+        func = getattr(module, FlowsheetInterface.UI_HOOK, None)
+        if func is None:
+            _log.warning(
+                f"Interface for module '{module}' is missing UI hook function: "
+                f"{FlowsheetInterface.UI_HOOK}()"
+            )
+            return None
+        # Call the function that creates the FlowsheetInterface
+        try:
+            interface = func()
+        except Exception as err:
+            _log.error(
+                f"Cannot get FlowsheetInterface object for module '{module}': {err}"
+            )
+            return None
+        # Return created FlowsheetInterface
+        return interface
+
+

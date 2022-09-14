@@ -100,7 +100,7 @@ async def update(flowsheet_id: str, request: Request):
     input_data = await request.json()
     try:
         flowsheet.load(input_data)
-        _log.debug(f"Loading new data {input_data} into flowsheet {flowsheet_id}")
+        _log.debug(f"Loading new data into flowsheet '{flowsheet_id}'")
     except FlowsheetInterface.MissingObjectError as err:
         # this is unlikely, the model would need to change while running
         # (but could happen since 'build' and 'solve' can do anything they want)
