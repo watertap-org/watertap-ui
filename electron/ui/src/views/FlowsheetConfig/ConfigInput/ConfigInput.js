@@ -155,6 +155,7 @@ export default function ConfigInput(props) {
                 </>
                 }
                 
+                
 
                 </Stack>
                 <Box sx={{ flexGrow: 1 }}></Box>
@@ -162,6 +163,9 @@ export default function ConfigInput(props) {
                     {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
                     <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.data,null)}>SAVE</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.data,"SOLVE")}>SOLVE</Button>
+                    {configName.length > 0 &&
+                    <Button variant="outlined" color="error">Delete</Button>
+                    }
                 </Stack>
             </Toolbar>
 
