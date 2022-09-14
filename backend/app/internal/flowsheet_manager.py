@@ -268,6 +268,7 @@ class FlowsheetManager:
             return {}
 
         interfaces = {}
+        _log.debug(f"Loading {len(list(entry_points))} entry points")
         for ep in entry_points:
             _log.debug(f"ep = {ep}")
             module_name = ep.value
