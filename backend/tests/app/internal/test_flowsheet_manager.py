@@ -1,11 +1,11 @@
 """
 Tests for flowsheet_manager module
 """
+from importlib import import_module
 from uuid import uuid4
 import pytest
 from app.internal import flowsheet_manager as fm
 from fastapi import HTTPException
-import logging
 import time
 
 
@@ -48,31 +48,29 @@ def test_mgr_flowsheets_property(mgr: fm.FlowsheetManager):
 
 @pytest.mark.unit
 def test_mgr_get_diagram(mgr: fm.FlowsheetManager):
-    no_diagram = "nodiagram"
-    print(f"All flowsheets: {mgr._flowsheets.keys()}")
 
-    # get an examples module
-    mod_id = one_id(
-        mgr, filter_func=lambda k: (k.startswith("tests") and no_diagram not in k)
-    )
-    print(f"Getting diagram: {mod_id}")
-    d = mgr.get_diagram(mod_id)
+    example_module = "tests.app.internal.examples.api_example"
+    m = import_module(example_module)
+    example_interface = mgr._get_flowsheet_interface(m)
+    assert example_interface
+    mgr.add_flowsheet_interface(example_module, example_interface)
+
+    d = mgr.get_diagram(example_module)
     assert d
     # known size of "diagram"
     assert 18000 < len(d) < 19000
 
-    # module has no API fails
-    with pytest.raises(HTTPException):
-        mgr.get_diagram("watertap.core.wt_database")
 
-    # raw pkg fails
-    with pytest.raises(HTTPException):
-        mgr.get_diagram("examples")
+@pytest.mark.unit
+def test_mgr_get_diagram_missing(mgr: fm.FlowsheetManager):
+    example_module = "tests.app.internal.examples.api_example_nodiagram"
+    m = import_module(example_module)
+    example_interface = mgr._get_flowsheet_interface(m)
+    assert example_interface
+    mgr.add_flowsheet_interface(example_module, example_interface)
 
-    mod_id2 = mod_id.replace("api_example", f"api_example_{no_diagram}")
-    print(f"Getting diagram: {mod_id2}")
-    b = mgr.get_diagram(mod_id2)
-    assert len(b) == 0
+    d = mgr.get_diagram(example_module)
+    assert len(d) == 0
 
 
 @pytest.mark.unit

@@ -18,7 +18,7 @@ setup(
 
     entry_points={
         "watertap.flowsheets": [
-            "metab = watertap.examples.flowsheets.case_studies.wastewater_resource_recovery.metab.metab_ui:export_to_ui",
+            "metab = watertap.examples.flowsheets.case_studies.wastewater_resource_recovery.metab.metab_ui",
         ],
     }
 )
