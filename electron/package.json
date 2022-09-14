@@ -51,6 +51,7 @@
     "extends": null,
     "asar": false,
     "productName": "WaterTAP-UI",
+    "afterSign": "build/notarize.js",
     "files": [
       "dist/**/*",
       "build/**/*",
