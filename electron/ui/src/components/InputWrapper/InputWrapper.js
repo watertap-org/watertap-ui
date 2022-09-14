@@ -32,7 +32,7 @@ export default function InputWrapper(props) {
                         label={fieldData.name}
                         variant="outlined" 
                         size="small"
-                        value={fieldData.value}
+                        defaultValue={fieldData.value}
                         onChange={handleFieldChange}
                         fullWidth 
                         InputProps={{
