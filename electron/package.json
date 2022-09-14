@@ -21,9 +21,10 @@
     "build-frontend": "npm --prefix ui run build",
     "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
     "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
+    "build-replace-backend": "npm run remove-previous-backend-build && npm run build-backend || npm run build-backend",
     "electron-build-mac": "npm run remove-previous-dist && electron-builder -m || electron-builder -m",
-    "dist:mac": "npm run build-backend && npm run build-frontend && electron-builder -m",
-    "dist:win": "npm run build-backend && npm run build-frontend && electron-builder -w",
+    "dist:mac": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-mac",
+    "dist:win": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-win",
     "remove-previous-backend-build": "rm -r py_dist/*",
     "remove-previous-dist": "rm -r dist/*"
   },
