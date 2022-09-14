@@ -21,7 +21,7 @@ export default function FlowsheetsListTable(props) {
             <TableHead>
             <TableRow>
                 <TableCell>Name</TableCell>
-                <TableCell>Last Run</TableCell> 
+                <TableCell>Description</TableCell> 
                 <TableCell></TableCell>
             </TableRow>
             </TableHead>
@@ -35,11 +35,8 @@ export default function FlowsheetsListTable(props) {
                     {/* <a href={"/flowsheet/" + row.id_ + "/config"}>{row.name}</a> */}
                     <u style={{color:"#2444ac", cursor:"pointer"}}onClick={()=>handleFlowsheetClick(row.id_)}>{row.name}</u>
                 </TableCell>
-                <TableCell></TableCell>
+                <TableCell>{row.description}</TableCell>
                 <TableCell>
-                    <IconButton color="primary" aria-label="Edit project">
-                        <SettingsIcon />
-                    </IconButton>
                 </TableCell>
                 </TableRow>
             ))}
