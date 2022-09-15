@@ -8,7 +8,7 @@ describe('Invalid Input Test', () => {
          sc_count+=1
  
          //click flowsheet and wait for api response
-         var flowsheet_name = "foo"
+         var flowsheet_name = "metab"
          cy.intercept({
              method: "GET",
              url: "http://localhost:8001/flowsheets/**",
@@ -20,7 +20,7 @@ describe('Invalid Input Test', () => {
          sc_count+=1
 
         //enter negative value for recovery rate twice to ensure it is entered
-        var input_textbox_name = "Tank 1 inlet flowrate"
+        var input_textbox_name = "Volumetric flow rate"
         var input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})

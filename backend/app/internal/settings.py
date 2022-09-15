@@ -1,9 +1,8 @@
 """
 Configuration for the backend
 """
-import app
-import os
 from pathlib import Path
+from typing import List
 from pydantic import (
     BaseSettings,
     validator
@@ -12,7 +11,7 @@ from pydantic import (
 
 class AppSettings(BaseSettings):
     #: List of package names in which to look for flowsheets
-    packages: list[str] = ["watertap", "examples"]
+    packages: List[str] = ["watertap", "examples"]
     data_basedir: Path = None
 
     @validator("data_basedir", always=True)

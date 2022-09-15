@@ -129,8 +129,8 @@ def test_update(client, flowsheet_id):
     assert response.status_code == 200, update_body
     for var_name, var_data in update_body["model_objects"].items():
         value = var_data["value"]
-        if isinstance(value, float):
-            print(f"check {var_name}")
+        if isinstance(value, float) and var_data["is_input"]:
+            print(f"check {var_name} is_input={var_data['is_input']}")
             expect_value = new_body["model_objects"][var_name]["value"]
             assert value == expect_value
 

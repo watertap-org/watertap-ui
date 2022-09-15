@@ -1,0 +1,25 @@
+version: 1
+formatters:
+  default:
+    format: '[%(levelname)s] %(asctime)s %(name)s: %(message)s'
+  verbose:
+    format: '[%(levelname)s] %(asctime)s %(name)s (%(filename)s:%(lineno)s): %(message)s'
+handlers:
+  console:
+    class : logging.StreamHandler
+    formatter: default
+    level   : DEBUG
+    stream  : ext://sys.stdout
+  file:
+    class : logging.handlers.FileHandler
+    formatter: verbose
+    filename: backend.log
+    level: DEBUG
+loggers:
+  backend:
+    level: DEBUG
+    handlers: [file]
+    propagate: false
+root:
+  level: NOTSET
+  handlers: [console]

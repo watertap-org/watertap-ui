@@ -96,7 +96,7 @@ export default function ConfigInput(props) {
             <Toolbar spacing={2}>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Stack direction="row" spacing={2}>
-                    <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button>
+                    {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
                     <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData,null)}>SAVE</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData,"SOLVE")}>SOLVE</Button>
                 </Stack>
@@ -126,7 +126,7 @@ export default function ConfigInput(props) {
             <Toolbar>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Stack direction="row" spacing={2}>
-                    <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button>
+                    {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
                     <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData,null)}>SAVE</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData,"SOLVE")}>SOLVE</Button>
                 </Stack>

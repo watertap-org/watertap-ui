@@ -9,7 +9,6 @@ test('test flowsheets list table', () => {
 
     expect(screen.getByRole('table', {  name: /simple table/i}))
     expect(screen.getByRole('columnheader', {  name: /name/i}))
-    expect(screen.getByRole('columnheader', {  name: /Last Run/i}))
-    expect(screen.getByRole('button', { name: /edit project/i }))
+    expect(screen.getByRole('columnheader', {  name: /description/i}))
 
 })

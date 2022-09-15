@@ -48,11 +48,11 @@ export default function FlowsheetsList() {
     <Container>
       <h2 style={{textAlign:"left"}}>Flowsheets</h2>  
         
-      <Toolbar>
+      {/* <Toolbar>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleNewFlowsheetDialogClickOpen}>
           New
         </Button>
-      </Toolbar> 
+      </Toolbar>  */}
 
       <FlowsheetsListTable rows={rows}></FlowsheetsListTable> 
       
