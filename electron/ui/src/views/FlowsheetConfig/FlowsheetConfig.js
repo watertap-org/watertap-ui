@@ -52,7 +52,7 @@ function a11yProps(index) {
 export default function FlowsheetConfig() {
     let navigate = useNavigate();
     let params = useParams(); 
-    const [flowsheetData, setFlowsheetData] = useState({solved:false}); 
+    const [flowsheetData, setFlowsheetData] = useState({inputData:{}, outputData:null}); 
     const [loadingFlowsheetData, setLoadingFlowsheetData] = useState(true);
     const [tabValue, setTabValue] = useState(0);
     const [title, setTitle] = useState("");
@@ -72,7 +72,7 @@ export default function FlowsheetConfig() {
       .then((data)=>{
         console.log("Flowsheet Data:", data);
         setLoadingFlowsheetData(false)
-        setFlowsheetData({solved:false, data: data, name: data.name});
+        setFlowsheetData({outputData:null, inputData: data, name: data.name});
         setTitle(getTitle(data)); 
       }).catch((e) => {
         console.error('error getting flowsheet: ',e)
@@ -121,6 +121,7 @@ export default function FlowsheetConfig() {
       // }
       else if(solve=== "UPDATE_CONFIG"){
         setFlowsheetData(data)
+        handleSave(data.inputData);
       }
     };
 
@@ -128,8 +129,9 @@ export default function FlowsheetConfig() {
       console.log("handle solved.....",data);
       // data = data[data.length - 1]
       
-      // setOutputData({name: data.name, data: data});
-      setFlowsheetData({name: data.name, data: data, solved:true});
+      let tempFlowsheetData = {...flowsheetData}
+      tempFlowsheetData.outputData = data
+      setFlowsheetData(tempFlowsheetData);
       
       // if(data.hasOwnProperty("input") && data.input)
       // {console.log("iiiiiiii:",data.input);
@@ -202,8 +204,8 @@ export default function FlowsheetConfig() {
             <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
               <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
                 <Tab label="Input" {...a11yProps(0)} />
-                <Tab label="Output" disabled={!flowsheetData.solved} {...a11yProps(1)} /> 
-                <Tab label="Compare" disabled={!flowsheetData.solved} {...a11yProps(2)} /> 
+                <Tab label="Output" disabled={!flowsheetData.outputData} {...a11yProps(1)} /> 
+                <Tab label="Compare" disabled={!flowsheetData.outputData} {...a11yProps(2)} /> 
               </Tabs>
               <TabPanel value={tabValue} index={0}>
                 <ConfigInput flowsheetData={flowsheetData} 

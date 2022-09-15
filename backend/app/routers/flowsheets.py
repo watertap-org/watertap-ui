@@ -100,7 +100,7 @@ async def update(flowsheet_id: str, request: Request):
     input_data = await request.json()
     try:
         flowsheet.load(input_data)
-        _log.debug(f"Loading new data into flowsheet '{flowsheet_id}'")
+        _log.info(f"Loading new data into flowsheet '{flowsheet_id}'")
     except FlowsheetInterface.MissingObjectError as err:
         # this is unlikely, the model would need to change while running
         # (but could happen since 'build' and 'solve' can do anything they want)
@@ -180,6 +180,26 @@ async def list_config_names(flowsheet_id: str) -> List[str]:
     """
     result = flowsheet_manager.list_flowsheet_names(flowsheet_id)
     return result
+
+
+@router.get("/{flowsheet_id}/delete")
+async def delete(flowsheet_id: str, name: str) -> List[str]:
+    """Delete given flowsheet configuration from tinydb.
+
+    Args:
+        flowsheet_id: Identifier for flowsheet (structure)
+        name: Name under which this particular configuration was saved
+
+    Returns:
+        Remaining ist of config names (may be empty) for given flowsheet identifier
+    """
+    try:
+        result = flowsheet_manager.delete_config(flowsheet_id, name)
+        return result
+    except:
+        raise HTTPException(
+            404, f"Cannot find flowsheet id='{flowsheet_id}'"
+        )
 
 
 @router.post("/{flowsheet_id}/download", response_class=FileResponse)

@@ -16,6 +16,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { deleteConfig }  from '../../../services/input.service.js'
 
 
 
@@ -26,22 +27,6 @@ export default function ConfigInput(props) {
     const { flowsheetData, updateFlowsheetData } = props; 
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
-
-    const handleConfigSelection = (event) => {
-      const {
-        target: { value },
-      } = event;
-
-      loadConfig(params.id, value)
-      .then(response => response.json())
-      .then((data)=>{
-        updateFlowsheetData({name:value, solved: true, data:data},"UPDATE_CONFIG")
-        setConfigName(value);
-      }).catch((err)=>{
-          console.error("unable to get load config: ",err)
-      });
-      
-    };
 
     useEffect(()=>{   
         listConfigNames(params.id)
@@ -56,6 +41,38 @@ export default function ConfigInput(props) {
         })
     }, []);
  
+    const handleConfigSelection = (event) => {
+        const {
+          target: { value },
+        } = event;
+  
+        loadConfig(params.id, value)
+        .then(response => response.json())
+        .then((data)=>{
+          let tempFlowsheetData = {...flowsheetData}
+          tempFlowsheetData.name = value
+          tempFlowsheetData.outputData = data.outputData
+          tempFlowsheetData.inputData = data.inputData
+          updateFlowsheetData(tempFlowsheetData,"UPDATE_CONFIG")
+          setConfigName(value);
+        }).catch((err)=>{
+            console.error("unable to get load config: ",err)
+        });
+        
+      };
+
+    const handleDelete = () => {
+        console.log('deleting id=',params.id,'name=',configName)
+        deleteConfig(params.id, configName)
+        .then(response => response.json())
+        .then((data)=>{
+            console.log('returned data (configs) ',data)
+          setConfigName("");
+          setPreviousConfigs(data)
+        }).catch((err)=>{
+            console.error("unable to get load config: ",err)
+        });
+    }
 
     /**
      * Organize variables into sections by their 'category' attribute.
@@ -112,7 +129,7 @@ export default function ConfigInput(props) {
     }
 
     const renderInputAccordions = () => {
-        let var_sections = organizeVariables(flowsheetData.data.model_objects)
+        let var_sections = organizeVariables(flowsheetData.inputData.model_objects)
         return Object.entries(var_sections).map(([key, value])=>{
             let _key = key + Math.floor(Math.random() * 100001);
             if(Object.keys(value.input_variables).length > 0) {
@@ -161,10 +178,10 @@ export default function ConfigInput(props) {
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.data,null)}>SAVE</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.data,"SOLVE")}>SOLVE</Button>
+                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>SAVE</Button>
+                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
                     {configName.length > 0 &&
-                    <Button variant="outlined" color="error">Delete</Button>
+                    <Button variant="outlined" color="error" onClick={() => handleDelete()}>Delete</Button>
                     }
                 </Stack>
             </Toolbar>
@@ -194,8 +211,8 @@ export default function ConfigInput(props) {
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.data,null)}>SAVE</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.data,"SOLVE")}>SOLVE</Button>
+                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>SAVE</Button>
+                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
                 </Stack>
             </Toolbar>
         </>

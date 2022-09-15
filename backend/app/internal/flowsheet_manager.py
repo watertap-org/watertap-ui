@@ -1,6 +1,7 @@
 # stdlib
 import sys
 import types
+from xml.etree.ElementTree import QName
 
 if sys.version_info < (3, 10):
     from importlib_resources import files
@@ -228,6 +229,22 @@ class FlowsheetManager:
             (fs_q.id_ == id_) & (fs_q.name == name),
         )
         return name
+
+    def delete_config(self, id_: str = None, name: str = None) -> List[str]:
+        """Delete saved flowsheet config with this identifier.
+
+        Args:
+            id_: Flowsheet ID
+            name: Name under which this particular configuration was saved
+
+        Returns:
+            Remaining list of config names (may be empty) for given flowsheet
+        """
+        query = tinydb.Query()
+        _log.debug(f"Deleteing name='{name}' for id='{id_}'")
+        self._histdb.remove((query.id_ == id_) & (query.name == name))
+        items = self._histdb.search(query.fragment({"id_": id_}))
+        return [item["name"] for item in items]
 
     def list_flowsheet_names(self, id_: str = None) -> List[str]:
         """Get a list of all flowsheet names saved for this identifier.
