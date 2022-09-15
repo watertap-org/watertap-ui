@@ -17,6 +17,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { deleteConfig }  from '../../../services/input.service.js'
+import Modal from '@mui/material/Modal';
 
 
 
@@ -27,6 +28,20 @@ export default function ConfigInput(props) {
     const { flowsheetData, updateFlowsheetData } = props; 
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
+    const [ openDeleteConfig, setOpenDeleteConfig] = useState(false)
+
+    const modalStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+      };
+      
 
     useEffect(()=>{   
         listConfigNames(params.id)
@@ -69,8 +84,10 @@ export default function ConfigInput(props) {
             console.log('returned data (configs) ',data)
           setConfigName("");
           setPreviousConfigs(data)
+          setOpenDeleteConfig(false)
         }).catch((err)=>{
             console.error("unable to get load config: ",err)
+            setOpenDeleteConfig(false)
         });
     }
 
@@ -181,7 +198,7 @@ export default function ConfigInput(props) {
                     <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>SAVE</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
                     {configName.length > 0 &&
-                    <Button variant="outlined" color="error" onClick={() => handleDelete()}>Delete</Button>
+                    <Button variant="outlined" color="error" onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
                     }
                 </Stack>
             </Toolbar>
@@ -191,21 +208,25 @@ export default function ConfigInput(props) {
                     renderInputAccordions()
                 }
             </Grid>
-
-            <Grid container spacing={2}>
-                <Grid item xs={6}> 
-                    {  /* 
-                        Object.keys(costingBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={costingBlocks[key]}></InputAccordion>)
-                    */
-                    }
-                </Grid>
-                <Grid item xs={6}>
-                    { /*  
-                        Object.keys(parametersBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={parametersBlocks[key]}></InputAccordion>) 
-                    */
-                    }
-                </Grid>
-            </Grid>
+                <Modal
+                    open={openDeleteConfig}
+                    onClose={() => setOpenDeleteConfig(false)}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Grid container sx={modalStyle} spacing={1}>
+                        <Grid item xs={12}>
+                            <Box justifyContent="center" alignItems="center" display="flex">
+                                <p>Are you sure you want to delete {configName}?</p>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Box justifyContent="center" alignItems="center" display="flex">
+                                <Button onClick={() => handleDelete()} variant="contained" color="error">Delete</Button>
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </Modal>
             <br/>
             <Toolbar>
                 <Box sx={{ flexGrow: 1 }}></Box>
