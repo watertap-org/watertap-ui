@@ -73,11 +73,11 @@
       "hardenedRuntime": true,
       "entitlements": "build/entitlements.mac.inherit.plist",
       "entitlementsInherit": "build/entitlements.mac.inherit.plist",
-      "icon": "build/watertap-logo.ico"
+      "icon": "build/nawi-logo.ico"
     },
     "win": {
       "target": "zip",
-      "icon": "build/watertap-logo.ico"
+      "icon": "build/nawi-logo.ico"
     },
     "linux": {
       "target": "deb",
