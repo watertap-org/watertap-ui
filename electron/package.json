@@ -26,7 +26,8 @@
     "dist:mac": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-mac",
     "dist:win": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-win",
     "remove-previous-backend-build": "rm -r py_dist/*",
-    "remove-previous-dist": "rm -r dist/*"
+    "remove-previous-dist": "rm -r dist/*",
+    "app-start": "npm --prefix ui run app-start"
   },
   "eslintConfig": {
     "extends": [
