@@ -169,6 +169,8 @@ const startServer = () => {
 app.whenReady().then(() => {
     // Entry point
     if (isDev) {
+      log.info('starting electron app in dev mode')
+      console.log('starting electron app in dev mode')
       createWindow()
     } else {
       let serverProcess
