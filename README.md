@@ -161,7 +161,7 @@ cd <watertap-ui-path>/electron
 npm run dist:win
 ```
 
-#### MacOS - (requires Mac OS):
+#### Mac (requires Mac OS):
 
 
 ```console
