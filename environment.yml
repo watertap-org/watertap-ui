@@ -6,6 +6,4 @@ dependencies:
   - pip
   - nodejs=17.9.0
   - pip:
-    - '.'
-    - -r backend/requirements.txt
-    - watertap @ https://github.com/watertap-org/watertap/archive/main.zip
+    - -r requirements-dev.txt

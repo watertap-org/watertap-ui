@@ -1,7 +1,4 @@
-try:
-    from importlib import metadata
-except ImportError:
-    from importlib_metadata import metadata
+from importlib import metadata
 from typing import (
     Dict,
     Union,

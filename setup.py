@@ -12,9 +12,10 @@ setup(
     packages=find_packages(where="src"),
 
     install_requires=[
-        "importlib_metadata ; python_version < '3.8' ",
+        "importlib_resources; python_version < '3.10' ",
         "pytest>=7",
     ],
+    python_requires=">=3.8",
 
     entry_points={
         "watertap.flowsheets": [

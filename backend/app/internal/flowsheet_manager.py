@@ -2,14 +2,12 @@
 import sys
 import types
 
-if sys.version_info < (3, 10):
-    from importlib_resources import files
-else:
-    from importlib.resources import files
 try:
-    from importlib import metadata
+    from importlib.resources import files
 except ImportError:
-    from importlib_metadata import metadata
+    from importlib_resources import files
+
+from importlib import metadata
 from pathlib import Path
 import time
 from types import ModuleType
