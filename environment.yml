@@ -8,4 +8,4 @@ dependencies:
   - pip:
     - '.'
     - -r backend/requirements.txt
-   - watertap @ https://github.com/watertap-org/watertap/archive/main.zip
+    - watertap @ https://github.com/watertap-org/watertap/archive/main.zip
