@@ -58,6 +58,10 @@
     "asar": false,
     "productName": "WaterTAP-UI",
     "afterSign": "build/notarize.js",
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "files": [
       "dist/**/*",
       "build/**/*",
@@ -81,7 +85,7 @@
       "icon": "build/nawi-logo.ico"
     },
     "win": {
-      "target": "zip",
+      "target": "nsis",
       "icon": "build/nawi-logo.ico"
     },
     "linux": {
