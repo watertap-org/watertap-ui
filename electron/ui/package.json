@@ -1,5 +1,5 @@
 {
-  "name": "nawi-ui",
+  "name": "watertap-ui",
   "author": "Michael Pesce",
   "version": "0.1.0",
   "private": true,
@@ -26,8 +26,7 @@
     "wait-on": "^6.0.1",
     "web-vitals": "^2.1.4"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "scripts": {
     "start": "react-scripts start",
     "app-start": "concurrently -k \"cross-env npm run start-backend\" \"react-scripts start\"",
