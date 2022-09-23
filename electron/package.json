@@ -67,7 +67,7 @@
       "build/**/*",
       "py_dist/**/*",
       "package.json",
-      "get-idaes-extensions-dist/**/*"
+      "setup-extensions-dist/**/*"
     ],
     "directories": {
       "buildResources": "assets"

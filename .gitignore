@@ -146,3 +146,5 @@ videos/
 idaes-extensions/
 get-idaes-extensions-dist/
 cert/
+extensions/
+setup-extensions-dist/
