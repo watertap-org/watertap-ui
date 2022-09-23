@@ -4,8 +4,6 @@ import logging
 import uvicorn
 import multiprocessing
 import idaes.logger as idaeslog
-# from idaes.commands.util.download_bin import download_binaries
-# from idaes.config import default_binary_release
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
