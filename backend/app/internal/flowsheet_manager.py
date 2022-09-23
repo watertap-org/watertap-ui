@@ -259,7 +259,7 @@ class FlowsheetManager:
         Returns:
             Mapping with keys the module names and values FlowsheetInterface objects
         """
-        group_name = package_name + ".flowsheets"
+        group_name = "watertap.flowsheets"
         try:
             entry_points = metadata.entry_points()[group_name]
         except KeyError:
