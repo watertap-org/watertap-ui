@@ -3,6 +3,9 @@ import os
 import certifi
 from pathlib import Path
 from shutil import copytree
+import certifi
+from idaes.util.download_bin import download_binaries
+from idaes.config import default_binary_release
 
 idaes_extensions_dir = Path.home() / ".watertap" / ".idaes"
 pyomo_extensions_dir = Path.home() / ".watertap" / ".pyomo"
