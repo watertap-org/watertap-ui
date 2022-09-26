@@ -4,11 +4,9 @@ import certifi
 from pathlib import Path
 from shutil import copytree
 import certifi
-from idaes.util.download_bin import download_binaries
-from idaes.config import default_binary_release
 
 idaes_extensions_dir = Path.home() / ".watertap" / ".idaes"
-pyomo_extensions_dir = Path.home() / ".watertap" / ".pyomo"
+pyomo_extensions_dir = Path.home() / ".watertap" / ".pyomo_"
 def check_for_idaes_extensions():
     print('checking for idaes extensions')
     found_extensions = os.path.exists(idaes_extensions_dir)
@@ -35,7 +33,15 @@ def get_idaes_extensions():
             print(f'get idaes extensions successful, making directory')
         else:
             print('not mac')
+            try:
+                print(f'setting requests_ca_bundle and ssl_cert_file to certifi.where(): {certifi.where()}')
+                os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
+                os.environ["SSL_CERT_FILE"] = certifi.where()
+            except Exception as e:
+                print(f'unable to set requests_ca_bundle and ssl_cert_file:\n{e}')
             print(f'trying to download binaries')
+            from idaes.commands.util.download_bin import download_binaries
+            from idaes.config import default_binary_release
             download_binaries(release=default_binary_release)
             print(f'extensions have been gotten')
         print('successfully installed idaes extensions')
