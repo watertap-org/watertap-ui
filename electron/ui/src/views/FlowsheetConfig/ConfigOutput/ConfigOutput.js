@@ -43,7 +43,7 @@ export default function ConfigOutput(props) {
     }
 
     const handleSaveConfig = () => {
-        saveConfig(params.id,{inputData: outputData.inputData, outputData: outputData.outputData},configName)
+        saveConfig(params.id,{inputData: outputData.inputData, outputData: outputData.outputData},configName, outputData.inputData.version)
         .then(response => response.json())
         .then((data)=>{
             console.log('successfully saved config')

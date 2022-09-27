@@ -37,7 +37,7 @@ useEffect(() => {
 }, [historyData])
 
 useEffect(()=>{
-  listConfigNames(params.id)
+  listConfigNames(params.id, outputData.inputData.version)
   .then(response => response.json())
   .then((data)=>{
     console.log("list config names:", data);

@@ -116,7 +116,7 @@ async def update(flowsheet_id: str, request: Request):
 
 
 @router.post("/{flowsheet_id}/save")
-async def save_config(flowsheet_id: str, request: Request, name: str = CURRENT) -> str:
+async def save_config(flowsheet_id: str, request: Request, version: int, name: str = CURRENT) -> str:
     """Save flowsheet 'config' with a name. See also :func:`load_config`.
 
     The query parameter 'name' is the name to save under. If no name is
@@ -134,7 +134,7 @@ async def save_config(flowsheet_id: str, request: Request, name: str = CURRENT) 
         name used to save record
     """
     data = await request.json()
-    name = flowsheet_manager.put_flowsheet_data(id_=flowsheet_id, name=name, data=data)
+    name = flowsheet_manager.put_flowsheet_data(id_=flowsheet_id, name=name, data=data, version=version)
     return name
 
 
@@ -169,7 +169,7 @@ async def load_config(flowsheet_id: str, name: str = CURRENT):
 
 
 @router.get("/{flowsheet_id}/list")
-async def list_config_names(flowsheet_id: str) -> List[str]:
+async def list_config_names(flowsheet_id: str, version: int) -> List[str]:
     """Get names of all currently saved configs for a given flowsheet.
 
     Args:
@@ -178,7 +178,7 @@ async def list_config_names(flowsheet_id: str) -> List[str]:
     Returns:
         List of names (may be empty)
     """
-    result = flowsheet_manager.list_flowsheet_names(flowsheet_id)
+    result = flowsheet_manager.list_flowsheet_names(flowsheet_id, version)
     return result
 
 

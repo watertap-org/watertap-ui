@@ -10,8 +10,8 @@ import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
-import Alert from '@mui/material/Alert';
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
+import ErrorBar from "../../components/ErrorBar/ErrorBar"; 
 import Snackbar from '@mui/material/Snackbar';
 import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
 import DialogTitle from '@mui/material/DialogTitle';
@@ -152,11 +152,20 @@ export default function FlowsheetConfig() {
     const handleSave = (data) => {
       console.log("handle save.....",data);
       saveFlowsheet(params.id, data)
-      .then(response => response.json())
-      .then((data)=>{
-        console.log("new Flowsheet Data:", data); 
-        setOpenSuccessSaveConfirmation(true);
-      });
+      .then(response => {
+        if(response.status === 200) {
+          response.json()
+          .then((data)=>{
+            console.log("new Flowsheet Data:", data); 
+            setOpenSuccessSaveConfirmation(true);
+          });
+        } else if(response.status === 400) {
+          console.error("error saving data")
+          handleError("Infeasible data, configuration not saved")
+        }
+        
+      })
+        
     };
 
     const handleSuccessSaveConfirmationClose = () => {
@@ -231,11 +240,13 @@ export default function FlowsheetConfig() {
         onClose={handleSuccessSaveConfirmationClose}
         message="Changes saved!" 
       />
-      <Snackbar open={openErrorMessage} autoHideDuration={3000} onClose={handleErrorClose}>
-        <Alert onClose={handleErrorClose} severity="error">
-          {errorMessage}
-        </Alert>
-      </Snackbar>
+      <ErrorBar 
+        open={openErrorMessage} 
+        duration={3000}
+        handleErrorClose={handleErrorClose}
+        severity={"error"}
+        errorMessage={errorMessage}
+      />
       </Container>  
       
     );

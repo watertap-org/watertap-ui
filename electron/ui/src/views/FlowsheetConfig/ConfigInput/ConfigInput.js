@@ -18,6 +18,7 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { deleteConfig }  from '../../../services/input.service.js'
 import Modal from '@mui/material/Modal';
+import ErrorBar from "../../../components/ErrorBar/ErrorBar"; 
 
 
 
@@ -29,6 +30,7 @@ export default function ConfigInput(props) {
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
     const [ openDeleteConfig, setOpenDeleteConfig] = useState(false)
+    const [ openErrorMessage, setOpenErrorMessage ] = useState(false);
 
     const modalStyle = {
         position: 'absolute',
@@ -43,16 +45,24 @@ export default function ConfigInput(props) {
       };
       
 
-    useEffect(()=>{   
-        listConfigNames(params.id)
-        .then(response => response.json())
-        .then((data)=>{
-          setPreviousConfigs(data)
-          if(data.includes(flowsheetData.name)) {
-            setConfigName(flowsheetData.name)
-          }
-        }).catch((err)=>{
-            console.error("unable to get list of config names: ",err)
+    useEffect(()=>{ 
+        console.log('list config names with version ', flowsheetData.inputData.version)
+        listConfigNames(params.id, flowsheetData.inputData.version)
+        .then(response => {
+            if (response.status === 200) {
+                response.json()
+                .then((data)=>{
+                  setPreviousConfigs(data)
+                  if(data.includes(flowsheetData.name)) {
+                    setConfigName(flowsheetData.name)
+                  }
+                }).catch((err)=>{
+                    console.error("unable to get list of config names: ",err)
+                })
+            }
+        else {
+            console.error("unable to get list of config names: ",response.statusText)
+        }
         })
     }, []);
  
