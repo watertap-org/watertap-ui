@@ -146,15 +146,24 @@ export default function ConfigInput(props) {
     }
 
     const renderInputAccordions = () => {
-        let var_sections = organizeVariables(flowsheetData.inputData.model_objects)
-        return Object.entries(var_sections).map(([key, value])=>{
-            let _key = key + Math.floor(Math.random() * 100001);
-            if(Object.keys(value.input_variables).length > 0) {
-                return (<Grid item xs={6} key={_key}>
-                    <InputAccordion data={value}></InputAccordion>
-                </Grid>)
-            }
-        })
+        try {
+            let var_sections = organizeVariables(flowsheetData.inputData.model_objects)
+            return Object.entries(var_sections).map(([key, value])=>{
+                let _key = key + Math.floor(Math.random() * 100001);
+                if(Object.keys(value.input_variables).length > 0) {
+                    return (<Grid item xs={6} key={_key}>
+                        <InputAccordion data={value}></InputAccordion>
+                    </Grid>)
+                }
+            })
+        } catch (e) {
+            // version of data is likely wrong
+            // should we delete this data automatically? 
+            // for now just output an error. the user will have the ability to delete this record
+            console.error('unable to display this data, likely an incorrect version of data')
+            console.error(e)
+        }
+        
     };
     
   
