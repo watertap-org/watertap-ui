@@ -56,6 +56,10 @@ jobs:
         run: |
           pip install --progress-bar off .
 
+      - name: Display installed environment
+        run: |
+          conda env export --no-builds
+
       - name: run pytest
         working-directory: backend
         env:
