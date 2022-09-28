@@ -7,7 +7,9 @@ added_files = [
         ('../../../watertap/watertap/data/techno_economic/*.yaml', 'watertap/data/techno_economic'), 
         ('../../../watertap/watertap/data/techno_economic/metab.yaml', 'watertap/core'), 
         ('../../../watertap/watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/metab/metab_global_costing.yaml','watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/metab'),
-        ('../data/flowsheets/fake/graph.png', 'data/flowsheets/fake')]
+        ('../../../watertap/watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/suboxic_activated_sludge_process/suboxic_activated_sludge_process_global.yaml', 'watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/suboxic_activated_sludge_process'),
+        ('../../../watertap/watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/amo_1575_magprex/magprex_case_1575.yaml', 'watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/amo_1575_magprex'),
+        ('../../../watertap/watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/biomembrane_filtration/biomembrane_filtration_global_costing.yaml', 'watertap/examples/flowsheets/case_studies/wastewater_resource_recovery/biomembrane_filtration')]
 a = Analysis(
     ['main.py'],
     pathex=[],
