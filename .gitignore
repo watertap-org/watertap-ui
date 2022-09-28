@@ -110,7 +110,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-# .env
+.env
 .venv
 env/
 venv/
@@ -145,3 +145,6 @@ videos/
 
 idaes-extensions/
 get-idaes-extensions-dist/
+cert/
+extensions/
+setup-extensions-dist/
