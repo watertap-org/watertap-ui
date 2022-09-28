@@ -1,7 +1,7 @@
 {
-  "name": "nawi-ui",
+  "name": "watertap-ui",
   "author": "Michael Pesce",
-  "version": "0.1.0v2",
+  "version": "0.1.0v5",
   "private": true,
   "main": "build/main.js",
   "dependencies": {
@@ -14,18 +14,25 @@
   },
   "devDependencies": {
     "electron": "^20.1.3",
-    "electron-builder": "^23.3.3"
+    "electron-builder": "^23.3.3",
+    "electron-notarize": "^1.2.1"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build-frontend": "npm --prefix ui run build",
+    "start-frontend": "npm --prefix ui run start",
     "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
     "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
+    "build-replace-backend": "npm run remove-previous-backend-build && npm run build-backend || npm run build-backend",
     "electron-build-mac": "npm run remove-previous-dist && electron-builder -m || electron-builder -m",
-    "dist:mac": "npm run build-backend && npm run build-frontend && electron-builder -m",
-    "dist:win": "npm run build-backend && npm run build-frontend && electron-builder -w",
+    "electron-build-win": "npm run remove-previous-dist && electron-builder -w || electron-builder -w",
+    "dist:mac": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-mac",
+    "dist:win": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-win",
     "remove-previous-backend-build": "rm -r py_dist/*",
-    "remove-previous-dist": "rm -r dist/*"
+    "remove-previous-dist": "rm -r dist/*",
+    "app-start": "npm --prefix ui run app-start",
+    "electron-start": "npm --prefix ui run electron-start",
+    "get-extensions-installer": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/setup-extensions-dist setup-extensions.spec",
+    "create-idaes-extensions-installer": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/get-idaes-extensions-dist get-idaes-extensions.spec"
   },
   "eslintConfig": {
     "extends": [
@@ -51,12 +58,17 @@
     "extends": null,
     "asar": false,
     "productName": "WaterTAP-UI",
+    "afterSign": "build/notarize.js",
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "files": [
       "dist/**/*",
       "build/**/*",
       "py_dist/**/*",
       "package.json",
-      "get-idaes-extensions-dist/**/*"
+      "setup-extensions-dist/**/*"
     ],
     "directories": {
       "buildResources": "assets"
@@ -67,13 +79,15 @@
     "mac": {
       "target": "dmg",
       "category": "utilities",
-      "gatekeeperAssess" : false,
+      "gatekeeperAssess": false,
       "hardenedRuntime": true,
-      "icon": "build/watertap-logo.ico"
+      "entitlements": "build/entitlements.mac.inherit.plist",
+      "entitlementsInherit": "build/entitlements.mac.inherit.plist",
+      "icon": "build/nawi-logo.ico"
     },
     "win": {
-      "target": "msi",
-      "icon": "build/watertap-logo.ico"
+      "target": "nsis",
+      "icon": "build/nawi-logo.ico"
     },
     "linux": {
       "target": "deb",

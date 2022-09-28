@@ -1,5 +1,5 @@
 {
-  "name": "nawi-ui",
+  "name": "watertap-ui",
   "author": "Michael Pesce",
   "version": "0.1.0",
   "private": true,
@@ -26,19 +26,16 @@
     "wait-on": "^6.0.1",
     "web-vitals": "^2.1.4"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "scripts": {
     "start": "react-scripts start",
-    "electron-start": "concurrently -k \"npm run start-nob\" \"wait-on http://127.0.0.1:3000 && npx --prefix ../ electron .\"",
+    "app-start": "concurrently -k \"cross-env npm run start-backend\" \"react-scripts start\"",
+    "electron-start": "concurrently -k \"npm run start-backend\" \"npm run start-nob\" \"wait-on http://127.0.0.1:3000 && npx --prefix ../ electron .\"",
+    "start-backend": "cd ../../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
     "start-nob": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "postbuild": "rm -r ../build && mv build ../ || mv build ../",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start-backend": "cd ../../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
-    "app-start": "concurrently -k \"cross-env npm run start-backend\" \"react-scripts start\"",
-    "app-start-nob": "concurrently -k \"cross-env npm run start-backend\" \"npm run start-nob\"",
     "build-backend": "cd ../../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec"
   },
   "eslintConfig": {
