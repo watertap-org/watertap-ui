@@ -10,14 +10,22 @@ export default function Graph() {
     useEffect(() => {
       
       getDiagram(params.id)
-      .then(response => response.blob())
-      .then((data)=>{
-        if(data.size > 0) {
-          setGraphImage(URL.createObjectURL(data))
-        }
-        }).catch((e) => {
-          console.error('error fetching diagram: ',e)
-      }); 
+      .then(response => {
+      if (response.status === 200) {
+          response.blob()
+          .then((data)=>{
+            if(data.size > 0) {
+              setGraphImage(URL.createObjectURL(data))
+            }
+          }).catch((err)=>{
+              console.error("error fetching diagram: ",err)
+          })
+      }
+      else {
+          console.error("error fetching diagram: ",response.statusText)
+      }
+      })
+
     },[])
 
     const noImage = () => {
