@@ -1,6 +1,5 @@
 # stdlib
 import sys
-import this
 import types
 from xml.etree.ElementTree import QName
 
