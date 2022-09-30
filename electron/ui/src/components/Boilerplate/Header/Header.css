@@ -25,6 +25,15 @@ hr {
   align-items: center;
 }
 
+.right {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  flex-grow: 1;
+  align-items: center;
+  color: white;
+}
+
 #nawi_logo {
   display: flex;
   align-items: center;
