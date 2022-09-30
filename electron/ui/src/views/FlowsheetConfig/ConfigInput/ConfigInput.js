@@ -214,7 +214,7 @@ export default function ConfigInput(props) {
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>SAVE</Button>
+                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
                     {configName.length > 0 &&
                     <Button variant="outlined" color="error" onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
