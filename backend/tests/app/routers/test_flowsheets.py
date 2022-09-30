@@ -22,10 +22,16 @@ def client():
     return TestClient(app)
 
 
-@pytest.fixture(scope="module")
-def flowsheet_id():
-    mgr = fm.FlowsheetManager()
-    return list(mgr._flowsheets.keys())[0]
+def pytest_generate_tests(metafunc):
+    if "flowsheet_id" in metafunc.fixturenames:
+        from watertap.ui.fsapi import FlowsheetInterface
+
+        module_names = list(FlowsheetInterface.from_installed_packages())
+        metafunc.parametrize(
+            "flowsheet_id",
+            list(module_names),
+            scope="module",
+        )
 
 
 def get_flowsheet(client, flowsheet_id, r, get_body=True, query_params=None):

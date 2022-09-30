@@ -56,11 +56,15 @@ jobs:
         run: |
           pip install --progress-bar off .
 
+      - name: Display installed environment
+        run: |
+          conda env export --no-builds
+
       - name: run pytest
         working-directory: backend
         env:
           PYTHONPATH: ${{ env.GITHUB_WORKSPACE }}/backend
-        run: pytest tests
+        run: pytest tests -v
 
       - name: run backend server
         run: uvicorn --app-dir backend/app main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
