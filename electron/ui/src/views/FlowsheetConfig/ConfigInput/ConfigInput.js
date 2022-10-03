@@ -9,20 +9,97 @@ import Toolbar from '@mui/material/Toolbar';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SaveIcon from '@mui/icons-material/Save';
 import Stack from '@mui/material/Stack';
+import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
+import { useParams } from "react-router-dom";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { deleteConfig }  from '../../../services/input.service.js'
+import Modal from '@mui/material/Modal';
+import ErrorBar from "../../../components/ErrorBar/ErrorBar"; 
+
 
 
 
 
 export default function ConfigInput(props) {
-    const { flowsheetData, updateFlowsheetData } = props;  
-    // const [costingBlocks, setCostingBlocks] = useState({});
-    // const [parametersBlocks, setParametersBlocks] = useState({}); 
-    // const [inputBlocks, setInputBlocks] = useState({});
+    let params = useParams(); 
+    const { flowsheetData, updateFlowsheetData } = props; 
+    const [ previousConfigs, setPreviousConfigs ] = useState([]) 
+    const [ configName, setConfigName ] = React.useState("");
+    const [ openDeleteConfig, setOpenDeleteConfig] = useState(false)
+    const [ openErrorMessage, setOpenErrorMessage ] = useState(false);
 
-    useEffect(()=>{   
+    const modalStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+      };
+      
 
-    }, [flowsheetData]);
+    useEffect(()=>{ 
+        console.log('list config names with version ', flowsheetData.inputData.version)
+        listConfigNames(params.id, flowsheetData.inputData.version)
+        .then(response => {
+            if (response.status === 200) {
+                response.json()
+                .then((data)=>{
+                  setPreviousConfigs(data)
+                  if(data.includes(flowsheetData.name)) {
+                    setConfigName(flowsheetData.name)
+                  }
+                }).catch((err)=>{
+                    console.error("unable to get list of config names: ",err)
+                })
+            }
+        else {
+            console.error("unable to get list of config names: ",response.statusText)
+        }
+        })
+    }, []);
  
+    const handleConfigSelection = (event) => {
+        const {
+          target: { value },
+        } = event;
+  
+        loadConfig(params.id, value)
+        .then(response => response.json())
+        .then((data)=>{
+          let tempFlowsheetData = {...flowsheetData}
+          tempFlowsheetData.name = value
+          tempFlowsheetData.outputData = data.outputData
+          tempFlowsheetData.inputData = data.inputData
+          updateFlowsheetData(tempFlowsheetData,"UPDATE_CONFIG")
+          setConfigName(value);
+        }).catch((err)=>{
+            console.error("unable to get load config: ",err)
+        });
+        
+      };
+
+    const handleDelete = () => {
+        console.log('deleting id=',params.id,'name=',configName)
+        deleteConfig(params.id, configName)
+        .then(response => response.json())
+        .then((data)=>{
+            console.log('returned data (configs) ',data)
+          setConfigName("");
+          setPreviousConfigs(data)
+          setOpenDeleteConfig(false)
+        }).catch((err)=>{
+            console.error("unable to get load config: ",err)
+            setOpenDeleteConfig(false)
+        });
+    }
 
     /**
      * Organize variables into sections by their 'category' attribute.
@@ -79,26 +156,69 @@ export default function ConfigInput(props) {
     }
 
     const renderInputAccordions = () => {
-        let var_sections = organizeVariables(flowsheetData.model_objects)
-        return Object.entries(var_sections).map(([key, value])=>{
-            let _key = key + Math.floor(Math.random() * 100001);
-            if(Object.keys(value.input_variables).length > 0) {
-                return (<Grid item xs={6} key={_key}>
-                    <InputAccordion data={value}></InputAccordion>
-                </Grid>)
-            }
-        })
+        try {
+            let var_sections = organizeVariables(flowsheetData.inputData.model_objects)
+            return Object.entries(var_sections).map(([key, value])=>{
+                let _key = key + Math.floor(Math.random() * 100001);
+                if(Object.keys(value.input_variables).length > 0) {
+                    return (<Grid item xs={6} key={_key}>
+                        <InputAccordion data={value}></InputAccordion>
+                    </Grid>)
+                }
+            })
+        } catch (e) {
+            // version of data is likely wrong
+            // should we delete this data automatically? 
+            // for now just output an error. the user will have the ability to delete this record
+            console.error('unable to display this data, likely an incorrect version of data')
+            console.error(e)
+        }
+        
     };
     
   
     return ( 
         <>
             <Toolbar spacing={2}>
+            <Stack direction="row" spacing={2}>
+                {previousConfigs.length > 0 && 
+                <>
+                <InputLabel style={{paddingTop:"8px"}} id="previous-configs-label">Previous Configurations:</InputLabel>
+                <FormControl sx={{ width: 200 }}>
+                    {/* <InputLabel id="previous-configs-label">Previous Configs</InputLabel> */}
+                    <Select
+                    labelId="previous-configs-label"
+                    id="previous-configs-select"
+                    value={configName}
+                    onChange={handleConfigSelection}
+                    // MenuProps={MenuProps}
+                    size="small"
+                    >
+                    {previousConfigs.map((name) => (
+                        <MenuItem
+                        key={name}
+                        value={name}
+                        // style={getStyles(name, personName, theme)}
+                        >
+                        {name}
+                        </MenuItem>
+                    ))}
+                    </Select>
+                </FormControl>
+                </>
+                }
+                
+                
+
+                </Stack>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData,null)}>SAVE</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData,"SOLVE")}>SOLVE</Button>
+                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button>
+                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
+                    {configName.length > 0 &&
+                    <Button variant="outlined" color="error" onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
+                    }
                 </Stack>
             </Toolbar>
 
@@ -107,30 +227,25 @@ export default function ConfigInput(props) {
                     renderInputAccordions()
                 }
             </Grid>
-
-            <Grid container spacing={2}>
-                <Grid item xs={6}> 
-                    {  /* 
-                        Object.keys(costingBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={costingBlocks[key]}></InputAccordion>)
-                    */
-                    }
-                </Grid>
-                <Grid item xs={6}>
-                    { /*  
-                        Object.keys(parametersBlocks).map((key)=><InputAccordion key={key} dataKey={key} data={parametersBlocks[key]}></InputAccordion>) 
-                    */
-                    }
-                </Grid>
-            </Grid>
-            <br/>
-            <Toolbar>
-                <Box sx={{ flexGrow: 1 }}></Box>
-                <Stack direction="row" spacing={2}>
-                    {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData,null)}>SAVE</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData,"SOLVE")}>SOLVE</Button>
-                </Stack>
-            </Toolbar>
+                <Modal
+                    open={openDeleteConfig}
+                    onClose={() => setOpenDeleteConfig(false)}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Grid container sx={modalStyle} spacing={1}>
+                        <Grid item xs={12}>
+                            <Box justifyContent="center" alignItems="center" display="flex">
+                                <p>Are you sure you want to delete {configName}?</p>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Box justifyContent="center" alignItems="center" display="flex">
+                                <Button onClick={() => handleDelete()} variant="contained" color="error">Delete</Button>
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </Modal>
         </>
          
       

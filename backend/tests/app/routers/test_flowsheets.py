@@ -135,7 +135,7 @@ def test_update(client, flowsheet_id):
     assert response.status_code == 200, update_body
     for var_name, var_data in update_body["model_objects"].items():
         value = var_data["value"]
-        if isinstance(value, float) and var_data["is_input"]:
+        if isinstance(value, float) and var_data["is_input"] and not var_data["is_readonly"]:
             print(f"check {var_name} is_input={var_data['is_input']}")
             expect_value = new_body["model_objects"][var_name]["value"]
             assert value == expect_value
@@ -157,6 +157,7 @@ def test_update_missing(client, flowsheet_id):
         "is_readonly": False,
         "input_category": None,
         "output_category": None,
+        "obj_key": "something"
     }
     response, update_body = post_flowsheet(client, flowsheet_id, "update", new_body)
     assert response.status_code == 200, update_body
@@ -168,12 +169,12 @@ def test_save_config(client, flowsheet_id):
     assert response.status_code == 200, body
     config = body
     response, body = post_flowsheet(
-        client, flowsheet_id, "save", config, query_params={"name": "test name!"}
+        client, flowsheet_id, "save", config, query_params={"name": "test name!", "version": "1"}
     )
     assert response.status_code == 200, body
     assert body == "test name!"
 
-    response, body = post_flowsheet(client, flowsheet_id, "save", config)
+    response, body = post_flowsheet(client, flowsheet_id, "save", config, query_params={"version": "1"})
     assert response.status_code == 200, body
     assert body == "current"
 
@@ -191,11 +192,11 @@ def test_load_config(client, flowsheet_id):
     for var_name, var_data in config["model_objects"].items():
         var_data["value"] = 99
     response, body = post_flowsheet(
-        client, flowsheet_id, "save", config, query_params={"name": "test name!"}
+        client, flowsheet_id, "save", config, query_params={"name": "test name!", "version": "1"}
     )
     # fetch it back & check values
     response, body = get_flowsheet(
-        client, flowsheet_id, "load", query_params={"name": "test name!"}
+        client, flowsheet_id, "load", query_params={"name": "test name!", "version": "1"}
     )
     assert response.status_code == 200, body
     config2 = body
@@ -206,7 +207,7 @@ def test_load_config(client, flowsheet_id):
 @pytest.mark.unit
 def test_list_configs(client, flowsheet_id):
     # get current list of names
-    response, body = get_flowsheet(client, flowsheet_id, "list")
+    response, body = get_flowsheet(client, flowsheet_id, "list", query_params={"version": "1"})
     assert response.status_code == 200
     current_names = body
     # add some more names
@@ -216,10 +217,10 @@ def test_list_configs(client, flowsheet_id):
     add_names = [f"name{i}" for i in range(1, 5)]
     for name in add_names:
         response, body = post_flowsheet(
-            client, flowsheet_id, "save", config, query_params={"name": name}
+            client, flowsheet_id, "save", config, query_params={"name": name, "version": "1"}
         )
     # check that all names are present
-    response, body = get_flowsheet(client, flowsheet_id, "list")
+    response, body = get_flowsheet(client, flowsheet_id, "list", query_params={"version": "1"})
     assert response.status_code == 200
     assert set(body) == set(current_names + add_names)
 

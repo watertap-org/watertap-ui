@@ -100,7 +100,7 @@ async def update(flowsheet_id: str, request: Request):
     input_data = await request.json()
     try:
         flowsheet.load(input_data)
-        _log.debug(f"Loading new data into flowsheet '{flowsheet_id}'")
+        _log.info(f"Loading new data into flowsheet '{flowsheet_id}'")
     except FlowsheetInterface.MissingObjectError as err:
         # this is unlikely, the model would need to change while running
         # (but could happen since 'build' and 'solve' can do anything they want)
@@ -116,7 +116,7 @@ async def update(flowsheet_id: str, request: Request):
 
 
 @router.post("/{flowsheet_id}/save")
-async def save_config(flowsheet_id: str, request: Request, name: str = CURRENT) -> str:
+async def save_config(flowsheet_id: str, request: Request, version: int, name: str = CURRENT) -> str:
     """Save flowsheet 'config' with a name. See also :func:`load_config`.
 
     The query parameter 'name' is the name to save under. If no name is
@@ -134,7 +134,7 @@ async def save_config(flowsheet_id: str, request: Request, name: str = CURRENT) 
         name used to save record
     """
     data = await request.json()
-    name = flowsheet_manager.put_flowsheet_data(id_=flowsheet_id, name=name, data=data)
+    name = flowsheet_manager.put_flowsheet_data(id_=flowsheet_id, name=name, data=data, version=version)
     return name
 
 
@@ -169,7 +169,7 @@ async def load_config(flowsheet_id: str, name: str = CURRENT):
 
 
 @router.get("/{flowsheet_id}/list")
-async def list_config_names(flowsheet_id: str) -> List[str]:
+async def list_config_names(flowsheet_id: str, version: int) -> List[str]:
     """Get names of all currently saved configs for a given flowsheet.
 
     Args:
@@ -178,8 +178,28 @@ async def list_config_names(flowsheet_id: str) -> List[str]:
     Returns:
         List of names (may be empty)
     """
-    result = flowsheet_manager.list_flowsheet_names(flowsheet_id)
+    result = flowsheet_manager.list_flowsheet_names(flowsheet_id, version)
     return result
+
+
+@router.get("/{flowsheet_id}/delete")
+async def delete(flowsheet_id: str, name: str) -> List[str]:
+    """Delete given flowsheet configuration from tinydb.
+
+    Args:
+        flowsheet_id: Identifier for flowsheet (structure)
+        name: Name under which this particular configuration was saved
+
+    Returns:
+        Remaining ist of config names (may be empty) for given flowsheet identifier
+    """
+    try:
+        result = flowsheet_manager.delete_config(flowsheet_id, name)
+        return result
+    except:
+        raise HTTPException(
+            404, f"Cannot find flowsheet id='{flowsheet_id}'"
+        )
 
 
 @router.post("/{flowsheet_id}/download", response_class=FileResponse)

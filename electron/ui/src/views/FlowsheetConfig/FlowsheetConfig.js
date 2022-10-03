@@ -10,8 +10,8 @@ import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
-import Alert from '@mui/material/Alert';
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
+import ErrorBar from "../../components/ErrorBar/ErrorBar"; 
 import Snackbar from '@mui/material/Snackbar';
 import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
 import DialogTitle from '@mui/material/DialogTitle';
@@ -52,17 +52,15 @@ function a11yProps(index) {
 export default function FlowsheetConfig() {
     let navigate = useNavigate();
     let params = useParams(); 
-    const [flowsheetData, setFlowsheetData] = useState(null); 
+    const [flowsheetData, setFlowsheetData] = useState({inputData:{}, outputData:null}); 
     const [loadingFlowsheetData, setLoadingFlowsheetData] = useState(true);
     const [tabValue, setTabValue] = useState(0);
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
-    const [outputData, setOutputData] = useState(null);
-    const [pastConfigs, setPastConfigs] = useState(null)
+    // const [outputData, setOutputData] = useState(null);
     const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
     const [errorMessage, setErrorMessage] = useState("")
-
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
@@ -74,7 +72,7 @@ export default function FlowsheetConfig() {
       .then((data)=>{
         console.log("Flowsheet Data:", data);
         setLoadingFlowsheetData(false)
-        setFlowsheetData(data);
+        setFlowsheetData({outputData:null, inputData: data, name: data.name});
         setTitle(getTitle(data)); 
       }).catch((e) => {
         console.error('error getting flowsheet: ',e)
@@ -94,7 +92,7 @@ export default function FlowsheetConfig() {
     
     const getTitle = (data) => {
       try{
-        let v = data.blocks.fs.display_name;
+        let v = data.name;
         if(v)
           return v;
         else
@@ -117,9 +115,13 @@ export default function FlowsheetConfig() {
       {
         handleSave(data);
       }
-      else if(solve==="RESET")
-      {
-        handleReset();
+      // else if(solve==="RESET")
+      // {
+      //   handleReset();
+      // }
+      else if(solve=== "UPDATE_CONFIG"){
+        setFlowsheetData(data)
+        handleSave(data.inputData);
       }
     };
 
@@ -127,12 +129,14 @@ export default function FlowsheetConfig() {
       console.log("handle solved.....",data);
       // data = data[data.length - 1]
       
-      setOutputData({name: data.name, data: data});
+      let tempFlowsheetData = {...flowsheetData}
+      tempFlowsheetData.outputData = data
+      setFlowsheetData(tempFlowsheetData);
       
-      if(data.hasOwnProperty("input") && data.input)
-      {console.log("iiiiiiii:",data.input);
-        setFlowsheetData(data.input);
-      }
+      // if(data.hasOwnProperty("input") && data.input)
+      // {console.log("iiiiiiii:",data.input);
+      //   setFlowsheetData(data.input);
+      // }
 
       setTabValue(1);
       setSolveDialogOpen(false);
@@ -148,13 +152,21 @@ export default function FlowsheetConfig() {
     const handleSave = (data) => {
       console.log("handle save.....",data);
       saveFlowsheet(params.id, data)
-      .then(response => response.json())
-      .then((data)=>{
-        console.log("new Flowsheet Data:", data); 
-        setOpenSuccessSaveConfirmation(true);
-      });
+      .then(response => {
+        if(response.status === 200) {
+          response.json()
+          .then((data)=>{
+            console.log("new Flowsheet Data:", data); 
+            setOpenSuccessSaveConfirmation(true);
+          });
+        } else if(response.status === 400) {
+          console.error("error saving data")
+          handleError("Infeasible data, configuration not saved")
+        }
+        
+      })
+        
     };
-
 
     const handleSuccessSaveConfirmationClose = () => {
       setOpenSuccessSaveConfirmation(false);
@@ -164,15 +176,15 @@ export default function FlowsheetConfig() {
       setOpenErrorMessage(false);
     };
 
-    const handleReset = () => {
-      console.log("reset. id:", params.id)
-      resetFlowsheet(params.id)
-      .then(response => response.json())
-      .then((data)=>{
-        console.log("reset Flowsheet:", data)
-        setFlowsheetData(data)
-      })
-    }
+    // const handleReset = () => {
+    //   console.log("reset. id:", params.id)
+    //   resetFlowsheet(params.id)
+    //   .then(response => response.json())
+    //   .then((data)=>{
+    //     console.log("reset Flowsheet:", data)
+    //     setFlowsheetData(data)
+    //   })
+    // }
 
 
     return ( 
@@ -201,8 +213,8 @@ export default function FlowsheetConfig() {
             <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
               <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
                 <Tab label="Input" {...a11yProps(0)} />
-                <Tab label="Output" disabled={!outputData} {...a11yProps(1)} /> 
-                <Tab label="Compare" disabled={!outputData} {...a11yProps(2)} /> 
+                <Tab label="Output" disabled={!flowsheetData.outputData} {...a11yProps(1)} /> 
+                <Tab label="Compare" disabled={!flowsheetData.outputData} {...a11yProps(2)} /> 
               </Tabs>
               <TabPanel value={tabValue} index={0}>
                 <ConfigInput flowsheetData={flowsheetData} 
@@ -210,11 +222,11 @@ export default function FlowsheetConfig() {
                 </ConfigInput>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>
-                <ConfigOutput outputData={outputData}  setPastConfigs={setPastConfigs}>
+                <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData}>
                 </ConfigOutput>
               </TabPanel> 
               <TabPanel value={tabValue} index={2}>
-                <ConfigOutputComparisonTable outputData={outputData}>
+                <ConfigOutputComparisonTable outputData={flowsheetData}>
                 </ConfigOutputComparisonTable>
               </TabPanel> 
             </Box>
@@ -228,11 +240,13 @@ export default function FlowsheetConfig() {
         onClose={handleSuccessSaveConfirmationClose}
         message="Changes saved!" 
       />
-      <Snackbar open={openErrorMessage} autoHideDuration={3000} onClose={handleErrorClose}>
-        <Alert onClose={handleErrorClose} severity="error">
-          {errorMessage}
-        </Alert>
-      </Snackbar>
+      <ErrorBar 
+        open={openErrorMessage} 
+        duration={3000}
+        handleErrorClose={handleErrorClose}
+        severity={"error"}
+        errorMessage={errorMessage}
+      />
       </Container>  
       
     );

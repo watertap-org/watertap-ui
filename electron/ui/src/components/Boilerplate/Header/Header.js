@@ -2,6 +2,7 @@ import './Header.css';
 import React from 'react';
 import logo from "../../../assets/nawi-logo-color.png";
 import { useNavigate } from "react-router-dom";
+import Button from '@mui/material/Button';
  
 export default function Header() {
   let navigate = useNavigate();
@@ -17,7 +18,11 @@ export default function Header() {
           <div id="titlebar-name">
             WaterTAP
           </div>
+          <div  className="right" > 
+          <Button style={{ color:"white" }} onClick={handleNavigateHome}>Return to list page</Button>
+          </div>
         </div> 
+        
       </div>
     );
 }
