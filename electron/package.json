@@ -1,7 +1,7 @@
 {
   "name": "watertap-ui",
   "author": "Michael Pesce",
-  "version": "0.1.0v6",
+  "version": "0.1.0",
   "private": true,
   "main": "build/main.js",
   "dependencies": {
