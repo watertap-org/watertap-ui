@@ -25,8 +25,10 @@
     "build-replace-backend": "npm run remove-previous-backend-build && npm run build-backend || npm run build-backend",
     "electron-build-mac": "npm run remove-previous-dist && electron-builder -m || electron-builder -m",
     "electron-build-win": "npm run remove-previous-dist && electron-builder -w || electron-builder -w",
+    "electron-build-lin": "npm run remove-previous-dist && electron-builder -l || electron-builder -l",
     "dist:mac": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-mac",
     "dist:win": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-win",
+    "dist:lin": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-lin",
     "remove-previous-backend-build": "rm -r py_dist/*",
     "remove-previous-dist": "rm -r dist/*",
     "app-start": "npm --prefix ui run app-start",
@@ -91,7 +93,8 @@
     },
     "linux": {
       "target": "deb",
-      "category": "Development"
+      "category": "Development",
+      "icon": "build/nawi-logo.ico"
     }
   }
 }
