@@ -137,7 +137,7 @@ pip install idaes-pse==1.13
 
 ```console
 cd <watertap-ui-path>/electron
-npm run create-idaes-extensions-installer
+npm run setup-extensions-installer
 ```
 
 #### 1.5. Uninstall idaes version 1.13

@@ -43,15 +43,18 @@ export default function ConfigOutput(props) {
     }
 
     const handleSaveConfig = () => {
-        saveConfig(params.id,outputData.data,configName)
+        saveConfig(params.id,{inputData: outputData.inputData, outputData: outputData.outputData},configName, outputData.inputData.version)
         .then(response => response.json())
         .then((data)=>{
             console.log('successfully saved config')
+            let tempFlowsheetData = {...outputData}
+            tempFlowsheetData.name=configName
+            props.updateFlowsheetData(tempFlowsheetData, "UPDATE_CONFIG")
             handleCloseSaveConfig()
             setSaved(true)
         })
         .catch((e) => {
-            console.log('error saving config')
+            console.log('error saving config',e)
             handleCloseSaveConfig()
         });
     }
@@ -123,7 +126,7 @@ export default function ConfigOutput(props) {
         //                 <Alert severity="info">No soluction found!</Alert>
         //             </Grid>);
         // }
-        let var_sections = organizeVariables(outputData.data.model_objects)
+        let var_sections = organizeVariables(outputData.outputData.model_objects)
         // console.log("var_sections",var_sections)
         return Object.entries(var_sections).map(([key,value])=>{
             //console.log("O key:",key);

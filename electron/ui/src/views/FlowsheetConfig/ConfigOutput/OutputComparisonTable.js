@@ -37,17 +37,17 @@ useEffect(() => {
 }, [historyData])
 
 useEffect(()=>{
-  listConfigNames(params.id)
+  listConfigNames(params.id, outputData.inputData.version)
   .then(response => response.json())
   .then((data)=>{
     console.log("list config names:", data);
     setPastConfigs(data)
     var tempHistory = []
-    for (const conf of data) {
-      loadConfig(params.id, conf)
+    for (const config of data) {
+      loadConfig(params.id, config)
       .then(response => response.json())
       .then((data2)=>{
-      tempHistory.push({name: conf.replaceAll('"',''), data:data2})
+      tempHistory.push({name: config.replaceAll('"',''), data:data2})
       setHistoryData([...tempHistory])
       }).catch((err)=>{
           console.error("unable to get load config: ",err)
@@ -65,7 +65,7 @@ const organizeVariables = () => {
     let var_sections = {}
     let tempVariables = {}
     let tempName = bvars.name
-    for (const [key, v] of Object.entries(bvars.data.model_objects)) {
+    for (const [key, v] of Object.entries(bvars.data.outputData.model_objects)) {
         
         let catg
         let is_input = v.is_input
@@ -92,7 +92,7 @@ const organizeVariables = () => {
     setHistoryDataOrganized([...tempHistory])
     setLeftConfigIndex(tempHistory.length-1)
     setShowTable(true)
-    console.log("historyDataOrganized",tempHistory)
+    // console.log("historyDataOrganized",tempHistory)
   }
   
 }
