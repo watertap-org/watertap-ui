@@ -23,8 +23,8 @@ def get_idaes_extensions():
             print(f'moving binaries from {idaes_src} to {idaes_dst}')
             copytree(idaes_src,idaes_dst,dirs_exist_ok=True)
             print(f'get idaes extensions successful, making directory')
-        else:
-            print('not mac')
+        elif(sys.platform == "linux"):
+            print('linux')
             try:
                 print(f'setting requests_ca_bundle and ssl_cert_file to certifi.where(): {certifi.where()}')
                 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
@@ -32,7 +32,20 @@ def get_idaes_extensions():
             except Exception as e:
                 print(f'unable to set requests_ca_bundle and ssl_cert_file:\n{e}')
             print(f'trying to download binaries')
-            from idaes.commands.util.download_bin import download_binaries
+            from idaes.util.download_bin import download_binaries
+            from idaes.config import default_binary_release
+            download_binaries(release=default_binary_release)
+            print(f'extensions have been gotten')
+        else:
+            print('windows')
+            try:
+                print(f'setting requests_ca_bundle and ssl_cert_file to certifi.where(): {certifi.where()}')
+                os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
+                os.environ["SSL_CERT_FILE"] = certifi.where()
+            except Exception as e:
+                print(f'unable to set requests_ca_bundle and ssl_cert_file:\n{e}')
+            print(f'trying to download binaries')
+            from idaes.util.download_bin import download_binaries
             from idaes.config import default_binary_release
             download_binaries(release=default_binary_release)
             print(f'extensions have been gotten')
