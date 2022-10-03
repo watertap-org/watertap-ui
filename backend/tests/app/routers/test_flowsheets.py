@@ -157,6 +157,7 @@ def test_update_missing(client, flowsheet_id):
         "is_readonly": False,
         "input_category": None,
         "output_category": None,
+        "obj_key": "something"
     }
     response, update_body = post_flowsheet(client, flowsheet_id, "update", new_body)
     assert response.status_code == 200, update_body

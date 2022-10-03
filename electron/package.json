@@ -1,6 +1,6 @@
 {
   "name": "watertap-ui",
-  "author": "Michael Pesce",
+  "author": "Michael Pesce <mpesce@lbl.gov>",
   "version": "0.1.0",
   "private": true,
   "main": "build/main.js",
@@ -92,8 +92,8 @@
       "icon": "build/nawi-logo.ico"
     },
     "linux": {
-      "target": "deb",
-      "category": "Development",
+      "target": "AppImage",
+      "category": "Utility",
       "icon": "build/nawi-logo.ico"
     }
   }
