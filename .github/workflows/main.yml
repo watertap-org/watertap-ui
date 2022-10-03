@@ -88,8 +88,8 @@ jobs:
         with:
             name: cypress_results-${{ matrix.os }}
             path: |
-              electron/cypress/screenshots/
-              electron/cypress/videos/
+              electron/ui/cypress/screenshots/
+              electron/ui/cypress/videos/
 
   pytest:
     name: pytest (${{ matrix.os }})

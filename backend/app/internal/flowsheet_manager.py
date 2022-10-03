@@ -1,6 +1,7 @@
 # stdlib
 import sys
 import types
+from xml.etree.ElementTree import QName
 
 if sys.version_info < (3, 10):
     from importlib_resources import files
@@ -207,7 +208,7 @@ class FlowsheetManager:
         return [item["data"] for item in items]
 
     def put_flowsheet_data(
-        self, id_: str = None, name: str = None, data: Dict = None
+        self, id_: str = None, name: str = None, data: Dict = None, version = None
     ) -> str:
         """Create or update the data for the flowsheet with given identifier + name.
 
@@ -223,13 +224,37 @@ class FlowsheetManager:
         info.ts = time.time()
         fs_q = tinydb.Query()
         _log.debug(f"Saving/replacing name='{name}' for id='{id_}'")
-        self._histdb.upsert(
-            {"name": name, "id_": id_, "ts": info.ts, "data": data},
-            (fs_q.id_ == id_) & (fs_q.name == name),
-        )
+        if version is not None:
+            _log.debug(f'saving id {id_} with version {version}')
+            self._histdb.upsert(
+                {"name": name, "id_": id_, "version": version, "ts": info.ts, "data": data},
+                (fs_q.id_ == id_) & (fs_q.name == name),
+            )
+        else:
+            _log.debug(f'version is none, saving {id_} without version')
+            self._histdb.upsert(
+                {"name": name, "id_": id_, "ts": info.ts, "data": data},
+                (fs_q.id_ == id_) & (fs_q.name == name),
+            )
         return name
 
-    def list_flowsheet_names(self, id_: str = None) -> List[str]:
+    def delete_config(self, id_: str = None, name: str = None) -> List[str]:
+        """Delete saved flowsheet config with this identifier.
+
+        Args:
+            id_: Flowsheet ID
+            name: Name under which this particular configuration was saved
+
+        Returns:
+            Remaining list of config names (may be empty) for given flowsheet
+        """
+        query = tinydb.Query()
+        _log.debug(f"Deleteing name='{name}' for id='{id_}'")
+        self._histdb.remove((query.id_ == id_) & (query.name == name))
+        items = self._histdb.search(query.fragment({"id_": id_}))
+        return [item["name"] for item in items]
+
+    def list_flowsheet_names(self, id_: str = None, version: int = None) -> List[str]:
         """Get a list of all flowsheet names saved for this identifier.
 
         Args:
@@ -239,7 +264,12 @@ class FlowsheetManager:
             List of names (may be empty)
         """
         query = tinydb.Query()
-        items = self._histdb.search(query.fragment({"id_": id_}))
+        if version is not None:
+            _log.debug(f'searching for id {id_} with version {version}')
+            items = self._histdb.search(query.fragment({"id_": id_, "version": version}))
+        else:
+            _log.debug(f'version is none, searching for id {id_} without version')
+            items = self._histdb.search(query.fragment({"id_": id_}))
         return [item["name"] for item in items]
 
     def _get_flowsheet_interfaces(

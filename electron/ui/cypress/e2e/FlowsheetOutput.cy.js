@@ -39,7 +39,7 @@ describe('Flowsheet Output Test', () => {
             method: "POST",
             url: "http://localhost:8001/flowsheets/**",
         }).as("saveChanges");
-        cy.findAllByRole('button', {  name: /save/i}).eq(0).click()
+        cy.findAllByRole('button', {  name: /update flowsheet/i}).eq(0).click()
         cy.wait("@saveChanges");
         cy.screenshot(sc_count+'_saved1')
         sc_count+=1
@@ -63,7 +63,7 @@ describe('Flowsheet Output Test', () => {
             method: "POST",
             url: "http://localhost:8001/flowsheets/**",
         }).as("saveChanges");
-        cy.findAllByRole('button', {  name: /save/i}).eq(0).click()
+        cy.findAllByRole('button', {  name: /update flowsheet/i}).eq(0).click()
         cy.wait("@saveChanges");
         cy.screenshot(sc_count+'_saved2')
         sc_count+=1

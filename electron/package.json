@@ -1,7 +1,7 @@
 {
   "name": "watertap-ui",
-  "author": "Michael Pesce",
-  "version": "0.1.0v5",
+  "author": "Michael Pesce <mpesce@lbl.gov>",
+  "version": "0.1.0",
   "private": true,
   "main": "build/main.js",
   "dependencies": {
@@ -20,13 +20,15 @@
   "scripts": {
     "build-frontend": "npm --prefix ui run build",
     "start-frontend": "npm --prefix ui run start",
-    "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 0.0.0.0 --port 8001",
+    "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 127.0.0.1 --port 8001",
     "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
     "build-replace-backend": "npm run remove-previous-backend-build && npm run build-backend || npm run build-backend",
     "electron-build-mac": "npm run remove-previous-dist && electron-builder -m || electron-builder -m",
     "electron-build-win": "npm run remove-previous-dist && electron-builder -w || electron-builder -w",
+    "electron-build-lin": "npm run remove-previous-dist && electron-builder -l || electron-builder -l",
     "dist:mac": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-mac",
     "dist:win": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-win",
+    "dist:lin": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-lin",
     "remove-previous-backend-build": "rm -r py_dist/*",
     "remove-previous-dist": "rm -r dist/*",
     "app-start": "npm --prefix ui run app-start",
@@ -90,8 +92,9 @@
       "icon": "build/nawi-logo.ico"
     },
     "linux": {
-      "target": "deb",
-      "category": "Development"
+      "target": "AppImage",
+      "category": "Utility",
+      "icon": "build/nawi-logo.ico"
     }
   }
 }

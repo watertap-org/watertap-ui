@@ -1,6 +1,6 @@
 {
     "name": "foo",
-    "data": {
+    "inputData": {
         "name": "foo",
         "description": "foo flowsheet",
         "model_objects": {
@@ -28,6 +28,7 @@
                 "input_category": null,
                 "output_category": null
             }
-        }
+        },
+        "version": 1
     }
 }
