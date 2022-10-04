@@ -27,7 +27,7 @@
     "build-replace-backend": "npm run remove-previous-backend-build && npm run build-backend || npm run build-backend",
     "build-replace-backend-win": "npm run remove-previous-backend-build-win && npm run build-backend || npm run build-backend",
     "electron-build-mac": "npm run remove-previous-dist && electron-builder -m || electron-builder -m",
-    "electron-build-win": "npm run remove-previous-dist-win && electron-builder -w || electron-builder -w",
+    "electron-build-win": "./env.bat && (npm run remove-previous-dist-win && electron-builder -w || electron-builder -w)",
     "electron-build-lin": "npm run remove-previous-dist && electron-builder -l || electron-builder -l",
     "dist:mac": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-mac",
     "dist:win": "npm run build-replace-backend-win && npm run build-frontend-win && npm run electron-build-win",
