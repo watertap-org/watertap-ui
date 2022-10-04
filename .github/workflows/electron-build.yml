@@ -55,7 +55,7 @@ jobs:
 
       - name: Install older version of idaes-pse
         run: |
-          pip uninstall -y idaes-pse && install idaes-pse==1.13
+          pip uninstall -y idaes-pse && pip install idaes-pse==1.13
 
       - name: Create idaes extensions installer
         run: |
@@ -63,19 +63,18 @@ jobs:
 
       - name: Revert to correct idaes version
         run: |
-          pip uninstall -y idaes-pse && install 'idaes-pse @ https://github.com/IDAES/idaes-pse/archive/2.0.0a3.zip'
+          pip uninstall -y idaes-pse && pip install 'idaes-pse @ https://github.com/IDAES/idaes-pse/archive/2.0.0a3.zip'
 
       - name: Build Windows Distribution
         run: npm --prefix electron run dist:win
 
-      - name: Upload artifact for screenshots & videos
+      - name: Upload artifact for windows build
         uses: actions/upload-artifact@v3
         if: always()
         with:
-            name: cypress_results-${{ matrix.os }}
+            name: windows-dist
             path: |
-              electron/ui/cypress/screenshots/
-              electron/ui/cypress/videos/
+              electron/dist/
 
   # Mac-Build:
   #   name: Mac Build
