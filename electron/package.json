@@ -97,9 +97,9 @@
       "icon": "build/nawi-logo.ico"
     },
     "linux": {
-      "target": "AppImage",
+      "target": "Deb",
       "category": "Utility",
-      "icon": "build/nawi-logo.ico"
+      "icon": "build/512x512.png"
     }
   }
 }
