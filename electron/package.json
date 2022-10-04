@@ -19,22 +19,27 @@
   },
   "scripts": {
     "build-frontend": "npm --prefix ui run build",
+    "build-frontend-win": "npm --prefix ui run build && npm run move-frontend-build-win || npm run move-frontend-build-win",
+    "move-frontend-build-win": "move /Y ui/build build",
     "start-frontend": "npm --prefix ui run start",
     "start-backend": "cd ../backend/app && uvicorn main:app --reload --host 127.0.0.1 --port 8001",
     "build-backend": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/py_dist main.spec",
     "build-replace-backend": "npm run remove-previous-backend-build && npm run build-backend || npm run build-backend",
+    "build-replace-backend-win": "npm run remove-previous-backend-build-win && npm run build-backend || npm run build-backend",
     "electron-build-mac": "npm run remove-previous-dist && electron-builder -m || electron-builder -m",
-    "electron-build-win": "npm run remove-previous-dist && electron-builder -w || electron-builder -w",
+    "electron-build-win": "npm run remove-previous-dist-win && electron-builder -w || electron-builder -w",
     "electron-build-lin": "npm run remove-previous-dist && electron-builder -l || electron-builder -l",
     "dist:mac": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-mac",
-    "dist:win": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-win",
+    "dist:win": "npm run build-replace-backend && npm run build-frontend-win && npm run electron-build-win",
     "dist:lin": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-lin",
     "remove-previous-backend-build": "rm -r py_dist/*",
+    "remove-previous-backend-build-win": "rd /S /Q py_dist",
     "remove-previous-dist": "rm -r dist/*",
+    "remove-previous-dist-win": "rd /S /Q dist",
     "app-start": "npm --prefix ui run app-start",
     "electron-start": "npm --prefix ui run electron-start",
     "get-extensions-installer": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/setup-extensions-dist setup-extensions.spec",
-    "create-idaes-extensions-installer": "cd ../backend/app && pyinstaller -y --clean --distpath ../../electron/get-idaes-extensions-dist get-idaes-extensions.spec"
+    "move-entrypoints": "python ../move_entrypoints.py"
   },
   "eslintConfig": {
     "extends": [
