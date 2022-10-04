@@ -65,8 +65,17 @@ jobs:
         run: |
           pip uninstall -y idaes-pse && pip install 'idaes-pse @ https://github.com/IDAES/idaes-pse/archive/2.0.0a3.zip'
 
+      - name: Set env variables for code signing
+        run: set CSC_LINK=${{secrets.CSC_LINK}} & set CSC_KEY_PASSWORD=${{secrets.CSC_KEY_PASSWORD}}
+
+      - name: Build Backend
+        run: npm --prefix electron run build-backend
+
+      - name: Build Frotend
+        run: npm --prefix electron run build-frontend-win
+
       - name: Build Windows Distribution
-        run: npm --prefix electron run dist:win
+        run: npm --prefix electron run electron-build-win
 
       - name: Upload artifact for windows build
         uses: actions/upload-artifact@v3

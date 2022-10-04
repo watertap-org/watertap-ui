@@ -30,7 +30,7 @@
     "electron-build-win": "npm run remove-previous-dist-win && electron-builder -w || electron-builder -w",
     "electron-build-lin": "npm run remove-previous-dist && electron-builder -l || electron-builder -l",
     "dist:mac": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-mac",
-    "dist:win": "npm run build-replace-backend && npm run build-frontend-win && npm run electron-build-win",
+    "dist:win": "npm run build-replace-backend-win && npm run build-frontend-win && npm run electron-build-win",
     "dist:lin": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-lin",
     "remove-previous-backend-build": "rm -r py_dist/*",
     "remove-previous-backend-build-win": "rd /S /Q py_dist",
