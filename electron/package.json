@@ -68,7 +68,8 @@
     "afterSign": "build/notarize.js",
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "WatertapUI-Setup.exe"
     },
     "files": [
       "dist/**/*",

@@ -87,7 +87,7 @@ jobs:
         with:
             name: windows-dist
             path: |
-              electron/dist/
+              electron/dist/WatertapUI-Setup.exe
 
   # Mac-Build:
   #   name: Mac Build
