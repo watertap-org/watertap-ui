@@ -17,10 +17,12 @@ try:
         entrypoints_dst_path = f'{conda_prefix}/lib/python*/site-packages/setuptools-*info/entry_points.txt'
     else:
         print('windows')
-        entrypoints_src_path = f'{conda_prefix}/lib/site-packages/entry_points.txt'
+        entrypoints_src_path = f'{conda_prefix}/lib/site-packages/watertap-*info/entry_points.txt'
         entrypoints_dst_path = f'{conda_prefix}/lib/site-packages/setuptools-*info/entry_points.txt'
 except Exception as e:
     print(f'unable to get entry points src/dst: {e}') 
+
+print(f'globbing from {entrypoints_src_path} to {entrypoints_dst_path}')
 
 entrypoints_src = glob.glob(entrypoints_src_path)[0]
 entrypoints_dst = glob.glob(entrypoints_dst_path)[0]
