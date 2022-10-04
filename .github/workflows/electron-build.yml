@@ -13,14 +13,16 @@ defaults:
 
 env:
   PYTEST_ADDOPTS: --color=yes
-  CSC_LINK: ${{ secrets.CSC_LINK }}
-  CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
 jobs:
   windows-build:
     name: Windows Build
 
     runs-on: windows-latest
+
+    env:
+      CSC_LINK: ${{ secrets.CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
     strategy:
       fail-fast: false
