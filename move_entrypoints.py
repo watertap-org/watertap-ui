@@ -7,11 +7,7 @@ conda_prefix = os.environ['CONDA_PREFIX']
 print(f'conda_prefix is {conda_prefix}')
 
 try:
-    if sys.platform == "windows":
-        print('windows')
-        entrypoints_src_path = f'{conda_prefix}/lib/site-packages/entry_points.txt'
-        entrypoints_dst_path = f'{conda_prefix}/lib/site-packages/setuptools-*info/entry_points.txt'
-    elif sys.platform == "darwin":
+    if sys.platform == "darwin":
         print('darwin')
         entrypoints_src_path = f'{conda_prefix}/lib/python*/site-packages/watertap-*info/entry_points.txt'
         entrypoints_dst_path = f'{conda_prefix}/lib/python*/site-packages/setuptools-*info/entry_points.txt'
@@ -19,6 +15,10 @@ try:
         print('linux')
         entrypoints_src_path = f'{conda_prefix}/lib/python*/site-packages/watertap-*info/entry_points.txt'
         entrypoints_dst_path = f'{conda_prefix}/lib/python*/site-packages/setuptools-*info/entry_points.txt'
+    else:
+        print('windows')
+        entrypoints_src_path = f'{conda_prefix}/lib/site-packages/entry_points.txt'
+        entrypoints_dst_path = f'{conda_prefix}/lib/site-packages/setuptools-*info/entry_points.txt'
 except Exception as e:
     print(f'unable to get entry points src/dst: {e}') 
 
