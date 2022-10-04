@@ -74,6 +74,9 @@ jobs:
       - name: Build Frotend
         run: npm --prefix electron run build-frontend-win
 
+      - name: Echo env variables for code signing
+        run: echo %CSC_LINK%
+
       - name: Build Windows Distribution
         run: npm --prefix electron run electron-build-win
 
