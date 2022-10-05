@@ -29,6 +29,7 @@
     "electron-build-mac": "npm run remove-previous-dist && electron-builder -m || electron-builder -m",
     "electron-build-win": "npm run remove-previous-dist-win && electron-builder -w || electron-builder -w",
     "electron-build-lin": "npm run remove-previous-dist && electron-builder -l || electron-builder -l",
+    "electron-build-lin-arm64": "npm run remove-previous-dist && USE_SYSTEM_FPM=true electron-builder -l --arm64 || USE_SYSTEM_FPM=true electron-builder -l --arm64",
     "dist:mac": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-mac",
     "dist:win": "npm run build-replace-backend-win && npm run build-frontend-win && npm run electron-build-win",
     "dist:lin": "npm run build-replace-backend && npm run build-frontend && npm run electron-build-lin",
@@ -69,7 +70,15 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "WatertapUI-Setup.exe"
+      "artifactName": "WaterTAP-UI_Setup.exe"
+    },
+    "deb": {
+      "depends": [
+        "libgfortran5", 
+        "libgomp1",
+        "liblapack3",
+        "libblas3"
+      ]
     },
     "files": [
       "dist/**/*",
