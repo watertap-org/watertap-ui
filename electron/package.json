@@ -78,7 +78,8 @@
         "libgomp1",
         "liblapack3",
         "libblas3"
-      ]
+      ],
+      "artifactName": "watertap-ui_0.1.0_amd64.deb"
     },
     "files": [
       "dist/**/*",

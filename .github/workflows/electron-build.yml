@@ -159,7 +159,7 @@ jobs:
         with:
             name: linux-dist
             path: |
-              electron/dist/
+              electron/dist/watertap-ui_0.1.0_amd64.deb
 
   # Mac-Build:
   #   name: Mac Build
