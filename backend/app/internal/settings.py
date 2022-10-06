@@ -28,7 +28,10 @@ class AppSettings(BaseSettings):
         if v is None:
             v = Path.home() / ".watertap" / "logs"
         v.mkdir(parents=True, exist_ok=True)
-        logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(asctime)s %(name)s (%(filename)s:%(lineno)s): %(message)s", handlers=[logging.handlers.RotatingFileHandler(v / "ui_backend_logs.log", backupCount=2, maxBytes=5000000)])
+        
+        loggingFormat = "[%(levelname)s] %(asctime)s %(name)s (%(filename)s:%(lineno)s): %(message)s"
+        loggingFileHandler = logging.handlers.RotatingFileHandler(v / "ui_backend_logs.log", backupCount=2, maxBytes=5000000)
+        logging.basicConfig(level=logging.INFO, format=loggingFormat, handlers=[loggingFileHandler])
         return v
 
     class Config:
