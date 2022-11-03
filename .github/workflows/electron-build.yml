@@ -3,8 +3,7 @@ name: App build
 on:
   push:
     branches:
-      # - electron-build
-  pull_request:
+      - electron-build
 
 defaults:
   run:
