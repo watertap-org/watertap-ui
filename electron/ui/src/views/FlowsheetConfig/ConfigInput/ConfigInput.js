@@ -19,6 +19,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { deleteConfig }  from '../../../services/input.service.js'
 import Modal from '@mui/material/Modal';
 import ErrorBar from "../../../components/ErrorBar/ErrorBar"; 
+import { display } from '@mui/system';
 
 
 
@@ -27,6 +28,7 @@ import ErrorBar from "../../../components/ErrorBar/ErrorBar";
 export default function ConfigInput(props) {
     let params = useParams(); 
     const { flowsheetData, updateFlowsheetData } = props; 
+    const [ displayData, setDisplayData ] = useState({}) 
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
     const [ openDeleteConfig, setOpenDeleteConfig] = useState(false)
@@ -46,7 +48,7 @@ export default function ConfigInput(props) {
       
 
     useEffect(()=>{ 
-        console.log('list config names with version ', flowsheetData.inputData.version)
+        setDisplayData(JSON.parse(JSON.stringify(flowsheetData.inputData)))
         listConfigNames(params.id, flowsheetData.inputData.version)
         .then(response => {
             if (response.status === 200) {
@@ -74,12 +76,15 @@ export default function ConfigInput(props) {
         loadConfig(params.id, value)
         .then(response => response.json())
         .then((data)=>{
-          let tempFlowsheetData = {...flowsheetData}
-          tempFlowsheetData.name = value
-          tempFlowsheetData.outputData = data.outputData
-          tempFlowsheetData.inputData = data.inputData
-          updateFlowsheetData(tempFlowsheetData,"UPDATE_CONFIG")
-          setConfigName(value);
+            let tempFlowsheetData = {...flowsheetData}
+            tempFlowsheetData.name = value
+            tempFlowsheetData.outputData = data.outputData
+            tempFlowsheetData.inputData = data.inputData
+            let tempData = {}
+            Object.assign(tempData, tempFlowsheetData.inputData)
+            setDisplayData({...tempData})
+            updateFlowsheetData(tempFlowsheetData,"UPDATE_CONFIG")
+            setConfigName(value);
         }).catch((err)=>{
             console.error("unable to get load config: ",err)
         });
@@ -99,6 +104,13 @@ export default function ConfigInput(props) {
             console.error("unable to get load config: ",err)
             setOpenDeleteConfig(false)
         });
+    }
+
+    const handleUpdateDisplayValue = (id, value) => {
+        let tempFlowsheetData = {...flowsheetData}
+        let previousValue = tempFlowsheetData.inputData.model_objects[id].value
+        console.log('updating '+id+' with value '+value+'. previous value was '+previousValue)
+        tempFlowsheetData.inputData.model_objects[id].value = value
     }
 
     /**
@@ -157,15 +169,17 @@ export default function ConfigInput(props) {
 
     const renderInputAccordions = () => {
         try {
-            let var_sections = organizeVariables(flowsheetData.inputData.model_objects)
-            return Object.entries(var_sections).map(([key, value])=>{
-                let _key = key + Math.floor(Math.random() * 100001);
-                if(Object.keys(value.input_variables).length > 0) {
-                    return (<Grid item xs={6} key={_key}>
-                        <InputAccordion data={value}></InputAccordion>
-                    </Grid>)
-                }
-            })
+            if(Object.keys(displayData).length > 0) {
+                let var_sections = organizeVariables(displayData.model_objects)
+                return Object.entries(var_sections).map(([key, value])=>{
+                    let _key = key + Math.floor(Math.random() * 100001);
+                    if(Object.keys(value.input_variables).length > 0) {
+                        return (<Grid item xs={6} key={_key}>
+                            <InputAccordion handleUpdateDisplayValue={handleUpdateDisplayValue} data={value}></InputAccordion>
+                        </Grid>)
+                    }
+                })
+            }
         } catch (e) {
             // version of data is likely wrong
             // should we delete this data automatically? 
@@ -213,7 +227,6 @@ export default function ConfigInput(props) {
                 </Stack>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Stack direction="row" spacing={2}>
-                    {/* <Button variant="outlined" startIcon={<RefreshIcon />} onClick={()=>updateFlowsheetData(flowsheetData,"RESET")}>RESET ALL</Button> */}
                     <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
                     {configName.length > 0 &&
