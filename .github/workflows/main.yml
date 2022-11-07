@@ -60,11 +60,11 @@ jobs:
         run: |
           conda env export --no-builds
 
-      - name: run pytest
-        working-directory: backend
-        env:
-          PYTHONPATH: ${{ env.GITHUB_WORKSPACE }}/backend
-        run: pytest tests -v
+      # - name: run pytest
+      #   working-directory: backend
+      #   env:
+      #     PYTHONPATH: ${{ env.GITHUB_WORKSPACE }}/backend
+      #   run: pytest tests -v
 
       - name: run backend server
         run: uvicorn --app-dir backend/app main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
@@ -117,6 +117,9 @@ jobs:
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
+      - name: get idaes extensions
+        run: idaes get-extensions
       - name: Run pytest
+        working-directory: backend
         run: |
-          pytest --pyargs watertap_ui
+          pytest tests -v

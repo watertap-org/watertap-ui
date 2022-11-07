@@ -111,6 +111,12 @@ Last merged PR: : graph_settings-issue53
 
 # Building production Electron app (experimental)
 
+The following steps assume that:
+
+1. `conda` is already installed and configured
+2. The WaterTAP-UI package has been succesfully installed
+3. Watertap is cloned and installed locally, required for transferring data files (png and yaml)
+
 ### 1. Create installer for idaes extensions (needs to be done one time locally)
 
 To create the installer needed to download idaes-extensions, we need a different version of idaes-pse than the one required to run watertap. If the installer is already created, skip this step.  
@@ -137,7 +143,7 @@ pip install idaes-pse==1.13
 
 ```console
 cd <watertap-ui-path>/electron
-npm run setup-extensions-installer
+npm run get-extensions-installer
 ```
 
 #### 1.5. Uninstall idaes version 1.13

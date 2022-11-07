@@ -1,0 +1,205 @@
+name: App build
+
+on:
+  push:
+    branches:
+      - electron-build
+
+defaults:
+  run:
+    # -l: use login shell (required when using Conda)
+    shell: bash -l {0}
+
+env:
+  PYTEST_ADDOPTS: --color=yes
+
+jobs:
+  windows-build:
+    name: Windows Build
+
+    runs-on: windows-latest
+
+    env:
+      CSC_LINK: ${{ secrets.CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+
+    # strategy:
+    #   fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          environment-file: environment.yml
+          activate-environment: watertap-ui-env
+
+      - name: Install Electron JS dependencies
+        run: |
+          npm --prefix electron clean-install
+
+      - name: Install frontend JS dependencies
+        run: |
+          npm --prefix electron/ui clean-install
+
+      - name: Get idaes extensions
+        run: idaes get-extensions
+
+      - name: Install Watertap locally
+        working-directory: ../
+        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && pip install --progress-bar off .
+
+      - name: Transfer Entry points
+        run: |
+          npm --prefix electron run move-entrypoints
+
+      - name: Install watertap-ui Python package
+        run: |
+          pip install --progress-bar off .
+
+      - name: Install older version of idaes-pse
+        run: |
+          pip uninstall -y idaes-pse && pip install idaes-pse==1.13
+
+      - name: Create idaes extensions installer
+        run: |
+          npm --prefix electron run get-extensions-installer
+
+      - name: Revert to correct idaes version
+        run: |
+          pip uninstall -y idaes-pse && pip install 'idaes-pse @ https://github.com/IDAES/idaes-pse/archive/2.0.0a3.zip'
+
+      - name: Build Backend
+        run: npm --prefix electron run build-backend
+
+      - name: Build Frontend
+        run: npm --prefix electron run build-frontend-win
+
+      - name: Build Windows Distribution
+        run: npm --prefix electron run electron-build-win
+
+      - name: Upload artifact for windows build
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+            name: windows-dist
+            path: |
+              electron/dist/WaterTAP-UI_Setup.exe
+
+  linux-build:
+    name: Linux Build
+
+    runs-on: ubuntu-latest
+
+    env: 
+      CI: false
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          environment-file: environment.yml
+          activate-environment: watertap-ui-env
+
+      - name: Install Electron JS dependencies
+        run: |
+          npm --prefix electron clean-install
+
+      - name: Install frontend JS dependencies
+        run: |
+          npm --prefix electron/ui clean-install
+
+      - name: Install GNU FORTRAN, GOMP, Blas, and Lapack libraries
+        run: |
+          sudo apt-get install -y libgfortran5 libgomp1 liblapack3 libblas3
+
+      - name: Get idaes extensions
+        run: idaes get-extensions
+
+      - name: Install Watertap locally
+        working-directory: ../
+        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && pip install --progress-bar off .
+
+      - name: Transfer Entry points
+        run: |
+          npm --prefix electron run move-entrypoints
+
+      - name: Install watertap-ui Python package
+        run: |
+          pip install --progress-bar off .
+
+      - name: Install older version of idaes-pse
+        run: |
+          pip uninstall -y idaes-pse && pip install idaes-pse==1.13
+
+      - name: Create idaes extensions installer
+        run: |
+          npm --prefix electron run get-extensions-installer
+
+      - name: Revert to correct idaes version
+        run: |
+          pip uninstall -y idaes-pse && pip install 'idaes-pse @ https://github.com/IDAES/idaes-pse/archive/2.0.0a3.zip'
+
+      - name: Build Backend
+        run: npm --prefix electron run build-backend
+
+      - name: Build Frontend
+        run: npm --prefix electron run build-frontend
+
+      # for some reason, ico file breaks linux build. going without icon for now
+      - name: Remove ico file
+        run: rm electron/build/nawi-logo.ico
+
+      - name: Build Linux Distribution
+        run: npm --prefix electron run electron-build-lin
+
+      - name: Upload artifact for linux build
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+            name: linux-dist
+            path: |
+              electron/dist/watertap-ui_0.1.0_amd64.deb
+
+  # Mac-Build:
+  #   name: Mac Build
+
+  #   runs-on: macos-latest
+
+  #   strategy:
+  #     fail-fast: false
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: conda-incubator/setup-miniconda@v2
+  #       with:
+  #         environment-file: environment.yml
+  #         activate-environment: watertap-ui-env
+
+  #     - name: Install Electron JS dependencies
+  #       run: |
+  #         npm --prefix electron clean-install
+
+  #     - name: Install frontend JS dependencies
+  #       run: |
+  #         npm --prefix electron/ui clean-install
+
+  #     - name: Get idaes extensions
+  #       run: idaes get-extensions
+
+  #     - name: Install Watertap locally
+  #       working-directory: ../
+  #       run: git clone https://github.com/watertap-org/watertap.git && cd watertap && pip install --progress-bar off .
+
+  #     - name: Transfer Entry points
+  #       run: # execute some bat file that moves the entry points 
+
+  #     - name: Install watertap-ui Python package
+  #       run: |
+  #         pip install --progress-bar off .
+
+  #     - name: Create idaes extensions installer
+  #       run: |
+  #         npm --prefix electron get-extensions-installer
+
+  #     - name: Run dist:mac
+  #       run: npm --prefix electron dist:mac

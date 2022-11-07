@@ -10,12 +10,13 @@ export default function InputWrapper(props) {
     const [value, setValue] = useState("");
 
     useEffect(()=>{  
-        //console.log("fieldData:", fieldData);
+        // console.log("fieldData:", fieldData);
     }, [fieldData]);
 
     const handleFieldChange = (event) => {
         setValue(event.target.value);
         fieldData.value = event.target.value;
+        props.handleUpdateDisplayValue(event.target.id,event.target.value)
     };
 
     const displayUnits = (d) => {
@@ -28,7 +29,7 @@ export default function InputWrapper(props) {
     }
 
     return  <Tooltip title={fieldData.description}>
-                <TextField id={"outlined-basic"+fieldData.name} 
+                <TextField id={fieldData.obj_key} 
                         label={fieldData.name}
                         variant="outlined" 
                         size="small"
