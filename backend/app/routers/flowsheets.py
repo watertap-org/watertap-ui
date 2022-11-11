@@ -23,7 +23,7 @@ import idaes.logger as idaeslog
 CURRENT = "current"
 
 _log = idaeslog.getLogger(__name__)
-_log.setLevel(logging.DEBUG)
+
 router = APIRouter(
     prefix="/flowsheets",
     tags=["flowsheets"],
