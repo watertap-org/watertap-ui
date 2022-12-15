@@ -15,7 +15,6 @@ from pathlib import Path
 import time
 from types import ModuleType
 from typing import Optional, Dict, List
-import logging
 import app
 
 # third-party
@@ -29,7 +28,7 @@ from watertap.ui.fsapi import FlowsheetInterface
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
-_log.setLevel(logging.DEBUG)
+# _log.setLevel(logging.DEBUG)
 
 
 class FlowsheetInfo(BaseModel):

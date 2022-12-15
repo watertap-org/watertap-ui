@@ -13,7 +13,6 @@ from app.routers import flowsheets
 from fastapi.middleware.cors import CORSMiddleware
 
 _log = idaeslog.getLogger(__name__)
-_log.setLevel(logging.DEBUG)
 
 app = FastAPI()
 
