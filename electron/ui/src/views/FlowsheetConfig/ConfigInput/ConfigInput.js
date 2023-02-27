@@ -113,6 +113,17 @@ export default function ConfigInput(props) {
         tempFlowsheetData.inputData.model_objects[id].value = value
     }
 
+    const handleUpdateFixed = (id, value) => {
+        let tempFlowsheetData = {...flowsheetData}
+        let previousValue = tempFlowsheetData.inputData.model_objects[id].fixed
+        tempFlowsheetData.inputData.model_objects[id].fixed = value
+    }
+
+    const handleUpdateBounds = (id, value, bound) => {
+        let tempFlowsheetData = {...flowsheetData}
+        tempFlowsheetData.inputData.model_objects[id][bound] = value
+    }
+
     /**
      * Organize variables into sections by their 'category' attribute.
      *
@@ -175,7 +186,7 @@ export default function ConfigInput(props) {
                     let _key = key + Math.floor(Math.random() * 100001);
                     if(Object.keys(value.input_variables).length > 0) {
                         return (<Grid item xs={6} key={_key}>
-                            <InputAccordion handleUpdateDisplayValue={handleUpdateDisplayValue} data={value}></InputAccordion>
+                            <InputAccordion handleUpdateDisplayValue={handleUpdateDisplayValue} handleUpdateFixed={handleUpdateFixed} handleUpdateBounds={handleUpdateBounds} data={value}/>
                         </Grid>)
                     }
                 })

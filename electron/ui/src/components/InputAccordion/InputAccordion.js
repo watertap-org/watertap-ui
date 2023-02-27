@@ -29,7 +29,13 @@ export default function InputAccordion(props) {
     const renderFields = () => {
         return Object.keys(data.input_variables).map((key)=>{
             let vItem = data.input_variables[key];
-            return <InputWrapper key={key} fieldData={vItem} handleUpdateDisplayValue={props.handleUpdateDisplayValue}/>
+            return <InputWrapper 
+                        key={key} 
+                        fieldData={vItem} 
+                        handleUpdateDisplayValue={props.handleUpdateDisplayValue} 
+                        handleUpdateFixed={props.handleUpdateFixed} 
+                        handleUpdateBounds={props.handleUpdateBounds}
+                    />
             
         });
     };
