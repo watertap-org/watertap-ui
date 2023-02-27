@@ -56,6 +56,10 @@ jobs:
         run: |
           pip install --progress-bar off .
 
+      - name: Install correct branch of pareto
+        working-directory: ../
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && checkout dof && pip install --progress-bar off .
+
       - name: Display installed environment
         run: |
           conda env export --no-builds
