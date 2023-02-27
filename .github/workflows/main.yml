@@ -2,9 +2,9 @@ name: App Tests
 
 on:
   push:
-    branches:
-      - main
-      - rel_*
+    # branches:
+    #   - main
+    #   - rel_*
   pull_request:
 
 defaults:
