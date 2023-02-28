@@ -82,7 +82,7 @@ export default function FlowsheetConfig() {
     }, [params.id]);
 
     const navigateHome = (e) => {
-      navigate("/", {replace: true, state:{error:e}})
+      navigate("/flowsheets", {replace: true, state:{error:e}})
     }
 
     const handleTabChange = (event, newValue) => {

@@ -7,13 +7,11 @@ require('dotenv').config()
 
 const axios = require('axios').default;
 const isDev = require('electron-is-dev')
-const { spawn, execFile } = require("child_process")
+const { spawn } = require("child_process")
 
 // Python server parameters
-const PY_HOST = "127.0.0.1";
 const PY_PORT = 8001;
 const UI_PORT = 3000;
-const PY_LOG_LEVEL = "info";
 let uiReady = false
 
 const serverURL = `http://localhost:${PY_PORT}`
@@ -59,16 +57,17 @@ function createWindow() {
       webSecurity: false,
     }
   })
-
+  if (isDev) {
+    win.webContents.openDevTools()
+  } 
+  
   console.log("storing user preferences in: ",app.getPath('userData'));
   
   // save size of window when resized
   win.on("resized", () => saveBounds(win.getSize()));
   // win.on("moved", () => saveBounds(win.getSize()));
 
- if (isDev) {
-    win.webContents.openDevTools()
- } 
+ 
   win.loadURL(
     isDev
       ? uiURL

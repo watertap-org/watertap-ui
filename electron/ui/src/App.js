@@ -1,32 +1,51 @@
  
 import './App.css';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import Header from './components/Boilerplate/Header/Header'; 
+import SplashPage from './views/SplashPage/SplashPage';
 import FlowsheetsList from './views/FlowsheetsList/FlowsheetsList';
 import FlowsheetConfig from './views/FlowsheetConfig/FlowsheetConfig';
+import { getFlowsheetsList } from "./services/flowsheetsList.service"; 
 
 function App() {
-  let location = useLocation()
+  let navigate = useNavigate();
+  const [ loadLandingPage, setLoadLandingPage ] = useState(1)
+  const [ showHeader, setShowHeader ] = useState(false)
 
-  useEffect(
-    () => {
-      // console.log('location : ',location)
-    },
-    [location]
-  )
+  useEffect(()=>{
+    /*
+      ping backend until it is ready then redirect away from splash page
+    */
+    getFlowsheetsList()
+    .then(response => response.json())
+    .then((data)=>{
+      console.log('connectrd to backend')
+      setShowHeader(true)
+      navigate('/flowsheets', {replace: true})
+    })
+    .catch(e => {
+      console.error('try #'+loadLandingPage+' unable to connect to backend: ',e)
+      setTimeout(function() {
+        setLoadLandingPage(loadLandingPage => loadLandingPage+1)
+      }, 1000)
+  
+      
+    })
+    
+}, [loadLandingPage])
   return (
     <div className="App">  
-      <Header/>
+      <Header show={showHeader}/>
       <Routes> 
         <Route path="flowsheet/:id/config" element={<FlowsheetConfig />} /> 
         <Route path="flowsheets" element={<FlowsheetsList />} />
-        <Route path="/" element={<FlowsheetsList />} />
-        <Route path="*" element={<Navigate replace to="/" />}/>
+        <Route path="/" element={<SplashPage />} />
+        <Route path="*" element={<Navigate replace to="flowsheets" />}/>
       </Routes> 
     </div> 
   );
