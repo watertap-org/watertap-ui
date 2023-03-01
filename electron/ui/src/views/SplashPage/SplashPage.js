@@ -1,9 +1,10 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';  
 import Box from '@mui/material/Box';
-import BackgroundPic from '../../assets/splashpage-background.png'
+import BackgroundPic from '../../assets/nawiwater.png'
+import FullLogo from '../../assets/nawi-full-logo.png'
 
-export default function LandingPage(props) {
+export default function SplashPage() {
 
     const styles = {
         background: {
@@ -44,12 +45,12 @@ export default function LandingPage(props) {
         <img alt="PARETO background" src={BackgroundPic} style={styles.bacgkroundImage}>
         
         </img>
-        {/* <Box style={styles.boxStyle}>
+        <Box style={styles.boxStyle}>
             <Grid container>
                 <Grid item xs={2}> </Grid>
                 <Grid item xs={8}> 
                     <Box style={{}}>
-                        <img alt="PARETO logo" src={FullLogo} style={{width:'100%'}}></img>
+                        <img alt="PARETO logo" src={FullLogo} style={{width:'100%', paddingTop:"50px"}}></img>
                     </Box>
                 </Grid>
                 <Grid item xs={2}> </Grid>
@@ -57,18 +58,17 @@ export default function LandingPage(props) {
                 <Grid item xs={5}> </Grid>
                 <Grid item xs={2}> 
                     <Box>
-                        <p style={{paddingTop:0, marginTop: 0, color:"#9c9c9c"}}>v 0.6.0</p>
+                        <p style={{paddingTop:0, marginTop: 0, color:"#9c9c9c"}}>v 1.0.0</p>
                     </Box>
                 </Grid>
                 <Grid item xs={5}> </Grid>
 
                 <Grid item xs={1}> </Grid>
                 <Grid item xs={10}> 
-                    <Box style={{}}>
+                    <Box style={{color: "#676B71", paddingBottom:"40px"}}>
                         <p>
-                            PARETO helps organizations better manage, better treat, and 
-                            - where possible - beneficially reuse produced water from oil 
-                            and gas operations.
+                            The Water treatment Technoeconomic Assessment Platform (WaterTAP) is an open-source Python-based
+                            software package that suppors the technoeconomic assessment of full water treatment trains.
                         </p>
                     </Box>
                 </Grid>
@@ -83,7 +83,7 @@ export default function LandingPage(props) {
                 <Grid item xs={1}> </Grid>
                 
             </Grid>
-        </Box> */}
+        </Box>
     </div> 
   );
 
