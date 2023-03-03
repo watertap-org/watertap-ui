@@ -52,9 +52,18 @@ export default function InputWrapper(props) {
         let name = event.target.name
         let bound = name.split("::")[1]
         let key = name.split("::")[0]
-        console.log(`updating ${bound} for ${key} with value ${value}`)
-        fieldData[bound] = value
-        props.handleUpdateBounds(key, value, bound)
+        if(!isNaN(value)) {
+            if(value === "") {
+                console.log(`updating ${bound} for ${key} with value ${null}`)
+                fieldData[bound] = null
+                props.handleUpdateBounds(key, null, bound)
+            } else {
+                console.log(`updating ${bound} for ${key} with value ${value}`)
+                fieldData[bound] = value
+                props.handleUpdateBounds(key, value, bound)
+            }
+        }
+        
     };
 
     const handleShowBounds = () => {
