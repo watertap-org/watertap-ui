@@ -163,15 +163,26 @@ pip install 'idaes-pse @ https://github.com/watertap-org/idaes-pse/archive/2.0.0
 
 ### 2. Create build distribution
 
-#### Windows (requires Windows OS):
+### Windows:
+#### Requirements: 
+1) Windows operating system
+2) The following environment variables must be set
+    - CSC_LINK: "<path-to-valid-codesigning-certificate.p12>"
+    - CSC_KEY_PASSWORD: "<codesign-account-password>"
 
+#### Command:
 ```console
 cd <watertap-ui-path>/electron
 npm run dist:win
 ```
 
-#### Mac (requires Mac OS):
+### Mac (requires Mac OS):
+#### Requirements: 
+1) Mac operationg system
+2) Signed in to Apple developer account
+3) A valid <u>Developer ID Application</u> certificate AND corresponding private key stored in keychain access
 
+#### Command:
 
 ```console
 cd <watertap-ui-path>/electron
