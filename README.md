@@ -106,10 +106,7 @@ To run the Python tests, make sure you have the appropriate version of watertap 
 `pytest backend/tests`
 
 
-Last merged PR: : graph_settings-issue53
-
-
-# Building production Electron app (experimental)
+# Building production Electron app
 
 The following steps assume that:
 
@@ -127,32 +124,38 @@ To create the installer needed to download idaes-extensions, we need a different
 conda activate watertap-ui-env
 ```
 
-#### 1.2. Uninstall the currently installed version of idaes
+#### 1.2. Transfer Entry points
+
+```sh
+cd <watertap-ui-path>/electron
+npm --prefix electron run move-entrypoints
+```
+          
+#### 1.3. Uninstall the currently installed version of idaes
 
 ```sh
 pip uninstall --yes idaes-pse
 ```
 
-#### 1.3. Install idaes version 1.13 
+#### 1.4. Install idaes version 1.13 
 
 ```sh
 pip install idaes-pse==1.13
 ```
 
-#### 1.4. Create executable distribution using pyinstaller
+#### 1.5. Create executable distribution using pyinstaller
 
 ```console
-cd <watertap-ui-path>/electron
 npm run get-extensions-installer
 ```
 
-#### 1.5. Uninstall idaes version 1.13
+#### 1.6. Uninstall idaes version 1.13
 
 ```sh
 pip uninstall --yes idaes-pse
 ```
 
-#### 1.5. Reinstall idaes version 2.0.0
+#### 1.7. Reinstall idaes version 2.0.0
 
 ```sh
 pip install 'idaes-pse @ https://github.com/watertap-org/idaes-pse/archive/2.0.0.dev3.watertap.22.08.11.zip'
