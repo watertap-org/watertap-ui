@@ -20,6 +20,7 @@ import { deleteConfig }  from '../../../services/input.service.js'
 import Modal from '@mui/material/Modal';
 import ErrorBar from "../../../components/ErrorBar/ErrorBar"; 
 import { display } from '@mui/system';
+import { Typography } from '@mui/material';
 
 
 
@@ -205,38 +206,38 @@ export default function ConfigInput(props) {
     return ( 
         <>
             <Toolbar spacing={2}>
-            <Stack direction="row" spacing={2}>
-                {previousConfigs.length > 0 && 
-                <>
-                <InputLabel style={{paddingTop:"8px"}} id="previous-configs-label">Previous Configurations:</InputLabel>
-                <FormControl sx={{ width: 200 }}>
-                    {/* <InputLabel id="previous-configs-label">Previous Configs</InputLabel> */}
-                    <Select
-                    labelId="previous-configs-label"
-                    id="previous-configs-select"
-                    value={configName}
-                    onChange={handleConfigSelection}
-                    // MenuProps={MenuProps}
-                    size="small"
-                    >
-                    {previousConfigs.map((name) => (
-                        <MenuItem
-                        key={name}
-                        value={name}
-                        // style={getStyles(name, personName, theme)}
+                <Stack direction="row" spacing={2}>
+                    {previousConfigs.length > 0 && 
+                    <>
+                    <InputLabel style={{paddingTop:"8px"}} id="previous-configs-label">Previous Configurations:</InputLabel>
+                    <FormControl sx={{ width: 200 }}>
+                        {/* <InputLabel id="previous-configs-label">Previous Configs</InputLabel> */}
+                        <Select
+                        labelId="previous-configs-label"
+                        id="previous-configs-select"
+                        value={configName}
+                        onChange={handleConfigSelection}
+                        // MenuProps={MenuProps}
+                        size="small"
                         >
-                        {name}
-                        </MenuItem>
-                    ))}
-                    </Select>
-                </FormControl>
-                </>
-                }
-                
-                
+                        {previousConfigs.map((name) => (
+                            <MenuItem
+                            key={name}
+                            value={name}
+                            // style={getStyles(name, personName, theme)}
+                            >
+                            {name}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                    </>
+                    }
 
                 </Stack>
-                <Box sx={{ flexGrow: 1 }}></Box>
+                <Box sx={{ flexGrow: 1 }}>
+                
+                </Box>
                 <Stack direction="row" spacing={2}>
                     <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
@@ -245,6 +246,11 @@ export default function ConfigInput(props) {
                     }
                 </Stack>
             </Toolbar>
+            <Box direction="column">
+                <Typography variant="h6">
+                    Degrees of Freedom: {flowsheetData.inputData.dof}
+                </Typography>
+            </Box>
 
             <Grid container spacing={2} alignItems="flex-start">
                 {

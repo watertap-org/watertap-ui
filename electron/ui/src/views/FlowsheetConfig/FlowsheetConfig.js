@@ -157,6 +157,9 @@ export default function FlowsheetConfig() {
           response.json()
           .then((data)=>{
             console.log("new Flowsheet Data:", data); 
+            let tempFlowsheetData = {...flowsheetData}
+            tempFlowsheetData.inputData = data
+            setFlowsheetData(tempFlowsheetData)
             setOpenSuccessSaveConfirmation(true);
           });
         } else if(response.status === 400) {
