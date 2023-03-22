@@ -18,7 +18,7 @@ export default function InputWrapper(props) {
 
     const {fieldLabel, fieldData} = props;
     const [value, setValue] = useState("");
-    const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
+    const [ showBounds, setShowBounds ] = useState(false)
     const [ editBounds, setEditBounds ] = useState(false)
     const styles = {
         highlighted: {
@@ -31,7 +31,11 @@ export default function InputWrapper(props) {
     }
 
     useEffect(()=>{  
-        // console.log("fieldData:", fieldData);
+        if (fieldData.fixed === undefined) {
+            fieldData.fixed = true
+        } else if (!fieldData.fixed) {
+            setShowBounds(true)
+        }
     }, [fieldData]);
 
     const handleFieldChange = (event) => {
