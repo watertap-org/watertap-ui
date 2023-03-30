@@ -113,7 +113,7 @@ pyomo_imports = [
     'pyomo.opt.results.solution', 'pyomo.opt.results.solver', 'pyomo.opt.base', 'pyomo.core.base.suffix', 
     'pyomo.core.base.var', 'pyomo.core.base.PyomoModel', 'pyomo.solvers.plugins.solvers.persistent_solver', 
     'pyomo.opt.base.problem', 'pyomo.opt.base.convert', 'pyomo.opt.base.formats', 'pyomo.opt.base.results', 
-    'pyomo.core.base.block', 'pyomo.core.kernel.block', 'pyomo.core.kernel.suffix'
+    'pyomo.core.base.block', 'pyomo.core.kernel.block', 'pyomo.core.kernel.suffix','pyomo.contrib.cp.plugins'
 ]
 
 hiddenimports.extend(pyomo_imports)

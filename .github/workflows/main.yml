@@ -2,9 +2,9 @@ name: App Tests
 
 on:
   push:
-    branches:
-      - main
-      - rel_*
+    # branches:
+    #   - main
+    #   - rel_*
   pull_request:
 
 defaults:
@@ -55,6 +55,10 @@ jobs:
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
+
+      - name: Install correct branch of pareto
+        working-directory: ../
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git checkout dof && pip install --progress-bar off .
 
       - name: Display installed environment
         run: |

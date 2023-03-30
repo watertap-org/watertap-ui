@@ -7,7 +7,7 @@ import { HashRouter } from "react-router-dom";
 
 test('test input accordion', () => {
 
-    render( <HashRouter><Header></Header></HashRouter> )
+    render( <HashRouter><Header show={true}></Header></HashRouter> )
 
     //test for component elements
     screen.getByRole('img', {  name: /NAWI logo/i});

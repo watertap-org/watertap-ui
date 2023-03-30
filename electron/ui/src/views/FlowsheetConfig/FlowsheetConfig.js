@@ -8,6 +8,7 @@ import Graph from "../../components/Graph/Graph";
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
@@ -19,6 +20,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent'; 
 import CircularProgress from '@mui/material/CircularProgress';
+import { Typography } from '@mui/material';
 
 
 function TabPanel(props) {
@@ -82,7 +84,7 @@ export default function FlowsheetConfig() {
     }, [params.id]);
 
     const navigateHome = (e) => {
-      navigate("/", {replace: true, state:{error:e}})
+      navigate("/flowsheets", {replace: true, state:{error:e}})
     }
 
     const handleTabChange = (event, newValue) => {
@@ -157,6 +159,9 @@ export default function FlowsheetConfig() {
           response.json()
           .then((data)=>{
             console.log("new Flowsheet Data:", data); 
+            let tempFlowsheetData = {...flowsheetData}
+            tempFlowsheetData.inputData = data
+            setFlowsheetData(tempFlowsheetData)
             setOpenSuccessSaveConfirmation(true);
           });
         } else if(response.status === 400) {
@@ -204,9 +209,28 @@ export default function FlowsheetConfig() {
           :
           (
           <>
-            <h2 style={{textAlign:"left"}}>
+            {/* <h2 style={{textAlign:"left"}}>
             {title}
-            </h2>
+            </h2> */}
+            <Grid container>
+                <Grid item xs={6}>
+                    <Box justifyContent="left" display="flex">
+                    <h2 style={{marginTop:10, marginBottom: 6}}>
+                      {title}
+                    </h2>
+                    </Box>
+                </Grid>
+                {(tabValue === 0 || tabValue === 1) && 
+                <Grid item xs={6}>
+                  <Box justifyContent="right" display="flex">
+                  <Typography style={{marginTop:15}}>
+                      DEGREES OF FREEDOM: {flowsheetData.inputData.dof}
+                  </Typography>
+                  </Box>
+              </Grid>
+                } 
+                
+            </Grid>
 
             <Graph/>
 

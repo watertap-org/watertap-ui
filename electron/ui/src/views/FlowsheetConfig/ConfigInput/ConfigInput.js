@@ -20,6 +20,7 @@ import { deleteConfig }  from '../../../services/input.service.js'
 import Modal from '@mui/material/Modal';
 import ErrorBar from "../../../components/ErrorBar/ErrorBar"; 
 import { display } from '@mui/system';
+import { Typography } from '@mui/material';
 
 
 
@@ -113,6 +114,17 @@ export default function ConfigInput(props) {
         tempFlowsheetData.inputData.model_objects[id].value = value
     }
 
+    const handleUpdateFixed = (id, value) => {
+        let tempFlowsheetData = {...flowsheetData}
+        let previousValue = tempFlowsheetData.inputData.model_objects[id].fixed
+        tempFlowsheetData.inputData.model_objects[id].fixed = value
+    }
+
+    const handleUpdateBounds = (id, value, bound) => {
+        let tempFlowsheetData = {...flowsheetData}
+        tempFlowsheetData.inputData.model_objects[id][bound] = value
+    }
+
     /**
      * Organize variables into sections by their 'category' attribute.
      *
@@ -175,7 +187,7 @@ export default function ConfigInput(props) {
                     let _key = key + Math.floor(Math.random() * 100001);
                     if(Object.keys(value.input_variables).length > 0) {
                         return (<Grid item xs={6} key={_key}>
-                            <InputAccordion handleUpdateDisplayValue={handleUpdateDisplayValue} data={value}></InputAccordion>
+                            <InputAccordion handleUpdateDisplayValue={handleUpdateDisplayValue} handleUpdateFixed={handleUpdateFixed} handleUpdateBounds={handleUpdateBounds} data={value}/>
                         </Grid>)
                     }
                 })
@@ -194,38 +206,38 @@ export default function ConfigInput(props) {
     return ( 
         <>
             <Toolbar spacing={2}>
-            <Stack direction="row" spacing={2}>
-                {previousConfigs.length > 0 && 
-                <>
-                <InputLabel style={{paddingTop:"8px"}} id="previous-configs-label">Previous Configurations:</InputLabel>
-                <FormControl sx={{ width: 200 }}>
-                    {/* <InputLabel id="previous-configs-label">Previous Configs</InputLabel> */}
-                    <Select
-                    labelId="previous-configs-label"
-                    id="previous-configs-select"
-                    value={configName}
-                    onChange={handleConfigSelection}
-                    // MenuProps={MenuProps}
-                    size="small"
-                    >
-                    {previousConfigs.map((name) => (
-                        <MenuItem
-                        key={name}
-                        value={name}
-                        // style={getStyles(name, personName, theme)}
+                <Stack direction="row" spacing={2}>
+                    {previousConfigs.length > 0 && 
+                    <>
+                    <InputLabel style={{paddingTop:"8px"}} id="previous-configs-label">Previous Configurations:</InputLabel>
+                    <FormControl sx={{ width: 200 }}>
+                        {/* <InputLabel id="previous-configs-label">Previous Configs</InputLabel> */}
+                        <Select
+                        labelId="previous-configs-label"
+                        id="previous-configs-select"
+                        value={configName}
+                        onChange={handleConfigSelection}
+                        // MenuProps={MenuProps}
+                        size="small"
                         >
-                        {name}
-                        </MenuItem>
-                    ))}
-                    </Select>
-                </FormControl>
-                </>
-                }
-                
-                
+                        {previousConfigs.map((name) => (
+                            <MenuItem
+                            key={name}
+                            value={name}
+                            // style={getStyles(name, personName, theme)}
+                            >
+                            {name}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                    </>
+                    }
 
                 </Stack>
-                <Box sx={{ flexGrow: 1 }}></Box>
+                <Box sx={{ flexGrow: 1 }}>
+                
+                </Box>
                 <Stack direction="row" spacing={2}>
                     <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
@@ -234,6 +246,16 @@ export default function ConfigInput(props) {
                     }
                 </Stack>
             </Toolbar>
+            {/* <Grid container>
+                <Grid item xs={12}>
+                    <Box justifyContent="left" display="flex" sx={{pb:1}}>
+                    <Typography>
+                        DEGREES OF FREEDOM: {flowsheetData.inputData.dof}
+                    </Typography>
+                    </Box>
+                </Grid>
+            </Grid> */}
+                
 
             <Grid container spacing={2} alignItems="flex-start">
                 {

@@ -2,23 +2,23 @@ describe('Display Data Rounding', () => {
     it('test that values rounded to and displayed as 0 retain their original value', () => {
         let sc_count = 0
 
-         //load webpage
-         cy.visit('/')
-         cy.screenshot(sc_count+'_loaded homepage')
-         sc_count+=1
- 
-         //click flowsheet and wait for api response
-         var flowsheet_name = "amo 1690"
-         cy.intercept({
-             method: "GET",
-             url: "http://localhost:8001/flowsheets/**",
-         }).as("loadFlowsheet");
-        //  cy.findByRole('link', {  name: flowsheet_name}).click()
-         cy.findByText(flowsheet_name).click()
-         cy.wait("@loadFlowsheet");
-         cy.screenshot(sc_count+'_loaded flowsheet')
-         sc_count+=1
+        //load webpage
+        cy.visit('/')
+        cy.screenshot(sc_count+'_loaded homepage')
+        sc_count+=1
 
+        //click flowsheet and wait for api response
+        var flowsheet_name = "amo 1690"
+        cy.intercept({
+            method: "GET",
+            url: "http://localhost:8001/flowsheets/**",
+        }).as("loadFlowsheet");
+    //  cy.findByRole('link', {  name: flowsheet_name}).click()
+        cy.findByText(flowsheet_name).click()
+        cy.wait("@loadFlowsheet");
+        cy.screenshot(sc_count+'_loaded flowsheet')
+        sc_count+=1
+        cy.wait (5000)
         //click on update and wait for api response
         cy.intercept({
             method: "POST",
