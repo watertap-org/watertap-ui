@@ -12,7 +12,6 @@ if sys.platform == 'darwin':
 elif sys.platform == 'linux':
     extra_data = [(f'{idaes_path}/bin/ipopt_sens', 'extensions/.idaes/bin/'), (f'{idaes_path}/bin/cubic_roots.so', 'extensions/.idaes/bin/'), 
     (f'{idaes_path}/bin/version_lib.txt', 'extensions/.idaes/bin/'), 
-    (f'{idaes_path}/bin/libadolc.so.2.2.0', 'extensions/.idaes/bin/'), 
     (f'{idaes_path}/bin/general_helmholtz_external.so', 'extensions/.idaes/bin/'), (f'{idaes_path}/bin/libipopt.so', 'extensions/.idaes/bin/'), 
     (f'{idaes_path}/bin/libpynumero_ASL.so', 'extensions/.idaes/bin/'),
     (f'{idaes_path}/bin/ipopt', 'extensions/.idaes/bin/'), (f'{idaes_path}/bin/couenne', 'extensions/.idaes/bin/'), 
