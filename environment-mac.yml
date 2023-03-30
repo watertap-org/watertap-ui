@@ -1,4 +1,4 @@
-name: watertap
+name: watertap-ui-env2
 channels:
   - conda-forge/osx-arm64
 dependencies:
