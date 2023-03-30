@@ -172,6 +172,7 @@ app.whenReady().then(() => {
       console.log('starting electron app in dev mode')
       createWindow()
     } else {
+      let win = createWindow();
       let serverProcess
       let installationProcess = installExtensions()
       installationProcess.on('exit', code => {
@@ -187,9 +188,9 @@ app.whenReady().then(() => {
         var startUp = (url, appName, spawnedProcess, successFn=null, maxTrials=15) => {
             axios.get(url).then(() => {
                 console.log(`${appName} is ready at ${url}!`)
-                if (successFn) {
-                    successFn()
-                }
+                // if (successFn) {
+                //     successFn()
+                // }
             })
             .catch(async () => {
                 console.log(`Waiting to be able to connect ${appName} at ${url}...`)
