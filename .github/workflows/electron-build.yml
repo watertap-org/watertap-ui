@@ -3,8 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - electron-build
-      - logging
+      - 0.8.0rc0
 
 defaults:
   run:
