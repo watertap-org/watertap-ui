@@ -3,6 +3,13 @@ export const solve = (id) => {
     return fetch('http://localhost:8001/flowsheets/'+id+'/solve', {mode: 'cors'});
 }; 
 
+export const sweep = (id) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/sweep', {
+        method: 'POST', 
+        mode: 'cors'
+    });
+}
+
 export const downloadCSV = (id,data) => {
     return fetch('http://localhost:8001/flowsheets/'+id+'/download', {
         method: 'POST', 

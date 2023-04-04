@@ -17,8 +17,11 @@ from pydantic.error_wrappers import ValidationError
 
 # package-local
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
+from app.internal.parameter_sweep import run_analysis as run_parameter_sweep
 from watertap.ui.fsapi import FlowsheetInterface, FlowsheetExport
 import idaes.logger as idaeslog
+import ctypes
+import weakref
 
 CURRENT = "current"
 
@@ -82,6 +85,51 @@ async def solve(flowsheet_id: str):
     try:
         flowsheet.solve()
     except Exception as err:
+        raise HTTPException(500, detail=f"Solve failed: {err}")
+    return flowsheet.fs_exp
+
+@router.post("/{flowsheet_id}/sweep", response_model=FlowsheetExport)
+async def sweep(flowsheet_id: str):
+    flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+    info = flowsheet_manager.get_info(flowsheet_id)
+    if not info.built:
+        try:
+            flowsheet.build()
+        except Exception as err:
+            raise HTTPException(500, detail=f"Build failed: {err}")
+        info.updated(built=True)
+    
+    try:
+        _log.info('trying to sweep')
+        parameters = []
+        output_params = []
+        for key in flowsheet.fs_exp.model_objects:
+            if not flowsheet.fs_exp.model_objects[key].fixed:
+                # print(f'{key} is unfixed')
+                if (flowsheet.fs_exp.model_objects[key].lb is not None and flowsheet.fs_exp.model_objects[key].ub is not None):
+                    parameters.append({
+                        "name": flowsheet.fs_exp.model_objects[key].name,
+                        "lb": flowsheet.fs_exp.model_objects[key].lb,
+                        "ub": flowsheet.fs_exp.model_objects[key].ub,
+                        "nx": 5,
+                        "param": flowsheet.fs_exp.model_objects[key].obj
+                    })
+            if flowsheet.fs_exp.model_objects[key].is_output:
+                if "evelized cost" in flowsheet.fs_exp.model_objects[key].description:
+                    output_params.append({
+                        "name": flowsheet.fs_exp.model_objects[key].name,
+                        "param": flowsheet.fs_exp.model_objects[key].obj
+                    })
+
+        run_parameter_sweep(
+            m=flowsheet.fs_exp.m, 
+            flowsheet=info.module[0:-3],
+            parameters=parameters,
+            output_params=output_params,
+            results_path=f'sweep_outputs/{info.name}_sweep.csv', 
+        )
+    except Exception as err:
+        print(f'err: {err}')
         raise HTTPException(500, detail=f"Solve failed: {err}")
     return flowsheet.fs_exp
 

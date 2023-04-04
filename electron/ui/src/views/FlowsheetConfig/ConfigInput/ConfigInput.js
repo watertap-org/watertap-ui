@@ -241,6 +241,7 @@ export default function ConfigInput(props) {
                 <Stack direction="row" spacing={2}>
                     <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
+                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SWEEP")}>SWEEP</Button>
                     {configName.length > 0 &&
                     <Button variant="outlined" color="error" onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
                     }

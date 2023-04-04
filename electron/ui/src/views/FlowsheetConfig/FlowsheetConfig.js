@@ -59,6 +59,7 @@ export default function FlowsheetConfig() {
     const [tabValue, setTabValue] = useState(0);
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
+    const [ sweep, setSweep ] = useState(true)
     // const [outputData, setOutputData] = useState(null);
     const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
@@ -110,8 +111,14 @@ export default function FlowsheetConfig() {
     const updateFlowsheetData = (data, solve) => {
       console.log(">main updateFlowsheetData:",data);
       if(solve==="SOLVE")
+      { 
+        setSolveDialogOpen(true);
+        setSweep(false)
+      } 
+      else if(solve==="SWEEP")
       {
         setSolveDialogOpen(true);
+        setSweep(true);
       }
       else if(solve===null)
       {
@@ -257,7 +264,8 @@ export default function FlowsheetConfig() {
           </>
           )
       }  
-      <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id}></SolveDialog>
+      {/* <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id} isSweep={false}></SolveDialog> */}
+      <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id} isSweep={sweep}></SolveDialog>
       <Snackbar
         open={openSuccessSaveConfirmation}
         autoHideDuration={2000} 
