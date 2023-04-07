@@ -3,7 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - 0.8.0rc0
+      - "0.8.0"
 
 defaults:
   run:
@@ -46,7 +46,7 @@ jobs:
 
       - name: Install Watertap locally
         working-directory: ../
-        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && pip install --progress-bar off .
+        run: git clone https://github.com/watertap-org/watertap.git && git fetch --all --tags && git checkout tags/0.8.0 -b 0.8.0 && cd watertap && pip install --progress-bar off .
 
       - name: Transfer Entry points
         run: |
@@ -117,7 +117,7 @@ jobs:
 
       - name: Install Watertap locally
         working-directory: ../
-        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && pip install --progress-bar off .
+        run: git clone https://github.com/watertap-org/watertap.git && git fetch --all --tags && git checkout tags/0.8.0 -b 0.8.0 && cd watertap && pip install --progress-bar off .
 
       - name: Transfer Entry points
         run: |
