@@ -253,7 +253,7 @@ export default function FlowsheetConfig() {
                 </ConfigInput>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>
-                <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData}>
+                <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData} isSweep={sweep}>
                 </ConfigOutput>
               </TabPanel> 
               <TabPanel value={tabValue} index={2}>

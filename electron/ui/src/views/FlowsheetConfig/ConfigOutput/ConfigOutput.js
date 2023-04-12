@@ -2,22 +2,14 @@
 import React from 'react'; 
 import { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';  
-import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Typography } from '@mui/material';
+import { Modal, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, TextField } from '@mui/material';
 import { saveConfig }  from '../../../services/output.service.js'
-import Modal from '@mui/material/Modal';
-
 
 export default function ConfigOutput(props) {
     let params = useParams(); 
-    const { outputData } = props;
+    const { outputData, updateFlowsheetData, isSweep } = props;
     const [ configName, setConfigName ] = useState(outputData.name)
     const [ openSaveConfig, setOpenSaveConfig ] = React.useState(false);
     const [ saved, setSaved ] = React.useState(false);
@@ -49,7 +41,7 @@ export default function ConfigOutput(props) {
             console.log('successfully saved config')
             let tempFlowsheetData = {...outputData}
             tempFlowsheetData.name=configName
-            props.updateFlowsheetData(tempFlowsheetData, "UPDATE_CONFIG")
+            updateFlowsheetData(tempFlowsheetData, "UPDATE_CONFIG")
             handleCloseSaveConfig()
             setSaved(true)
         })
@@ -137,7 +129,7 @@ export default function ConfigOutput(props) {
             let _key = key + Math.floor(Math.random() * 100001); 
             if(Object.keys(value.output_variables).length > 0) {
                 return (<Grid item xs={gridSize} key={_key}>
-                    <Accordion expanded={true} style={{border:"1px solid #ddd"}}>
+                    <Accordion expanded={true} style={{border:"1px solid #71797E"}}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />} >
                             {value.display_name}
                         </AccordionSummary>
@@ -163,41 +155,71 @@ export default function ConfigOutput(props) {
     
     return ( 
         <> 
-            <Grid container spacing={2} alignItems="flex-start"> 
-            {   
-                renderOutputAccordions()
-            }
-            <Grid item xs={12}> 
-                <Button disabled={saved ? true : false} variant="contained" onClick={handleOpenSaveConfig}>
-                    Save Configuration
-                </Button> 
-                <Modal
-                    open={openSaveConfig}
-                    onClose={handleCloseSaveConfig}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Grid container sx={modalStyle} spacing={1}>
-                        <Grid item xs={12}>
-                            <TextField
-                                required
-                                variant="standard"
-                                id="margin-none"
-                                label="Config Name"
-                                value={configName}
-                                onChange={handleChangeConfigName}
-                                fullWidth
-                                className="modal-save-config"
-                            />
-                        </Grid>
-                        <Grid item xs={8}></Grid>
-                        <Grid item xs={4}>
-                            <Button onClick={handleSaveConfig} variant="contained">Save</Button>
-                        </Grid>
+        {isSweep ? 
+            <Grid item xs={12}>
+            <TableContainer sx={{height: "80vh", overflowX:'auto'}}>
+              <Table style={{border:"1.5px solid #71797E"}} size={'small'}>
+                <TableHead>
+                <TableRow style={{border:"1px solid #71797E"}} key="tablehead"> 
+                    {outputData.outputData.sweep_results.headers.map( (value, index)  => {
+                        return <TableCell style={{border:"1px solid #71797E", backgroundColor:"#E5E4E2"}} key={`head_${index}`}> 
+                        <Typography noWrap>{value}</Typography>
+                        </TableCell>
+                    })}
+                </TableRow>
+                </TableHead>
+                <TableBody>
+                    {outputData.outputData.sweep_results.values.map( (row, ridx)  => {
+                        return (
+                            <TableRow key={`row_${ridx}`}> 
+                            {row.map( (cell, cidx) => {
+                                return <TableCell style={{border:"1px solid #71797E"}} key={`cell_${cidx}`} align="right"> {cell.toFixed(3)}</TableCell>
+                            })}
+                            </TableRow>
+                        )
+                    })}
+                </TableBody>
+              </Table>
+              </TableContainer>
+            </Grid> 
+        : 
+        <Grid container spacing={2} alignItems="flex-start"> 
+        {   
+            renderOutputAccordions()
+        }
+        <Grid item xs={12}> 
+            <Button disabled={saved ? true : false} variant="contained" onClick={handleOpenSaveConfig}>
+                Save Configuration
+            </Button> 
+            <Modal
+                open={openSaveConfig}
+                onClose={handleCloseSaveConfig}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Grid container sx={modalStyle} spacing={1}>
+                    <Grid item xs={12}>
+                        <TextField
+                            required
+                            variant="standard"
+                            id="margin-none"
+                            label="Config Name"
+                            value={configName}
+                            onChange={handleChangeConfigName}
+                            fullWidth
+                            className="modal-save-config"
+                        />
                     </Grid>
-                </Modal>
-            </Grid>
-            </Grid>
+                    <Grid item xs={8}></Grid>
+                    <Grid item xs={4}>
+                        <Button onClick={handleSaveConfig} variant="contained">Save</Button>
+                    </Grid>
+                </Grid>
+            </Modal>
+        </Grid>
+        </Grid>
+        }
+            
         </>
     );
 }

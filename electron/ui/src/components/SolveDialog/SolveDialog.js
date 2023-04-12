@@ -19,7 +19,8 @@ export default function SolveDialog(props) {
               response.json()
               .then((data)=>{
                 console.log(data)
-                handleError("just handling success")
+                handleSolved(data);
+                // handleError("just handling success")
               });
             } else if(response.status === 400) {
               console.error("error saving data")

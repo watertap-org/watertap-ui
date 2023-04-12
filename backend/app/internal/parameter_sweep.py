@@ -43,8 +43,8 @@ def run_analysis(m, flowsheet, parameters, output_params, results_path="output.c
         interpolate_nan_outputs=interpolate_nan_outputs,
     )
 
-    return global_results, sweep_params, m
+    return global_results
 
 
-if __name__ == "__main__":
-    results, sweep_params, m = run_analysis()
+# if __name__ == "__main__":
+#     results, sweep_params, m = run_analysis()
