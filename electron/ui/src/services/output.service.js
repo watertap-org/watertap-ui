@@ -33,3 +33,10 @@ export const listConfigNames = (id, version) => {
 export const loadConfig = (id, name) => {
     return fetch('http://localhost:8001/flowsheets/'+id+'/load?name='+name, {mode: 'cors'});
 }; 
+
+export const downloadSweepResults = (id) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/download_sweep', {
+        method: 'GET', 
+        mode: 'cors',
+    });
+}

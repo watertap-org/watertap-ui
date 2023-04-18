@@ -324,3 +324,25 @@ async def download(flowsheet_id: str, request: Request) -> Path:
 
     # User can now download the contents of that file
     return path
+
+@router.get("/{flowsheet_id}/download_sweep", response_class=FileResponse)
+async def download_sweep(flowsheet_id: str) -> Path:
+    """Download sweep results.
+
+    Args:
+        flowsheet_id: Identifier for flowsheet
+
+    Returns:
+        File to download (path converted to FileResponse by FastAPI)
+    """
+    flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+    sweep_results = flowsheet.fs_exp.sweep_results
+    columns = sweep_results["headers"]
+    table = sweep_results["values"]
+    df = pd.DataFrame(table, columns=columns)
+
+    # Write to file
+    path = flowsheet_manager.get_flowsheet_dir(flowsheet_id) / "sweep_results.csv"
+    df.to_csv(path, index=False)
+    # # User can now download the contents of that file
+    return path

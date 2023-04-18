@@ -6,6 +6,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Typography } from '@mui/material';
 import { Modal, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, TextField } from '@mui/material';
 import { saveConfig }  from '../../../services/output.service.js'
+import DownloadIcon from '@mui/icons-material/Download';
+import { downloadSweepResults }  from '../../../services/output.service.js'
 
 export default function ConfigOutput(props) {
     let params = useParams(); 
@@ -48,6 +50,21 @@ export default function ConfigOutput(props) {
         .catch((e) => {
             console.log('error saving config',e)
             handleCloseSaveConfig()
+        });
+    }
+
+    const download = () => {
+        console.log('downloading sweep results')
+        downloadSweepResults(params.id)
+        .then(response => response.blob())
+        .then((data)=>{
+            const href = window.URL.createObjectURL(data);
+            const link = document.createElement('a');
+            link.href = href;
+            link.setAttribute('download', 'sweep_results.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
     }
 
@@ -156,8 +173,9 @@ export default function ConfigOutput(props) {
     return ( 
         <> 
         {isSweep ? 
+        <Grid container spacing={2} alignItems="flex-start"> 
             <Grid item xs={12}>
-            <TableContainer sx={{height: "80vh", overflowX:'auto'}}>
+            <TableContainer sx={{maxHeight: "80vh", overflowX:'auto'}}>
               <Table style={{border:"1.5px solid #71797E"}} size={'small'}>
                 <TableHead>
                 <TableRow style={{border:"1px solid #71797E"}} key="tablehead"> 
@@ -181,7 +199,12 @@ export default function ConfigOutput(props) {
                 </TableBody>
               </Table>
               </TableContainer>
+              
             </Grid> 
+            <Grid item xs={12}>
+                <Button variant="text" startIcon={<DownloadIcon />} onClick={download}>Download Results</Button>
+            </Grid>
+            </Grid>
         : 
         <Grid container spacing={2} alignItems="flex-start"> 
         {   

@@ -47,12 +47,6 @@ export default function FlowsheetsList() {
   return ( 
     <Container>
       <h2 style={{textAlign:"left"}}>Flowsheets</h2>  
-        
-      {/* <Toolbar>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleNewFlowsheetDialogClickOpen}>
-          New
-        </Button>
-      </Toolbar>  */}
 
       <FlowsheetsListTable rows={rows}></FlowsheetsListTable> 
       
