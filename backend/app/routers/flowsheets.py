@@ -131,9 +131,8 @@ async def sweep(flowsheet_id: str):
             results_path=f'sweep_outputs/{info.name}_sweep.csv', 
         )
         results_table["values"] = results[0].tolist()
-        # print('results table is ')
-        # print(results_table)
-        # print(type(results_table["values"]))
+        results_table['num_parameters'] = len(parameters)
+        results_table['num_outputs'] = len(output_params)
         flowsheet.fs_exp.sweep_results = results_table
     except Exception as err:
         print(f'err: {err}')

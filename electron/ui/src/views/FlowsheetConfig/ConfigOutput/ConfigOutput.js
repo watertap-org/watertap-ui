@@ -1,13 +1,12 @@
  
 import React from 'react'; 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Typography } from '@mui/material';
-import { Modal, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, TextField } from '@mui/material';
+import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Modal, TextField } from '@mui/material';
 import { saveConfig }  from '../../../services/output.service.js'
-import DownloadIcon from '@mui/icons-material/Download';
 import { downloadSweepResults }  from '../../../services/output.service.js'
+import SweepOutput from '../../../components/SweepOutput/SweepOutput.js';
 
 export default function ConfigOutput(props) {
     let params = useParams(); 
@@ -173,38 +172,7 @@ export default function ConfigOutput(props) {
     return ( 
         <> 
         {isSweep ? 
-        <Grid container spacing={2} alignItems="flex-start"> 
-            <Grid item xs={12}>
-            <TableContainer sx={{maxHeight: "80vh", overflowX:'auto'}}>
-              <Table style={{border:"1.5px solid #71797E"}} size={'small'}>
-                <TableHead>
-                <TableRow style={{border:"1px solid #71797E"}} key="tablehead"> 
-                    {outputData.outputData.sweep_results.headers.map( (value, index)  => {
-                        return <TableCell style={{border:"1px solid #71797E", backgroundColor:"#E5E4E2"}} key={`head_${index}`}> 
-                        <Typography noWrap>{value}</Typography>
-                        </TableCell>
-                    })}
-                </TableRow>
-                </TableHead>
-                <TableBody>
-                    {outputData.outputData.sweep_results.values.map( (row, ridx)  => {
-                        return (
-                            <TableRow key={`row_${ridx}`}> 
-                            {row.map( (cell, cidx) => {
-                                return <TableCell style={{border:"1px solid #71797E"}} key={`cell_${cidx}`} align="right"> {cell.toFixed(3)}</TableCell>
-                            })}
-                            </TableRow>
-                        )
-                    })}
-                </TableBody>
-              </Table>
-              </TableContainer>
-              
-            </Grid> 
-            <Grid item xs={12}>
-                <Button variant="text" startIcon={<DownloadIcon />} onClick={download}>Download Results</Button>
-            </Grid>
-            </Grid>
+            <SweepOutput outputData={outputData} download={download}/>
         : 
         <Grid container spacing={2} alignItems="flex-start"> 
         {   

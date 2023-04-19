@@ -19,14 +19,16 @@
     "cross-env": "^7.0.3",
     "cypress": "^10.4.0",
     "jointjs": "^3.5.5",
+    "plotly.js": "^2.21.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
+    "react-plotly.js": "^2.6.0",
+    "react-plotlyjs": "^0.4.4",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "wait-on": "^6.0.1",
     "web-vitals": "^2.1.4"
   },
-  "devDependencies": {},
   "scripts": {
     "start": "react-scripts start",
     "app-start": "concurrently -k \"cross-env npm run start-backend\" \"react-scripts start\"",
