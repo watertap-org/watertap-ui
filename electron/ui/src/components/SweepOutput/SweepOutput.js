@@ -44,7 +44,8 @@ export default function SweepOutput(props) {
     }
 
     const unpackData = (xIndex, yIndex, zIndex) => {
-        // let zIndex = outputData.outputData.sweep_results.headers.length-1
+        let keys = outputData.outputData.sweep_results.keys
+        console.log(keys)
         let x = []
         let y = []
         let z = []
@@ -65,30 +66,36 @@ export default function SweepOutput(props) {
                 currZ = []
             }
         }
+
+        let xLabel = `${outputData.outputData.sweep_results.headers[xIndex]} (${outputData.outputData.model_objects[keys[xIndex]].display_units})`
+        let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.model_objects[keys[yIndex]].display_units})`
+        let zLabel = `${outputData.outputData.sweep_results.headers[zIndex]} (${outputData.outputData.model_objects[keys[zIndex]].display_units})`
+
         let tempPlotData = [{
             z:z,
             x:x,
             y:y,
-            type: 'heatmap',
+            type: 'contour',
             zsmooth:"best",
             hoverongaps: false,
             colorbar: {
                 title: {
-                    text: outputData.outputData.sweep_results.headers[zIndex],
+                    text: zLabel,
                     side: "right"
                 },
             },
             // colorscale: [`[[0, 'rgb(248,252,202,255)'], [0.055, 'rgb(50,167,194,255)'], [0.11, 'rgb(7,30,88,255)']]`]
         }]
+
         let tempPlotLayout = {
             xaxis: {
                 title: {
-                    text: outputData.outputData.sweep_results.headers[xIndex],
+                    text: xLabel,
                 }
             },
             yaxis: {
                 title: {
-                    text: outputData.outputData.sweep_results.headers[yIndex]
+                    text: yLabel
                 }
             },
         }
@@ -147,46 +154,6 @@ export default function SweepOutput(props) {
             <>
                 <Grid sx={{marginTop:15}} item xs={2}>
                     {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
-                    {/* <InputLabel id="previous-configs-label">X&nbsp;</InputLabel>
-                    <FormControl >
-                        <Select
-                        labelId="Parameter Selection"
-                        id="Parameter Selection"
-                        value={indices[2]-outputData.outputData.sweep_results.num_parameters}
-                        onChange={handleParamaterSelection}
-                        size="small"
-                        >
-                        {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
-                            <MenuItem
-                            key={name}
-                            value={index}
-                            // style={getStyles(name, personName, theme)}
-                            >
-                            {name}
-                            </MenuItem>
-                        ))}
-                        </Select>
-                    </FormControl>
-                    <InputLabel sx={{marginTop:1}} id="previous-configs-label">Y&nbsp;</InputLabel>
-                    <FormControl >
-                        <Select
-                        labelId="Parameter Selection"
-                        id="Parameter Selection"
-                        value={indices[2]-outputData.outputData.sweep_results.num_parameters}
-                        onChange={handleParamaterSelection}
-                        size="small"
-                        >
-                        {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
-                            <MenuItem
-                            key={name}
-                            value={index}
-                            // style={getStyles(name, personName, theme)}
-                            >
-                            {name}
-                            </MenuItem>
-                        ))}
-                        </Select>
-                    </FormControl> */}
                     <InputLabel sx={{marginTop:1}} id="previous-configs-label">Value&nbsp;</InputLabel>
                     <FormControl >
                         <Select

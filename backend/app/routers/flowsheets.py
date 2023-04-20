@@ -103,6 +103,7 @@ async def sweep(flowsheet_id: str):
         _log.info('trying to sweep')
         parameters = []
         output_params = []
+        keys = []
         results_table = {"headers": []}
         for key in flowsheet.fs_exp.model_objects:
             if flowsheet.fs_exp.model_objects[key].is_output:
@@ -112,6 +113,7 @@ async def sweep(flowsheet_id: str):
                         "name": flowsheet.fs_exp.model_objects[key].name,
                         "param": flowsheet.fs_exp.model_objects[key].obj
                     })
+                    keys.append(key)
             if not flowsheet.fs_exp.model_objects[key].fixed:
                 # print(f'{key} is unfixed')
                 if (flowsheet.fs_exp.model_objects[key].lb is not None and flowsheet.fs_exp.model_objects[key].ub is not None):
@@ -123,6 +125,7 @@ async def sweep(flowsheet_id: str):
                         "nx": 5,
                         "param": flowsheet.fs_exp.model_objects[key].obj
                     })
+                    keys.append(key)
         results = run_parameter_sweep(
             m=flowsheet.fs_exp.m, 
             flowsheet=info.module[0:-3],
@@ -131,6 +134,7 @@ async def sweep(flowsheet_id: str):
             results_path=f'sweep_outputs/{info.name}_sweep.csv', 
         )
         results_table["values"] = results[0].tolist()
+        results_table["keys"] = keys
         results_table['num_parameters'] = len(parameters)
         results_table['num_outputs'] = len(output_params)
         flowsheet.fs_exp.sweep_results = results_table
