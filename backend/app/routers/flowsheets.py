@@ -126,12 +126,13 @@ async def sweep(flowsheet_id: str):
                         "param": flowsheet.fs_exp.model_objects[key].obj
                     })
                     keys.append(key)
+        output_path = Path.home() / ".watertap" / "sweep_outputs" / f"{info.name}_sweep.csv"
         results = run_parameter_sweep(
             m=flowsheet.fs_exp.m, 
             flowsheet=info.module[0:-3],
             parameters=parameters,
             output_params=output_params,
-            results_path=f'sweep_outputs/{info.name}_sweep.csv', 
+            results_path=output_path, 
         )
         results_table["values"] = results[0].tolist()
         results_table["keys"] = keys
