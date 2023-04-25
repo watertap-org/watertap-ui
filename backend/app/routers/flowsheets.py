@@ -108,6 +108,7 @@ async def sweep(flowsheet_id: str):
         for key in flowsheet.fs_exp.model_objects:
             if flowsheet.fs_exp.model_objects[key].is_output:
                 if "evelized cost" in flowsheet.fs_exp.model_objects[key].description:
+                    print(f'{key}: {flowsheet.fs_exp.model_objects[key].obj.__dict__}')
                     results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
                     output_params.append({
                         "name": flowsheet.fs_exp.model_objects[key].name,
@@ -115,13 +116,12 @@ async def sweep(flowsheet_id: str):
                     })
                     keys.append(key)
             if not flowsheet.fs_exp.model_objects[key].fixed:
-                # print(f'{key} is unfixed')
                 if (flowsheet.fs_exp.model_objects[key].lb is not None and flowsheet.fs_exp.model_objects[key].ub is not None):
                     results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
                     parameters.append({
                         "name": flowsheet.fs_exp.model_objects[key].name,
-                        "lb": flowsheet.fs_exp.model_objects[key].lb,
-                        "ub": flowsheet.fs_exp.model_objects[key].ub,
+                        "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
+                        "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
                         "nx": 5,
                         "param": flowsheet.fs_exp.model_objects[key].obj
                     })
