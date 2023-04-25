@@ -104,6 +104,7 @@ async def sweep(flowsheet_id: str):
         parameters = []
         output_params = []
         keys = []
+        conversion_factors = []
         results_table = {"headers": []}
         for key in flowsheet.fs_exp.model_objects:
             if flowsheet.fs_exp.model_objects[key].is_output:
@@ -118,6 +119,7 @@ async def sweep(flowsheet_id: str):
             if not flowsheet.fs_exp.model_objects[key].fixed:
                 if (flowsheet.fs_exp.model_objects[key].lb is not None and flowsheet.fs_exp.model_objects[key].ub is not None):
                     results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
+                    conversion_factor = flowsheet.fs_exp.model_objects[key].lb / flowsheet.fs_exp.model_objects[key].obj.lb
                     parameters.append({
                         "name": flowsheet.fs_exp.model_objects[key].name,
                         "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
@@ -125,6 +127,7 @@ async def sweep(flowsheet_id: str):
                         "nx": 5,
                         "param": flowsheet.fs_exp.model_objects[key].obj
                     })
+                    conversion_factors.append(conversion_factor)
                     keys.append(key)
         output_path = Path.home() / ".watertap" / "sweep_outputs" / f"{info.name}_sweep.csv"
         results = run_parameter_sweep(
@@ -135,6 +138,11 @@ async def sweep(flowsheet_id: str):
             results_path=output_path, 
         )
         results_table["values"] = results[0].tolist()
+        for value in results_table["values"]:
+            for i in range(len(conversion_factors)):
+                conversion_factor = conversion_factors[i]
+                value[i] = value[i] * conversion_factor
+            print(value)
         results_table["keys"] = keys
         results_table['num_parameters'] = len(parameters)
         results_table['num_outputs'] = len(output_params)

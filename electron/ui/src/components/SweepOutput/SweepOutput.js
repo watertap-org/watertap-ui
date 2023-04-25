@@ -6,30 +6,19 @@ import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Selec
 import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab, Box } from '@mui/material';
 import Plot from 'react-plotly.js';
 
-var data = [
-    {
-      z: [[1, null, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, -10, 20]],
-      x: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-      y: ['Morning', 'Afternoon', 'Evening'],
-      type: 'heatmap',
-      hoverongaps: false
-    }
-  ];
-
 export default function SweepOutput(props) {
     const { outputData, download } = props;
     const [ plotData, setPlotData ] = useState({})
     const [ showPlot, setShowPlot ] = useState(false)
-    const [ params, setParams ] = useState([])
-    const [ outputs, setOutputs ] = useState([])
     const [ indices, setIndices ] = useState([1, 0, 2])
     const [ tabValue, setTabValue ] = useState(0)
 
     useEffect(() => {
         let num_parameters = outputData.outputData.sweep_results.num_parameters
-        let num_outputs = outputData.outputData.sweep_results.num_outputs
-        if (num_parameters === 2) {
-            unpackData(1, 0, outputData.outputData.sweep_results.headers.length-1)
+        if (num_parameters === 1) {
+            unpackData()
+        } else if (num_parameters === 2) {
+            unpackData(1, 0, 2)
         } else setShowPlot(false)
     }, [props.outputData])
 
@@ -45,63 +34,99 @@ export default function SweepOutput(props) {
 
     const unpackData = (xIndex, yIndex, zIndex) => {
         let keys = outputData.outputData.sweep_results.keys
-        console.log(keys)
-        let x = []
-        let y = []
-        let z = []
-        let currZ = []
-        for (let each of outputData.outputData.sweep_results.values) {
-            let tempX = Math.round(each[xIndex] * 1000) / 1000
-            let tempY = Math.round(each[yIndex] * 1000) / 1000
-            let tempZ = Math.round(each[zIndex] * 1000) / 1000
-            currZ.push(tempZ)
-            if(!x.includes(tempX)) {
-                x.push(tempX)
+        if (zIndex) {
+            console.log(keys)
+            let x = []
+            let y = []
+            let z = []
+            let currZ = []
+            for (let each of outputData.outputData.sweep_results.values) {
+                let tempX = Math.round(each[xIndex] * 1000) / 1000
+                let tempY = Math.round(each[yIndex] * 1000) / 1000
+                let tempZ = Math.round(each[zIndex] * 1000) / 1000
+                currZ.push(tempZ)
+                if(!x.includes(tempX)) {
+                    x.push(tempX)
+                }
+                if(!y.includes(tempY)) {
+                    y.push(tempY)
+                }
+                if (currZ.length === 5) {
+                    z.push(currZ)
+                    currZ = []
+                }
             }
-            if(!y.includes(tempY)) {
-                y.push(tempY)
-            }
-            if (currZ.length === 5) {
-                z.push(currZ)
-                currZ = []
-            }
-        }
 
-        let xLabel = `${outputData.outputData.sweep_results.headers[xIndex]} (${outputData.outputData.model_objects[keys[xIndex]].display_units})`
-        let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.model_objects[keys[yIndex]].display_units})`
-        let zLabel = `${outputData.outputData.sweep_results.headers[zIndex]} (${outputData.outputData.model_objects[keys[zIndex]].display_units})`
+            let xLabel = `${outputData.outputData.sweep_results.headers[xIndex]} (${outputData.outputData.model_objects[keys[xIndex]].display_units})`
+            let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.model_objects[keys[yIndex]].display_units})`
+            let zLabel = `${outputData.outputData.sweep_results.headers[zIndex]} (${outputData.outputData.model_objects[keys[zIndex]].display_units})`
 
-        let tempPlotData = [{
-            z:z,
-            x:x,
-            y:y,
-            type: 'contour',
-            zsmooth:"best",
-            hoverongaps: false,
-            colorbar: {
-                title: {
-                    text: zLabel,
-                    side: "right"
+            let tempPlotData = [{
+                z:z,
+                x:x,
+                y:y,
+                type: 'contour',
+                zsmooth:"best",
+                hoverongaps: false,
+                colorbar: {
+                    title: {
+                        text: zLabel,
+                        side: "right"
+                    },
                 },
-            },
-            // colorscale: [`[[0, 'rgb(248,252,202,255)'], [0.055, 'rgb(50,167,194,255)'], [0.11, 'rgb(7,30,88,255)']]`]
-        }]
+                // colorscale: [`[[0, 'rgb(248,252,202,255)'], [0.055, 'rgb(50,167,194,255)'], [0.11, 'rgb(7,30,88,255)']]`]
+            }]
 
-        let tempPlotLayout = {
-            xaxis: {
-                title: {
-                    text: xLabel,
+            let tempPlotLayout = {
+                xaxis: {
+                    title: {
+                        text: xLabel,
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: yLabel
+                    }
+                },
+            }
+            setPlotData({data: tempPlotData, layout: tempPlotLayout})
+            setShowPlot(true)
+            setIndices([xIndex, yIndex, zIndex])
+        } else{
+            let x = []
+            let ys = []
+            for (let i = 0; i < outputData.outputData.sweep_results.num_outputs; i++) {
+                ys.push([])
+            }
+            for (let each of outputData.outputData.sweep_results.values) {
+                x.push(each[0])
+                for(let i = 1; i < each.length; i++) {
+                    ys[i-1].push(each[i])
                 }
-            },
-            yaxis: {
-                title: {
-                    text: yLabel
-                }
-            },
+            }
+            let tempData = []
+            let keyIdx = 1
+            for (let each of ys) {
+                let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.model_objects[keys[keyIdx]].display_units})`
+                let tempTrace = {x: x, y: each, type:"scatter", name: yName}
+                tempData.push(tempTrace)
+                keyIdx+=1
+            }
+            
+            let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.model_objects[keys[0]].display_units})`
+            let tempLayout = {
+                xaxis: {
+                    title: {
+                        text: xLabel,
+                    }
+                },
+                width: 1000,
+                height: 500,
+            };
+
+            setPlotData({data: tempData, layout:tempLayout})
+            setShowPlot(true)
         }
-        setPlotData({data: tempPlotData, layout: tempPlotLayout})
-        setShowPlot(true)
-        setIndices([xIndex, yIndex, zIndex])
     }
     
     return ( 
@@ -152,6 +177,7 @@ export default function SweepOutput(props) {
             }
             {tabValue === 1 && 
             <>
+            {showPlot && outputData.outputData.sweep_results.num_parameters === 2 && 
                 <Grid sx={{marginTop:15}} item xs={2}>
                     {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
                     <InputLabel sx={{marginTop:1}} id="previous-configs-label">Value&nbsp;</InputLabel>
@@ -174,18 +200,21 @@ export default function SweepOutput(props) {
                         ))}
                         </Select>
                     </FormControl>
-                    {/* </Box> */}
-                
                 </Grid>
-                <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={10}>
-                    {showPlot && 
-                    <Plot
-                        data={plotData.data}
-                        layout={plotData.layout}
-                    />
-                    }
+            }
                 
-                </Grid>
+            <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={10}>
+                {showPlot && 
+                <>
+                <Plot
+                    data={plotData.data}
+                    layout={plotData.layout}
+                />
+                </>
+                
+                }
+            
+            </Grid>
                 
             </>
             }
