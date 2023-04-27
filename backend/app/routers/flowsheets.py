@@ -12,6 +12,7 @@ from fastapi import Request, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
 import pandas as pd
+import numpy as np
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
@@ -137,19 +138,23 @@ async def sweep(flowsheet_id: str):
             output_params=output_params,
             results_path=output_path, 
         )
-        results_table["values"] = results[0].tolist()
-        for value in results_table["values"]:
-            for i in range(len(conversion_factors)):
-                conversion_factor = conversion_factors[i]
-                value[i] = value[i] * conversion_factor
-            print(value)
-        results_table["keys"] = keys
-        results_table['num_parameters'] = len(parameters)
-        results_table['num_outputs'] = len(output_params)
-        flowsheet.fs_exp.sweep_results = results_table
     except Exception as err:
-        print(f'err: {err}')
-        raise HTTPException(500, detail=f"Solve failed: {err}")
+        _log.error(f'err: {err}')
+        raise HTTPException(500, detail=f"Sweep failed: {err}")
+    results_table["values"] = results[0].tolist()
+    for value in results_table["values"]:
+        for i in range(len(conversion_factors)):
+            conversion_factor = conversion_factors[i]
+            value[i] = value[i] * conversion_factor
+        for i in range(len(conversion_factors), len(value)):
+            if np.isnan(value[i]):
+                _log.error(f'Sweep produced invalid results:')
+                raise HTTPException(500, detail=f"Sweep produced invalid results")
+    results_table["keys"] = keys
+    results_table['num_parameters'] = len(parameters)
+    results_table['num_outputs'] = len(output_params)
+    flowsheet.fs_exp.sweep_results = results_table
+    
     return flowsheet.fs_exp
 
 

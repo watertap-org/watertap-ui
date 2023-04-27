@@ -14,20 +14,21 @@ export default function SolveDialog(props) {
     { 
         if(isSweep) {
           sweep(id)
-          .then(response => {
-            if(response.status === 200) {
-              response.json()
-              .then((data)=>{
+          .then(r =>  r.json().then(data => ({status: r.status, body: data})))
+          .then(data => {
+              let status = data.status
+              let outputData = data.body
+              if(status===200) {
                 console.log(data)
-                handleSolved(data);
-                // handleError("just handling success")
-              });
-            } else if(response.status === 400) {
-              console.error("error saving data")
-              handleError("just handling error")
-            }
-            
-          })
+                handleSolved(outputData);
+              } else if (status===500) {
+                console.error("500 error running sweep: "+outputData.detail)
+                handleError("error: "+outputData.detail)
+              }
+          }).catch(e => {
+            console.error("caught error running sweep: "+e)
+            handleError(""+e)
+        });
         }else {
           solve(id)
           .then(r =>  r.json().then(data => ({status: r.status, body: data})))
