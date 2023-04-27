@@ -148,8 +148,14 @@ async def sweep(flowsheet_id: str):
             value[i] = value[i] * conversion_factor
         for i in range(len(conversion_factors), len(value)):
             if np.isnan(value[i]):
-                _log.error(f'Sweep produced invalid results:')
-                raise HTTPException(500, detail=f"Sweep produced invalid results")
+                error_params = ""
+                for j in range(len(parameters)):
+                    error_param = parameters[j]["name"]
+                    error_value = value[j]
+                    error_params += f'{error_param}: {error_value}, '
+                error_params = error_params[:-2]
+                _log.error(f'Sweep produced invalid results: {error_params}')
+                raise HTTPException(500, detail=f"Sweep produced invalid results for input parameters: {error_params}")
     results_table["keys"] = keys
     results_table['num_parameters'] = len(parameters)
     results_table['num_outputs'] = len(output_params)
