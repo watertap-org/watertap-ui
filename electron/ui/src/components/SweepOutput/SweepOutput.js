@@ -16,25 +16,28 @@ export default function SweepOutput(props) {
     useEffect(() => {
         let num_parameters = outputData.outputData.sweep_results.num_parameters
         if (num_parameters === 1) {
-            unpackData()
+            unpackData(1)
         } else if (num_parameters === 2) {
-            unpackData(1, 0, 2)
-        } else setShowPlot(false)
+            unpackData(2, 1, 0, 2)
+        } else {
+            // show parrallel lines plot
+            unpackData(3)
+        }
     }, [props.outputData])
 
     const handleParamaterSelection = (event) => {
         console.log(event.target.value)
         let newIndex = event.target.value + outputData.outputData.sweep_results.num_parameters
-        unpackData(indices[0], indices[1], newIndex)
+        unpackData(2, indices[0], indices[1], newIndex)
     }
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue)
     }
 
-    const unpackData = (xIndex, yIndex, zIndex) => {
+    const unpackData = (plotType, xIndex, yIndex, zIndex) => {
         let keys = outputData.outputData.sweep_results.keys
-        if (zIndex) {
+        if (plotType === 2) { //contour map
             console.log(keys)
             let x = []
             let y = []
@@ -92,7 +95,7 @@ export default function SweepOutput(props) {
             setPlotData({data: tempPlotData, layout: tempPlotLayout})
             setShowPlot(true)
             setIndices([xIndex, yIndex, zIndex])
-        } else{
+        } else if (plotType===1){ // line plot
             let x = []
             let ys = []
             for (let i = 0; i < outputData.outputData.sweep_results.num_outputs; i++) {
@@ -125,6 +128,58 @@ export default function SweepOutput(props) {
             };
 
             setPlotData({data: tempData, layout:tempLayout})
+            setShowPlot(true)
+        } else if (plotType ===3) {
+            console.log('making parallel coordinates plot')
+            let dimensions = []
+            for (let each of outputData.outputData.sweep_results.headers) {
+                dimensions.push({label: each, values: []})
+            }
+            for (let each of outputData.outputData.sweep_results.values) {
+                for(let i = 0; i < each.length; i++) {
+                    let tempDimension = dimensions[i]
+                    tempDimension.values.push(each[i])
+                }
+            }
+            for (let each of dimensions) {
+                // let maxRange
+                let max = Math.max(...each.values)
+                let min = Math.min(...each.values)
+                if (max > 0 && min > 0) {
+                    // maxRange = Math.ceil(max) + Math.ceil(min)
+                    each.range = [0, Math.ceil(max+min)]
+                }
+            }
+            console.log(dimensions)
+            let trace = {
+                type: 'parcoords',
+                line: {
+                  color: 'blue'
+                },
+                dimensions: dimensions
+                // dimensions: [{
+                //   range: [1, 5],
+                //   constraintrange: [1, 2],
+                //   label: 'A',
+                //   values: [1,4]
+                // }, {    
+                //   range: [1,5],
+                //   label: 'B',
+                //   values: [3,1.5],
+                //   tickvals: [1.5,3,4.5]
+                // }, {
+                //   range: [1, 5],
+                //   label: 'C',
+                //   values: [2,4],
+                //   tickvals: [1,2,4,5],
+                //   ticktext: ['text 1','text 2','text 4','text 5']
+                // }, {
+                //   range: [1, 5],
+                //   label: 'D',
+                //   values: [4,2]
+                // }]
+              };
+            setPlotData({data: [trace]})
             setShowPlot(true)
         }
     }
