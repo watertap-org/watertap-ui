@@ -13,6 +13,21 @@ export default function SweepOutput(props) {
     const [ indices, setIndices ] = useState([1, 0, 2])
     const [ tabValue, setTabValue ] = useState(0)
 
+    const styles = {
+        parameters: {
+            border:"1px solid #71797E",
+            backgroundColor: "#f4f0ec"
+        },
+        outputs: {
+            border:"1px solid #71797E"
+        }, 
+        tableHeader: {
+            border:"2px solid #71797E", 
+            backgroundColor:"#E5E4E2",
+            fontWeight: "bold"
+        }
+    }
+
     useEffect(() => {
         let num_parameters = outputData.outputData.sweep_results.num_parameters
         if (num_parameters === 1) {
@@ -157,27 +172,6 @@ export default function SweepOutput(props) {
                   color: 'blue'
                 },
                 dimensions: dimensions
-                // dimensions: [{
-                //   range: [1, 5],
-                //   constraintrange: [1, 2],
-                //   label: 'A',
-                //   values: [1,4]
-                // }, {    
-                //   range: [1,5],
-                //   label: 'B',
-                //   values: [3,1.5],
-                //   tickvals: [1.5,3,4.5]
-                // }, {
-                //   range: [1, 5],
-                //   label: 'C',
-                //   values: [2,4],
-                //   tickvals: [1,2,4,5],
-                //   ticktext: ['text 1','text 2','text 4','text 5']
-                // }, {
-                //   range: [1, 5],
-                //   label: 'D',
-                //   values: [4,2]
-                // }]
               };
             setPlotData({data: [trace]})
             setShowPlot(true)
@@ -202,7 +196,15 @@ export default function SweepOutput(props) {
                 <TableContainer sx={{maxHeight: "80vh", overflowX:'auto'}}>
                 <Table style={{border:"1.5px solid #71797E"}} size={'small'}>
                     <TableHead>
-                    <TableRow style={{border:"1px solid #71797E"}} key="tablehead"> 
+                    <TableRow style={styles.tableHeader}>
+                        <TableCell style={styles.tableHeader} colSpan={outputData.outputData.sweep_results.num_parameters} align="center">
+                            Sweep Parameters
+                        </TableCell>
+                        <TableCell style={styles.tableHeader} colSpan={outputData.outputData.sweep_results.num_outputs} align="center">
+                            Outputs
+                        </TableCell>
+                    </TableRow>
+                    <TableRow key="tablehead"> 
                         {outputData.outputData.sweep_results.headers.map( (value, index)  => {
                             return <TableCell style={{border:"1px solid #71797E", backgroundColor:"#E5E4E2"}} key={`head_${index}`}> 
                             <Typography noWrap>{value}</Typography>
@@ -215,7 +217,13 @@ export default function SweepOutput(props) {
                             return (
                                 <TableRow key={`row_${ridx}`}> 
                                 {row.map( (cell, cidx) => {
-                                    return <TableCell style={{border:"1px solid #71797E"}} key={`cell_${cidx}`} align="right"> {cell.toFixed(3)}</TableCell>
+                                    return (<TableCell 
+                                                style={cidx < outputData.outputData.sweep_results.num_parameters ? styles.parameters : styles.outputs} key={`cell_${cidx}`} 
+                                                align="right"
+                                            > 
+                                                {cell.toFixed(3)}
+                                            </TableCell>
+                                    )
                                 })}
                                 </TableRow>
                             )
