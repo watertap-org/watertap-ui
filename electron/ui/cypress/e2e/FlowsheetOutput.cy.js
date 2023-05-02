@@ -35,14 +35,14 @@ describe('Flowsheet Output Test', () => {
         sc_count+=1
 
         //click on save and wait for api response
-        cy.intercept({
-            method: "POST",
-            url: "http://localhost:8001/flowsheets/**",
-        }).as("saveChanges");
-        cy.findAllByRole('button', {  name: /update flowsheet/i}).eq(0).click()
-        cy.wait("@saveChanges");
-        cy.screenshot(sc_count+'_saved1')
-        sc_count+=1
+        // cy.intercept({
+        //     method: "POST",
+        //     url: "http://localhost:8001/flowsheets/**",
+        // }).as("saveChanges");
+        // cy.findAllByRole('button', {  name: /update flowsheet/i}).eq(0).click()
+        // cy.wait("@saveChanges");
+        // cy.screenshot(sc_count+'_saved1')
+        // sc_count+=1
 
         //need to do it twice to ensure changes are saved
         //enter valid value for recovery rate
@@ -59,18 +59,18 @@ describe('Flowsheet Output Test', () => {
         sc_count+=1
 
         //click on save and wait for api response
-        cy.intercept({
-            method: "POST",
-            url: "http://localhost:8001/flowsheets/**",
-        }).as("saveChanges");
-        cy.findAllByRole('button', {  name: /update flowsheet/i}).eq(0).click()
-        cy.wait("@saveChanges");
-        cy.screenshot(sc_count+'_saved2')
-        sc_count+=1
+        // cy.intercept({
+        //     method: "POST",
+        //     url: "http://localhost:8001/flowsheets/**",
+        // }).as("saveChanges");
+        // cy.findAllByRole('button', {  name: /update flowsheet/i}).eq(0).click()
+        // cy.wait("@saveChanges");
+        // cy.screenshot(sc_count+'_saved2')
+        // sc_count+=1
 
         //click on solve and wait for api response
         cy.intercept({
-            method: "GET",
+            method: "POST",
             url: "http://localhost:8001/flowsheets/**",
         }).as("solve");
         cy.findAllByRole('button', {  name: /solve/i}).eq(0).click()
