@@ -1,12 +1,17 @@
 
-export const solve = (id) => {
-    return fetch('http://localhost:8001/flowsheets/'+id+'/solve', {mode: 'cors'});
+export const solve = (id, data) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/solve', {
+        method: 'POST', 
+        mode: 'cors',
+        body: JSON.stringify(data)
+    });
 }; 
 
-export const sweep = (id) => {
+export const sweep = (id, data) => {
     return fetch('http://localhost:8001/flowsheets/'+id+'/sweep', {
         method: 'POST', 
-        mode: 'cors'
+        mode: 'cors',
+        body: JSON.stringify(data)
     });
 }
 

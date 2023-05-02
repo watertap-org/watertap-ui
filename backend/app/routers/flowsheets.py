@@ -73,16 +73,35 @@ async def get_diagram(flowsheet_id: str):
     return StreamingResponse(io.BytesIO(data), media_type="image/png")
 
 
-@router.get("/{flowsheet_id}/solve", response_model=FlowsheetExport)
-async def solve(flowsheet_id: str):
+@router.post("/{flowsheet_id}/solve", response_model=FlowsheetExport)
+async def solve(flowsheet_id: str, request: Request):
     flowsheet = flowsheet_manager.get_obj(flowsheet_id)
     info = flowsheet_manager.get_info(flowsheet_id)
+
+    # update input data before running a solve
+    input_data = await request.json()
+    try:
+        flowsheet.load(input_data)
+        _log.info(f"Loading new data into flowsheet '{flowsheet_id}'")
+    except FlowsheetInterface.MissingObjectError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        # XXX: return something about the error to caller
+    except ValidationError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        raise HTTPException(
+            400, f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input"
+        )
+    flowsheet_manager.get_info(flowsheet_id).updated()
+
+    # ensure flowsheet is built
     if not info.built:
         try:
             flowsheet.build()
         except Exception as err:
             raise HTTPException(500, detail=f"Build failed: {err}")
         info.updated(built=True)
+
+    # run solve
     try:
         flowsheet.solve()
     except Exception as err:
@@ -90,9 +109,25 @@ async def solve(flowsheet_id: str):
     return flowsheet.fs_exp
 
 @router.post("/{flowsheet_id}/sweep", response_model=FlowsheetExport)
-async def sweep(flowsheet_id: str):
+async def sweep(flowsheet_id: str, request: Request):
     flowsheet = flowsheet_manager.get_obj(flowsheet_id)
     info = flowsheet_manager.get_info(flowsheet_id)
+
+    # update input data before running a sweep
+    input_data = await request.json()
+    try:
+        flowsheet.load(input_data)
+        _log.info(f"Loading new data into flowsheet '{flowsheet_id}'")
+    except FlowsheetInterface.MissingObjectError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        # XXX: return something about the error to caller
+    except ValidationError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        raise HTTPException(
+            400, f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input"
+        )
+    flowsheet_manager.get_info(flowsheet_id).updated()
+
     if not info.built:
         try:
             flowsheet.build()

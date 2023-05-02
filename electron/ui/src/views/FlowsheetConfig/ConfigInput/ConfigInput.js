@@ -18,9 +18,6 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { deleteConfig }  from '../../../services/input.service.js'
 import Modal from '@mui/material/Modal';
-import ErrorBar from "../../../components/ErrorBar/ErrorBar"; 
-import { display } from '@mui/system';
-import { Typography } from '@mui/material';
 
 
 
@@ -116,8 +113,8 @@ export default function ConfigInput(props) {
 
     const handleUpdateFixed = (id, value) => {
         let tempFlowsheetData = {...flowsheetData}
-        let previousValue = tempFlowsheetData.inputData.model_objects[id].fixed
         tempFlowsheetData.inputData.model_objects[id].fixed = value
+        updateFlowsheetData(tempFlowsheetData,"UPDATE_CONFIG")
     }
 
     const handleUpdateBounds = (id, value, bound) => {
@@ -239,7 +236,7 @@ export default function ConfigInput(props) {
                 
                 </Box>
                 <Stack direction="row" spacing={2}>
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button>
+                    {/* <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button> */}
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SWEEP")}>SWEEP</Button>
                     {configName.length > 0 &&

@@ -79,7 +79,6 @@ export default function FlowsheetConfig() {
         setTitle(getTitle(data)); 
       }).catch((e) => {
         console.error('error getting flowsheet: ',e)
-        // return to list page?
         navigateHome(e)
       });
     }, [params.id]);
@@ -106,7 +105,6 @@ export default function FlowsheetConfig() {
       }
     };
 
-
     //send updated flowsheet data
     const updateFlowsheetData = (data, solve) => {
       console.log(">main updateFlowsheetData:",data);
@@ -124,10 +122,6 @@ export default function FlowsheetConfig() {
       {
         handleSave(data);
       }
-      // else if(solve==="RESET")
-      // {
-      //   handleReset();
-      // }
       else if(solve=== "UPDATE_CONFIG"){
         setFlowsheetData(data)
         handleSave(data.inputData);
@@ -136,17 +130,9 @@ export default function FlowsheetConfig() {
 
     const handleSolved = (data) => {
       console.log("handle solved.....",data);
-      // data = data[data.length - 1]
-      
       let tempFlowsheetData = {...flowsheetData}
       tempFlowsheetData.outputData = data
       setFlowsheetData(tempFlowsheetData);
-      
-      // if(data.hasOwnProperty("input") && data.input)
-      // {console.log("iiiiiiii:",data.input);
-      //   setFlowsheetData(data.input);
-      // }
-
       setTabValue(1);
       setSolveDialogOpen(false);
     };
@@ -188,16 +174,6 @@ export default function FlowsheetConfig() {
       setOpenErrorMessage(false);
     };
 
-    // const handleReset = () => {
-    //   console.log("reset. id:", params.id)
-    //   resetFlowsheet(params.id)
-    //   .then(response => response.json())
-    //   .then((data)=>{
-    //     console.log("reset Flowsheet:", data)
-    //     setFlowsheetData(data)
-    //   })
-    // }
-
 
     return ( 
       <Container>
@@ -216,9 +192,6 @@ export default function FlowsheetConfig() {
           :
           (
           <>
-            {/* <h2 style={{textAlign:"left"}}>
-            {title}
-            </h2> */}
             <Grid container>
                 <Grid item xs={6}>
                     <Box justifyContent="left" display="flex">
@@ -264,7 +237,6 @@ export default function FlowsheetConfig() {
           </>
           )
       }  
-      {/* <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id} isSweep={false}></SolveDialog> */}
       <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id} isSweep={sweep}></SolveDialog>
       <Snackbar
         open={openSuccessSaveConfirmation}

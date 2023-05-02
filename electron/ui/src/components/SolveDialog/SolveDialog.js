@@ -13,7 +13,7 @@ export default function SolveDialog(props) {
     if(open)
     { 
         if(isSweep) {
-          sweep(id)
+          sweep(id, flowsheetData.inputData)
           .then(r =>  r.json().then(data => ({status: r.status, body: data})))
           .then(data => {
               let status = data.status
@@ -30,7 +30,7 @@ export default function SolveDialog(props) {
             handleError(""+e)
         });
         }else {
-          solve(id)
+          solve(id, flowsheetData.inputData)
           .then(r =>  r.json().then(data => ({status: r.status, body: data})))
           .then(data => {
             // console.log(data)
