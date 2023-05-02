@@ -244,15 +244,6 @@ export default function ConfigInput(props) {
                     }
                 </Stack>
             </Toolbar>
-            {/* <Grid container>
-                <Grid item xs={12}>
-                    <Box justifyContent="left" display="flex" sx={{pb:1}}>
-                    <Typography>
-                        DEGREES OF FREEDOM: {flowsheetData.inputData.dof}
-                    </Typography>
-                    </Box>
-                </Grid>
-            </Grid> */}
                 
 
             <Grid container spacing={2} alignItems="flex-start">

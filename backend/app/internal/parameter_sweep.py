@@ -1,6 +1,12 @@
+from pathlib import Path
+from fastapi import HTTPException
+import numpy as np
 from watertap.tools.parameter_sweep import LinearSample, parameter_sweep
 import watertap.examples.flowsheets.case_studies.wastewater_resource_recovery.amo_1575_magprex.magprex as magprex
 from importlib import import_module
+import idaes.logger as idaeslog
+
+_log = idaeslog.getLogger(__name__)
 
 def set_up_sensitivity(m, solve, output_params):
     outputs = {}
@@ -11,13 +17,7 @@ def set_up_sensitivity(m, solve, output_params):
     # we should have the user provide outputs as a parameter
     for each in output_params:
         outputs[each["name"]] = each["param"]
-    # outputs["LCOW"] = m.fs.costing.LCOW
-    # outputs["LCOT"] = m.fs.costing.LCOT
-
-    # outputs["LCOM"] = m.fs.costing.LCOM
-    # outputs["LCOH"] = m.fs.costing.LCOH
-    # outputs["LCOS"] = m.fs.costing.LCOS
-
+    
     return outputs, optimize_kwargs, opt_function
 
 
@@ -45,6 +45,64 @@ def run_analysis(m, flowsheet, parameters, output_params, results_path="output.c
 
     return global_results
 
-
-# if __name__ == "__main__":
-#     results, sweep_params, m = run_analysis()
+def run_parameter_sweep(flowsheet, info):
+    try:
+        _log.info('trying to sweep')
+        parameters = []
+        output_params = []
+        keys = []
+        conversion_factors = []
+        results_table = {"headers": []}
+        for key in flowsheet.fs_exp.model_objects:
+            if flowsheet.fs_exp.model_objects[key].is_output:
+                if "evelized cost" in flowsheet.fs_exp.model_objects[key].description:
+                    print(f'{key}: {flowsheet.fs_exp.model_objects[key].obj.__dict__}')
+                    results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
+                    output_params.append({
+                        "name": flowsheet.fs_exp.model_objects[key].name,
+                        "param": flowsheet.fs_exp.model_objects[key].obj
+                    })
+                    keys.append(key)
+            if not flowsheet.fs_exp.model_objects[key].fixed:
+                if (flowsheet.fs_exp.model_objects[key].lb is not None and flowsheet.fs_exp.model_objects[key].ub is not None):
+                    results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
+                    conversion_factor = flowsheet.fs_exp.model_objects[key].lb / flowsheet.fs_exp.model_objects[key].obj.lb
+                    parameters.append({
+                        "name": flowsheet.fs_exp.model_objects[key].name,
+                        "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
+                        "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
+                        "nx": 5,
+                        "param": flowsheet.fs_exp.model_objects[key].obj
+                    })
+                    conversion_factors.append(conversion_factor)
+                    keys.append(key)
+        output_path = Path.home() / ".watertap" / "sweep_outputs" / f"{info.name}_sweep.csv"
+        results = run_analysis(
+            m=flowsheet.fs_exp.m, 
+            flowsheet=info.module[0:-3],
+            parameters=parameters,
+            output_params=output_params,
+            results_path=output_path, 
+        )
+    except Exception as err:
+        _log.error(f'err: {err}')
+        raise HTTPException(500, detail=f"Sweep failed: {err}")
+    results_table["values"] = results[0].tolist()
+    for value in results_table["values"]:
+        for i in range(len(conversion_factors)):
+            conversion_factor = conversion_factors[i]
+            value[i] = value[i] * conversion_factor
+        for i in range(len(conversion_factors), len(value)):
+            if np.isnan(value[i]):
+                error_params = ""
+                for j in range(len(parameters)):
+                    error_param = parameters[j]["name"]
+                    error_value = value[j]
+                    error_params += f'{error_param}: {error_value}, '
+                error_params = error_params[:-2]
+                _log.error(f'Sweep produced invalid results: {error_params}')
+                raise HTTPException(500, detail=f"Sweep produced invalid results for input parameters: {error_params}")
+    results_table["keys"] = keys
+    results_table['num_parameters'] = len(parameters)
+    results_table['num_outputs'] = len(output_params)
+    return results_table
