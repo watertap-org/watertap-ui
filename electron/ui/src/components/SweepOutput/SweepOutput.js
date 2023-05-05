@@ -136,15 +136,24 @@ export default function SweepOutput(props) {
                 xaxis: {
                     title: {
                         text: xLabel,
-                    }
+                    },
+                },
+                yaxis: {
+                    // range: [-1,0.8],
+                    type: 'log',
+                    autorange: true,
+                    // domain: [0, 50],
+                    // range: [5,10],
                 },
                 width: 1000,
                 height: 500,
             };
+            console.log('lineplot data: ')
+            console.log(tempData)
 
             setPlotData({data: tempData, layout:tempLayout})
             setShowPlot(true)
-        } else if (plotType ===3) {
+        } else if (plotType ===3) { //parallel coordinates plot
             console.log('making parallel coordinates plot')
             let dimensions = []
             for (let each of outputData.outputData.sweep_results.headers) {
@@ -173,7 +182,11 @@ export default function SweepOutput(props) {
                 },
                 dimensions: dimensions
               };
-            setPlotData({data: [trace]})
+              let tempLayout = {
+                width: 1000,
+                height: 500,
+            };
+            setPlotData({data: [trace], layout:tempLayout})
             setShowPlot(true)
         }
     }
