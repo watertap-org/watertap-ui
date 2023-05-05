@@ -114,7 +114,7 @@ export default function ConfigInput(props) {
     const handleUpdateFixed = (id, value) => {
         let tempFlowsheetData = {...flowsheetData}
         tempFlowsheetData.inputData.model_objects[id].fixed = value
-        updateFlowsheetData(tempFlowsheetData,"UPDATE_CONFIG")
+        updateFlowsheetData(tempFlowsheetData, null)
     }
 
     const handleUpdateBounds = (id, value, bound) => {

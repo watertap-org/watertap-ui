@@ -120,7 +120,7 @@ export default function FlowsheetConfig() {
       }
       else if(solve===null)
       {
-        handleSave(data);
+        handleSave(data.inputData);
       }
       else if(solve=== "UPDATE_CONFIG"){
         setFlowsheetData(data)
@@ -155,7 +155,7 @@ export default function FlowsheetConfig() {
             let tempFlowsheetData = {...flowsheetData}
             tempFlowsheetData.inputData = data
             setFlowsheetData(tempFlowsheetData)
-            setOpenSuccessSaveConfirmation(true);
+            // setOpenSuccessSaveConfirmation(true);
           });
         } else if(response.status === 400) {
           console.error("error saving data")

@@ -15,7 +15,7 @@ export default function InputAccordion(props) {
     const [value, setValue] = useState("");
 
     useEffect(()=>{  
-        //console.log("DDD:",data);
+        // console.log("DDD:",data);
     }, [data]);
 
     const handleAccordionChange = (panel) => (event, isExpanded) => {
