@@ -56,17 +56,9 @@ jobs:
         run: |
           pip install --progress-bar off .
 
-      # - name: Install older version of idaes-pse
-      #   run: |
-      #     pip uninstall -y idaes-pse && pip install idaes-pse==1.13
-
-      # - name: Create idaes extensions installer
-      #   run: |
-      #     npm --prefix electron run get-extensions-installer
-
-      # - name: Revert to correct idaes version
-      #   run: |
-      #     pip uninstall -y idaes-pse && pip install 'idaes-pse @ https://github.com/IDAES/idaes-pse/archive/2.0.0a3.zip'
+      - name: Install scipy 1.9.1
+        run: |
+          pip uninstall -y scipy && pip install scipy==1.9.1
 
       - name: Build Backend
         run: npm --prefix electron run build-backend
