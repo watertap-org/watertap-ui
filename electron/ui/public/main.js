@@ -78,12 +78,12 @@ function createWindow() {
 const installExtensions = () => {
 
   try{
-  installationProcess = spawn(
-    path.join(__dirname, "../setup-extensions-dist/setup-extensions/setup-extensions"),
-    [
-      ""
-    ]
-  );
+    installationProcess = spawn(
+      path.join(__dirname, "../py_dist/main/main"),
+      [
+        "install"
+      ]
+    );
 
   log.info("installation started");
   console.log("installation started");
