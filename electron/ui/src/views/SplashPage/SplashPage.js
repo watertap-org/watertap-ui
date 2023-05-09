@@ -42,7 +42,7 @@ export default function SplashPage() {
 
   return ( 
     <div style={styles.background}>
-        <img alt="PARETO background" src={BackgroundPic} style={styles.bacgkroundImage}>
+        <img alt="WaterTAP background" src={BackgroundPic} style={styles.bacgkroundImage}>
         
         </img>
         <Box style={styles.boxStyle}>
@@ -50,7 +50,7 @@ export default function SplashPage() {
                 <Grid item xs={2}> </Grid>
                 <Grid item xs={8}> 
                     <Box style={{}}>
-                        <img alt="PARETO logo" src={FullLogo} style={{width:'100%', paddingTop:"50px"}}></img>
+                        <img alt="WaterTAP logo" src={FullLogo} style={{width:'100%', paddingTop:"50px"}}></img>
                     </Box>
                 </Grid>
                 <Grid item xs={2}> </Grid>
