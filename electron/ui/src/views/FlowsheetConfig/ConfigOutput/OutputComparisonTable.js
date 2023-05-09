@@ -169,8 +169,8 @@ const organizeVariables = () => {
       return Object.keys(historyDataOrganized[leftConfigIndex].data).map((category,index)=>{  
         if (historyDataOrganized[leftConfigIndex].data[category] && historyDataOrganized[rightConfigIndex].data[category]) {
         if (historyDataOrganized[leftConfigIndex].data[category].variables.length > 0) {
-          return ( <Fragment>
-            <TableRow key={category+index}>
+          return ( <Fragment key={category+index}>
+            <TableRow key={category+" "+index}>
               <TableCell rowSpan={historyDataOrganized[leftConfigIndex].data[category].variables.length + 1}>
                 <b>{category}</b>
               </TableCell>
