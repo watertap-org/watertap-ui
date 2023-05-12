@@ -46,7 +46,7 @@ jobs:
 
       - name: Install Watertap locally
         working-directory: ../
-        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout tags/0.8.0 -b 0.8.0 && pip install --progress-bar off .
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout ui-parameter-sweep && pip install --progress-bar off .
 
       - name: Transfer Entry points
         run: |
@@ -109,7 +109,7 @@ jobs:
 
       - name: Install Watertap locally
         working-directory: ../
-        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout tags/0.8.0 -b 0.8.0 && pip install --progress-bar off .
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all --tags && git checkout ui-parameter-sweep && pip install --progress-bar off .
 
       - name: Transfer Entry points
         run: |
