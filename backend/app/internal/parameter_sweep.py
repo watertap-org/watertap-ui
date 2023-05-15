@@ -28,10 +28,12 @@ def run_analysis(m, flowsheet, parameters, output_params, results_path="output.c
 
     sweep_params = {}
     # sensitivity analysis
+    i = 0
     for each in parameters:
-        sweep_params[each["name"]] = LinearSample(
+        sweep_params[f'{i}: {each["name"]}'] = LinearSample(
             each["param"], each["lb"], each["ub"], each["nx"]
         )
+        i+=1
 
     global_results = parameter_sweep(
         m,
