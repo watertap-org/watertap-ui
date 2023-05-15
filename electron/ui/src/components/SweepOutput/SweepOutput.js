@@ -8,6 +8,7 @@ import Plot from 'react-plotly.js';
 
 export default function SweepOutput(props) {
     const { outputData, download } = props;
+    const [ plotType, setPlotType ] = useState(0)
     const [ plotData, setPlotData ] = useState({})
     const [ showPlot, setShowPlot ] = useState(false)
     const [ indices, setIndices ] = useState([1, 0, 2])
@@ -31,19 +32,28 @@ export default function SweepOutput(props) {
     useEffect(() => {
         let num_parameters = outputData.outputData.sweep_results.num_parameters
         if (num_parameters === 1) {
-            unpackData(1)
+            setPlotType(1)
+            unpackData(1, 0, 1)
         } else if (num_parameters === 2) {
+            setPlotType(2)
             unpackData(2, 1, 0, 2)
         } else {
             // show parrallel lines plot
+            setPlotType(3)
             unpackData(3)
         }
     }, [props.outputData])
 
     const handleParamaterSelection = (event) => {
-        console.log(event.target.value)
+        // console.log("handle parameter selection")
         let newIndex = event.target.value + outputData.outputData.sweep_results.num_parameters
-        unpackData(2, indices[0], indices[1], newIndex)
+        if(plotType === 2) {
+            unpackData(2, indices[0], indices[1], newIndex)
+        }
+        else if(plotType === 1) {
+            unpackData(1, indices[0], newIndex)
+        }
+        
     }
 
     const handleTabChange = (event, newValue) => {
@@ -110,7 +120,6 @@ export default function SweepOutput(props) {
             }
             setPlotData({data: tempPlotData, layout: tempPlotLayout})
             setShowPlot(true)
-            setIndices([xIndex, yIndex, zIndex])
         } else if (plotType===1){ // line plot
             let x = []
             let ys = []
@@ -126,13 +135,18 @@ export default function SweepOutput(props) {
             let tempData = []
             let keyIdx = 1
             for (let each of ys) {
-                let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.model_objects[keys[keyIdx]].display_units})`
-                let tempTrace = {x: x, y: each, type:"scatter", name: yName}
-                tempData.push(tempTrace)
+                if( keyIdx === yIndex){
+                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.model_objects[keys[keyIdx]].display_units})`
+                    let tempTrace = {x: x, y: each, type:"scatter", name: yName}
+                    tempData.push(tempTrace)
+                    
+                }
                 keyIdx+=1
+                
             }
             
             let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.model_objects[keys[0]].display_units})`
+            let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.model_objects[keys[yIndex]].display_units})`
             let tempLayout = {
                 xaxis: {
                     title: {
@@ -140,13 +154,13 @@ export default function SweepOutput(props) {
                     },
                 },
                 yaxis: {
-                    // range: [-1,0.8],
-                    type: 'log',
-                    autorange: true,
-                    // domain: [0, 50],
-                    // range: [5,10],
+                    title: {
+                        text: yLabel,
+                    },
+                    // type: 'log',
+                    // autorange: true,
                 },
-                width: 1000,
+                width: 700,
                 height: 500,
             };
             // console.log('lineplot data: ')
@@ -190,6 +204,7 @@ export default function SweepOutput(props) {
             setPlotData({data: [trace], layout:tempLayout})
             setShowPlot(true)
         }
+        setIndices([xIndex, yIndex, zIndex])
     }
     
     return ( 
@@ -254,7 +269,7 @@ export default function SweepOutput(props) {
             }
             {tabValue === 1 && 
             <>
-            {showPlot && outputData.outputData.sweep_results.num_parameters === 2 && 
+            {showPlot && (outputData.outputData.sweep_results.num_parameters === 1 || outputData.outputData.sweep_results.num_parameters === 2) && 
                 <Grid sx={{marginTop:15, height:"100px"}} item xs={2}>
                     {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
                     <InputLabel sx={{marginTop:1}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
@@ -262,7 +277,7 @@ export default function SweepOutput(props) {
                         <Select
                         labelId="Parameter Selection"
                         id="Parameter Selection"
-                        value={indices[2]-outputData.outputData.sweep_results.num_parameters}
+                        value={plotType === 2 ? indices[2]-outputData.outputData.sweep_results.num_parameters : plotType === 1 && indices[1]-outputData.outputData.sweep_results.num_parameters}
                         onChange={handleParamaterSelection}
                         size="small"
                         sx={{minWidth: 200}}

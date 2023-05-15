@@ -72,7 +72,7 @@ def run_parameter_sweep(flowsheet, info):
                     conversion_factors.append(conversion_factor)
                     keys.append(key)
         for key in flowsheet.fs_exp.model_objects:
-            if flowsheet.fs_exp.model_objects[key].is_output:
+            if flowsheet.fs_exp.model_objects[key].is_output and not flowsheet.fs_exp.model_objects[key].is_input:
                 results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
                 try:
                     conversion_factor = flowsheet.fs_exp.model_objects[key].value / flowsheet.fs_exp.model_objects[key].obj.value
