@@ -15,8 +15,10 @@ def set_up_sensitivity(m, solve, output_params):
 
     # create outputs
     # we should have the user provide outputs as a parameter
+    i = 0
     for each in output_params:
-        outputs[each["name"]] = each["param"]
+        outputs[f'{i}: {each["name"]}'] = each["param"]
+        i+=1
     
     return outputs, optimize_kwargs, opt_function
 
@@ -56,15 +58,6 @@ def run_parameter_sweep(flowsheet, info):
         conversion_factors = []
         results_table = {"headers": []}
         for key in flowsheet.fs_exp.model_objects:
-            if flowsheet.fs_exp.model_objects[key].is_output:
-                if "evelized cost" in flowsheet.fs_exp.model_objects[key].description:
-                    print(f'{key}: {flowsheet.fs_exp.model_objects[key].obj.__dict__}')
-                    results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
-                    output_params.append({
-                        "name": flowsheet.fs_exp.model_objects[key].name,
-                        "param": flowsheet.fs_exp.model_objects[key].obj
-                    })
-                    keys.append(key)
             if not flowsheet.fs_exp.model_objects[key].fixed:
                 if (flowsheet.fs_exp.model_objects[key].lb is not None and flowsheet.fs_exp.model_objects[key].ub is not None):
                     results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
@@ -78,6 +71,20 @@ def run_parameter_sweep(flowsheet, info):
                     })
                     conversion_factors.append(conversion_factor)
                     keys.append(key)
+        for key in flowsheet.fs_exp.model_objects:
+            if flowsheet.fs_exp.model_objects[key].is_output:
+                results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
+                try:
+                    conversion_factor = flowsheet.fs_exp.model_objects[key].value / flowsheet.fs_exp.model_objects[key].obj.value
+                except Exception as e:
+                    conversion_factor = 1
+                    # print(f'unable to find conversion factor for {flowsheet.fs_exp.model_objects[key].name}: {e}')
+                conversion_factors.append(conversion_factor)
+                output_params.append({
+                    "name": flowsheet.fs_exp.model_objects[key].name,
+                    "param": flowsheet.fs_exp.model_objects[key].obj
+                })
+                keys.append(key)
         output_path = Path.home() / ".watertap" / "sweep_outputs" / f"{info.name}_sweep.csv"
         results = run_analysis(
             m=flowsheet.fs_exp.m, 
@@ -91,10 +98,7 @@ def run_parameter_sweep(flowsheet, info):
         raise HTTPException(500, detail=f"Sweep failed: {err}")
     results_table["values"] = results[0].tolist()
     for value in results_table["values"]:
-        for i in range(len(conversion_factors)):
-            conversion_factor = conversion_factors[i]
-            value[i] = value[i] * conversion_factor
-        for i in range(len(conversion_factors), len(value)):
+        for i in range(len(value)):
             if np.isnan(value[i]):
                 error_params = ""
                 for j in range(len(parameters)):
@@ -104,6 +108,9 @@ def run_parameter_sweep(flowsheet, info):
                 error_params = error_params[:-2]
                 _log.error(f'Sweep produced invalid results: {error_params}')
                 raise HTTPException(500, detail=f"Sweep produced invalid results for input parameters: {error_params}")
+            else:
+                conversion_factor = conversion_factors[i]
+                value[i] = value[i] * conversion_factor
     results_table["keys"] = keys
     results_table['num_parameters'] = len(parameters)
     results_table['num_outputs'] = len(output_params)

@@ -51,6 +51,7 @@ export default function SweepOutput(props) {
     }
 
     const unpackData = (plotType, xIndex, yIndex, zIndex) => {
+        // console.log(outputData.outputData.sweep_results)
         let keys = outputData.outputData.sweep_results.keys
         if (plotType === 2) { //contour map
             console.log(keys)
@@ -148,8 +149,8 @@ export default function SweepOutput(props) {
                 width: 1000,
                 height: 500,
             };
-            console.log('lineplot data: ')
-            console.log(tempData)
+            // console.log('lineplot data: ')
+            // console.log(tempData)
 
             setPlotData({data: tempData, layout:tempLayout})
             setShowPlot(true)
@@ -254,20 +255,26 @@ export default function SweepOutput(props) {
             {tabValue === 1 && 
             <>
             {showPlot && outputData.outputData.sweep_results.num_parameters === 2 && 
-                <Grid sx={{marginTop:15}} item xs={2}>
+                <Grid sx={{marginTop:15, height:"100px"}} item xs={2}>
                     {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
-                    <InputLabel sx={{marginTop:1}} id="previous-configs-label">Value&nbsp;</InputLabel>
-                    <FormControl >
+                    <InputLabel sx={{marginTop:1}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
+                    <FormControl>
                         <Select
                         labelId="Parameter Selection"
                         id="Parameter Selection"
                         value={indices[2]-outputData.outputData.sweep_results.num_parameters}
                         onChange={handleParamaterSelection}
                         size="small"
+                        sx={{minWidth: 200}}
+                        MenuProps={{
+                            style: {
+                               maxHeight: 400,
+                                  },
+                            }}
                         >
                         {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
                             <MenuItem
-                            key={name}
+                            key={`${name}_${index}`}
                             value={index}
                             // style={getStyles(name, personName, theme)}
                             >
