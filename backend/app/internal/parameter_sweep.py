@@ -58,7 +58,7 @@ def run_parameter_sweep(flowsheet, info):
         conversion_factors = []
         results_table = {"headers": []}
         for key in flowsheet.fs_exp.model_objects:
-            if not flowsheet.fs_exp.model_objects[key].fixed:
+            if not flowsheet.fs_exp.model_objects[key].fixed and flowsheet.fs_exp.model_objects[key].is_input:
                 if (flowsheet.fs_exp.model_objects[key].lb is not None and flowsheet.fs_exp.model_objects[key].ub is not None):
                     results_table["headers"].append(flowsheet.fs_exp.model_objects[key].name)
                     conversion_factor = flowsheet.fs_exp.model_objects[key].ub / flowsheet.fs_exp.model_objects[key].obj.ub
