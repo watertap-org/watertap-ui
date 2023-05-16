@@ -25,8 +25,11 @@ def set_up_sensitivity(m, solve, output_params):
 
 def run_analysis(m, flowsheet, parameters, output_params, results_path="output.csv", interpolate_nan_outputs=True):
     flowsheet = import_module(flowsheet)
-    
-    outputs, optimize_kwargs, opt_function = set_up_sensitivity(m, flowsheet.solve, output_params)
+    try:
+        solve_function = flowsheet.solve
+    except:
+        solve_function = flowsheet.optimize
+    outputs, optimize_kwargs, opt_function = set_up_sensitivity(m, solve_function, output_params)
 
     sweep_params = {}
     # sensitivity analysis
