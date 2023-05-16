@@ -142,7 +142,6 @@ export default function FlowsheetConfig() {
       setErrorMessage(msg)
       setOpenErrorMessage(true);
       setSolveDialogOpen(false);
-      resetFlowsheet()
     };
 
     const handleSave = (data) => {
@@ -175,11 +174,12 @@ export default function FlowsheetConfig() {
       setOpenErrorMessage(false);
     };
 
-    const resetFlowsheet = () => {
-      getFlowsheet(params.id)
+    const reset = () => {
+      console.log('inside reset')
+      resetFlowsheet(params.id)
       .then(response => response.json())
       .then((data)=>{
-        console.log("Flowsheet Data:", data);
+        console.log("Reset flowsheet Data:", data);
         setLoadingFlowsheetData(false)
         setFlowsheetData({outputData:null, inputData: data, name: data.name});
         setTitle(getTitle(data)); 
@@ -236,7 +236,10 @@ export default function FlowsheetConfig() {
               </Tabs>
               <TabPanel value={tabValue} index={0}>
                 <ConfigInput flowsheetData={flowsheetData} 
-                            updateFlowsheetData={updateFlowsheetData}>
+                            updateFlowsheetData={updateFlowsheetData}
+                            reset={reset}
+                            >
+                            
                 </ConfigInput>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>

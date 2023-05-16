@@ -94,10 +94,10 @@ async def solve(flowsheet_id: str, request: Request):
         try:
             flowsheet.build()
         except Exception as err:
-            print('failed on build, rebuilding')
-            flowsheet = flowsheet_manager.get_obj(flowsheet_id)
-            flowsheet.build()
-            flowsheet_manager.get_info(flowsheet_id).updated(built=True)
+            # print('failed on build, rebuilding')
+            # flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+            # flowsheet.build()
+            # flowsheet_manager.get_info(flowsheet_id).updated(built=True)
             raise HTTPException(500, detail=f"Build failed: {err}")
         info.updated(built=True)
 
@@ -105,10 +105,10 @@ async def solve(flowsheet_id: str, request: Request):
     try:
         flowsheet.solve()
     except Exception as err:
-        print('failed on solve, rebuilding')
-        flowsheet = flowsheet_manager.get_obj(flowsheet_id)
-        flowsheet.build()
-        flowsheet_manager.get_info(flowsheet_id).updated(built=True)
+        # print('failed on solve, rebuilding')
+        # flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+        # flowsheet.build()
+        # flowsheet_manager.get_info(flowsheet_id).updated(built=True)
         raise HTTPException(500, detail=f"Solve failed: {err}")
     return flowsheet.fs_exp
 

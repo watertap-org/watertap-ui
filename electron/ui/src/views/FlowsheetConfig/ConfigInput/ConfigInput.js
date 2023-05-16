@@ -18,6 +18,7 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { deleteConfig }  from '../../../services/input.service.js'
 import Modal from '@mui/material/Modal';
+// import { resetFlowsheet } from '../../../services/flowsheet.service';
 
 
 
@@ -25,7 +26,7 @@ import Modal from '@mui/material/Modal';
 
 export default function ConfigInput(props) {
     let params = useParams(); 
-    const { flowsheetData, updateFlowsheetData } = props; 
+    const { flowsheetData, updateFlowsheetData, reset } = props; 
     const [ displayData, setDisplayData ] = useState({}) 
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
@@ -237,6 +238,7 @@ export default function ConfigInput(props) {
                 </Box>
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button> */}
+                    <Button variant="outlined" onClick={reset}>RESET FLOWSHEET</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SWEEP")}>SWEEP</Button>
                     {configName.length > 0 &&

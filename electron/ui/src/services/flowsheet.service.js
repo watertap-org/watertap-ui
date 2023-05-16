@@ -18,7 +18,7 @@ export const saveFlowsheet = (id, data) => {
 
 export const resetFlowsheet = (id) => {
     return fetch('http://localhost:8001/flowsheets/'+id+'/reset', {
-        method: 'POST', 
+        method: 'GET', 
         mode: 'cors'
     });
 }; 
