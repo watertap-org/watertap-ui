@@ -142,6 +142,7 @@ export default function FlowsheetConfig() {
       setErrorMessage(msg)
       setOpenErrorMessage(true);
       setSolveDialogOpen(false);
+      resetFlowsheet()
     };
 
     const handleSave = (data) => {
@@ -174,6 +175,19 @@ export default function FlowsheetConfig() {
       setOpenErrorMessage(false);
     };
 
+    const resetFlowsheet = () => {
+      getFlowsheet(params.id)
+      .then(response => response.json())
+      .then((data)=>{
+        console.log("Flowsheet Data:", data);
+        setLoadingFlowsheetData(false)
+        setFlowsheetData({outputData:null, inputData: data, name: data.name});
+        setTitle(getTitle(data)); 
+      }).catch((e) => {
+        console.error('error getting flowsheet: ',e)
+        navigateHome(e)
+      });
+    }
 
     return ( 
       <Container>

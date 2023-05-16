@@ -64,7 +64,7 @@ export default function ConfigInput(props) {
             console.error("unable to get list of config names: ",response.statusText)
         }
         })
-    }, []);
+    }, [flowsheetData.inputData]);
  
     const handleConfigSelection = (event) => {
         const {
