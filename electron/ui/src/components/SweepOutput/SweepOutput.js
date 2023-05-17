@@ -250,7 +250,7 @@ export default function SweepOutput(props) {
                                                 style={cidx < outputData.outputData.sweep_results.num_parameters ? styles.parameters : styles.outputs} key={`cell_${cidx}`} 
                                                 align="right"
                                             > 
-                                                {cell.toFixed(3)}
+                                                {cell && cell.toFixed(3)}
                                             </TableCell>
                                     )
                                 })}
