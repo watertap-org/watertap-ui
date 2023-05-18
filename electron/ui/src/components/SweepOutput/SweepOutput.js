@@ -61,10 +61,9 @@ export default function SweepOutput(props) {
     }
 
     const unpackData = (plotType, xIndex, yIndex, zIndex) => {
-        console.log(outputData.outputData.sweep_results)
+        // console.log(outputData.outputData.sweep_results)
         let keys = outputData.outputData.sweep_results.keys
         if (plotType === 2) { //contour map
-            console.log(keys)
             let x = []
             let y = []
             let z = []
@@ -170,7 +169,7 @@ export default function SweepOutput(props) {
             setPlotData({data: tempData, layout:tempLayout})
             setShowPlot(true)
         } else if (plotType ===3) { //parallel coordinates plot
-            console.log('making parallel coordinates plot')
+            // console.log('making parallel coordinates plot')
             let dimensions = []
             for (let each of outputData.outputData.sweep_results.headers) {
                 dimensions.push({label: each, values: []})
@@ -190,7 +189,7 @@ export default function SweepOutput(props) {
                     each.range = [0, Math.ceil(max+min)]
                 }
             }
-            console.log(dimensions)
+            // console.log(dimensions)
             let trace = {
                 type: 'parcoords',
                 line: {

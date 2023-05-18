@@ -19,7 +19,7 @@ export default function SolveDialog(props) {
               let status = data.status
               let outputData = data.body
               if(status===200) {
-                console.log(data)
+                // console.log(data)
                 handleSolved(outputData);
               } else if (status===500) {
                 console.error("500 error running sweep: "+outputData.detail)

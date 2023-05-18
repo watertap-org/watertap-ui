@@ -187,12 +187,11 @@ export default function FlowsheetConfig() {
     };
 
     const reset = () => {
-      console.log('inside reset')
       setLoadingFlowsheetData(true)
       resetFlowsheet(params.id)
       .then(response => response.json())
       .then((data)=>{
-        console.log("Reset flowsheet Data:", data);
+        // console.log("Reset flowsheet Data:", data);
         setLoadingFlowsheetData(false)
         setFlowsheetData({outputData:null, inputData: data, name: data.name});
         setTitle(getTitle(data)); 
