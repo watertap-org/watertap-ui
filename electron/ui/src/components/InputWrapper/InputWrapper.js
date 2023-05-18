@@ -15,8 +15,8 @@ import ExpandIcon from '@mui/icons-material/Expand';
 import Typography from '@mui/material/Typography';
 
 export default function InputWrapper(props) {
-
-    const {fieldLabel, fieldData, handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds} = props;
+    //"fs.feed.flow_vol[0.0]"
+    const { fieldData, handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds } = props;
     const [ disabled, setDisabled ] = useState(false)
     const [value, setValue] = useState("");
     const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
@@ -46,10 +46,18 @@ export default function InputWrapper(props) {
 
     const handleFixedChange = (event) => {
         console.log(`updating fixed for ${event.target.name} with value ${event.target.value}`)
+        let value
+        if(event.target.value === "fixed") value = true
+        else if(event.target.value === "free") value = false
+        else if(event.target.value === "sweep") {
+            value = false
+            fieldData.is_sweep = true
+            // add variable to sweep variables
+        }
         // setDisabled(true)
-        fieldData.fixed = event.target.value;
-        handleUpdateFixed(event.target.name,event.target.value)
-        setShowBounds(!event.target.value)
+        fieldData.fixed = value;
+        handleUpdateFixed(event.target.name,value, event.target.value)
+        setShowBounds(!value)
     };
 
     const handleBoundsChange = (event) => {
@@ -73,6 +81,12 @@ export default function InputWrapper(props) {
 
     const handleShowBounds = () => {
         setShowBounds(!showBounds)
+    }
+
+    const getVariableState = () => {
+        if (fieldData.fixed) return "fixed"
+        else if(!fieldData.fixed && !fieldData.is_sweep) return "free"
+        else if(!fieldData.fixed && fieldData.is_sweep) return "sweep"
     }
 
 
@@ -110,12 +124,13 @@ export default function InputWrapper(props) {
                 <FormControl size="small" sx={{width:'80%'}}>
                     <Select
                         name={fieldData.obj_key} 
-                        value={fieldData.fixed}
+                        value={getVariableState()}
                         onChange={handleFixedChange}
                         // sx={{color:'#0b89b9', fontWeight: "bold"}}
                     >
-                    <MenuItem key={true} value={true}>Fixed</MenuItem>
-                    <MenuItem disabled={!fieldData.has_bounds || disabled} key={false} value={false}>Free</MenuItem>
+                    <MenuItem key={true} value={"fixed"}>Fixed</MenuItem>
+                    <MenuItem disabled={!fieldData.has_bounds || disabled} key={false} value={"free"}>Free</MenuItem>
+                    <MenuItem disabled={!fieldData.has_bounds || disabled} key={"sweep"} value={"sweep"}>Sweep</MenuItem>
                     </Select>
                 </FormControl>
                 </Grid>

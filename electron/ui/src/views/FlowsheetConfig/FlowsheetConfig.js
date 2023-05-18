@@ -115,8 +115,20 @@ export default function FlowsheetConfig() {
       } 
       else if(solve==="SWEEP")
       {
-        setSolveDialogOpen(true);
-        setSweep(true);
+        //check if sweep variables all have lower and upper bounds
+        let goodToGo = true
+        for (let each of Object.entries(data.model_objects)) {
+          if(each[1].is_sweep) {
+            if(each[1].ub === null || each[1].lb === null) goodToGo=false
+          }
+        }
+        if(goodToGo) {
+          setSolveDialogOpen(true);
+          setSweep(true);
+        } else {
+          handleError('please provide a lower and upper bound for all sweep variables')
+        }
+        
       }
       else if(solve===null)
       {

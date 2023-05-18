@@ -9,7 +9,7 @@ import Toolbar from '@mui/material/Toolbar';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SaveIcon from '@mui/icons-material/Save';
 import Stack from '@mui/material/Stack';
-import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
+import { loadConfig, listConfigNames, sweep }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
@@ -112,10 +112,14 @@ export default function ConfigInput(props) {
         tempFlowsheetData.inputData.model_objects[id].value = value
     }
 
-    const handleUpdateFixed = (id, value) => {
+    const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
         tempFlowsheetData.inputData.model_objects[id].fixed = value
+        if(type==="sweep") tempFlowsheetData.inputData.model_objects[id].is_sweep = true
+        else tempFlowsheetData.inputData.model_objects[id].is_sweep = false
         updateFlowsheetData(tempFlowsheetData, null)
+
+        
     }
 
     const handleUpdateBounds = (id, value, bound) => {
@@ -185,7 +189,12 @@ export default function ConfigInput(props) {
                     let _key = key + Math.floor(Math.random() * 100001);
                     if(Object.keys(value.input_variables).length > 0) {
                         return (<Grid item xs={6} key={_key}>
-                            <InputAccordion handleUpdateDisplayValue={handleUpdateDisplayValue} handleUpdateFixed={handleUpdateFixed} handleUpdateBounds={handleUpdateBounds} data={value}/>
+                            <InputAccordion 
+                                handleUpdateDisplayValue={handleUpdateDisplayValue} 
+                                handleUpdateFixed={handleUpdateFixed} 
+                                handleUpdateBounds={handleUpdateBounds} 
+                                data={value}
+                                />
                         </Grid>)
                     }
                 })
