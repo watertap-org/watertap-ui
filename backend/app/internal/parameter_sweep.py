@@ -10,7 +10,8 @@ _log = idaeslog.getLogger(__name__)
 
 def set_up_sensitivity(m, solve, output_params):
     outputs = {}
-    optimize_kwargs = {"fail_flag": False}
+    # optimize_kwargs = {"fail_flag": False}
+    optimize_kwargs = {}
     opt_function = solve
 
     # create outputs
