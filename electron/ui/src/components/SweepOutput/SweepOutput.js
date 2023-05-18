@@ -97,6 +97,7 @@ export default function SweepOutput(props) {
                 type: 'heatmap',
                 zsmooth:false,
                 hoverongaps: false,
+                colorscale: 'Viridis',
                 colorbar: {
                     title: {
                         text: zLabel,
