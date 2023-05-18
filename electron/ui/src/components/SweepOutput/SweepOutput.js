@@ -61,7 +61,7 @@ export default function SweepOutput(props) {
     }
 
     const unpackData = (plotType, xIndex, yIndex, zIndex) => {
-        // console.log(outputData.outputData.sweep_results)
+        console.log(outputData.outputData.sweep_results)
         let keys = outputData.outputData.sweep_results.keys
         if (plotType === 2) { //contour map
             console.log(keys)
@@ -94,8 +94,8 @@ export default function SweepOutput(props) {
                 z:z,
                 x:x,
                 y:y,
-                type: 'contour',
-                zsmooth:"best",
+                type: 'heatmap',
+                zsmooth:false,
                 hoverongaps: false,
                 colorbar: {
                     title: {
