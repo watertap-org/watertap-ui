@@ -127,9 +127,9 @@ export default function SweepOutput(props) {
                 ys.push([])
             }
             for (let each of outputData.outputData.sweep_results.values) {
-                x.push(each[0])
+                x.push(Math.round(each[0] * 1000) / 1000)
                 for(let i = 1; i < each.length; i++) {
-                    ys[i-1].push(each[i])
+                    ys[i-1].push(Math.round(each[i] * 1000) / 1000)
                 }
             }
             let tempData = []
