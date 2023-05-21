@@ -9,13 +9,12 @@ import InputWrapper from "../InputWrapper/InputWrapper";
 
 
 export default function InputAccordion(props) {
-
-    const { data} = props;
+    const { handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds, data } = props;
     const [expanded1, setExpanded1] = useState('panel1'); 
     const [value, setValue] = useState("");
 
     useEffect(()=>{  
-        //console.log("DDD:",data);
+        // console.log("DDD:",data);
     }, [data]);
 
     const handleAccordionChange = (panel) => (event, isExpanded) => {
@@ -32,9 +31,9 @@ export default function InputAccordion(props) {
             return <InputWrapper 
                         key={key} 
                         fieldData={vItem} 
-                        handleUpdateDisplayValue={props.handleUpdateDisplayValue} 
-                        handleUpdateFixed={props.handleUpdateFixed} 
-                        handleUpdateBounds={props.handleUpdateBounds}
+                        handleUpdateDisplayValue={handleUpdateDisplayValue} 
+                        handleUpdateFixed={handleUpdateFixed} 
+                        handleUpdateBounds={handleUpdateBounds}
                     />
             
         });

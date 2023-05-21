@@ -59,6 +59,7 @@ export default function FlowsheetConfig() {
     const [tabValue, setTabValue] = useState(0);
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
+    const [ sweep, setSweep ] = useState(true)
     // const [outputData, setOutputData] = useState(null);
     const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
@@ -78,7 +79,6 @@ export default function FlowsheetConfig() {
         setTitle(getTitle(data)); 
       }).catch((e) => {
         console.error('error getting flowsheet: ',e)
-        // return to list page?
         navigateHome(e)
       });
     }, [params.id]);
@@ -105,22 +105,35 @@ export default function FlowsheetConfig() {
       }
     };
 
-
     //send updated flowsheet data
     const updateFlowsheetData = (data, solve) => {
       console.log(">main updateFlowsheetData:",data);
       if(solve==="SOLVE")
-      {
+      { 
         setSolveDialogOpen(true);
+        setSweep(false)
+      } 
+      else if(solve==="SWEEP")
+      {
+        //check if sweep variables all have lower and upper bounds
+        let goodToGo = true
+        for (let each of Object.entries(data.model_objects)) {
+          if(each[1].is_sweep) {
+            if(each[1].ub === null || each[1].lb === null) goodToGo=false
+          }
+        }
+        if(goodToGo) {
+          setSolveDialogOpen(true);
+          setSweep(true);
+        } else {
+          handleError('please provide a lower and upper bound for all sweep variables')
+        }
+        
       }
       else if(solve===null)
       {
-        handleSave(data);
+        handleSave(data.inputData);
       }
-      // else if(solve==="RESET")
-      // {
-      //   handleReset();
-      // }
       else if(solve=== "UPDATE_CONFIG"){
         setFlowsheetData(data)
         handleSave(data.inputData);
@@ -129,17 +142,9 @@ export default function FlowsheetConfig() {
 
     const handleSolved = (data) => {
       console.log("handle solved.....",data);
-      // data = data[data.length - 1]
-      
       let tempFlowsheetData = {...flowsheetData}
       tempFlowsheetData.outputData = data
       setFlowsheetData(tempFlowsheetData);
-      
-      // if(data.hasOwnProperty("input") && data.input)
-      // {console.log("iiiiiiii:",data.input);
-      //   setFlowsheetData(data.input);
-      // }
-
       setTabValue(1);
       setSolveDialogOpen(false);
     };
@@ -162,7 +167,7 @@ export default function FlowsheetConfig() {
             let tempFlowsheetData = {...flowsheetData}
             tempFlowsheetData.inputData = data
             setFlowsheetData(tempFlowsheetData)
-            setOpenSuccessSaveConfirmation(true);
+            // setOpenSuccessSaveConfirmation(true);
           });
         } else if(response.status === 400) {
           console.error("error saving data")
@@ -181,16 +186,20 @@ export default function FlowsheetConfig() {
       setOpenErrorMessage(false);
     };
 
-    // const handleReset = () => {
-    //   console.log("reset. id:", params.id)
-    //   resetFlowsheet(params.id)
-    //   .then(response => response.json())
-    //   .then((data)=>{
-    //     console.log("reset Flowsheet:", data)
-    //     setFlowsheetData(data)
-    //   })
-    // }
-
+    const reset = () => {
+      setLoadingFlowsheetData(true)
+      resetFlowsheet(params.id)
+      .then(response => response.json())
+      .then((data)=>{
+        // console.log("Reset flowsheet Data:", data);
+        setLoadingFlowsheetData(false)
+        setFlowsheetData({outputData:null, inputData: data, name: data.name});
+        setTitle(getTitle(data)); 
+      }).catch((e) => {
+        console.error('error getting flowsheet: ',e)
+        navigateHome(e)
+      });
+    }
 
     return ( 
       <Container>
@@ -209,9 +218,6 @@ export default function FlowsheetConfig() {
           :
           (
           <>
-            {/* <h2 style={{textAlign:"left"}}>
-            {title}
-            </h2> */}
             <Grid container>
                 <Grid item xs={6}>
                     <Box justifyContent="left" display="flex">
@@ -242,11 +248,14 @@ export default function FlowsheetConfig() {
               </Tabs>
               <TabPanel value={tabValue} index={0}>
                 <ConfigInput flowsheetData={flowsheetData} 
-                            updateFlowsheetData={updateFlowsheetData}>
+                            updateFlowsheetData={updateFlowsheetData}
+                            reset={reset}
+                            >
+                            
                 </ConfigInput>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>
-                <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData}>
+                <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData} isSweep={sweep}>
                 </ConfigOutput>
               </TabPanel> 
               <TabPanel value={tabValue} index={2}>
@@ -257,7 +266,7 @@ export default function FlowsheetConfig() {
           </>
           )
       }  
-      <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id}></SolveDialog>
+      <SolveDialog open={solveDialogOpen} handleSolved={handleSolved} handleError={handleError} flowsheetData={flowsheetData} id={params.id} isSweep={sweep}></SolveDialog>
       <Snackbar
         open={openSuccessSaveConfirmation}
         autoHideDuration={2000} 

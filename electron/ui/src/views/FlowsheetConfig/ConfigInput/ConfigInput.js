@@ -9,7 +9,7 @@ import Toolbar from '@mui/material/Toolbar';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SaveIcon from '@mui/icons-material/Save';
 import Stack from '@mui/material/Stack';
-import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
+import { loadConfig, listConfigNames, sweep }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
@@ -18,9 +18,7 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { deleteConfig }  from '../../../services/input.service.js'
 import Modal from '@mui/material/Modal';
-import ErrorBar from "../../../components/ErrorBar/ErrorBar"; 
-import { display } from '@mui/system';
-import { Typography } from '@mui/material';
+// import { resetFlowsheet } from '../../../services/flowsheet.service';
 
 
 
@@ -28,7 +26,7 @@ import { Typography } from '@mui/material';
 
 export default function ConfigInput(props) {
     let params = useParams(); 
-    const { flowsheetData, updateFlowsheetData } = props; 
+    const { flowsheetData, updateFlowsheetData, reset } = props; 
     const [ displayData, setDisplayData ] = useState({}) 
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
@@ -67,7 +65,7 @@ export default function ConfigInput(props) {
             console.error("unable to get list of config names: ",response.statusText)
         }
         })
-    }, []);
+    }, [flowsheetData.inputData]);
  
     const handleConfigSelection = (event) => {
         const {
@@ -114,10 +112,14 @@ export default function ConfigInput(props) {
         tempFlowsheetData.inputData.model_objects[id].value = value
     }
 
-    const handleUpdateFixed = (id, value) => {
+    const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
-        let previousValue = tempFlowsheetData.inputData.model_objects[id].fixed
         tempFlowsheetData.inputData.model_objects[id].fixed = value
+        if(type==="sweep") tempFlowsheetData.inputData.model_objects[id].is_sweep = true
+        else tempFlowsheetData.inputData.model_objects[id].is_sweep = false
+        updateFlowsheetData(tempFlowsheetData, null)
+
+        
     }
 
     const handleUpdateBounds = (id, value, bound) => {
@@ -187,7 +189,12 @@ export default function ConfigInput(props) {
                     let _key = key + Math.floor(Math.random() * 100001);
                     if(Object.keys(value.input_variables).length > 0) {
                         return (<Grid item xs={6} key={_key}>
-                            <InputAccordion handleUpdateDisplayValue={handleUpdateDisplayValue} handleUpdateFixed={handleUpdateFixed} handleUpdateBounds={handleUpdateBounds} data={value}/>
+                            <InputAccordion 
+                                handleUpdateDisplayValue={handleUpdateDisplayValue} 
+                                handleUpdateFixed={handleUpdateFixed} 
+                                handleUpdateBounds={handleUpdateBounds} 
+                                data={value}
+                                />
                         </Grid>)
                     }
                 })
@@ -239,22 +246,15 @@ export default function ConfigInput(props) {
                 
                 </Box>
                 <Stack direction="row" spacing={2}>
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button>
+                    {/* <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button> */}
+                    <Button variant="outlined" onClick={reset}>RESET FLOWSHEET</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
+                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SWEEP")}>SWEEP</Button>
                     {configName.length > 0 &&
                     <Button variant="outlined" color="error" onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
                     }
                 </Stack>
             </Toolbar>
-            {/* <Grid container>
-                <Grid item xs={12}>
-                    <Box justifyContent="left" display="flex" sx={{pb:1}}>
-                    <Typography>
-                        DEGREES OF FREEDOM: {flowsheetData.inputData.dof}
-                    </Typography>
-                    </Box>
-                </Grid>
-            </Grid> */}
                 
 
             <Grid container spacing={2} alignItems="flex-start">

@@ -148,3 +148,4 @@ get-idaes-extensions-dist/
 cert/
 extensions/
 setup-extensions-dist/
+sweep_outputs/

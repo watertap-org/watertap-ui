@@ -58,14 +58,14 @@ describe('Invalid Input Test', () => {
         sc_count+=1
 
         //click on save and wait for api response
-        cy.intercept({
-            method: "POST",
-            url: "http://localhost:8001/flowsheets/**",
-        }).as("saveChanges");
-        cy.findAllByRole('button', {  name: /update flowsheet/i}).eq(0).click()
-        cy.wait("@saveChanges").its('response.statusCode').should('eq', 400)
-        cy.screenshot(sc_count+'_saved1')
-        sc_count+=1
+        // cy.intercept({
+        //     method: "POST",
+        //     url: "http://localhost:8001/flowsheets/**",
+        // }).as("saveChanges");
+        // cy.findAllByRole('button', {  name: /update flowsheet/i}).eq(0).click()
+        // cy.wait("@saveChanges").its('response.statusCode').should('eq', 400)
+        // cy.screenshot(sc_count+'_saved1')
+        // sc_count+=1
 
         // //click on solve and wait for api response
         // cy.intercept({

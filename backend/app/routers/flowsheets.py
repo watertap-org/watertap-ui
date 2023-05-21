@@ -6,7 +6,6 @@ import csv
 import io
 from pathlib import Path
 from typing import List
-import logging
 # third-party
 from fastapi import Request, APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
@@ -17,6 +16,7 @@ from pydantic.error_wrappers import ValidationError
 
 # package-local
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
+from app.internal.parameter_sweep import run_parameter_sweep
 from watertap.ui.fsapi import FlowsheetInterface, FlowsheetExport
 import idaes.logger as idaeslog
 
@@ -69,20 +69,84 @@ async def get_diagram(flowsheet_id: str):
     return StreamingResponse(io.BytesIO(data), media_type="image/png")
 
 
-@router.get("/{flowsheet_id}/solve", response_model=FlowsheetExport)
-async def solve(flowsheet_id: str):
+@router.post("/{flowsheet_id}/solve", response_model=FlowsheetExport)
+async def solve(flowsheet_id: str, request: Request):
     flowsheet = flowsheet_manager.get_obj(flowsheet_id)
     info = flowsheet_manager.get_info(flowsheet_id)
+
+    # update input data before running a solve
+    input_data = await request.json()
+    try:
+        flowsheet.load(input_data)
+        _log.info(f"Loading new data into flowsheet '{flowsheet_id}'")
+    except FlowsheetInterface.MissingObjectError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        # XXX: return something about the error to caller
+    except ValidationError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        raise HTTPException(
+            400, f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input"
+        )
+    flowsheet_manager.get_info(flowsheet_id).updated()
+
+    # ensure flowsheet is built
+    if not info.built:
+        try:
+            flowsheet.build()
+        except Exception as err:
+            # print('failed on build, rebuilding')
+            # flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+            # flowsheet.build()
+            # flowsheet_manager.get_info(flowsheet_id).updated(built=True)
+            raise HTTPException(500, detail=f"Build failed: {err}")
+        info.updated(built=True)
+
+    # run solve
+    try:
+        flowsheet.solve()
+    except Exception as err:
+        # print('failed on solve, rebuilding')
+        # flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+        # flowsheet.build()
+        # flowsheet_manager.get_info(flowsheet_id).updated(built=True)
+        raise HTTPException(500, detail=f"Solve failed: {err}")
+    return flowsheet.fs_exp
+
+@router.post("/{flowsheet_id}/sweep", response_model=FlowsheetExport)
+async def sweep(flowsheet_id: str, request: Request):
+    flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+    info = flowsheet_manager.get_info(flowsheet_id)
+
+    # update input data before running a sweep
+    input_data = await request.json()
+    try:
+        flowsheet.load(input_data)
+        _log.info(f"Loading new data into flowsheet '{flowsheet_id}'")
+    except FlowsheetInterface.MissingObjectError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        # XXX: return something about the error to caller
+    except ValidationError as err:
+        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        raise HTTPException(
+            400, f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input"
+        )
+    flowsheet_manager.get_info(flowsheet_id).updated()
+
     if not info.built:
         try:
             flowsheet.build()
         except Exception as err:
             raise HTTPException(500, detail=f"Build failed: {err}")
         info.updated(built=True)
-    try:
-        flowsheet.solve()
-    except Exception as err:
-        raise HTTPException(500, detail=f"Solve failed: {err}")
+    
+
+    _log.info('trying to sweep')
+    results_table = run_parameter_sweep(
+        flowsheet=flowsheet,
+        info=info,
+    )
+    flowsheet.fs_exp.sweep_results = results_table
+    
     return flowsheet.fs_exp
 
 
@@ -268,4 +332,26 @@ async def download(flowsheet_id: str, request: Request) -> Path:
     df.to_csv(path, index=False)
 
     # User can now download the contents of that file
+    return path
+
+@router.get("/{flowsheet_id}/download_sweep", response_class=FileResponse)
+async def download_sweep(flowsheet_id: str) -> Path:
+    """Download sweep results.
+
+    Args:
+        flowsheet_id: Identifier for flowsheet
+
+    Returns:
+        File to download (path converted to FileResponse by FastAPI)
+    """
+    flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+    sweep_results = flowsheet.fs_exp.sweep_results
+    columns = sweep_results["headers"]
+    table = sweep_results["values"]
+    df = pd.DataFrame(table, columns=columns)
+
+    # Write to file
+    path = flowsheet_manager.get_flowsheet_dir(flowsheet_id) / "sweep_results.csv"
+    df.to_csv(path, index=False)
+    # # User can now download the contents of that file
     return path

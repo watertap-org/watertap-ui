@@ -4,30 +4,49 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent'; 
 import CircularProgress from '@mui/material/CircularProgress';
-import { solve } from "../../services/output.service"; 
+import { solve, sweep } from "../../services/output.service"; 
 
 export default function SolveDialog(props) {
-  const { open, handleSolved, handleError, flowsheetData, id } = props;
+  const { open, handleSolved, handleError, flowsheetData, id, isSweep } = props;
 
   useEffect(()=>{  
     if(open)
     { 
-        solve(id)
-        .then(r =>  r.json().then(data => ({status: r.status, body: data})))
-        .then(data => {
-          // console.log(data)
-            let status = data.status
-            let outputData = data.body
-            if(status===200) {
-              handleSolved(outputData);
-            } else if (status===500) {
-              handleError(outputData.detail)
-            }
-            
-        }).catch(e => {
-          console.log("caught error: "+e)
-          handleError()
-      });
+        if(isSweep) {
+          sweep(id, flowsheetData.inputData)
+          .then(r =>  r.json().then(data => ({status: r.status, body: data})))
+          .then(data => {
+              let status = data.status
+              let outputData = data.body
+              if(status===200) {
+                // console.log(data)
+                handleSolved(outputData);
+              } else if (status===500) {
+                console.error("500 error running sweep: "+outputData.detail)
+                handleError("error: "+outputData.detail)
+              }
+          }).catch(e => {
+            console.error("caught error running sweep: "+e)
+            handleError(""+e)
+        });
+        }else {
+          solve(id, flowsheetData.inputData)
+          .then(r =>  r.json().then(data => ({status: r.status, body: data})))
+          .then(data => {
+            // console.log(data)
+              let status = data.status
+              let outputData = data.body
+              if(status===200) {
+                handleSolved(outputData);
+              } else if (status===500) {
+                handleError(outputData.detail)
+              }
+              
+          }).catch(e => {
+            console.log("caught error: "+e)
+            handleError()
+        });
+      } 
     }
   },[open]);
 

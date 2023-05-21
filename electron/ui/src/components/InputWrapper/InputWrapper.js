@@ -15,20 +15,20 @@ import ExpandIcon from '@mui/icons-material/Expand';
 import Typography from '@mui/material/Typography';
 
 export default function InputWrapper(props) {
-
-    const {fieldLabel, fieldData} = props;
+    //"fs.feed.flow_vol[0.0]"
+    const { fieldData, handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds } = props;
+    const [ disabled, setDisabled ] = useState(false)
     const [value, setValue] = useState("");
-    const [ showBounds, setShowBounds ] = useState(false)
-    const [ editBounds, setEditBounds ] = useState(false)
-    const styles = {
-        highlighted: {
-            backgroundColor: '#F5F5F5',
-            // paddingTop: 20,
-            border: "15px solid #F5F5F5"
-        },
-        other: {
-        }
-    }
+    const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
+    // const styles = {
+    //     highlighted: {
+    //         backgroundColor: '#F5F5F5',
+    //         // paddingTop: 20,
+    //         border: "15px solid #F5F5F5"
+    //     },
+    //     other: {
+    //     }
+    // }
 
     useEffect(()=>{  
         if (fieldData.fixed === undefined) {
@@ -41,14 +41,23 @@ export default function InputWrapper(props) {
     const handleFieldChange = (event) => {
         setValue(event.target.value);
         fieldData.value = event.target.value;
-        props.handleUpdateDisplayValue(event.target.id,event.target.value)
+        handleUpdateDisplayValue(event.target.id,event.target.value)
     };
 
     const handleFixedChange = (event) => {
         console.log(`updating fixed for ${event.target.name} with value ${event.target.value}`)
-        fieldData.fixed = event.target.value;
-        props.handleUpdateFixed(event.target.name,event.target.value)
-        setShowBounds(!event.target.value)
+        let value
+        if(event.target.value === "fixed") value = true
+        else if(event.target.value === "free") value = false
+        else if(event.target.value === "sweep") {
+            value = false
+            fieldData.is_sweep = true
+            // add variable to sweep variables
+        }
+        // setDisabled(true)
+        fieldData.fixed = value;
+        handleUpdateFixed(event.target.name,value, event.target.value)
+        setShowBounds(!value)
     };
 
     const handleBoundsChange = (event) => {
@@ -60,11 +69,11 @@ export default function InputWrapper(props) {
             if(value === "") {
                 console.log(`updating ${bound} for ${key} with value ${null}`)
                 fieldData[bound] = null
-                props.handleUpdateBounds(key, null, bound)
+                handleUpdateBounds(key, null, bound)
             } else {
                 console.log(`updating ${bound} for ${key} with value ${value}`)
                 fieldData[bound] = value
-                props.handleUpdateBounds(key, value, bound)
+                handleUpdateBounds(key, value, bound)
             }
         }
         
@@ -74,9 +83,12 @@ export default function InputWrapper(props) {
         setShowBounds(!showBounds)
     }
 
-    const handleEditBounds = () => {
-        setEditBounds(!editBounds)
+    const getVariableState = () => {
+        if (fieldData.fixed) return "fixed"
+        else if(!fieldData.fixed && !fieldData.is_sweep) return "free"
+        else if(!fieldData.fixed && fieldData.is_sweep) return "sweep"
     }
+
 
     const displayUnits = (d) => {
         let u = d.display_units
@@ -104,7 +116,7 @@ export default function InputWrapper(props) {
                                     </span>
                                     </InputAdornment>
                             }}
-                            disabled={fieldData.is_readonly ? true : false}
+                            disabled={fieldData.is_readonly ? true : disabled ? true : false}
                     />
                 </Tooltip>
                 </Grid>
@@ -112,12 +124,13 @@ export default function InputWrapper(props) {
                 <FormControl size="small" sx={{width:'80%'}}>
                     <Select
                         name={fieldData.obj_key} 
-                        value={fieldData.fixed}
+                        value={getVariableState()}
                         onChange={handleFixedChange}
                         // sx={{color:'#0b89b9', fontWeight: "bold"}}
                     >
-                    <MenuItem key={true} value={true}>Fixed</MenuItem>
-                    <MenuItem disabled={!fieldData.has_bounds} key={false} value={false}>Free</MenuItem>
+                    <MenuItem key={true} value={"fixed"}>Fixed</MenuItem>
+                    <MenuItem disabled={!fieldData.has_bounds || disabled} key={false} value={"free"}>Free</MenuItem>
+                    <MenuItem disabled={!fieldData.has_bounds || disabled} key={"sweep"} value={"sweep"}>Sweep</MenuItem>
                     </Select>
                 </FormControl>
                 </Grid>
@@ -137,7 +150,7 @@ export default function InputWrapper(props) {
                                 defaultValue={fieldData.lb}
                                 onChange={handleBoundsChange}
                                 fullWidth 
-                                disabled={!editBounds}
+                                disabled={disabled}
                         />
                         </Grid>
                         <Grid item xs={.5}>
@@ -152,16 +165,13 @@ export default function InputWrapper(props) {
                                 defaultValue={fieldData.ub}
                                 onChange={handleBoundsChange}
                                 fullWidth 
-                                disabled={!editBounds}
+                                disabled={disabled}
                         />
                         {/* <Typography variant="h6">
                             1000
                         </Typography> */}
                         </Grid>
                         <Grid item xs={0.3}></Grid>
-                        <Grid item xs={1} sx={{marginTop: 1}}>
-                            <IconButton onClick={handleEditBounds}><EditIcon/></IconButton>
-                        </Grid>
                     </>
                 }
                 
