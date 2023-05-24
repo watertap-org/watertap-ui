@@ -127,6 +127,11 @@ export default function ConfigInput(props) {
         tempFlowsheetData.inputData.model_objects[id][bound] = value
     }
 
+    const handleUpdateSamples = (id, value) => {
+        let tempFlowsheetData = {...flowsheetData}
+        tempFlowsheetData.inputData.model_objects[id].num_samples = value
+        console.log('updating samples '+id+' with value '+value+ ' '+tempFlowsheetData.inputData.model_objects[id].num_samples)
+    }
     /**
      * Organize variables into sections by their 'category' attribute.
      *
@@ -193,6 +198,7 @@ export default function ConfigInput(props) {
                                 handleUpdateDisplayValue={handleUpdateDisplayValue} 
                                 handleUpdateFixed={handleUpdateFixed} 
                                 handleUpdateBounds={handleUpdateBounds} 
+                                handleUpdateSamples={handleUpdateSamples} 
                                 data={value}
                                 />
                         </Grid>)

@@ -71,15 +71,25 @@ export default function SweepOutput(props) {
             for (let each of outputData.outputData.sweep_results.values) {
                 let tempX = Math.round(each[xIndex] * 1000) / 1000
                 let tempY = Math.round(each[yIndex] * 1000) / 1000
-                let tempZ = Math.round(each[zIndex] * 1000) / 1000
-                currZ.push(tempZ)
+                let tempZ = null
+                if (each[zIndex]!==null){
+                tempZ = Math.round(each[zIndex] * 1000) / 1000}
+           
+
                 if(!x.includes(tempX)) {
                     x.push(tempX)
                 }
                 if(!y.includes(tempY)) {
                     y.push(tempY)
                 }
-                if (currZ.length === 5) {
+            }
+
+            for (let each of outputData.outputData.sweep_results.values) {
+                let tempZ = null
+                if (each[zIndex]!==null){
+                tempZ = Math.round(each[zIndex] * 1000) / 1000}
+                currZ.push(tempZ)
+                if (currZ.length === x.length) {
                     z.push(currZ)
                     currZ = []
                 }
@@ -128,8 +138,12 @@ export default function SweepOutput(props) {
             }
             for (let each of outputData.outputData.sweep_results.values) {
                 x.push(Math.round(each[0] * 1000) / 1000)
+                
                 for(let i = 1; i < each.length; i++) {
-                    ys[i-1].push(Math.round(each[i] * 1000) / 1000)
+                    let out=null
+                    if (each[i]!==null){
+                        out = Math.round(each[i] * 1000) / 1000}
+                    ys[i-1].push(out)
                 }
             }
             let tempData = []

@@ -16,7 +16,7 @@ import Typography from '@mui/material/Typography';
 
 export default function InputWrapper(props) {
     //"fs.feed.flow_vol[0.0]"
-    const { fieldData, handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds } = props;
+    const { fieldData, handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds, handleUpdateSamples } = props;
     const [ disabled, setDisabled ] = useState(false)
     const [value, setValue] = useState("");
     const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
@@ -74,6 +74,23 @@ export default function InputWrapper(props) {
                 console.log(`updating ${bound} for ${key} with value ${value}`)
                 fieldData[bound] = value
                 handleUpdateBounds(key, value, bound)
+            }
+        }
+        
+    };
+    const handleSamplesChange = (event) => {
+        let value = event.target.value;
+        let name = event.target.name
+        let key = name.split("::")[0]
+        if(!isNaN(value)) {
+            if(value === "") {
+                console.log(`updating num_samples for ${key} with value ${null}`)
+                fieldData.num_samples = null
+                handleUpdateSamples(key, null)
+            } else {
+                console.log(`updating num_samples for ${key} with value ${value}`)
+                fieldData.num_samples = value
+                handleUpdateSamples(key, value)
             }
         }
         
@@ -140,8 +157,9 @@ export default function InputWrapper(props) {
                 {
                     showBounds &&
                     <>
-                        <Grid item xs={1.2}></Grid>
-                        <Grid item xs={4} sx={{marginTop:1, marginBottom: 2}}> 
+                        <Grid item xs={0.25}></Grid>
+                        <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}> 
+                        
                         <TextField id={'lower_bound'} 
                                 name={`${fieldData.obj_key}::lb`} 
                                 label={'Lower'}
@@ -153,10 +171,10 @@ export default function InputWrapper(props) {
                                 disabled={disabled}
                         />
                         </Grid>
-                        <Grid item xs={.5}>
-
+                        <Grid item xs={.25}>
                         </Grid>
-                        <Grid item xs={4} sx={{marginTop:1, marginBottom: 2}}>
+
+                        <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}>
                         <TextField id={'upper_bound'} 
                                 name={`${fieldData.obj_key}::ub`} 
                                 label={'Upper'}
@@ -167,11 +185,33 @@ export default function InputWrapper(props) {
                                 fullWidth 
                                 disabled={disabled}
                         />
+
+                        </Grid>
+                        <Grid item xs={0.25}></Grid>
+
+                        {
+                        fieldData.is_sweep===true &&
+                        <>
+                        <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}>
+                            
+                        <TextField id={'num_samples'} 
+                                name={`${fieldData.obj_key}::num_samples`} 
+                                label={'Num. samples'}
+                                variant="outlined" 
+                                size="small"
+                                defaultValue={fieldData.num_samples}
+                                onChange={handleSamplesChange}
+                                fullWidth 
+                                disabled={disabled}
+                        />
+                        
                         {/* <Typography variant="h6">
                             1000
                         </Typography> */}
                         </Grid>
                         <Grid item xs={0.3}></Grid>
+                        </>}
+                        
                     </>
                 }
                 
