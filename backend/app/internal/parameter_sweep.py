@@ -63,7 +63,7 @@ def run_analysis(
             custom_do_param_sweep_kwargs = None
 
     ps = ParameterSweep(
-         csv_results_file_name=results_path,
+        csv_results_file_name=results_path,
         optimize_function=opt_function,
         optimize_kwargs=optimize_kwargs,
         interpolate_nan_outputs=False,
@@ -101,18 +101,27 @@ def run_parameter_sweep(flowsheet, info):
                         flowsheet.fs_exp.model_objects[key].ub
                         / flowsheet.fs_exp.model_objects[key].obj.ub
                     )
-                    parameters.append(
-                        {
-                            "name": flowsheet.fs_exp.model_objects[key].name,
-                            "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
-                            "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
-                            "num_samples": flowsheet.fs_exp.model_objects[
-                                key
-                            ].num_samples,
-                           "param": flowsheet.fs_exp.model_objects[key].obj,
-                        }
-                    )
-                    print(parameters)
+                    try:
+                        parameters.append(
+                            {
+                                "name": flowsheet.fs_exp.model_objects[key].name,
+                                "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
+                                "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
+                                "num_samples": flowsheet.fs_exp.model_objects[key].num_samples,
+                                "param": flowsheet.fs_exp.model_objects[key].obj,
+                            }
+                        )
+                    except:
+                        parameters.append(
+                            {
+                                "name": flowsheet.fs_exp.model_objects[key].name,
+                                "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
+                                "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
+                                "num_samples": "5",
+                                "param": flowsheet.fs_exp.model_objects[key].obj,
+                            }
+                        )
+                    # print(parameters)
                     # HTTPException(500, detail=f"Sweep failed: {parameters}")
                     flowsheet.fs_exp.model_objects[key].obj.fix()
                     conversion_factors.append(conversion_factor)
@@ -150,7 +159,7 @@ def run_parameter_sweep(flowsheet, info):
             parameters=parameters,
             output_params=output_params,
             results_path=output_path,
-            custom_do_param_sweep_kwargs=flowsheet.custom_do_param_sweep_kwargs,
+            # custom_do_param_sweep_kwargs=flowsheet.custom_do_param_sweep_kwargs,
         )
     except Exception as err:
         _log.error(f"err: {err}")
