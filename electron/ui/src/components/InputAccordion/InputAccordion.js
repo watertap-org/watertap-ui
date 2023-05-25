@@ -34,6 +34,7 @@ export default function InputAccordion(props) {
                         handleUpdateDisplayValue={handleUpdateDisplayValue} 
                         handleUpdateFixed={handleUpdateFixed} 
                         handleUpdateBounds={handleUpdateBounds}
+                        handleUpdateSamples={handleUpdateSamples}
                     />
             
         });
