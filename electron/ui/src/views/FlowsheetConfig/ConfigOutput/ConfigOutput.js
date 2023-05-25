@@ -3,10 +3,13 @@ import React from 'react';
 import { useState } from 'react';
 import { useParams } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Modal, TextField, Stack, Toolbar } from '@mui/material';
 import { saveConfig }  from '../../../services/output.service.js'
 import { downloadSweepResults }  from '../../../services/output.service.js'
 import SweepOutput from '../../../components/SweepOutput/SweepOutput.js';
+import DownloadIcon from '@mui/icons-material/Download';
+import SaveIcon from '@mui/icons-material/Save';
+import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Modal, TextField, Stack, Toolbar } from '@mui/material';
+
 
 export default function ConfigOutput(props) {
     let params = useParams(); 
@@ -182,16 +185,16 @@ export default function ConfigOutput(props) {
         <Grid item xs={12}> 
         <Toolbar spacing={2}>
                 {/* <Stack direction="row" spacing={2}></Stack> */}
-                <Box sx={{ flexGrow: 1 }}></Box>
-                <Stack direction="row" spacing={2}>
-                    <Button disabled={saved ? true : false} variant="contained" onClick={handleDownloadOutput}>
-                        Download Result
-                    </Button> 
-                    <Button disabled={saved ? true : false} variant="contained" onClick={handleOpenSaveConfig}>
-                        Save Configuration
-                    </Button> 
-                </Stack>
-            </Toolbar>
+            <Box sx={{ flexGrow: 1 }}></Box>
+            <Stack direction="row" spacing={2}>
+                <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handleDownloadOutput}>
+                    Download Result
+                </Button> 
+                <Button disabled={saved ? true : false} variant="outlined" startIcon={<SaveIcon />} onClick={handleOpenSaveConfig}>
+                    Save Configuration
+                </Button>
+            </Stack>
+        </Toolbar>
             <Modal
                 open={openSaveConfig}
                 onClose={handleCloseSaveConfig}

@@ -1,24 +1,13 @@
  
 import React from 'react'; 
 import {useEffect, useState } from 'react';    
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
 import InputAccordion from "../../../components/InputAccordion/InputAccordion"; 
-import Toolbar from '@mui/material/Toolbar';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import SaveIcon from '@mui/icons-material/Save';
-import Stack from '@mui/material/Stack';
-import { loadConfig, listConfigNames, sweep }  from '../../../services/output.service.js'
+import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { deleteConfig }  from '../../../services/input.service.js'
-import Modal from '@mui/material/Modal';
-// import { resetFlowsheet } from '../../../services/flowsheet.service';
+import { Grid, InputLabel, MenuItem, FormControl, Button, Box, Modal, Select, Stack, Toolbar } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 
 
@@ -247,7 +236,7 @@ export default function ConfigInput(props) {
                     </>
                     }
                     {configName.length > 0 &&
-                    <Button variant="outlined" color="error" onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
+                    <Button variant="outlined" color="error" startIcon={<DeleteForeverIcon />} onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
                     }
 
                 </Stack>
@@ -256,7 +245,7 @@ export default function ConfigInput(props) {
                 </Box>
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button> */}
-                    <Button variant="outlined" onClick={reset}>RESET FLOWSHEET</Button>
+                    <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset}>RESET FLOWSHEET</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SWEEP")}>SWEEP</Button>
                 </Stack>
