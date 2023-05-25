@@ -3,7 +3,7 @@ import React from 'react';
 import { useState } from 'react';
 import { useParams } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Modal, TextField } from '@mui/material';
+import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Modal, TextField, Stack, Toolbar } from '@mui/material';
 import { saveConfig }  from '../../../services/output.service.js'
 import { downloadSweepResults }  from '../../../services/output.service.js'
 import SweepOutput from '../../../components/SweepOutput/SweepOutput.js';
@@ -52,7 +52,11 @@ export default function ConfigOutput(props) {
         });
     }
 
-    const download = () => {
+    const handleDownloadOutput = () => {
+        console.log('need backend functionality for this still')
+    }
+
+    const downloadSweepOutput = () => {
         console.log('downloading sweep results')
         downloadSweepResults(params.id)
         .then(response => response.blob())
@@ -172,16 +176,22 @@ export default function ConfigOutput(props) {
     return ( 
         <> 
         {isSweep ? 
-            <SweepOutput outputData={outputData} download={download}/>
+            <SweepOutput outputData={outputData} download={downloadSweepOutput}/>
         : 
         <Grid container spacing={2} alignItems="flex-start"> 
-        {   
-            renderOutputAccordions()
-        }
         <Grid item xs={12}> 
-            <Button disabled={saved ? true : false} variant="contained" onClick={handleOpenSaveConfig}>
-                Save Configuration
-            </Button> 
+        <Toolbar spacing={2}>
+                {/* <Stack direction="row" spacing={2}></Stack> */}
+                <Box sx={{ flexGrow: 1 }}></Box>
+                <Stack direction="row" spacing={2}>
+                    <Button disabled={saved ? true : false} variant="contained" onClick={handleDownloadOutput}>
+                        Download Result
+                    </Button> 
+                    <Button disabled={saved ? true : false} variant="contained" onClick={handleOpenSaveConfig}>
+                        Save Configuration
+                    </Button> 
+                </Stack>
+            </Toolbar>
             <Modal
                 open={openSaveConfig}
                 onClose={handleCloseSaveConfig}
@@ -208,6 +218,9 @@ export default function ConfigOutput(props) {
                 </Grid>
             </Modal>
         </Grid>
+        {   
+            renderOutputAccordions()
+        }
         </Grid>
         }
             
