@@ -6,6 +6,7 @@ describe('Display Data Rounding', () => {
         cy.visit('/')
         cy.screenshot(sc_count+'_loaded homepage')
         sc_count+=1
+        cy.wait (5000)
 
         //click flowsheet and wait for api response
         var flowsheet_name = "amo 1690"
