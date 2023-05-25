@@ -1,6 +1,6 @@
 # watertap-ui
 
-This repository is for work on the user interface (UI) for the WaterTAP library.
+This repository is for work on the user interface (UI) for the WaterTAP library. The UI installer can be downloaded from our homepage at: https://watertap-org.github.io/
 
 ## Getting started (developer)
 
