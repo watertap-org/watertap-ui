@@ -246,6 +246,9 @@ export default function ConfigInput(props) {
                     </FormControl>
                     </>
                     }
+                    {configName.length > 0 &&
+                    <Button variant="outlined" color="error" onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
+                    }
 
                 </Stack>
                 <Box sx={{ flexGrow: 1 }}>
@@ -256,9 +259,9 @@ export default function ConfigInput(props) {
                     <Button variant="outlined" onClick={reset}>RESET FLOWSHEET</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
                     <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SWEEP")}>SWEEP</Button>
-                    {configName.length > 0 &&
+                    {/* {configName.length > 0 &&
                     <Button variant="outlined" color="error" onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
-                    }
+                    } */}
                 </Stack>
             </Toolbar>
                 
