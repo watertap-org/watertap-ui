@@ -4,9 +4,10 @@ import { TextField, InputAdornment, Tooltip, Grid, MenuItem, FormControl, Select
 
 export default function InputWrapper(props) {
     const { fieldData, handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds, handleUpdateSamples } = props;
-    const [ disabled, setDisabled ] = useState(false)
-    const [value, setValue] = useState("");
+    // const [ disabled, setDisabled ] = useState(false)
+    // const [value, setValue] = useState("");
     const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
+    const disabled = false
 
     useEffect(()=>{  
         if (fieldData.fixed === undefined) {
@@ -17,7 +18,7 @@ export default function InputWrapper(props) {
     }, [fieldData]);
 
     const handleFieldChange = (event) => {
-        setValue(event.target.value);
+        // setValue(event.target.value);
         fieldData.value = event.target.value;
         handleUpdateDisplayValue(event.target.id,event.target.value)
     };
@@ -74,9 +75,9 @@ export default function InputWrapper(props) {
         
     };
 
-    const handleShowBounds = () => {
-        setShowBounds(!showBounds)
-    }
+    // const handleShowBounds = () => {
+    //     setShowBounds(!showBounds)
+    // }
 
     const getVariableState = () => {
         if (fieldData.fixed) return "fixed"
