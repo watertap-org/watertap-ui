@@ -23,6 +23,15 @@ export const downloadCSV = (id,data) => {
     });
 }
 
+export const downloadSingleOutput = (id,data) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/downloadOutput', {
+        method: 'POST', 
+        mode: 'cors',
+        body: JSON.stringify(data)
+    });
+}
+
+
 export const saveConfig = (id,data,name, version) => {
     return fetch('http://localhost:8001/flowsheets/'+id+'/save?name='+name+'&version='+version, {
         method: 'POST', 

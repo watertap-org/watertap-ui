@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useParams } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { saveConfig }  from '../../../services/output.service.js'
-import { downloadSweepResults }  from '../../../services/output.service.js'
+import { downloadSweepResults, downloadSingleOutput }  from '../../../services/output.service.js'
 import SweepOutput from '../../../components/SweepOutput/SweepOutput.js';
 import DownloadIcon from '@mui/icons-material/Download';
 import SaveIcon from '@mui/icons-material/Save';
@@ -56,11 +56,32 @@ export default function ConfigOutput(props) {
     }
 
     const handleDownloadOutput = () => {
-        console.log('need backend functionality for this still')
+        let headers = ['category','metric','units','value']
+        let values = []
+        for (let key of Object.keys(outputData.outputData.model_objects)) {
+            let each = outputData.outputData.model_objects[key]
+            console.log(each)
+            if (each.is_output) {
+                values.push([each.output_category, each.name, each.display_units, each.value])
+            }
+        }
+        let body = {headers: headers, values:values}
+        downloadSingleOutput(params.id, body)
+        .then(response => response.blob())
+        .then((data)=>{
+            const href = window.URL.createObjectURL(data);
+            const link = document.createElement('a');
+            link.href = href;
+            link.setAttribute('download', 'output.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
     }
 
+
+
     const downloadSweepOutput = () => {
-        console.log('downloading sweep results')
         downloadSweepResults(params.id)
         .then(response => response.blob())
         .then((data)=>{
