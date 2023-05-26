@@ -1,15 +1,8 @@
 import React from 'react'; 
-import {useEffect, useState} from 'react';    
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import Tooltip from '@mui/material/Tooltip';
-import Grid from '@mui/material/Grid';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import {useEffect, useState} from 'react';
+import { TextField, InputAdornment, Tooltip, Grid, MenuItem, FormControl, Select } from '@mui/material'
 
 export default function InputWrapper(props) {
-    //"fs.feed.flow_vol[0.0]"
     const { fieldData, handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds, handleUpdateSamples } = props;
     const [ disabled, setDisabled ] = useState(false)
     const [value, setValue] = useState("");

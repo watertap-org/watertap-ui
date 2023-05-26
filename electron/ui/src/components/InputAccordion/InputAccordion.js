@@ -1,9 +1,6 @@
 import React from 'react'; 
-import {useEffect, useState} from 'react';    
-import Box from '@mui/material/Box';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
+import {useEffect, useState} from 'react';
+import { Box, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InputWrapper from "../InputWrapper/InputWrapper";
 

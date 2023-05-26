@@ -24,7 +24,7 @@ function App() {
     getFlowsheetsList()
     .then(response => response.json())
     .then((data)=>{
-      console.log('connectrd to backend')
+      // console.log('connected to backend')
       setShowHeader(true)
       navigate('/flowsheets', {replace: true})
     })
