@@ -7,12 +7,6 @@ import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import IconButton from '@mui/material/IconButton';
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import EditIcon from '@mui/icons-material/Edit';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ExpandIcon from '@mui/icons-material/Expand';
-import Typography from '@mui/material/Typography';
 
 export default function InputWrapper(props) {
     //"fs.feed.flow_vol[0.0]"
@@ -20,15 +14,6 @@ export default function InputWrapper(props) {
     const [ disabled, setDisabled ] = useState(false)
     const [value, setValue] = useState("");
     const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
-    // const styles = {
-    //     highlighted: {
-    //         backgroundColor: '#F5F5F5',
-    //         // paddingTop: 20,
-    //         border: "15px solid #F5F5F5"
-    //     },
-    //     other: {
-    //     }
-    // }
 
     useEffect(()=>{  
         if (fieldData.fixed === undefined) {

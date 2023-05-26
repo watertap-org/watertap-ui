@@ -79,8 +79,6 @@ export default function ConfigOutput(props) {
         });
     }
 
-
-
     const downloadSweepOutput = () => {
         downloadSweepResults(params.id)
         .then(response => response.blob())
@@ -156,12 +154,6 @@ export default function ConfigOutput(props) {
 
 
     const renderOutputAccordions = () => { 
-        // if(!outputData.hasOwnProperty("output") || !outputData.output)
-        // {
-        //     return (<Grid item xs={12} >
-        //                 <Alert severity="info">No soluction found!</Alert>
-        //             </Grid>);
-        // }
         let var_sections = organizeVariables(outputData.outputData.model_objects)
         // console.log("var_sections",var_sections)
         return Object.entries(var_sections).map(([key,value])=>{
@@ -192,7 +184,7 @@ export default function ConfigOutput(props) {
                         </AccordionDetails>
                     </Accordion>
                 </Grid>)
-            }
+            } else return null
 
         })
     };
