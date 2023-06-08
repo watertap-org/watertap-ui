@@ -60,7 +60,6 @@ export default function ConfigOutput(props) {
         let values = []
         for (let key of Object.keys(outputData.outputData.model_objects)) {
             let each = outputData.outputData.model_objects[key]
-            console.log(each)
             if (each.is_output) {
                 values.push([each.output_category, each.name, each.display_units, each.value])
             }
@@ -72,7 +71,7 @@ export default function ConfigOutput(props) {
             const href = window.URL.createObjectURL(data);
             const link = document.createElement('a');
             link.href = href;
-            link.setAttribute('download', 'output.csv');
+            link.setAttribute('download', `${outputData.inputData.name}_output.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
