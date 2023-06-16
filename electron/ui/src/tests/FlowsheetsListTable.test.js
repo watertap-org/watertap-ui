@@ -8,7 +8,7 @@ test('test flowsheets list table', () => {
     render( <HashRouter><FlowsheetsListTable rows={[mockData]}/></HashRouter> )
 
     expect(screen.getByRole('table', {  name: /simple table/i}))
-    expect(screen.getByRole('columnheader', {  name: /name/i}))
-    expect(screen.getByRole('columnheader', {  name: /description/i}))
+    expect(screen.getByRole('columnheader', {  name: /flowsheet name/i}))
+    expect(screen.getByRole('columnheader', {  name: /last run/i}))
 
 })
