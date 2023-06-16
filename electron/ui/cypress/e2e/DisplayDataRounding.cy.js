@@ -9,7 +9,7 @@ describe('Display Data Rounding', () => {
         cy.wait (5000)
 
         //click flowsheet and wait for api response
-        var flowsheet_name = "Magprex"
+        var flowsheet_name = "Magprex flowsheet"
         cy.intercept({
             method: "GET",
             url: "http://localhost:8001/flowsheets/**",
