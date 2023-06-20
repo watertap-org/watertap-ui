@@ -40,7 +40,11 @@ async def get_all():
     The result of the first call is stored and returned for subsequent calls,
     without re-discovering the list of modules.
     """
-    return flowsheet_manager.flowsheets
+    flowsheet_list = flowsheet_manager.flowsheets
+    for each in flowsheet_list:
+        # gotta fetch last run for each from tiny db
+        each.set_last_run(flowsheet_manager.get_last_run(each.id_))
+    return flowsheet_list
 
 
 @router.get("/{id_}/config", response_model=FlowsheetExport)
@@ -94,7 +98,6 @@ async def solve(flowsheet_id: str, request: Request):
         try:
             flowsheet.build()
         except Exception as err:
-            # print('failed on build, rebuilding')
             # flowsheet = flowsheet_manager.get_obj(flowsheet_id)
             # flowsheet.build()
             # flowsheet_manager.get_info(flowsheet_id).updated(built=True)
@@ -104,8 +107,9 @@ async def solve(flowsheet_id: str, request: Request):
     # run solve
     try:
         flowsheet.solve()
+        # set last run in tiny db
+        flowsheet_manager.set_last_run(info.id_)
     except Exception as err:
-        # print('failed on solve, rebuilding')
         # flowsheet = flowsheet_manager.get_obj(flowsheet_id)
         # flowsheet.build()
         # flowsheet_manager.get_info(flowsheet_id).updated(built=True)
@@ -146,6 +150,7 @@ async def sweep(flowsheet_id: str, request: Request):
         info=info,
     )
     flowsheet.fs_exp.sweep_results = results_table
+    # set last run in tiny db
     
     return flowsheet.fs_exp
 
