@@ -18,13 +18,26 @@ export default function FlowsheetsListTable(props) {
         }
     }
 
+    const formatLastRun = (time) => {
+        try {
+            if (time && time.length >= 11) {
+                let full_date = new Date(parseFloat(time) * 1000)
+                return full_date.toLocaleString().split(',')[0];
+            }
+                return time
+        } catch(e) {
+            return time
+        } 
+        
+    }
+
     return (
         <TableContainer>
             <Table sx={{ minWidth: 700 }} aria-label="simple table">
             <TableHead>
             <TableRow>
                 <TableCell>Flowsheet Name</TableCell>
-                <TableCell>Last Run</TableCell> 
+                <TableCell align="right">Last Run</TableCell> 
                 <TableCell></TableCell>
             </TableRow>
             </TableHead>
@@ -36,7 +49,7 @@ export default function FlowsheetsListTable(props) {
                     onClick={()=>handleFlowsheetClick(row.id_)}
                 >
                 <TableCell>{row.description}</TableCell>
-                <TableCell>{row.last_run}</TableCell>
+                <TableCell align="right">{formatLastRun(row.last_run)}</TableCell>
                 <TableCell></TableCell>
                 </TableRow>
             ))}
