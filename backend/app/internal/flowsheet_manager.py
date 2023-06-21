@@ -16,7 +16,6 @@ import time
 from types import ModuleType
 from typing import Optional, Dict, List
 import app
-from datetime import datetime
 
 # third-party
 from fastapi import HTTPException
@@ -320,7 +319,7 @@ class FlowsheetManager:
         last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
         if(len(last_run_dict) > 0):
             last_run_dict = last_run_dict[0]["last_run_dict"]
-            curr_date = datetime.today().strftime('%Y-%m-%d')
+            curr_date = time.time()
             last_run_dict[id_] = curr_date
             self._histdb.upsert(
                 {"last_run_dict_version": VERSION, "last_run_dict": last_run_dict},
