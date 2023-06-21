@@ -151,6 +151,7 @@ async def sweep(flowsheet_id: str, request: Request):
     )
     flowsheet.fs_exp.sweep_results = results_table
     # set last run in tiny db
+    flowsheet_manager.set_last_run(info.id_)
     
     return flowsheet.fs_exp
 
