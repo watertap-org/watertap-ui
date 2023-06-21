@@ -74,7 +74,7 @@ def run_analysis(
     global_results = ps.parameter_sweep(
         m,
         sweep_params,
-        outputs=outputs,
+        outputs,
     )
 
     return global_results
