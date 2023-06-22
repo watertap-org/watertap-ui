@@ -3,10 +3,13 @@ import React from 'react';
 import { useState } from 'react';
 import { useParams } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Modal, TextField } from '@mui/material';
 import { saveConfig }  from '../../../services/output.service.js'
-import { downloadSweepResults }  from '../../../services/output.service.js'
+import { downloadSweepResults, downloadSingleOutput }  from '../../../services/output.service.js'
 import SweepOutput from '../../../components/SweepOutput/SweepOutput.js';
+import DownloadIcon from '@mui/icons-material/Download';
+import SaveIcon from '@mui/icons-material/Save';
+import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Modal, TextField, Stack, Toolbar } from '@mui/material';
+
 
 export default function ConfigOutput(props) {
     let params = useParams(); 
@@ -52,8 +55,30 @@ export default function ConfigOutput(props) {
         });
     }
 
-    const download = () => {
-        console.log('downloading sweep results')
+    const handleDownloadOutput = () => {
+        let headers = ['category','metric','units','value']
+        let values = []
+        for (let key of Object.keys(outputData.outputData.model_objects)) {
+            let each = outputData.outputData.model_objects[key]
+            if (each.is_output) {
+                values.push([each.output_category, each.name, each.display_units, each.value])
+            }
+        }
+        let body = {headers: headers, values:values}
+        downloadSingleOutput(params.id, body)
+        .then(response => response.blob())
+        .then((data)=>{
+            const href = window.URL.createObjectURL(data);
+            const link = document.createElement('a');
+            link.href = href;
+            link.setAttribute('download', `${outputData.inputData.name}_output.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    }
+
+    const downloadSweepOutput = () => {
         downloadSweepResults(params.id)
         .then(response => response.blob())
         .then((data)=>{
@@ -128,12 +153,6 @@ export default function ConfigOutput(props) {
 
 
     const renderOutputAccordions = () => { 
-        // if(!outputData.hasOwnProperty("output") || !outputData.output)
-        // {
-        //     return (<Grid item xs={12} >
-        //                 <Alert severity="info">No soluction found!</Alert>
-        //             </Grid>);
-        // }
         let var_sections = organizeVariables(outputData.outputData.model_objects)
         // console.log("var_sections",var_sections)
         return Object.entries(var_sections).map(([key,value])=>{
@@ -164,7 +183,7 @@ export default function ConfigOutput(props) {
                         </AccordionDetails>
                     </Accordion>
                 </Grid>)
-            }
+            } else return null
 
         })
     };
@@ -172,16 +191,22 @@ export default function ConfigOutput(props) {
     return ( 
         <> 
         {isSweep ? 
-            <SweepOutput outputData={outputData} download={download}/>
+            <SweepOutput outputData={outputData} download={downloadSweepOutput}/>
         : 
         <Grid container spacing={2} alignItems="flex-start"> 
-        {   
-            renderOutputAccordions()
-        }
         <Grid item xs={12}> 
-            <Button disabled={saved ? true : false} variant="contained" onClick={handleOpenSaveConfig}>
-                Save Configuration
-            </Button> 
+        <Toolbar spacing={2}>
+                {/* <Stack direction="row" spacing={2}></Stack> */}
+            <Box sx={{ flexGrow: 1 }}></Box>
+            <Stack direction="row" spacing={2}>
+                <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handleDownloadOutput}>
+                    Download Result
+                </Button> 
+                <Button disabled={saved ? true : false} variant="outlined" startIcon={<SaveIcon />} onClick={handleOpenSaveConfig}>
+                    Save Configuration
+                </Button>
+            </Stack>
+        </Toolbar>
             <Modal
                 open={openSaveConfig}
                 onClose={handleCloseSaveConfig}
@@ -208,6 +233,9 @@ export default function ConfigOutput(props) {
                 </Grid>
             </Modal>
         </Grid>
+        {   
+            renderOutputAccordions()
+        }
         </Grid>
         }
             

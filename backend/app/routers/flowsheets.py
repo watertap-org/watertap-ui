@@ -265,6 +265,32 @@ async def delete(flowsheet_id: str, name: str) -> List[str]:
             404, f"Cannot find flowsheet id='{flowsheet_id}'"
         )
 
+@router.post("/{flowsheet_id}/downloadOutput", response_class=FileResponse)
+async def download_single_output(flowsheet_id: str, request: Request) -> Path:
+    """Download a single solution for the given flowsheet.
+
+    Args:
+        flowsheet_id: Identifier for flowsheet
+        request: Request object with data in JSON form given above
+
+    Returns:
+        File to download (path converted to FileResponse by FastAPI)
+    """
+    # extract data from request
+    data = await request.json()
+    columns = data["headers"]
+    table = data["values"]
+
+    df = pd.DataFrame(table, columns=columns)
+
+    # Write to file
+    path = flowsheet_manager.get_flowsheet_dir(flowsheet_id) / "output_results.csv"
+    df.to_csv(path, index=False)
+    # # User can now download the contents of that file
+    return path
+
+
+    
 
 @router.post("/{flowsheet_id}/download", response_class=FileResponse)
 async def download(flowsheet_id: str, request: Request) -> Path:

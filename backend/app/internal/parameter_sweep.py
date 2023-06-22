@@ -1,7 +1,7 @@
 from pathlib import Path
 from fastapi import HTTPException
 import numpy as np
-from watertap.tools.parameter_sweep import LinearSample, parameter_sweep
+from watertap.tools.parameter_sweep import LinearSample, ParameterSweep, parameter_sweep
 import watertap.examples.flowsheets.case_studies.wastewater_resource_recovery.amo_1575_magprex.magprex as magprex
 from importlib import import_module
 import idaes.logger as idaeslog
@@ -32,6 +32,7 @@ def run_analysis(
     output_params,
     results_path="output.csv",
     interpolate_nan_outputs=True,
+    custom_do_param_sweep_kwargs=None,
 ):
     flowsheet = import_module(flowsheet)
     try:
@@ -47,18 +48,33 @@ def run_analysis(
     i = 0
     for each in parameters:
         sweep_params[f'{i}: {each["name"]}'] = LinearSample(
-            each["param"], each["lb"], each["ub"], each["nx"]
+            each["param"], each["lb"], each["ub"], int(each["num_samples"])
         )
         i += 1
+    # Check if user provided custom kwargs, if not don't use cutm swep param
+    # else check if user provided custom sweep function, if not use watertap default (will be merged)
+    if custom_do_param_sweep_kwargs is None:
+        custom_do_param_sweep = None
+    else:
+        custom_do_param_sweep = custom_do_param_sweep_kwargs.get(
+            "custom_do_param_sweep"
+        )
+        if custom_do_param_sweep is None:
+            custom_do_param_sweep_kwargs = None
 
-    global_results = parameter_sweep(
-        m,
-        sweep_params,
-        outputs,
+    ps = ParameterSweep(
         csv_results_file_name=results_path,
         optimize_function=opt_function,
         optimize_kwargs=optimize_kwargs,
         interpolate_nan_outputs=False,
+        custom_do_param_sweep=custom_do_param_sweep,
+        custom_do_param_sweep_kwargs=custom_do_param_sweep_kwargs,
+        reinitialize_before_sweep=False,
+    )
+    global_results = ps.parameter_sweep(
+        m,
+        sweep_params,
+        outputs=outputs,
     )
 
     return global_results
@@ -85,21 +101,35 @@ def run_parameter_sweep(flowsheet, info):
                         flowsheet.fs_exp.model_objects[key].ub
                         / flowsheet.fs_exp.model_objects[key].obj.ub
                     )
-                    parameters.append(
-                        {
-                            "name": flowsheet.fs_exp.model_objects[key].name,
-                            "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
-                            "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
-                            "nx": 5,
-                            "param": flowsheet.fs_exp.model_objects[key].obj,
-                        }
-                    )
+                    try:
+                        parameters.append(
+                            {
+                                "name": flowsheet.fs_exp.model_objects[key].name,
+                                "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
+                                "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
+                                "num_samples": flowsheet.fs_exp.model_objects[key].num_samples,
+                                "param": flowsheet.fs_exp.model_objects[key].obj,
+                            }
+                        )
+                    except:
+                        parameters.append(
+                            {
+                                "name": flowsheet.fs_exp.model_objects[key].name,
+                                "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
+                                "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
+                                "num_samples": "5",
+                                "param": flowsheet.fs_exp.model_objects[key].obj,
+                            }
+                        )
+                    # print(parameters)
+                    # HTTPException(500, detail=f"Sweep failed: {parameters}")
+                    flowsheet.fs_exp.model_objects[key].obj.fix()
                     conversion_factors.append(conversion_factor)
                     keys.append(key)
         for key in flowsheet.fs_exp.model_objects:
             if (
                 flowsheet.fs_exp.model_objects[key].is_output
-                and not flowsheet.fs_exp.model_objects[key].is_input
+                # and not flowsheet.fs_exp.model_objects[key].is_input
             ):
                 results_table["headers"].append(
                     flowsheet.fs_exp.model_objects[key].name
@@ -129,6 +159,7 @@ def run_parameter_sweep(flowsheet, info):
             parameters=parameters,
             output_params=output_params,
             results_path=output_path,
+            # custom_do_param_sweep_kwargs=flowsheet.custom_do_param_sweep_kwargs,
         )
     except Exception as err:
         _log.error(f"err: {err}")
