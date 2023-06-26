@@ -15,7 +15,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 export default function ConfigInput(props) {
     let params = useParams(); 
-    const { flowsheetData, updateFlowsheetData, reset } = props; 
+    const { flowsheetData, updateFlowsheetData, reset, solveType } = props; 
     const [ displayData, setDisplayData ] = useState({}) 
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
@@ -189,6 +189,7 @@ export default function ConfigInput(props) {
                                 handleUpdateBounds={handleUpdateBounds} 
                                 handleUpdateSamples={handleUpdateSamples} 
                                 data={value}
+                                solveType={solveType}
                                 />
                         </Grid>)
                     }
@@ -246,8 +247,8 @@ export default function ConfigInput(props) {
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button> */}
                     <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset}>RESET FLOWSHEET</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SWEEP")}>SWEEP</Button>
+                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)}>RUN</Button>
+                    {/* <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"sweep")}>SWEEP</Button> */}
                 </Stack>
             </Toolbar>
                 

@@ -6,7 +6,7 @@ import InputWrapper from "../InputWrapper/InputWrapper";
 
 
 export default function InputAccordion(props) {
-    const { handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds, handleUpdateSamples, data } = props;
+    const { handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds, handleUpdateSamples, data, solveType } = props;
     const [expanded1, setExpanded1] = useState('panel1'); 
     const [value, setValue] = useState("");
 
@@ -32,6 +32,7 @@ export default function InputAccordion(props) {
                         handleUpdateFixed={handleUpdateFixed} 
                         handleUpdateBounds={handleUpdateBounds}
                         handleUpdateSamples={handleUpdateSamples}
+                        solveType={solveType}
                     />
             
         });
