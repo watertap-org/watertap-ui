@@ -172,12 +172,12 @@ def test_save_config(client, flowsheet_id):
     assert response.status_code == 200, body
     config = body
     response, body = post_flowsheet(
-        client, flowsheet_id, "save", config, query_params={"name": "test name!", "version": "1"}
+        client, flowsheet_id, "save", config, query_params={"name": "test name!", "version": "2"}
     )
     assert response.status_code == 200, body
     assert body == "test name!"
 
-    response, body = post_flowsheet(client, flowsheet_id, "save", config, query_params={"version": "1"})
+    response, body = post_flowsheet(client, flowsheet_id, "save", config, query_params={"version": "2"})
     assert response.status_code == 200, body
     assert body == "current"
 
