@@ -72,9 +72,9 @@ describe('Flowsheet Output Test', () => {
         cy.intercept({
             method: "POST",
             url: "http://localhost:8001/flowsheets/**",
-        }).as("solve");
-        cy.findAllByRole('button', {  name: /solve/i}).eq(0).click()
-        cy.wait("@solve");
+        }).as("run");
+        cy.findAllByRole('button', {  name: /run/i}).eq(0).click()
+        cy.wait("@run");
         cy.screenshot(sc_count+"solved")
         sc_count+=1
 
