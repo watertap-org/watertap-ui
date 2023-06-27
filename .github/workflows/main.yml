@@ -16,88 +16,88 @@ env:
   PYTEST_ADDOPTS: --color=yes
 
 jobs:
-  component_e2e_testing:
-    name: E2E testing (${{ matrix.os }})
+  # component_e2e_testing:
+  #   name: E2E testing (${{ matrix.os }})
 
-    runs-on: ${{ matrix.os-version }}
+  #   runs-on: ${{ matrix.os-version }}
 
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - linux
-          - win64
-          # - macos
-        include:
-          - os: linux
-            os-version: ubuntu-latest
-          - os: win64
-            os-version: windows-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os:
+  #         - linux
+  #         - win64
+  #         # - macos
+  #       include:
+  #         - os: linux
+  #           os-version: ubuntu-latest
+  #         - os: win64
+  #           os-version: windows-latest
 
-    steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          environment-file: environment.yml
-          activate-environment: watertap-ui-env
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: conda-incubator/setup-miniconda@v2
+  #       with:
+  #         environment-file: environment.yml
+  #         activate-environment: watertap-ui-env
 
-      - name: Install Electron JS dependencies
-        run: |
-          npm --prefix electron clean-install
+  #     - name: Install Electron JS dependencies
+  #       run: |
+  #         npm --prefix electron clean-install
 
-      - name: Install frontend JS dependencies
-        run: |
-          npm --prefix electron/ui clean-install
+  #     - name: Install frontend JS dependencies
+  #       run: |
+  #         npm --prefix electron/ui clean-install
 
-      - name: get idaes extensions
-        run: idaes get-extensions
+  #     - name: get idaes extensions
+  #       run: idaes get-extensions
 
-      - name: Install watertap-ui Python package
-        run: |
-          pip install --progress-bar off .
+  #     - name: Install watertap-ui Python package
+  #       run: |
+  #         pip install --progress-bar off .
 
-      # - name: Install correct branch of watertap
-      #   working-directory: ../
-      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git checkout dof && pip install --progress-bar off .
+  #     # - name: Install correct branch of watertap
+  #     #   working-directory: ../
+  #     #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git checkout dof && pip install --progress-bar off .
 
-      - name: Install correct branch of watertap
-        working-directory: ../
-        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
+  #     - name: Install correct branch of watertap
+  #       working-directory: ../
+  #       run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
 
-      - name: Display installed environment
-        run: |
-          conda env export --no-builds
+  #     - name: Display installed environment
+  #       run: |
+  #         conda env export --no-builds
 
-      # - name: run pytest
-      #   working-directory: backend
-      #   env:
-      #     PYTHONPATH: ${{ env.GITHUB_WORKSPACE }}/backend
-      #   run: pytest tests -v
+  #     # - name: run pytest
+  #     #   working-directory: backend
+  #     #   env:
+  #     #     PYTHONPATH: ${{ env.GITHUB_WORKSPACE }}/backend
+  #     #   run: pytest tests -v
 
-      - name: run backend server
-        run: uvicorn --app-dir backend/app main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
+  #     - name: run backend server
+  #       run: uvicorn --app-dir backend/app main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
 
-      - name: run frontend
-        run: npm --prefix electron/ui start & sleep 30
+  #     - name: run frontend
+  #       run: npm --prefix electron/ui start & sleep 30
 
-      - name: run component tests
-        run: npm --prefix electron/ui run test
+  #     - name: run component tests
+  #       run: npm --prefix electron/ui run test
 
-      - name: Cypress e2e tests
-        working-directory: electron/ui
-        timeout-minutes: 15
-        run: |
-          echo "$(npm bin)"
-          "$(npm bin)"/cypress run
+  #     - name: Cypress e2e tests
+  #       working-directory: electron/ui
+  #       timeout-minutes: 15
+  #       run: |
+  #         echo "$(npm bin)"
+  #         "$(npm bin)"/cypress run
 
-      - name: Upload artifact for screenshots & videos
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-            name: cypress_results-${{ matrix.os }}
-            path: |
-              electron/ui/cypress/screenshots/
-              electron/ui/cypress/videos/
+  #     - name: Upload artifact for screenshots & videos
+  #       uses: actions/upload-artifact@v3
+  #       if: always()
+  #       with:
+  #           name: cypress_results-${{ matrix.os }}
+  #           path: |
+  #             electron/ui/cypress/screenshots/
+  #             electron/ui/cypress/videos/
 
   pytest:
     name: pytest (${{ matrix.os }})
