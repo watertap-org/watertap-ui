@@ -130,4 +130,4 @@ jobs:
       - name: Run pytest
         working-directory: backend
         run: |
-          pytest . -s -k "test_save_config"
+          pytest . -s -k "test_"
