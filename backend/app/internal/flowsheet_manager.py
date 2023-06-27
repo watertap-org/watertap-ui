@@ -85,29 +85,29 @@ class FlowsheetManager:
         self._histdb = tinydb.TinyDB(path)
 
         # check for (and set if necessary) the last_run dictionary
-        query = tinydb.Query()
-        last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
-        if(len(last_run_dict) == 0):
-            _log.debug('setting last run dictionary')
-            last_run_dict = {}
-            flowsheet_list = self._flowsheets.values()
-            for each in flowsheet_list:
-                last_run_dict[each.id_] = ""
-            self._histdb.upsert(
-                {"last_run_dict_version": VERSION, "last_run_dict": last_run_dict},
-                (query.last_run_dict_version == VERSION),
-            )
-        else:
-            _log.debug('found last run dictionary')
-            last_run_dict=last_run_dict[0]["last_run_dict"]
-            flowsheet_list = self._flowsheets.values()
-            for each in flowsheet_list:
-                if not each.id_ in last_run_dict:
-                    last_run_dict[each.id_] = ""
-            self._histdb.upsert(
-                {"last_run_dict_version": VERSION, "last_run_dict": last_run_dict},
-                (query.last_run_dict_version == VERSION),
-            )
+        # query = tinydb.Query()
+        # last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
+        # if(len(last_run_dict) == 0):
+        #     _log.debug('setting last run dictionary')
+        #     last_run_dict = {}
+        #     flowsheet_list = self._flowsheets.values()
+        #     for each in flowsheet_list:
+        #         last_run_dict[each.id_] = ""
+        #     self._histdb.upsert(
+        #         {"last_run_dict_version": VERSION, "last_run_dict": last_run_dict},
+        #         (query.last_run_dict_version == VERSION),
+        #     )
+        # else:
+        #     _log.debug('found last run dictionary')
+        #     last_run_dict=last_run_dict[0]["last_run_dict"]
+        #     flowsheet_list = self._flowsheets.values()
+        #     for each in flowsheet_list:
+        #         if not each.id_ in last_run_dict:
+        #             last_run_dict[each.id_] = ""
+        #     self._histdb.upsert(
+        #         {"last_run_dict_version": VERSION, "last_run_dict": last_run_dict},
+        #         (query.last_run_dict_version == VERSION),
+        #     )
             
 
     def add_flowsheet_interface(self, module_name: str, fsi: FlowsheetInterface):
