@@ -177,9 +177,9 @@ def test_save_config(client, flowsheet_id):
     assert response.status_code == 200, body
     assert body == "test name!"
 
-    # response, body = post_flowsheet(client, flowsheet_id, "save", config, query_params={"version": "2"})
-    # assert response.status_code == 200, body
-    # assert body == "current"
+    response, body = post_flowsheet(client, flowsheet_id, "save", config, query_params={"version": "2"})
+    assert response.status_code == 200, body
+    assert body == "current"
 
 
 @pytest.mark.unit

@@ -254,9 +254,16 @@ class FlowsheetManager:
         info.ts = time.time()
         fs_q = tinydb.Query()
         _log.debug(f"Saving/replacing name='{name}' for id='{id_}'")
+        print(f"Saving/replacing name='{name}' for id='{id_}'")
         if version is not None:
             _log.debug(f'saving id {id_} with version {version}')
-            self._histdb.upsert(
+            try:
+                self._histdb.upsert(
+                    {"name": name, "id_": id_, "version": version, "ts": info.ts, "data": data},
+                    (fs_q.id_ == id_) & (fs_q.name == name),
+                )
+            except:
+                self._histdb.upsert(
                 {"name": name, "id_": id_, "version": version, "ts": info.ts, "data": data},
                 (fs_q.id_ == id_) & (fs_q.name == name),
             )
