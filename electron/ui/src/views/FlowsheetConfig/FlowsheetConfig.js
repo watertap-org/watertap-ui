@@ -3,7 +3,7 @@ import React from 'react';
 import {useEffect, useState } from 'react';   
 import { useParams, useNavigate } from "react-router-dom";
 import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
-import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent } from '@mui/material'
+import { Dialog, DialogTitle, DialogActions, DialogContent } from '@mui/material'
 import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar } from '@mui/material';
 import Graph from "../../components/Graph/Graph";
 import ConfigInput from "./ConfigInput/ConfigInput";
@@ -239,30 +239,12 @@ export default function FlowsheetConfig() {
 
               
                 <Grid container>
-                  <Grid item xs={1}>
-                  <ToggleButtonGroup
-                    orientation="vertical"
-                    value={solveType}
-                    exclusive
-                    onChange={handleToggleSolveType}
-                  >
-                    <ToggleButton value="solve" aria-label="solve">
-                      <Typography>Solve</Typography>
-                    </ToggleButton>
-                    <ToggleButton value="sweep" aria-label="sweep">
-                      <Typography>Sweep</Typography>
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                  </Grid>
-
-                  <Grid item xs={11}>
+                  <Grid item xs={12}>
                   <Tabs value={tabValue} onChange={handleTabChange} aria-label="process tabs">
                     <Tab label="Input" {...a11yProps(0)} />
                     <Tab label="Output" disabled={!flowsheetData.outputData} {...a11yProps(1)} /> 
                     {solveType === "solve" && <Tab label="Compare" disabled={!flowsheetData.outputData} {...a11yProps(2)} /> }
-                    
                   </Tabs>
-
                   </Grid>
 
                 </Grid>
@@ -272,6 +254,7 @@ export default function FlowsheetConfig() {
                             updateFlowsheetData={updateFlowsheetData}
                             reset={reset}
                             solveType={solveType}
+                            handleToggleSolveType={handleToggleSolveType}
                             >
                 </ConfigInput>
               </TabPanel>
