@@ -130,4 +130,4 @@ jobs:
       - name: Run pytest
         working-directory: backend
         run: |
-          pytest . -s -k "test_"
+          pytest tests -v
