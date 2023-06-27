@@ -168,6 +168,7 @@ def test_update_missing(client, flowsheet_id):
 
 @pytest.mark.unit
 def test_save_config(client, flowsheet_id):
+    print(f'test save config for\nclient: {client}\nflowsheet_id:{flowsheet_id}')
     response, body = get_flowsheet(client, flowsheet_id, "config")
     assert response.status_code == 200, body
     config = body
