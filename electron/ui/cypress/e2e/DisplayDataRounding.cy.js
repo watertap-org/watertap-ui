@@ -35,8 +35,8 @@ describe('Display Data Rounding', () => {
             method: "POST",
             url: "http://localhost:8001/flowsheets/**",
         }).as("run");
-        cy.findAllByRole('button', {  name: /solve/i}).eq(0).click()
-        cy.wait("@solve").its('response.statusCode').should('eq', 200);
+        cy.findAllByRole('button', {  name: /run/i}).eq(0).click()
+        cy.wait("@run").its('response.statusCode').should('eq', 200);
         cy.screenshot(sc_count+'_solved')
         sc_count+=1
 
