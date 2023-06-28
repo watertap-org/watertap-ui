@@ -45,7 +45,8 @@ export default function FlowsheetsListTable(props) {
         }
         else {
             setSortKey(key)
-            setSortDirection('ascending')
+            if (key === "name") setSortDirection('ascending')
+            else setSortDirection('descending')
         }
     }
 
