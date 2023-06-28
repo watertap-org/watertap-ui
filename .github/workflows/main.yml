@@ -56,9 +56,13 @@ jobs:
         run: |
           pip install --progress-bar off .
 
+      # - name: Install correct branch of watertap
+      #   working-directory: ../
+      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git checkout dof && pip install --progress-bar off .
+
       - name: Install correct branch of watertap
         working-directory: ../
-        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git checkout dof && pip install --progress-bar off .
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
 
       - name: Display installed environment
         run: |

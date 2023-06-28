@@ -29,6 +29,7 @@ import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
 # _log.setLevel(logging.DEBUG)
+VERSION = 2
 
 
 class FlowsheetInfo(BaseModel):
@@ -42,6 +43,7 @@ class FlowsheetInfo(BaseModel):
     # current status of flowsheet
     built: bool = False
     ts: float = 0  # time last updated (including built)
+    last_run: str = ""
 
     # Make sure name is lowercase
     @validator("name")
@@ -52,6 +54,9 @@ class FlowsheetInfo(BaseModel):
         self.ts = time.time()
         if built is not None:
             self.built = built
+
+    def set_last_run(self, last_run: str):
+        self.last_run = last_run
 
 
 class FlowsheetManager:
@@ -78,6 +83,32 @@ class FlowsheetManager:
         # Connect to history DB
         path = self.app_settings.data_basedir / self.HISTORY_DB_FILE
         self._histdb = tinydb.TinyDB(path)
+
+        # check for (and set if necessary) the last_run dictionary
+        query = tinydb.Query()
+        last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
+        if(len(last_run_dict) == 0):
+            _log.debug('setting last run dictionary')
+            last_run_dict = {}
+            flowsheet_list = self._flowsheets.values()
+            for each in flowsheet_list:
+                last_run_dict[each.id_] = ""
+            self._histdb.upsert(
+                {"last_run_dict_version": VERSION, "last_run_dict": last_run_dict},
+                (query.last_run_dict_version == VERSION),
+            )
+        else:
+            _log.debug('found last run dictionary')
+            last_run_dict=last_run_dict[0]["last_run_dict"]
+            flowsheet_list = self._flowsheets.values()
+            for each in flowsheet_list:
+                if not each.id_ in last_run_dict:
+                    last_run_dict[each.id_] = ""
+            self._histdb.upsert(
+                {"last_run_dict_version": VERSION, "last_run_dict": last_run_dict},
+                (query.last_run_dict_version == VERSION),
+            )
+            
 
     def add_flowsheet_interface(self, module_name: str, fsi: FlowsheetInterface):
         """Add a flowsheet interface associated with the given module (full dotted
@@ -223,9 +254,16 @@ class FlowsheetManager:
         info.ts = time.time()
         fs_q = tinydb.Query()
         _log.debug(f"Saving/replacing name='{name}' for id='{id_}'")
+        print(f"Saving/replacing name='{name}' for id='{id_}'")
         if version is not None:
             _log.debug(f'saving id {id_} with version {version}')
-            self._histdb.upsert(
+            try:
+                self._histdb.upsert(
+                    {"name": name, "id_": id_, "version": version, "ts": info.ts, "data": data},
+                    (fs_q.id_ == id_) & (fs_q.name == name),
+                )
+            except:
+                self._histdb.upsert(
                 {"name": name, "id_": id_, "version": version, "ts": info.ts, "data": data},
                 (fs_q.id_ == id_) & (fs_q.name == name),
             )
@@ -270,6 +308,34 @@ class FlowsheetManager:
             _log.debug(f'version is none, searching for id {id_} without version')
             items = self._histdb.search(query.fragment({"id_": id_}))
         return [item["name"] for item in items]
+    
+    def get_last_run(self, id_: str = None) -> str:
+        query = tinydb.Query()
+        last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
+        if(len(last_run_dict) > 0):
+            last_run_dict = last_run_dict[0]["last_run_dict"]
+            last_run = last_run_dict[id_]
+        else:
+            _log.error('unable to access last run dictionary')
+            last_run = ""
+        return last_run
+    
+    def set_last_run(self, id_: str = None) -> dict:
+        _log.debug(f"setting last run for id='{id_}' with version {VERSION}")
+        query = tinydb.Query()
+        last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
+        if(len(last_run_dict) > 0):
+            last_run_dict = last_run_dict[0]["last_run_dict"]
+            curr_date = time.time()
+            last_run_dict[id_] = curr_date
+            self._histdb.upsert(
+                {"last_run_dict_version": VERSION, "last_run_dict": last_run_dict},
+                (query.last_run_dict_version == VERSION),
+            )
+        else:
+            _log.error('unable to access last run dictionary')
+
+        return last_run_dict
 
     def _get_flowsheet_interfaces(
         self, package_name: str

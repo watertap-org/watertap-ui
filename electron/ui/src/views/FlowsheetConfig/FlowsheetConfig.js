@@ -3,24 +3,14 @@ import React from 'react';
 import {useEffect, useState } from 'react';   
 import { useParams, useNavigate } from "react-router-dom";
 import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
-import Container from '@mui/material/Container';
+import { Dialog, DialogTitle, DialogActions, DialogContent } from '@mui/material'
+import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar } from '@mui/material';
 import Graph from "../../components/Graph/Graph";
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
-import ErrorBar from "../../components/ErrorBar/ErrorBar"; 
-import Snackbar from '@mui/material/Snackbar';
+import ErrorBar from "../../components/ErrorBar/ErrorBar";
 import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
-import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog'; 
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent'; 
-import CircularProgress from '@mui/material/CircularProgress';
-import { Typography } from '@mui/material';
 
 
 function TabPanel(props) {
@@ -64,6 +54,7 @@ export default function FlowsheetConfig() {
     const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
     const [errorMessage, setErrorMessage] = useState("")
+    const [ solveType, setSolveType ] = useState("solve")
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
@@ -108,12 +99,12 @@ export default function FlowsheetConfig() {
     //send updated flowsheet data
     const updateFlowsheetData = (data, solve) => {
       console.log(">main updateFlowsheetData:",data);
-      if(solve==="SOLVE")
+      if(solve==="solve")
       { 
         setSolveDialogOpen(true);
         setSweep(false)
       } 
-      else if(solve==="SWEEP")
+      else if(solve==="sweep")
       {
         //check if sweep variables all have lower and upper bounds
         let goodToGo = true
@@ -201,6 +192,10 @@ export default function FlowsheetConfig() {
       });
     }
 
+    const handleToggleSolveType = (event, nextType) => {
+      setSolveType(nextType)
+    }
+
     return ( 
       <Container>
       {(loadingFlowsheetData) ? 
@@ -241,21 +236,30 @@ export default function FlowsheetConfig() {
             <Graph/>
 
             <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
-              <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
-                <Tab label="Input" {...a11yProps(0)} />
-                <Tab label="Output" disabled={!flowsheetData.outputData} {...a11yProps(1)} /> 
-                <Tab label="Compare" disabled={!flowsheetData.outputData} {...a11yProps(2)} /> 
-              </Tabs>
+
+              
+                <Grid container>
+                  <Grid item xs={12}>
+                  <Tabs value={tabValue} onChange={handleTabChange} aria-label="process tabs">
+                    <Tab label="Input" {...a11yProps(0)} />
+                    <Tab label="Output" disabled={!flowsheetData.outputData} {...a11yProps(1)} /> 
+                    {solveType === "solve" && <Tab label="Compare" disabled={!flowsheetData.outputData} {...a11yProps(2)} /> }
+                  </Tabs>
+                  </Grid>
+
+                </Grid>
+              
               <TabPanel value={tabValue} index={0}>
                 <ConfigInput flowsheetData={flowsheetData} 
                             updateFlowsheetData={updateFlowsheetData}
                             reset={reset}
+                            solveType={solveType}
+                            handleToggleSolveType={handleToggleSolveType}
                             >
-                            
                 </ConfigInput>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>
-                <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData} isSweep={sweep}>
+                <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData} isSweep={sweep} solveType={solveType}>
                 </ConfigOutput>
               </TabPanel> 
               <TabPanel value={tabValue} index={2}>

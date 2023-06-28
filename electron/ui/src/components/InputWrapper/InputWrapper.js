@@ -1,11 +1,12 @@
 import React from 'react'; 
 import {useEffect, useState} from 'react';
 import { TextField, InputAdornment, Tooltip, Grid, MenuItem, FormControl, Select } from '@mui/material'
+import { solve } from '../../services/output.service';
 
 export default function InputWrapper(props) {
-    const { fieldData, handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds, handleUpdateSamples } = props;
+    const { fieldData, handleUpdateDisplayValue, handleUpdateFixed, handleUpdateBounds, handleUpdateSamples, solveType } = props;
     // const [ disabled, setDisabled ] = useState(false)
-    // const [value, setValue] = useState("");
+    const [value, setValue] = useState("");
     const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
     const disabled = false
 
@@ -17,8 +18,17 @@ export default function InputWrapper(props) {
         }
     }, [fieldData]);
 
+    useEffect(()=>{  
+        // handleFixedChange({target: {name: fieldData.obj_key, value: false}})
+        if (solveType === "solve" && fieldData.is_sweep) {
+            fieldData.is_sweep = false
+            handleUpdateFixed(fieldData.obj_key, false, "free")
+        }
+        
+    }, [solveType]);
+
     const handleFieldChange = (event) => {
-        // setValue(event.target.value);
+        setValue(event.target.value);
         fieldData.value = event.target.value;
         handleUpdateDisplayValue(event.target.id,event.target.value)
     };
@@ -126,7 +136,8 @@ export default function InputWrapper(props) {
                     >
                     <MenuItem key={true} value={"fixed"}>Fixed</MenuItem>
                     <MenuItem disabled={!fieldData.has_bounds || disabled} key={false} value={"free"}>Free</MenuItem>
-                    <MenuItem disabled={!fieldData.has_bounds || disabled} key={"sweep"} value={"sweep"}>Sweep</MenuItem>
+                    {solveType === "sweep" && <MenuItem disabled={!fieldData.has_bounds || disabled} key={"sweep"} value={"sweep"}>Sweep</MenuItem>}
+                    
                     </Select>
                 </FormControl>
                 </Grid>

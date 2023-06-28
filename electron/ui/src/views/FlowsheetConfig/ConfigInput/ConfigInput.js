@@ -5,7 +5,8 @@ import InputAccordion from "../../../components/InputAccordion/InputAccordion";
 import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
 import { deleteConfig }  from '../../../services/input.service.js'
-import { Grid, InputLabel, MenuItem, FormControl, Button, Box, Modal, Select, Stack, Toolbar } from '@mui/material';
+import { Button, Box, Modal, Select, Stack, Toolbar, Typography } from '@mui/material';
+import { ToggleButton, ToggleButtonGroup, Grid, InputLabel, MenuItem, FormControl } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
@@ -15,7 +16,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 export default function ConfigInput(props) {
     let params = useParams(); 
-    const { flowsheetData, updateFlowsheetData, reset } = props; 
+    const { flowsheetData, updateFlowsheetData, reset, solveType, handleToggleSolveType } = props; 
     const [ displayData, setDisplayData ] = useState({}) 
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
@@ -189,6 +190,7 @@ export default function ConfigInput(props) {
                                 handleUpdateBounds={handleUpdateBounds} 
                                 handleUpdateSamples={handleUpdateSamples} 
                                 data={value}
+                                solveType={solveType}
                                 />
                         </Grid>)
                     }
@@ -209,6 +211,19 @@ export default function ConfigInput(props) {
         <>
             <Toolbar spacing={2}>
                 <Stack direction="row" spacing={2}>
+                    <ToggleButtonGroup
+                        orientation="horizontal"
+                        value={solveType}
+                        exclusive
+                        onChange={handleToggleSolveType}
+                    >
+                        <ToggleButton value="solve" aria-label="solve">
+                        <Typography>Solve</Typography>
+                        </ToggleButton>
+                        <ToggleButton value="sweep" aria-label="sweep">
+                        <Typography>Sweep</Typography>
+                        </ToggleButton>
+                    </ToggleButtonGroup>
                     {previousConfigs.length > 0 && 
                     <>
                     <InputLabel style={{paddingTop:"8px"}} id="previous-configs-label">Previous Configurations:</InputLabel>
@@ -245,9 +260,10 @@ export default function ConfigInput(props) {
                 </Box>
                 <Stack direction="row" spacing={2}>
                     {/* <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button> */}
+                    
                     <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset}>RESET FLOWSHEET</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SOLVE")}>SOLVE</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"SWEEP")}>SWEEP</Button>
+                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)}>RUN</Button>
+                    {/* <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"sweep")}>SWEEP</Button> */}
                 </Stack>
             </Toolbar>
                 

@@ -9,7 +9,7 @@ describe('Display Data Rounding', () => {
         cy.wait (5000)
 
         //click flowsheet and wait for api response
-        var flowsheet_name = "magprex"
+        var flowsheet_name = "Magprex flowsheet"
         cy.intercept({
             method: "GET",
             url: "http://localhost:8001/flowsheets/**",
@@ -34,9 +34,9 @@ describe('Display Data Rounding', () => {
         cy.intercept({
             method: "POST",
             url: "http://localhost:8001/flowsheets/**",
-        }).as("solve");
-        cy.findAllByRole('button', {  name: /solve/i}).eq(0).click()
-        cy.wait("@solve").its('response.statusCode').should('eq', 200);
+        }).as("run");
+        cy.findAllByRole('button', {  name: /run/i}).eq(0).click()
+        cy.wait("@run").its('response.statusCode').should('eq', 200);
         cy.screenshot(sc_count+'_solved')
         sc_count+=1
 

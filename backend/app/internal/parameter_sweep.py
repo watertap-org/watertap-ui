@@ -74,7 +74,7 @@ def run_analysis(
     global_results = ps.parameter_sweep(
         m,
         sweep_params,
-        outputs=outputs,
+        outputs,
     )
 
     return global_results
@@ -121,7 +121,6 @@ def run_parameter_sweep(flowsheet, info):
                                 "param": flowsheet.fs_exp.model_objects[key].obj,
                             }
                         )
-                    # print(parameters)
                     # HTTPException(500, detail=f"Sweep failed: {parameters}")
                     flowsheet.fs_exp.model_objects[key].obj.fix()
                     conversion_factors.append(conversion_factor)
@@ -141,7 +140,6 @@ def run_parameter_sweep(flowsheet, info):
                     )
                 except Exception as e:
                     conversion_factor = 1
-                    # print(f'unable to find conversion factor for {flowsheet.fs_exp.model_objects[key].name}: {e}')
                 conversion_factors.append(conversion_factor)
                 output_params.append(
                     {

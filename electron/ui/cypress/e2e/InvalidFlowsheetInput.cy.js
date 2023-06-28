@@ -8,7 +8,7 @@ describe('Invalid Input Test', () => {
          sc_count+=1
  
          //click flowsheet and wait for api response
-         var flowsheet_name = "metab"
+         var flowsheet_name = "Metab flowsheet"
          cy.intercept({
              method: "GET",
              url: "http://localhost:8001/flowsheets/**",
