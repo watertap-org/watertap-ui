@@ -64,10 +64,6 @@ jobs:
         run: |
           pip uninstall -y scipy && pip install scipy==1.9.1
 
-      - name: Install pyyaml
-        run: |
-          pip install pyyaml
-
       - name: Build Backend
         run: npm --prefix electron run build-backend
 
@@ -126,10 +122,6 @@ jobs:
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
-
-      - name: Install pyyaml
-        run: |
-          pip install pyyaml
 
       # - name: Create idaes extensions installer
       #   run: |
