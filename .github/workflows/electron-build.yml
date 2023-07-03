@@ -64,6 +64,10 @@ jobs:
         run: |
           pip uninstall -y scipy && pip install scipy==1.9.1
 
+      - name: Install pyyaml
+        run: |
+          pip install pyyaml
+
       - name: Build Backend
         run: npm --prefix electron run build-backend
 
@@ -123,9 +127,9 @@ jobs:
         run: |
           pip install --progress-bar off .
 
-      # - name: Install older version of idaes-pse
-      #   run: |
-      #     pip uninstall -y idaes-pse && pip install idaes-pse==1.13
+      - name: Install pyyaml
+        run: |
+          pip install pyyaml
 
       # - name: Create idaes extensions installer
       #   run: |
