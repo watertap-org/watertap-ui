@@ -9,6 +9,7 @@ pydantic==1.9.1
 pyinstaller==5.3
 pyinstaller-hooks-contrib==2022.9
 pyyaml
+requests
 tinydb
 sniffio==1.2.0
 starlette==0.19.1
