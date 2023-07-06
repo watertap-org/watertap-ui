@@ -2,10 +2,10 @@
 import React from 'react'; 
 import {useEffect, useState } from 'react';    
 import InputAccordion from "../../../components/InputAccordion/InputAccordion"; 
-import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
+import { loadConfig, listConfigNames, solve }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
 import { deleteConfig }  from '../../../services/input.service.js'
-import { Button, Box, Modal, Select, Stack, Toolbar, Typography } from '@mui/material';
+import { Button, Box, Modal, Select, Stack, Toolbar, Typography, Tooltip } from '@mui/material';
 import { ToggleButton, ToggleButtonGroup, Grid, InputLabel, MenuItem, FormControl } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -22,6 +22,7 @@ export default function ConfigInput(props) {
     const [ configName, setConfigName ] = React.useState("");
     const [ openDeleteConfig, setOpenDeleteConfig] = useState(false)
     const [ openErrorMessage, setOpenErrorMessage ] = useState(false);
+    const [ disableRun, setDisableRun ] = useState(false)
 
     const modalStyle = {
         position: 'absolute',
@@ -36,7 +37,7 @@ export default function ConfigInput(props) {
       };
       
 
-    useEffect(()=>{ 
+    useEffect(()=>{
         setDisplayData(JSON.parse(JSON.stringify(flowsheetData.inputData)))
         listConfigNames(params.id, flowsheetData.inputData.version)
         .then(response => {
@@ -56,6 +57,22 @@ export default function ConfigInput(props) {
         }
         })
     }, [flowsheetData.inputData]);
+
+    useEffect(()=>{
+        if (solveType === "solve") setDisableRun(false)
+        else {
+            let tempDisableRun = true
+            for(let each of Object.keys(flowsheetData.inputData.model_objects)) {
+                let modelObject = flowsheetData.inputData.model_objects[each]
+                if(modelObject.is_sweep) {
+                    tempDisableRun = false
+                    break
+                }
+            }
+            setDisableRun(tempDisableRun)
+        }
+
+    }, [flowsheetData.inputData, solveType]);
  
     const handleConfigSelection = (event) => {
         const {
@@ -262,8 +279,11 @@ export default function ConfigInput(props) {
                     {/* <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button> */}
                     
                     <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset}>RESET FLOWSHEET</Button>
-                    <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)}>RUN</Button>
-                    {/* <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,"sweep")}>SWEEP</Button> */}
+                    <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
+                        <div>
+                        <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)} disabled={disableRun}>RUN</Button>
+                        </div>
+                    </Tooltip>
                 </Stack>
             </Toolbar>
                 
