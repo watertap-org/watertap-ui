@@ -2,6 +2,8 @@
 
 This repository is for work on the user interface (UI) for the WaterTAP library. The UI installer can be downloaded from our homepage at: https://watertap-org.github.io/
 
+The core WaterTAP repository is at https://github.com/watertap-org/watertap
+
 ## Getting started (developer)
 
 ### Prerequisites
