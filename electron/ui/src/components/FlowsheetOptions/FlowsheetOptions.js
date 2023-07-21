@@ -7,6 +7,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 /* import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; */
 
 /**
@@ -25,6 +26,8 @@ export default function FlowsheetOptions({data}) {
     console.info("All data =>", data);
     let options = data.options;
     console.info("Option data =>", options);
+    // Whether the values have changed
+    const [changed, setChanged] = useState(false);
 
     // XXX: For accordion open/close
     const [expanded, setExpanded] = useState(false);
@@ -32,6 +35,33 @@ export default function FlowsheetOptions({data}) {
     const handleAccordionChange = (panel) => (event, isExpanded) => {
       setExpanded(isExpanded);
     };
+
+    /**
+     * Convert input value to type specified in 't', which may be one of:
+     *   's' - string (no conversion)
+     *   'i' - integer
+     *   'f' - float
+     *
+     *   @returns {String|Number}
+     */
+    const convertValue = (v, t) => {
+        let cv = null;
+        switch (t) {
+            case 's':
+                cv = v;
+                break;
+            case 'i':
+                cv = parseInt(v);
+                break;
+            case 'f':
+                cv = parseFloat(v);
+                break;
+            default:
+                console.warning('Unknown type code: "' + t + '": not converting value:',v)
+                cv = v;
+        }
+        return cv;
+    }
 
     /**
      * Render all the flowsheet options for inclusion in an Accordion parent component.
@@ -43,7 +73,12 @@ export default function FlowsheetOptions({data}) {
         let optionItems = Array();
         for (const [key, opt] of Object.entries(options)) {
             // create setOption function for this option
-            const setOption = (value, opt=opt) =>  { opt.value = value; }
+            const setOption = (value) =>  {
+                if (value != opt.value) {
+                    opt.value = value;
+                    setChanged(true);
+                }
+            }
             // create and add a new TextField to the list
             optionItems.push(
                 <Tooltip
@@ -56,7 +91,7 @@ export default function FlowsheetOptions({data}) {
                     <TextField
                         id={key}
                         label={opt.display_name}
-                        variant="outline"
+                        variant="outlined"
                         value={opt.value}
                         onChange={(event) => {
                             setOption(event.target.value);
@@ -70,7 +105,7 @@ export default function FlowsheetOptions({data}) {
 
     // Create and return an Accordion component with the option items inside it
     return (
-        <Accordion defaultExpanded="true">
+        <Accordion defaultExpanded="{true}">
             <AccordionSummary>Flowsheet options</AccordionSummary>
             {renderOptionItems()}
         </Accordion>
