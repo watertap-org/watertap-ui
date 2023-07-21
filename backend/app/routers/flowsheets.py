@@ -64,6 +64,7 @@ async def get_config(id_: str, build: str = "0") -> FlowsheetExport:
         if not info.built:
             flowsheet.build()
             info.updated(built=True)
+    print(f"@@ getConfig: fs_exp keys = {list(flowsheet.fs_exp.dict().keys())}")
     return flowsheet.fs_exp
 
 

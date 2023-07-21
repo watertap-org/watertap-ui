@@ -1,7 +1,8 @@
  
 import React from 'react'; 
 import {useEffect, useState } from 'react';    
-import InputAccordion from "../../../components/InputAccordion/InputAccordion"; 
+import InputAccordion from "../../../components/InputAccordion/InputAccordion";
+import FlowsheetOptions from "../../../components/FlowsheetOptions/FlowsheetOptions";
 import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
 import { deleteConfig }  from '../../../services/input.service.js'
@@ -222,8 +223,7 @@ export default function ConfigInput(props) {
         }
         
     };
-    
-  
+
     return ( 
         <>
             <Toolbar spacing={2}>
@@ -274,6 +274,11 @@ export default function ConfigInput(props) {
                 </Stack>
             </Toolbar>
                 
+            <Grid container spacing={2} alignItems="flex-start">
+                <Grid item xs={6} key="flowsheet-options">
+                    <FlowsheetOptions data={flowsheetData.inputData} />
+                </Grid>
+            </Grid>
 
             <Grid container spacing={2} alignItems="flex-start">
                 {
