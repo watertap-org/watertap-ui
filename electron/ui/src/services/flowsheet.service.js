@@ -22,3 +22,10 @@ export const resetFlowsheet = (id) => {
         mode: 'cors'
     });
 }; 
+
+export const unbuildFlowsheet = (id) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/unbuild', {
+        method: 'GET', 
+        mode: 'cors'
+    });
+}; 

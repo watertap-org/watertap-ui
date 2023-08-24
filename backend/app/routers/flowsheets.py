@@ -164,6 +164,23 @@ async def reset(flowsheet_id: str):
     return flowsheet.fs_exp
 
 
+@router.get("/{flowsheet_id}/unbuild", response_model=FlowsheetExport)
+async def unbuild_config(flowsheet_id: str):
+    flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+    
+    ## reset everything:
+    fs_exp = flowsheet.fs_exp
+    fs_exp.m=None
+    fs_exp.obj=None 
+    fs_exp.model_objects={} 
+    fs_exp.dof=0 
+    fs_exp.sweep_results={} 
+    fs_exp.options={}
+    flowsheet_manager.get_info(flowsheet_id).updated(built=False)
+
+    return flowsheet.fs_exp
+
+
 @router.post("/{flowsheet_id}/update", response_model=FlowsheetExport)
 async def update(flowsheet_id: str, request: Request):
     flowsheet = flowsheet_manager.get_obj(flowsheet_id)

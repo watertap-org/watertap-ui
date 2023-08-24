@@ -2,7 +2,7 @@
 import React from 'react'; 
 import {useEffect, useState } from 'react';   
 import { useParams, useNavigate } from "react-router-dom";
-import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
+import { getFlowsheet, saveFlowsheet, resetFlowsheet, unbuildFlowsheet } from "../../services/flowsheet.service"; 
 import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
 import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar, Stack, Divider } from '@mui/material';
 import { Select, InputLabel, MenuItem, FormControl, TextField } from '@mui/material';
@@ -103,7 +103,21 @@ export default function FlowsheetConfig() {
         console.error('error getting flowsheet: ',e)
         navigateHome(e)
       });
+    }
 
+    const unBuildFlowsheet = () => {
+      unbuildFlowsheet(params.id, 1)
+      .then(response => response.json())
+      .then((data)=>{
+        console.log("Flowsheet Data:", data);
+        setLoadingFlowsheetData(false)
+        setFlowsheetData({outputData:null, inputData: data, name: data.name});
+        setTitle(getTitle(data));
+        setIsBuilt(false)
+      }).catch((e) => {
+        console.error('error getting flowsheet: ',e)
+        navigateHome(e)
+      });
     }
 
     const navigateHome = (e) => {
@@ -237,6 +251,15 @@ export default function FlowsheetConfig() {
       setAnalysisName(newName)
     }
 
+    const handleSaveConfiguration = () => {
+      if(analysisName.length > 0) {
+
+      } else {
+        setOpenErrorMessage(true)
+        setErrorMessage("Please provide a name for analysis.")
+      }
+    }
+
     return ( 
       <Container>
       {(loadingFlowsheetData) ? 
@@ -313,11 +336,13 @@ export default function FlowsheetConfig() {
                 <Grid item xs={6}></Grid>
                 <Grid item xs={6}>
                   <div style={{display:"flex"}}>
-                    <Button size="small" variant="outlined" color="error" sx={{marginRight: 1}}>
+                    <Button size="small" variant="outlined" color="error" sx={{marginRight: 1}}
+                      onClick={unBuildFlowsheet}  
+                    >
                       X Cancel
                     </Button>
                     <Button disabled={!isBuilt} variant="outlined" startIcon={<SaveIcon />} sx={{marginLeft: 1, marginRight: 1}}
-                      // onClick={handleOpenSaveConfig} 
+                      onClick={handleSaveConfiguration} 
                     >
                         Save Configuration
                     </Button>
