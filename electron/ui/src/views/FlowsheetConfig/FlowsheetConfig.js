@@ -4,7 +4,8 @@ import {useEffect, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
 import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent } from '@mui/material'
-import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar, Stack } from '@mui/material';
+import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar, Stack, Divider } from '@mui/material';
+import { Select, InputLabel, MenuItem, FormControl, TextField } from '@mui/material';
 import Graph from "../../components/Graph/Graph";
 import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
@@ -55,6 +56,7 @@ export default function FlowsheetConfig() {
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
     const [errorMessage, setErrorMessage] = useState("")
     const [ solveType, setSolveType ] = useState("solve")
+    const [ analysisName, setAnalysisName ] = useState("")
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
@@ -192,8 +194,17 @@ export default function FlowsheetConfig() {
       });
     }
 
+    const handleSelectSolveType = (event) => {
+      setSolveType(event.target.value)
+    }
+
     const handleToggleSolveType = (event, nextType) => {
       setSolveType(nextType)
+    }
+
+    const handleChangeAnalysisName = (event) => {
+      let newName = event.target.value
+      setAnalysisName(newName)
     }
 
     return ( 
@@ -237,6 +248,40 @@ export default function FlowsheetConfig() {
 
             <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
 
+              <div style={{display:"flex", justifyContent: "space-between"}}>
+                <h3 style={{marginBottom: 5, marginTop:10}}>Run a new analysis</h3>
+                {/* <Typography style={{ marginTop:10}}>
+                    DEGREES OF FREEDOM: {flowsheetData.inputData.dof}
+                </Typography> */}
+              </div>
+
+              <Divider light sx={{marginBottom:"20px"}}/>
+              <Grid container sx={{marginBottom: "50px"}}>
+                <Grid item xs={6}>
+
+                  <FormControl fullWidth sx={{marginBottom: 2}}>
+                    <InputLabel id="solve-sweep-label">Analysis Type</InputLabel>
+                    <Select labelId="solve-sweep-label" id="solve-sweep-select" label="Analysis Type" size="small" 
+                      sx={{textAlign: "left"}}
+                      value={solveType}
+                      onChange={handleSelectSolveType}
+                    >
+                      <MenuItem value="solve">&nbsp;&nbsp;&nbsp;&nbsp;optimization</MenuItem>
+                      <MenuItem value="sweep">&nbsp;&nbsp;&nbsp;&nbsp;sensitivity analysis</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                </Grid>
+                <Grid item xs={6}></Grid>
+                <Grid item xs={6}>
+                  <TextField label='Analysis Name' variant="outlined" size="small" fullWidth
+                    value={analysisName ? analysisName : ""}
+                    onChange={handleChangeAnalysisName}
+                  />
+                </Grid>
+                <Grid item xs={6}></Grid>
+              </Grid>
+              
               
                 <Grid container>
                 <Grid item xs={12}>

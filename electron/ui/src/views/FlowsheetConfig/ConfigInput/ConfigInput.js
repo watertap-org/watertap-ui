@@ -35,7 +35,6 @@ export default function ConfigInput(props) {
         boxShadow: 24,
         p: 4,
       };
-      
 
     useEffect(()=>{
         setDisplayData(JSON.parse(JSON.stringify(flowsheetData.inputData)))
@@ -159,8 +158,11 @@ export default function ConfigInput(props) {
                 var_sections[catg] = {display_name: catg, variables: {}, input_variables:{}, output_variables:{} }
             }
             var_sections[catg]["variables"][key] = v
+            if(var_sections[catg]['num_variables']) var_sections[catg]['num_variables']=var_sections[catg]['num_variables']+1
+            else var_sections[catg]['num_variables'] = 1
             if(is_input) var_sections[catg]["input_variables"][key] = v;
             if(is_output) var_sections[catg]["output_variables"][key] = v;
+
 
             //round values for input 
             try {
@@ -190,6 +192,15 @@ export default function ConfigInput(props) {
             }
             
         }
+
+        //sorting the keys of var_sections by amount of variables into object "items"
+        let items = Object.keys(var_sections).map(function(key) {
+            return [key, var_sections[key]['num_variables']];
+        });
+        items.sort(function(first, second) {
+            return second[1] - first[1];
+        });
+        // console.log(items)
         return var_sections
     }
 
