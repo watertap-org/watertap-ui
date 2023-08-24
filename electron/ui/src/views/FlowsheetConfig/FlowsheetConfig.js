@@ -3,9 +3,10 @@ import React from 'react';
 import {useEffect, useState } from 'react';   
 import { useParams, useNavigate } from "react-router-dom";
 import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
-import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent } from '@mui/material'
+import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
 import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar, Stack, Divider } from '@mui/material';
 import { Select, InputLabel, MenuItem, FormControl, TextField } from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
 import Graph from "../../components/Graph/Graph";
 import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
@@ -57,13 +58,14 @@ export default function FlowsheetConfig() {
     const [errorMessage, setErrorMessage] = useState("")
     const [ solveType, setSolveType ] = useState("solve")
     const [ analysisName, setAnalysisName ] = useState("")
+    const [ isBuilt, setIsBuilt ] = useState(false)
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
       if( !params.hasOwnProperty("id") || !params.id)
         return;
 
-      getFlowsheet(params.id)
+      getFlowsheet(params.id, 0)
       .then(response => response.json())
       .then((data)=>{
         console.log("Flowsheet Data:", data);
@@ -75,6 +77,34 @@ export default function FlowsheetConfig() {
         navigateHome(e)
       });
     }, [params.id]);
+
+    useEffect(() => {
+      try {
+        if (Object.keys(flowsheetData.inputData.model_objects).length > 0) {
+          console.log('flowsheet is indeed built')
+          setIsBuilt(true)
+        } else console.log('flowsheet is not built')
+      } catch (e){
+        console.log('unable to check for model objects: ',e)
+      }
+      
+    }, [flowsheetData])
+
+    const runBuildFlowsheet = () => {
+      setLoadingFlowsheetData(true)
+      getFlowsheet(params.id, 1)
+      .then(response => response.json())
+      .then((data)=>{
+        console.log("Flowsheet Data:", data);
+        setLoadingFlowsheetData(false)
+        setFlowsheetData({outputData:null, inputData: data, name: data.name});
+        setTitle(getTitle(data)); 
+      }).catch((e) => {
+        console.error('error getting flowsheet: ',e)
+        navigateHome(e)
+      });
+
+    }
 
     const navigateHome = (e) => {
       navigate("/flowsheets", {replace: true, state:{error:e}})
@@ -265,75 +295,104 @@ export default function FlowsheetConfig() {
                       sx={{textAlign: "left"}}
                       value={solveType}
                       onChange={handleSelectSolveType}
+                      disabled={tabValue!==0}
                     >
-                      <MenuItem value="solve">&nbsp;&nbsp;&nbsp;&nbsp;optimization</MenuItem>
-                      <MenuItem value="sweep">&nbsp;&nbsp;&nbsp;&nbsp;sensitivity analysis</MenuItem>
+                      <MenuItem value="solve">optimization</MenuItem>
+                      <MenuItem value="sweep">sensitivity analysis</MenuItem>
                     </Select>
                   </FormControl>
 
                 </Grid>
                 <Grid item xs={6}></Grid>
                 <Grid item xs={6}>
-                  <TextField label='Analysis Name' variant="outlined" size="small" fullWidth
+                  <TextField label='Analysis Name' variant="outlined" size="small" fullWidth sx={{marginBottom: 2}}
                     value={analysisName ? analysisName : ""}
                     onChange={handleChangeAnalysisName}
                   />
                 </Grid>
                 <Grid item xs={6}></Grid>
-              </Grid>
-              
-              
-                <Grid container>
-                <Grid item xs={12}>
-                  <Stack
-                    direction="row"
-                    justifyContent="left"
-                    alignItems="left"
-                    spacing={2}
-                  >
-                    <ToggleButtonGroup
-                        orientation="horizontal"
-                        value={solveType}
-                        exclusive
-                        onChange={handleToggleSolveType}
-                        disabled={tabValue!==0}
+                <Grid item xs={6}>
+                  <div style={{display:"flex"}}>
+                    <Button size="small" variant="outlined" color="error" sx={{marginRight: 1}}>
+                      X Cancel
+                    </Button>
+                    <Button disabled={!isBuilt} variant="outlined" startIcon={<SaveIcon />} sx={{marginLeft: 1, marginRight: 1}}
+                      // onClick={handleOpenSaveConfig} 
                     >
-                        <ToggleButton value="solve" aria-label="solve">
-                        <Typography>Solve</Typography>
-                        </ToggleButton>
-                        <ToggleButton value="sweep" aria-label="sweep">
-                        <Typography>Sweep</Typography>
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                  </Stack>
+                        Save Configuration
+                    </Button>
+                    <Button size="small" variant="contained" color="primary" sx={{marginLeft: 1}} onClick={runBuildFlowsheet}>
+                      {isBuilt ? "Re-build Flowsheet" : "Build Flowsheet"}
+                    </Button>
+                  </div>
                   
-                  </Grid>
-                  <Grid item xs={12}>
-                  <Tabs value={tabValue} onChange={handleTabChange} aria-label="process tabs">
-                    <Tab label="Input" {...a11yProps(0)} />
-                    <Tab label="Output" disabled={!flowsheetData.outputData} {...a11yProps(1)} /> 
-                    {solveType === "solve" && <Tab label="Compare" disabled={!flowsheetData.outputData} {...a11yProps(2)} /> }
-                  </Tabs>
-                  </Grid>
-
                 </Grid>
-              
-              <TabPanel value={tabValue} index={0}>
-                <ConfigInput flowsheetData={flowsheetData} 
-                            updateFlowsheetData={updateFlowsheetData}
-                            reset={reset}
-                            solveType={solveType}
-                            >
-                </ConfigInput>
-              </TabPanel>
-              <TabPanel value={tabValue} index={1}>
-                <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData} isSweep={sweep} solveType={solveType}>
-                </ConfigOutput>
-              </TabPanel> 
-              <TabPanel value={tabValue} index={2}>
-                <ConfigOutputComparisonTable outputData={flowsheetData}>
-                </ConfigOutputComparisonTable>
-              </TabPanel> 
+                <Grid item xs={6}></Grid>
+              </Grid>
+
+
+              {isBuilt && 
+    
+                <Box>
+                  <Grid container>
+                  <Grid item xs={12}>
+                    {/* <Stack
+                      direction="row"
+                      justifyContent="left"
+                      alignItems="left"
+                      spacing={2}
+                    >
+                      <ToggleButtonGroup
+                          orientation="horizontal"
+                          value={solveType}
+                          exclusive
+                          onChange={handleToggleSolveType}
+                          disabled={tabValue!==0}
+                      >
+                          <ToggleButton value="solve" aria-label="solve">
+                          <Typography>Solve</Typography>
+                          </ToggleButton>
+                          <ToggleButton value="sweep" aria-label="sweep">
+                          <Typography>Sweep</Typography>
+                          </ToggleButton>
+                      </ToggleButtonGroup>
+                    </Stack> */}
+                    
+                    </Grid>
+                    <Grid item xs={12}>
+                    <div style={{backgroundColor: '#F1F3F3'}}>
+                      <Tabs value={tabValue} onChange={handleTabChange} aria-label="process tabs" centered 
+                        textColor='#727272'
+                        TabIndicatorProps={{style: {background:'#727272'}}}
+                      >
+                        <Tab label="Input" {...a11yProps(0)} />
+                        <Tab label="Output" disabled={!flowsheetData.outputData} {...a11yProps(1)} /> 
+                        {solveType === "solve" && <Tab label="Compare" disabled={!flowsheetData.outputData} {...a11yProps(2)} /> }
+                      </Tabs>
+                    </div>
+                      
+                    </Grid>
+
+                  </Grid>
+                
+                <TabPanel value={tabValue} index={0}>
+                  <ConfigInput flowsheetData={flowsheetData} 
+                              updateFlowsheetData={updateFlowsheetData}
+                              reset={reset}
+                              solveType={solveType}
+                              >
+                  </ConfigInput>
+                </TabPanel>
+                <TabPanel value={tabValue} index={1}>
+                  <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData} isSweep={sweep} solveType={solveType}>
+                  </ConfigOutput>
+                </TabPanel> 
+                <TabPanel value={tabValue} index={2}>
+                  <ConfigOutputComparisonTable outputData={flowsheetData}>
+                  </ConfigOutputComparisonTable>
+                </TabPanel> 
+                </Box>
+              }
             </Box>
           </>
           )

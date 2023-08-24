@@ -1,7 +1,7 @@
 
 
-export const getFlowsheet = (id) => {
-    return fetch('http://localhost:8001/flowsheets/'+id+'/config?build=1', {mode: 'cors'});
+export const getFlowsheet = (id, build) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/config?build='+build, {mode: 'cors'});
     /*return new Promise((resolve, reject) => { 
         resolve(data3);
     });*/
