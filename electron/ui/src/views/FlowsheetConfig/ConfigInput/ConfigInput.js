@@ -237,53 +237,69 @@ export default function ConfigInput(props) {
   
     return ( 
         <>
-            <Toolbar spacing={2}>
-                <Stack direction="row" spacing={2}>
-                    {previousConfigs.length > 0 && 
-                    <>
-                    <InputLabel style={{paddingTop:"8px"}} id="previous-configs-label">Previous Configurations:</InputLabel>
-                    <FormControl sx={{ width: 200 }}>
-                        {/* <InputLabel id="previous-configs-label">Previous Configs</InputLabel> */}
-                        <Select
-                        labelId="previous-configs-label"
-                        id="previous-configs-select"
-                        value={configName}
-                        onChange={handleConfigSelection}
-                        // MenuProps={MenuProps}
-                        size="small"
-                        >
-                        {previousConfigs.map((name) => (
-                            <MenuItem
-                            key={name}
-                            value={name}
-                            // style={getStyles(name, personName, theme)}
-                            >
-                            {name}
-                            </MenuItem>
-                        ))}
-                        </Select>
-                    </FormControl>
-                    </>
-                    }
-                    {configName.length > 0 &&
-                    <Button variant="outlined" color="error" startIcon={<DeleteForeverIcon />} onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
-                    }
+            <Box>
+                <Grid container>
+                    <Grid item xs={6}>
+                        <Stack direction="row" spacing={2}>
+                            {previousConfigs.length > 0 && 
+                            <>
+                            <InputLabel style={{paddingTop:"8px"}} id="previous-configs-label">Saved Configurations:</InputLabel>
+                            <FormControl sx={{ width: 200 }}>
+                                <Select
+                                labelId="previous-configs-label"
+                                id="previous-configs-select"
+                                value={configName}
+                                onChange={handleConfigSelection}
+                                // MenuProps={MenuProps}
+                                size="small"
+                                >
+                                {previousConfigs.map((name) => (
+                                    <MenuItem
+                                    key={name}
+                                    value={name}
+                                    // style={getStyles(name, personName, theme)}
+                                    >
+                                    {name}
+                                    </MenuItem>
+                                ))}
+                                </Select>
+                            </FormControl>
+                            </>
+                            }
+                            {configName.length > 0 &&
+                            <Button variant="outlined" color="error" startIcon={<DeleteForeverIcon />} onClick={() => setOpenDeleteConfig(true)}>Delete</Button>
+                            }
+                        </Stack>
+                    </Grid>
 
-                </Stack>
-                <Box sx={{ flexGrow: 1 }}>
+                    <Grid item xs={6}>
+                        <Stack direction="row" spacing={2} justifyContent={'flex-end'} alignItems={'flex-end'} sx={{marginBottom: 2}}>
+                            <FormControl >
+                                <InputLabel id="solve-sweep-label">Analysis Type</InputLabel>
+                                <Select labelId="solve-sweep-label" id="solve-sweep-select" label="Analysis Type" size="small" 
+                                sx={{textAlign: "left"}}
+                                value={solveType}
+                                onChange={props.handleSelectSolveType}
+                                >
+                                <MenuItem value="solve">optimization</MenuItem>
+                                <MenuItem value="sweep">sensitivity analysis</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <div>
+                                <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset} fullWidth>RESET FLOWSHEET</Button>
+                            </div>
+                            <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
+                                <div>
+                                <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)} disabled={disableRun}>RUN</Button>
+                                </div>
+                            </Tooltip>
+                        </Stack>
+                    </Grid>
+
+                </Grid>
                 
-                </Box>
-                <Stack direction="row" spacing={2}>
-                    {/* <Button variant="outlined" startIcon={<SaveIcon />} onClick={()=>updateFlowsheetData(flowsheetData.inputData,null)}>UPDATE FLOWSHEET</Button> */}
-                    
-                    <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset}>RESET FLOWSHEET</Button>
-                    <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
-                        <div>
-                        <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)} disabled={disableRun}>RUN</Button>
-                        </div>
-                    </Tooltip>
-                </Stack>
-            </Toolbar>
+                
+            </Box>
                 
 
             <Grid container spacing={2} alignItems="flex-start">

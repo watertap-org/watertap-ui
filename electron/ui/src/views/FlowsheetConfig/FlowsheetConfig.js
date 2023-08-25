@@ -5,8 +5,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getFlowsheet, saveFlowsheet, resetFlowsheet, unbuildFlowsheet } from "../../services/flowsheet.service"; 
 import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
 import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar, Stack, Divider } from '@mui/material';
-import { Select, InputLabel, MenuItem, FormControl, TextField } from '@mui/material';
+import { Select, InputLabel, MenuItem, FormControl, TextField, Collapse, IconButton } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import Graph from "../../components/Graph/Graph";
 import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
@@ -59,13 +61,14 @@ export default function FlowsheetConfig() {
     const [ solveType, setSolveType ] = useState("solve")
     const [ analysisName, setAnalysisName ] = useState("")
     const [ isBuilt, setIsBuilt ] = useState(false)
+    const [ showBuildOptions, setShowBuildOptions ] = useState(true)
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
       if( !params.hasOwnProperty("id") || !params.id)
         return;
 
-      getFlowsheet(params.id, 0)
+      getFlowsheet(params.id, 1)
       .then(response => response.json())
       .then((data)=>{
         console.log("Flowsheet Data:", data);
@@ -89,6 +92,11 @@ export default function FlowsheetConfig() {
       }
       
     }, [flowsheetData])
+
+    useEffect(() => {
+      if (tabValue !== 0) setShowBuildOptions(false)
+      
+    }, [tabValue])
 
     const runBuildFlowsheet = () => {
       setLoadingFlowsheetData(true)
@@ -114,6 +122,7 @@ export default function FlowsheetConfig() {
         setFlowsheetData({outputData:null, inputData: data, name: data.name});
         setTitle(getTitle(data));
         setIsBuilt(false)
+        setTabValue(0)
       }).catch((e) => {
         console.error('error getting flowsheet: ',e)
         navigateHome(e)
@@ -300,53 +309,52 @@ export default function FlowsheetConfig() {
             <Graph/>
 
             <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
-
-              <div style={{display:"flex", justifyContent: "space-between"}}>
-                <h3 style={{marginBottom: 5, marginTop:10}}>Run a new analysis</h3>
-                {/* <Typography style={{ marginTop:10}}>
-                    DEGREES OF FREEDOM: {flowsheetData.inputData.dof}
-                </Typography> */}
+              <div style={{display:"flex", justifyContent: "space-between"}} >
+                <h3 style={{marginBottom: 5, marginTop:10}}>
+                  Build Options
+                  <IconButton disableRipple size="small" sx={{marginTop: -3, marginBottom: -3}} onClick={() => {setShowBuildOptions(!showBuildOptions)}}>
+                    {showBuildOptions ? <ExpandLess /> : <ExpandMore />}
+                  </IconButton>
+                </h3>
               </div>
-
               <Divider light sx={{marginBottom:"20px"}}/>
+              <Collapse in={showBuildOptions} timeout="auto" unmountOnExit>
               <Grid container sx={{marginBottom: "50px"}}>
                 <Grid item xs={6}>
 
                   <FormControl fullWidth sx={{marginBottom: 2}}>
-                    <InputLabel id="solve-sweep-label">Analysis Type</InputLabel>
+                    <InputLabel id="solve-sweep-label">Build Option 1</InputLabel>
                     <Select labelId="solve-sweep-label" id="solve-sweep-select" label="Analysis Type" size="small" 
                       sx={{textAlign: "left"}}
-                      value={solveType}
-                      onChange={handleSelectSolveType}
+                      value="with-bypass"
+                      // onChange={handleSelectSolveType}
                       disabled={tabValue!==0}
                     >
-                      <MenuItem value="solve">optimization</MenuItem>
-                      <MenuItem value="sweep">sensitivity analysis</MenuItem>
+                      <MenuItem value="with-bypass">With Bypass</MenuItem>
+                      <MenuItem value="without-bypass">Without Bypass</MenuItem>
                     </Select>
                   </FormControl>
 
                 </Grid>
                 <Grid item xs={6}></Grid>
                 <Grid item xs={6}>
-                  <TextField label='Analysis Name' variant="outlined" size="small" fullWidth sx={{marginBottom: 2}}
-                    value={analysisName ? analysisName : ""}
-                    onChange={handleChangeAnalysisName}
-                  />
+                  <FormControl fullWidth sx={{marginBottom: 2}}>
+                      <InputLabel id="solve-sweep-label">Build Option 2</InputLabel>
+                      <Select labelId="solve-sweep-label" id="solve-sweep-select" label="Analysis Type" size="small" 
+                        sx={{textAlign: "left"}}
+                        value="with-bypass"
+                        // onChange={handleSelectSolveType}
+                        disabled={tabValue!==0}
+                      >
+                        <MenuItem value="with-bypass">With RO</MenuItem>
+                        <MenuItem value="without-bypass">Without RO</MenuItem>
+                      </Select>
+                    </FormControl>
                 </Grid>
                 <Grid item xs={6}></Grid>
                 <Grid item xs={6}>
                   <div style={{display:"flex"}}>
-                    <Button size="small" variant="outlined" color="error" sx={{marginRight: 1}}
-                      onClick={unBuildFlowsheet}  
-                    >
-                      X Cancel
-                    </Button>
-                    <Button disabled={!isBuilt} variant="outlined" startIcon={<SaveIcon />} sx={{marginLeft: 1, marginRight: 1}}
-                      onClick={handleSaveConfiguration} 
-                    >
-                        Save Configuration
-                    </Button>
-                    <Button size="small" variant="contained" color="primary" sx={{marginLeft: 1}} onClick={runBuildFlowsheet}>
+                    <Button size="small" variant="contained" color="primary" sx={{marginLeft: 1}} onClick={runBuildFlowsheet} disabled={tabValue!==0}>
                       {isBuilt ? "Re-build Flowsheet" : "Build Flowsheet"}
                     </Button>
                   </div>
@@ -354,34 +362,13 @@ export default function FlowsheetConfig() {
                 </Grid>
                 <Grid item xs={6}></Grid>
               </Grid>
-
+              </Collapse>
 
               {isBuilt && 
     
                 <Box>
                   <Grid container>
                   <Grid item xs={12}>
-                    {/* <Stack
-                      direction="row"
-                      justifyContent="left"
-                      alignItems="left"
-                      spacing={2}
-                    >
-                      <ToggleButtonGroup
-                          orientation="horizontal"
-                          value={solveType}
-                          exclusive
-                          onChange={handleToggleSolveType}
-                          disabled={tabValue!==0}
-                      >
-                          <ToggleButton value="solve" aria-label="solve">
-                          <Typography>Solve</Typography>
-                          </ToggleButton>
-                          <ToggleButton value="sweep" aria-label="sweep">
-                          <Typography>Sweep</Typography>
-                          </ToggleButton>
-                      </ToggleButtonGroup>
-                    </Stack> */}
                     
                     </Grid>
                     <Grid item xs={12}>
@@ -405,6 +392,7 @@ export default function FlowsheetConfig() {
                               updateFlowsheetData={updateFlowsheetData}
                               reset={reset}
                               solveType={solveType}
+                              handleSelectSolveType={handleSelectSolveType}
                               >
                   </ConfigInput>
                 </TabPanel>
