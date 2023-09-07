@@ -8,6 +8,10 @@ describe('Display Data Rounding', () => {
         sc_count+=1
         cy.wait (5000)
 
+        //click on all flowsheets  
+        cy.findByText("All Flowsheets").click()
+
+
         //click flowsheet and wait for api response
         var flowsheet_name = "Magprex flowsheet"
         cy.intercept({

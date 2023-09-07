@@ -7,6 +7,9 @@ describe('Flowsheet Output Test', () => {
         cy.screenshot(sc_count+'_loaded homepage')
         sc_count+=1
 
+        //click on all flowsheets  
+        cy.findByText("All Flowsheets").click()
+
         //click flowsheet and wait for api response
         var flowsheet_name = "Metab flowsheet"
         cy.intercept({
