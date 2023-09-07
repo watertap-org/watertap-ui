@@ -61,7 +61,7 @@ export default function FlowsheetConfig() {
     const [ solveType, setSolveType ] = useState("solve")
     const [ analysisName, setAnalysisName ] = useState("")
     const [ isBuilt, setIsBuilt ] = useState(false)
-    const [ showBuildOptions, setShowBuildOptions ] = useState(true)
+    const [ showBuildOptions, setShowBuildOptions ] = useState(false)
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
