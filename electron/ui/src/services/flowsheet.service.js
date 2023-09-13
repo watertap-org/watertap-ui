@@ -29,3 +29,11 @@ export const unbuildFlowsheet = (id) => {
         mode: 'cors'
     });
 }; 
+
+export const selectOption = (id, data) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/select_option', {
+        method: 'POST', 
+        mode: 'cors',
+        body: JSON.stringify(data)
+    });
+}; 

@@ -66,6 +66,26 @@ async def get_config(id_: str, build: str = "0") -> FlowsheetExport:
             info.updated(built=True)
     return flowsheet.fs_exp
 
+@router.post("/{id_}/select_option", response_model=FlowsheetExport)
+async def select_option(id_: str, request: Request) -> FlowsheetExport:
+    """Get flowsheet configuration.
+
+    Args:
+        id_: Flowsheet identifier
+        option_name: name of option to select
+
+    Returns:
+        Flowsheet export model
+    """
+    req = await request.json()
+    # input_data = req["input_data"]
+    option_name = req["option_name"]
+    new_option = req["new_option"]
+
+    flowsheet = flowsheet_manager.get_obj(id_)
+    flowsheet.select_option(option_name, new_option)
+    return flowsheet.fs_exp
+
 
 @router.get("/{flowsheet_id}/diagram")
 async def get_diagram(flowsheet_id: str):

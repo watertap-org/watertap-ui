@@ -15,6 +15,7 @@ import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
 import ErrorBar from "../../components/ErrorBar/ErrorBar";
 import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
+import BuildOptions from '../../components/BuildOptions/BuildOptions';
 
 
 function TabPanel(props) {
@@ -322,86 +323,17 @@ export default function FlowsheetConfig() {
                 build options component
               */}
               {flowsheetData.inputData.options && Object.keys(flowsheetData.inputData.options).length > 0 &&
-                <Box>
-                  <div style={{display:"flex", justifyContent: "space-between"}} >
-                    <h3 style={{marginBottom: 5, marginTop:10}}>
-                      Build Options
-                      <IconButton disableRipple size="small" sx={{marginTop: -3, marginBottom: -3}} onClick={() => {setShowBuildOptions(!showBuildOptions)}}>
-                        {showBuildOptions ? <ExpandLess /> : <ExpandMore />}
-                      </IconButton>
-                    </h3>
-                  </div>
-                  <Divider light sx={{marginBottom:"20px"}}/>
-                  <Collapse in={showBuildOptions} timeout="auto" unmountOnExit>
-                  <Grid container sx={{marginBottom: "50px"}}>
-                    {Object.entries(flowsheetData.inputData.options).map(([k,v]) => {
-                      return (
-                        <Fragment key={k}>
-                          <Grid item xs={6}>
-                            <FormControl fullWidth sx={{marginBottom: 2}}>
-                              <InputLabel id={`${k}_label`}>{v.display_name}</InputLabel>
-                              <Select labelId={`${k}_label`} id={`${k}`} label={v.display_name} size="small" 
-                                sx={{textAlign: "left"}}
-                                value={v.value}
-                                // onChange={handleSelectSolveType}
-                                disabled={tabValue!==0}
-                              >
-                                {v.values_allowed.map((va, idx) => (
-                                  <MenuItem key={idx} value={va}>{formatOptionType(va)}</MenuItem>
-                                ))}
-                              </Select>
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={6}></Grid>
-                        </Fragment>
-                      )
-                    })}
+                <BuildOptions
+                  flowsheetData={flowsheetData} 
+                  tabValue={tabValue} 
+                  isBuilt={isBuilt} 
+                  showBuildOptions={showBuildOptions}
+                  setShowBuildOptions={setShowBuildOptions} 
+                  runBuildFlowsheet={runBuildFlowsheet}
+                  setFlowsheetData={setFlowsheetData}
+                >
 
-                    {/* <Grid item xs={6}>
-                      <FormControl fullWidth sx={{marginBottom: 2}}>
-                        <InputLabel id="solve-sweep-label">Build Option 1</InputLabel>
-                        <Select labelId="solve-sweep-label" id="solve-sweep-select" label="Analysis Type" size="small" 
-                          sx={{textAlign: "left"}}
-                          value="with-bypass"
-                          // onChange={handleSelectSolveType}
-                          disabled={tabValue!==0}
-                        >
-                          <MenuItem value="with-bypass">With Bypass</MenuItem>
-                          <MenuItem value="without-bypass">Without Bypass</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={6}></Grid>
-
-                    <Grid item xs={6}>
-                      <FormControl fullWidth sx={{marginBottom: 2}}>
-                          <InputLabel id="solve-sweep-label">Build Option 2</InputLabel>
-                          <Select labelId="solve-sweep-label" id="solve-sweep-select" label="Analysis Type" size="small" 
-                            sx={{textAlign: "left"}}
-                            value="with-bypass"
-                            // onChange={handleSelectSolveType}
-                            disabled={tabValue!==0}
-                          >
-                            <MenuItem value="with-bypass">With RO</MenuItem>
-                            <MenuItem value="without-bypass">Without RO</MenuItem>
-                          </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={6}></Grid> */}
-
-                    
-                    <Grid item xs={6}>
-                      <div style={{display:"flex"}}>
-                        <Button size="small" variant="contained" color="primary" sx={{marginLeft: 1}} onClick={runBuildFlowsheet} disabled={tabValue!==0}>
-                          {isBuilt ? "Re-build Flowsheet" : "Build Flowsheet"}
-                        </Button>
-                      </div>
-                      
-                    </Grid>
-                    <Grid item xs={6}></Grid>
-                  </Grid>
-                  </Collapse>
-                </Box>
+                </BuildOptions>
               }
               
 
