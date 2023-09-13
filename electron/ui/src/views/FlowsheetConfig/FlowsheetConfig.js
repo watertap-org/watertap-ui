@@ -1,7 +1,7 @@
 //import './Page.css';
 import React from 'react'; 
-import {useEffect, useState, Fragment } from 'react';   
-import { useParams, useNavigate } from "react-router-dom";
+import {useEffect, useState } from 'react';   
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getFlowsheet, saveFlowsheet, resetFlowsheet, unbuildFlowsheet } from "../../services/flowsheet.service"; 
 import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
 import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar, Stack, Divider } from '@mui/material';
@@ -49,6 +49,7 @@ function a11yProps(index) {
 export default function FlowsheetConfig() {
     let navigate = useNavigate();
     let params = useParams(); 
+    const location = useLocation();
     const [flowsheetData, setFlowsheetData] = useState({inputData:{}, outputData:null}); 
     const [loadingFlowsheetData, setLoadingFlowsheetData] = useState(true);
     const [tabValue, setTabValue] = useState(0);
@@ -68,8 +69,14 @@ export default function FlowsheetConfig() {
       //console.log("params.id",params.id);
       if( !params.hasOwnProperty("id") || !params.id)
         return;
-
-      getFlowsheet(params.id, 1)
+      // gotta find a way to figure out whether to build or not
+      let to_build = 1
+      try {
+        if(location.state.built) to_build = 0
+      } catch(e) {
+        console.log('unable to check for built status; defaulting to build flowsheet')
+      }
+      getFlowsheet(params.id, to_build)
       .then(response => response.json())
       .then((data)=>{
         console.log("Flowsheet Data:", data);
@@ -114,21 +121,22 @@ export default function FlowsheetConfig() {
       });
     }
 
-    const unBuildFlowsheet = () => {
-      unbuildFlowsheet(params.id, 1)
-      .then(response => response.json())
-      .then((data)=>{
-        console.log("Flowsheet Data:", data);
-        setLoadingFlowsheetData(false)
-        setFlowsheetData({outputData:null, inputData: data, name: data.name});
-        setTitle(getTitle(data));
-        setIsBuilt(false)
-        setTabValue(0)
-      }).catch((e) => {
-        console.error('error getting flowsheet: ',e)
-        navigateHome(e)
-      });
-    }
+    // const rebuildFlowsheet = () => {
+    //   unbuildFlowsheet(params.id, 1)
+    //   .then(response => response.json())
+    //   .then((data)=>{
+    //     console.log("Flowsheet Data:", data);
+    //     setLoadingFlowsheetData(false)
+    //     setFlowsheetData({outputData:null, inputData: data, name: data.name});
+    //     setTitle(getTitle(data));
+    //     setIsBuilt(false)
+    //     setTabValue(0)
+    //     runBuildFlowsheet()
+    //   }).catch((e) => {
+    //     console.error('error getting flowsheet: ',e)
+    //     navigateHome(e)
+    //   });
+    // }
 
     const navigateHome = (e) => {
       navigate("/flowsheets", {replace: true, state:{error:e}})

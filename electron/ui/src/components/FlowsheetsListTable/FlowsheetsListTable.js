@@ -72,8 +72,8 @@ export default function FlowsheetsListTable(props) {
       }
     }, [props.rows, category])
 
-    const handleFlowsheetClick = (id) => {
-        navigate("/flowsheet/" + id + "/config", {replace: true})
+    const handleFlowsheetClick = (id, built) => {
+        navigate("/flowsheet/" + id + "/config", {replace: true, state:{built: built}})
     }
     const styles = {
         listRow: {
@@ -205,7 +205,7 @@ export default function FlowsheetsListTable(props) {
                     <TableRow
                         key={row.name}
                         sx={styles.listRow}
-                        onClick={()=>handleFlowsheetClick(row.id_)}
+                        onClick={()=>handleFlowsheetClick(row.id_, row.built)}
                     >
                     <TableCell>{row.description}</TableCell>
                     <TableCell align="right">{formatLastRun(row.last_run)}</TableCell>

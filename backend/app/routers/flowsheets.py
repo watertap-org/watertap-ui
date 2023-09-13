@@ -61,9 +61,11 @@ async def get_config(id_: str, build: str = "0") -> FlowsheetExport:
     flowsheet = flowsheet_manager.get_obj(id_)
     if build == "1":
         info = flowsheet_manager.get_info(id_)
-        if not info.built:
-            flowsheet.build()
-            info.updated(built=True)
+        # if not info.built:
+        #     flowsheet.build()
+        #     info.updated(built=True)
+        flowsheet.build()
+        info.updated(built=True)
     return flowsheet.fs_exp
 
 @router.post("/{id_}/select_option", response_model=FlowsheetExport)
