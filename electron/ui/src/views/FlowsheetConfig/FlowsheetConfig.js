@@ -72,7 +72,16 @@ export default function FlowsheetConfig() {
       // gotta find a way to figure out whether to build or not
       let to_build = 1
       try {
+        // 4 possibilities
+        // hasoptions AND built -> dont build, dont show build options
+        // hasoptions and !build -> dont build, show build options
+        // !hasoptions and built -> dont build, dont show build options
+        // !hasoptions and !built -> build, dont show build options
         if(location.state.built) to_build = 0
+        else if(location.state.hasOptions) {
+          to_build = 0
+          setShowBuildOptions(true)
+        }
       } catch(e) {
         console.log('unable to check for built status; defaulting to build flowsheet')
       }

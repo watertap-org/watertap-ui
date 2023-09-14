@@ -40,6 +40,7 @@ class FlowsheetInfo(BaseModel):
     name: str
     description: str = ""
     module: str = ""
+    options: dict = {}
     # current status of flowsheet
     built: bool = False
     ts: float = 0  # time last updated (including built)
@@ -137,6 +138,7 @@ class FlowsheetManager:
             name=export.name,
             description=export.description,
             module=module_name,
+            options=export.options,
         )
         self._flowsheets[module_name] = info
         self._objs[module_name] = fsi
