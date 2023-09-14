@@ -173,7 +173,10 @@ class FlowsheetManager:
 
         # check if get_diagram function was provided by export
         flowsheet = self.get_obj(id_)
-        img_name = flowsheet.get_diagram(build_options=flowsheet.fs_exp.options)
+        try:
+            img_name = flowsheet.get_diagram(build_options=flowsheet.fs_exp.options)
+        except:
+            img_name = None
         
         data = b""
         info = self.get_info(id_)
