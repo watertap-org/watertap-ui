@@ -146,7 +146,7 @@ export default function FlowsheetsListTable(props) {
                         Category
                       </span>
                   </TableCell>
-                  <TableCell>Tags</TableCell>
+                  {/* <TableCell>Tags</TableCell> */}
                   <TableCell align="right"></TableCell> 
               </TableRow>
               </TableHead>
@@ -158,7 +158,7 @@ export default function FlowsheetsListTable(props) {
                       onClick={()=>setCategory(key)}
                   >
                   <TableCell>{key}</TableCell>
-                  <TableCell></TableCell>
+                  {/* <TableCell></TableCell> */}
                   <TableCell align="right">
                     <span>
                       <IconButton><ArrowRightAltIcon/></IconButton>
@@ -168,7 +168,7 @@ export default function FlowsheetsListTable(props) {
               ))}
               <TableRow sx={styles.listRow} onClick={()=>setCategory("all")}>
                   <TableCell>All Flowsheets</TableCell>
-                  <TableCell></TableCell>
+                  {/* <TableCell></TableCell> */}
                   <TableCell align="right">
                     <span>
                       <IconButton><ArrowRightAltIcon/></IconButton>

@@ -170,6 +170,11 @@ class FlowsheetManager:
         Raises:
             HTTPException: if the flowsheet itself cannot be found
         """
+
+        # check if get_diagram function was provided by export
+        flowsheet = self.get_obj(id_)
+        img_name = flowsheet.get_diagram(build_options=flowsheet.fs_exp.options)
+        
         data = b""
         info = self.get_info(id_)
 
@@ -179,10 +184,12 @@ class FlowsheetManager:
         else:
             p, m = info.module[:dot], info.module[dot + 1 :]
             try:
-                data = files(p).joinpath(f"{m}.png").read_bytes()
+                if img_name is not None: # export provided diagram name
+                    data = files(p).joinpath(img_name).read_bytes()
+                else: # export did not provide diagram. check for image with same name as export:
+                    data = files(p).joinpath(f"{m}.png").read_bytes()
             except (FileNotFoundError, IOError) as err:
                 _log.error(f"Cannot read diagram for flowsheet '{id_}': {err}")
-
         return data
 
     def get_obj(self, id_: str) -> FlowsheetInterface:
