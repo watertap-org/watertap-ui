@@ -40,7 +40,7 @@ class FlowsheetInfo(BaseModel):
     name: str
     description: str = ""
     module: str = ""
-    options: dict = {}
+    build_options: dict = {}
     # current status of flowsheet
     built: bool = False
     ts: float = 0  # time last updated (including built)
@@ -138,7 +138,7 @@ class FlowsheetManager:
             name=export.name,
             description=export.description,
             module=module_name,
-            options=export.options,
+            build_options=export.build_options,
         )
         self._flowsheets[module_name] = info
         self._objs[module_name] = fsi
@@ -176,7 +176,7 @@ class FlowsheetManager:
         # check if get_diagram function was provided by export
         flowsheet = self.get_obj(id_)
         try:
-            img_name = flowsheet.get_diagram(build_options=flowsheet.fs_exp.options)
+            img_name = flowsheet.get_diagram(build_options=flowsheet.fs_exp.build_options)
         except:
             img_name = None
         

@@ -339,7 +339,7 @@ export default function FlowsheetConfig() {
               {/* 
                 build options component
               */}
-              {flowsheetData.inputData.options && Object.keys(flowsheetData.inputData.options).length > 0 &&
+              {flowsheetData.inputData.build_options && Object.keys(flowsheetData.inputData.build_options).length > 0 &&
                 <BuildOptions
                   flowsheetData={flowsheetData} 
                   tabValue={tabValue} 

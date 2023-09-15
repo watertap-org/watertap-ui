@@ -13,7 +13,6 @@ export default function BuildOptions(props) {
     const { flowsheetData, tabValue, isBuilt, showBuildOptions, setShowBuildOptions, runBuildFlowsheet, setFlowsheetData } = props
     const [ options, setOptions ] = useState({})
 
-
     const formatOptionType = (option) => {
       try {
         return option.toString()
@@ -49,7 +48,7 @@ export default function BuildOptions(props) {
         <Divider light sx={{marginBottom:"20px"}}/>
         <Collapse in={showBuildOptions} timeout="auto" unmountOnExit>
         <Grid container sx={{marginBottom: "50px"}}>
-        {Object.entries(flowsheetData.inputData.options).map(([k,v]) => {
+        {Object.entries(flowsheetData.inputData.build_options).map(([k,v]) => {
             return (
             <Fragment key={k}>
                 <Grid item xs={6}>
@@ -62,7 +61,7 @@ export default function BuildOptions(props) {
                         onChange={handleSelect}
                         disabled={tabValue!==0}
                     >
-                    {v.display_values.map((va, idx) => (
+                    {v.values_allowed.map((va, idx) => (
                         <MenuItem key={idx} value={va}>{formatOptionType(va)}</MenuItem>
                     ))}
                     </Select>

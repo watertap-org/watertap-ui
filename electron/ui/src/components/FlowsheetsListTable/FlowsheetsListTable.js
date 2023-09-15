@@ -207,7 +207,7 @@ export default function FlowsheetsListTable(props) {
                     <TableRow
                         key={row.name}
                         sx={styles.listRow}
-                        onClick={()=>handleFlowsheetClick(row.id_, row.built, row.options)}
+                        onClick={()=>handleFlowsheetClick(row.id_, row.built, row.build_options)}
                     >
                     <TableCell>{row.description}</TableCell>
                     <TableCell align="right">{formatLastRun(row.last_run)}</TableCell>
