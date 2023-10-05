@@ -7,22 +7,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
-// const CATEGORIES = [
-//   {
-//     name: "Desalination",
-//     flowsheets: [
-//       "Magprex flowsheet",
-//       "Metab flowsheet",
-//     ]
-//   },
-//   {
-//     name: "Wastewater Recovery",
-//     flowsheets: [
-//       "Groundwater treatment flowsheet",
-//       "Biomembrane filtration flowsheet",
-//     ]
-//   },
-// ]
 
 const CATEGORIES = {
     "Desalination": [
