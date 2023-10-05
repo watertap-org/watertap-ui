@@ -81,19 +81,8 @@ class FlowsheetManager:
                 # _log.info(f'adding flowsheet with name: {name} and fsi: {fsi}')
                 self.add_flowsheet_interface(name, fsi)
 
-        ## add custom flowsheets
-        _log.info(f'adding path for custom flowsheets')
-        custom_flowsheets_path = Path.home() / ".watertap" / "python_files"
-        custom_flowsheet_name = "example"
-        # _log.info(custom_flowsheets_path)
-        sys.path.append(str(custom_flowsheets_path))
-        import example_ui
-        custom_flowsheet = example_ui
-        _log.info(f'adding custom flowsheet: {custom_flowsheet_name}')
-        fsi = self._get_flowsheet_interface(custom_flowsheet)
-        _log.info(f'custom fsi is {fsi}')
-        self.add_flowsheet_interface(custom_flowsheet_name, fsi)
-
+        # Search for and add user uploaded flowsheets
+        self.add_custom_flowsheets()
 
         # Connect to history DB
         path = self.app_settings.data_basedir / self.HISTORY_DB_FILE
@@ -393,6 +382,30 @@ class FlowsheetManager:
                 interfaces[module_name] = interface
 
         return interfaces
+    
+    def add_custom_flowsheets(self):
+        """Search for user uploaded flowsheets. If found, add them as flowsheet interfaces."""
+        from os import walk
+        import importlib
+        custom_flowsheets_path = Path.home() / ".watertap" / "python_files"
+        sys.path.append(str(custom_flowsheets_path))
+
+        files = [] 
+        for (_, _, filenames) in walk(custom_flowsheets_path):
+            files.extend(filenames)
+            break
+
+        for f in files:
+            if '_ui.py' in f:
+                try:
+                    _log.info(f'attempting to add custom flowsheet module: {f}')
+                    module_name = f.replace('.py','')
+                    custom_module = importlib.import_module(module_name)
+                    fsi = self._get_flowsheet_interface(custom_module)
+                    self.add_flowsheet_interface(module_name, fsi)
+                except Exception as e:
+                    _log.error(f'unable to add flowsheet module: {e}')
+
 
     @staticmethod
     def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:
@@ -423,5 +436,3 @@ class FlowsheetManager:
             return None
         # Return created FlowsheetInterface
         return interface
-
-
