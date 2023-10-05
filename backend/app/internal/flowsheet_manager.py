@@ -387,7 +387,7 @@ class FlowsheetManager:
         """Search for user uploaded flowsheets. If found, add them as flowsheet interfaces."""
         from os import walk
         import importlib
-        custom_flowsheets_path = Path.home() / ".watertap" / "python_files"
+        custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
         sys.path.append(str(custom_flowsheets_path))
 
         files = [] 
