@@ -153,7 +153,8 @@ def run_parameter_sweep(flowsheet, info):
         )
         results = run_analysis(
             m=flowsheet.fs_exp.m,
-            flowsheet=info.module[0:-3],
+            # flowsheet=info.module[0:-3], # replace _ui instead?
+            flowsheet=info.module.replace('_ui',''),
             parameters=parameters,
             output_params=output_params,
             results_path=output_path,

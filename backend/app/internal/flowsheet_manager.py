@@ -78,7 +78,22 @@ class FlowsheetManager:
             for name, fsi in self._get_flowsheet_interfaces(package).items():
                 _log.debug(f"Add flowsheet interface '{fsi.fs_exp.name}' "
                            f"for module '{name}'")
+                # _log.info(f'adding flowsheet with name: {name} and fsi: {fsi}')
                 self.add_flowsheet_interface(name, fsi)
+
+        ## add custom flowsheets
+        _log.info(f'adding path for custom flowsheets')
+        custom_flowsheets_path = Path.home() / ".watertap" / "python_files"
+        custom_flowsheet_name = "example"
+        # _log.info(custom_flowsheets_path)
+        sys.path.append(str(custom_flowsheets_path))
+        import example_ui
+        custom_flowsheet = example_ui
+        _log.info(f'adding custom flowsheet: {custom_flowsheet_name}')
+        fsi = self._get_flowsheet_interface(custom_flowsheet)
+        _log.info(f'custom fsi is {fsi}')
+        self.add_flowsheet_interface(custom_flowsheet_name, fsi)
+
 
         # Connect to history DB
         path = self.app_settings.data_basedir / self.HISTORY_DB_FILE
