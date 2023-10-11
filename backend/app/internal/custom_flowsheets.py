@@ -6,6 +6,7 @@ def get_flowsheet_variables(m):
     fs_components = {}
     failed_variables = []
     failed_categories = []
+    variables_without_pyomo_component_key = []
 
 
     print('getting flowsheet variables')
@@ -103,7 +104,21 @@ def get_flowsheet_variables(m):
                     except Exception as e:
                         print(f'failed on variable key {variable_key}: {e}')
                         print(f'variable is {variable}')
-                        failed_variables.append(variable_key)
+                        # failed_variables.append(variable_key)
+                        # failed_variables.append(variable_location_with_variable_key)
+                        try:
+                            print('trying to just add data[index] for this current state')
+                            # fs_components[variable_location_with_variable_key] = variable['data']['None']
+                            variable_data = variable['data']
+                            sub_variable_index, _ = list(variable_data.items())[0]
+                            leaf_node = variable_data[sub_variable_index]
+                            variable_location_final = variable_location_with_variable_key+f'[{sub_variable_index}]'
+                            fs_components[variable_location_final] = leaf_node
+                            variables_without_pyomo_component_key.append(variable_location_final)
+                        except Exception as e2:
+                            print(f'failed on variable key again {variable_key}: {e2}')
+                            failed_variables.append(variable_location_with_variable_key)
+
             except Exception as e:
                 print(f'failed on category {category_key}: {e}')
                 print(f'category_components is {category_components}')
@@ -111,7 +126,7 @@ def get_flowsheet_variables(m):
                 # return fs_components
     except:
         print(f'total failure: {e}')
-        return fs_components, failed_categories, failed_variables
+        return fs_components, failed_categories, failed_variables, variables_without_pyomo_component_key
 
             # variable_index, _ = list(variable.items())[0]
             # print(f'variable index is {variable_index}')
@@ -157,6 +172,6 @@ def get_flowsheet_variables(m):
     # gonna have to check for key values at the variable_key point to see if it contains
 
     # variable_location = f'm.fs.{category_key}.{variable_key}'
-    return fs_components, failed_categories, failed_variables
+    return fs_components, failed_categories, failed_variables, variables_without_pyomo_component_key
 
     # succeeds for 301/349 variables in metab
