@@ -11,22 +11,18 @@ import { FileUploader } from "react-drag-drop-files";
 
 export default function NewFlowsheetDialog(props) {
   const { onClose, open } = props;
+  const [ showWarning, setShowWarning ] = useState(false)
+  const [ warningMessage, setWarningMessage ] = useState("")
+  const [ files, setFiles ] = useState({"Model File": null, "Export File": null, "Diagram File": null, "Data Files": []})
+  const fileTypes = {"Model File": ["py"], "Export File": ["py"], "Diagram File": ["png"], "Data Files": ["yaml", "yml", "json", "csv"], };
+
   
 
   const handleClose = () => {
+    setFiles({"Model File": null, "Export File": null, "Diagram File": null, "Data Files": []})
     onClose(null);
-  };
+  }; 
 
-//   const handleCreate = (value) => {
-//     onClose("RELOAD");
-//   };
- 
-
-    const [ showWarning, setShowWarning ] = useState(false)
-    const [ warningMessage, setWarningMessage ] = useState("")
-    const [ file, setFile ] = useState(null)
-    const [ files, setFiles ] = useState({"Model File": null, "Export File": null, "Diagram File": null, "Data Files": []})
-    const fileTypes = {"Model File": ["py"], "Export File": ["py"], "Diagram File": ["png"], "Data Files": ["yaml", "yml", "json", "csv"], };
 
   useEffect(()=>{
     console.log('fileuploadmodal props: ')
@@ -157,7 +153,21 @@ export default function NewFlowsheetDialog(props) {
                 <Button style={{color: '#0884b4',}} variant="outlined">Browse...</Button>
             </Box> */}
             <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                <p style={{marginBottom:0, paddingTop:0}}>{files[fileId] === null ? "" : files[fileId].name}</p>
+                <Grid container>
+                    { fileId === "Data Files" ? 
+                    files[fileId].map((v,i) => (
+                        <Grid item xs={12}>
+                            <p style={{margin: 3}}>{v.name}</p>
+                        </Grid>
+                    )) 
+                    : 
+                        <Grid item xs={12}>
+                            <p style={{margin: 3}}>{files[fileId] === null ? "" : files[fileId].name}</p>
+                        </Grid>
+                    }
+                </Grid>
+                
+                
             </Box>
         </Box>
     )
@@ -165,9 +175,20 @@ export default function NewFlowsheetDialog(props) {
 
    function DragDrop(fileId) {
     const handleChange = (file) => {
-        console.log('setting file for '+fileId+': '+file.name)
         let tempFiles = {...files}
-        tempFiles[fileId] = file
+        if (fileId === "Data Files") {
+            let tempDataFiles = [...tempFiles[fileId]]
+            let fileIndex = tempDataFiles.length
+            // console.log('adding data file #'+fileIndex+': '+file[fileIndex].name)
+            console.log('adding data file #'+fileIndex)
+            console.log('new data file: '+file[0].name)
+            tempDataFiles.push(file[0])
+            console.log('data files is now: '+tempDataFiles)
+            tempFiles[fileId] = tempDataFiles
+        } else {
+            console.log('setting file for '+fileId+': '+file.name)
+            tempFiles[fileId] = file
+        }
         setFiles(tempFiles)
     //   setFile(file);
 
@@ -179,6 +200,7 @@ export default function NewFlowsheetDialog(props) {
         types={fileTypes[fileId]}
         children={fileUploaderContainer(fileId)}
         onTypeError={() => fileTypeError(fileId)}
+        multiple={fileId === "Data Files" ? true : false}
       />
     );
   }
