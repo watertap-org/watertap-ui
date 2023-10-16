@@ -48,7 +48,7 @@ export default function FlowsheetsList() {
     <Container>
       <h2 style={{textAlign:"left"}}>Flowsheets</h2>  
 
-      <FlowsheetsListTable rows={rows}></FlowsheetsListTable> 
+      <FlowsheetsListTable rows={rows} handleNewFlowsheetDialogClickOpen={handleNewFlowsheetDialogClickOpen}></FlowsheetsListTable> 
       
       <NewFlowsheetDialog open={newFlowsheetDialogOpen} onClose={handleReloadData}></NewFlowsheetDialog>
       {location.state && 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Icon } from '@mui/material'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Icon, Button } from '@mui/material'
 import { useNavigate } from "react-router-dom";
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -87,7 +87,7 @@ export default function FlowsheetsListTable(props) {
                         <IconButton>{sortKey==="last_run" && (sortDirection === "ascending" ? <KeyboardArrowDownIcon/> : sortDirection === "descending" &&  <KeyboardArrowUpIcon/>)}</IconButton>
                     </span>
                 </TableCell> 
-                <TableCell></TableCell>
+                <TableCell align="right" sx={{width: "20%"}}><Button variant="contained" onClick={props.handleNewFlowsheetDialogClickOpen}>New Flowsheet +</Button></TableCell>
             </TableRow>
             </TableHead>
             <TableBody>
