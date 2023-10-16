@@ -16,11 +16,6 @@ export default function NewFlowsheetDialog(props) {
   const [ files, setFiles ] = useState({"Model File": null, "Export File": null, "Diagram File": null, "Data Files": []})
   const fileTypes = {"Model File": ["py"], "Export File": ["py"], "Diagram File": ["png"], "Data Files": ["yaml", "yml", "json", "csv"], };
 
-//   useEffect(()=>{
-//     console.log('fileuploadmodal props: ')
-//     console.log(props)
-//   }, [props]);
-
    const styles = {
     modalStyle: {
       position: 'absolute',
@@ -53,9 +48,14 @@ export default function NewFlowsheetDialog(props) {
         textDecoration: "none",
         fontWeight: "bold"
     },
-    fileUploaderBox: {
+    fileUploaderOuterBox: {
         border: '2px dashed black',
         borderRadius:2,
+        // cursor: "pointer"
+    },
+    fileUploaderInnerBox: {
+        display: 'flex', 
+        justifyContent: 'center', 
         px:10,
         py: 3,
         cursor: "pointer"
@@ -104,7 +104,7 @@ export default function NewFlowsheetDialog(props) {
         }
         if (filesAreValid) {
             // make api call
-
+            console.log('passed file name checks')
 
             setShowWarning(false)
             handleClose()
@@ -137,11 +137,6 @@ export default function NewFlowsheetDialog(props) {
    }
 
    const removeFile = (fileId, i, e) => {
-    e.stopPropagation()
-    // e.preventDefault()
-    console.log('removing file for '+fileId)
-    console.log('event is ')
-    console.log(e)
     let tempFiles = {...files}
     if (fileId === "Data Files") {
         let tempDataFiles = [...tempFiles[fileId]]
@@ -154,36 +149,14 @@ export default function NewFlowsheetDialog(props) {
     setFiles(tempFiles)
    }
 
-   const clickP = (e) => {
-    e.stopPropagation()
-    console.log('clicked p')
-   }
+
 
    const fileUploaderContainer = (fileId) => {
     return (
-        <Box sx={styles.fileUploaderBox} style={fileId === "Data Files" ? {backgroundColor: "#D4EFFF"} : files[fileId] !== null ? {backgroundColor: "#D7F5D7"} : {backgroundColor: "#FEF1F0"}}>
-            <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                <h4 style={{marginTop:0, paddingTop:0, color:"#9B9B9B"}}>Drag and drop <u>{fileId}</u> or <Button style={{color: '#0884b4',}} variant="outlined">Browse...</Button></h4>
-            </Box>
-            <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                <Grid container>
-                    { fileId === "Data Files" ? 
-                    files[fileId].map((v,i) => (
-                        <Grid item xs={12} key={i}>
-                            <p style={{margin: 3}} onClick={clickP}>{v.name}<IconButton onClick={(e) => removeFile(fileId, i, e)}><CloseIcon sx={{fontSize: "15px"}}/></IconButton></p>
-                        </Grid>
-                    )) 
-                    : 
-                        files[fileId] !== null &&
-                        <Grid item xs={12}>
-                            <p style={{margin: 3}}>{files[fileId] === null ? "" : files[fileId].name}<IconButton onClick={(e) => removeFile(fileId, -1, e)}><CloseIcon sx={{fontSize: "15px"}}/></IconButton></p>
-                        </Grid>
-                    }
-                </Grid>
-                
-                
-            </Box>
+        <Box sx={styles.fileUploaderInnerBox}>
+            <h4 style={{margin:0, color:"#9B9B9B"}}>Drag and drop <u>{fileId}</u> or <Button style={{color: '#0884b4'}} variant="outlined">Browse...</Button></h4>
         </Box>
+
     )
    }
 
@@ -192,31 +165,51 @@ export default function NewFlowsheetDialog(props) {
         let tempFiles = {...files}
         if (fileId === "Data Files") {
             let tempDataFiles = [...tempFiles[fileId]]
-            let fileIndex = tempDataFiles.length
-            // console.log('adding data file #'+fileIndex+': '+file[fileIndex].name)
-            console.log('adding data file #'+fileIndex)
-            console.log('new data file: '+file[0].name)
             tempDataFiles.push(file[0])
-            console.log('data files is now: '+tempDataFiles)
             tempFiles[fileId] = tempDataFiles
         } else {
-            console.log('setting file for '+fileId+': '+file.name)
             tempFiles[fileId] = file
         }
         setFiles(tempFiles)
-    //   setFile(file);
 
     };
     return (
-      <FileUploader 
-        handleChange={handleChange} 
-        name="file" 
-        types={fileTypes[fileId]}
-        children={fileUploaderContainer(fileId)}
-        onTypeError={() => fileTypeError(fileId)}
-        multiple={fileId === "Data Files" ? true : false}
-        onSelect={(f) => console.log('selected boi')}
-      />
+        <Box 
+                sx={styles.fileUploaderOuterBox} 
+                style={fileId === "Data Files" ? {backgroundColor: "#D4EFFF"} : 
+                files[fileId] !== null ? {backgroundColor: "#D7F5D7"} : 
+                {backgroundColor: "#FEF1F0"}}
+        >
+            <FileUploader 
+                handleChange={handleChange} 
+                name="file" 
+                types={fileTypes[fileId]}
+                children={fileUploaderContainer(fileId)}
+                onTypeError={() => fileTypeError(fileId)}
+                multiple={fileId === "Data Files" ? true : false}
+                onSelect={(f) => console.log('selected boi')}
+            />
+            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                <Grid container>
+                    { fileId === "Data Files" ? 
+                    files[fileId].map((v,i) => (
+                        <Grid item xs={12} key={i}>
+                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                                <p style={{margin: 3}}>{v.name}<IconButton onClick={(e) => removeFile(fileId, i, e)}><CloseIcon sx={{fontSize: "15px"}}/></IconButton></p>
+                            </Box>
+                        </Grid>
+                    )) 
+                    : 
+                        files[fileId] !== null &&
+                        <Grid item xs={12}>
+                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                                <p style={{margin: 3}}>{files[fileId] === null ? "" : files[fileId].name}<IconButton onClick={(e) => removeFile(fileId, -1, e)}><CloseIcon sx={{fontSize: "15px"}}/></IconButton></p>
+                            </Box>
+                        </Grid>
+                    }
+                </Grid>
+            </Box>
+        </Box>
     );
   }
 
