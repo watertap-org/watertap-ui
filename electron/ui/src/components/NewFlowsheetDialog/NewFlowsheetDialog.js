@@ -7,7 +7,8 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 import { FileUploader } from "react-drag-drop-files";
- 
+import { uploadFlowsheet } from "../../services/flowsheetsList.service"; 
+import { useNavigate } from "react-router-dom";
 
 export default function NewFlowsheetDialog(props) {
   const { onClose, open } = props;
@@ -15,7 +16,7 @@ export default function NewFlowsheetDialog(props) {
   const [ warningMessage, setWarningMessage ] = useState("")
   const [ files, setFiles ] = useState({"Model File": null, "Export File": null, "Diagram File": null, "Data Files": []})
   const fileTypes = {"Model File": ["py"], "Export File": ["py"], "Diagram File": ["png"], "Data Files": ["yaml", "yml", "json", "csv"], };
-
+  let navigate = useNavigate();
    const styles = {
     modalStyle: {
       position: 'absolute',
@@ -105,6 +106,37 @@ export default function NewFlowsheetDialog(props) {
         if (filesAreValid) {
             // make api call
             console.log('passed file name checks')
+            console.log('appending model file: ')
+            console.log(files['Model File'])
+            const formData = new FormData();
+            formData.append('files', files['Model File'], files['Model File'].name);
+            formData.append('files', files['Export File'], files['Export File'].name);
+            formData.append('files', files['Diagram File'], files['Diagram File'].name);
+            for (let dataFile of files['Data Files']) {
+                formData.append('files', dataFile, dataFile.name);
+            }
+
+            // call API upload flowsheet
+            uploadFlowsheet(formData)
+            .then(response => {
+            if (response.status === 200) {
+                response.json()
+                .then((data)=>{
+                    console.log('fileupload successful: ',data)
+                    // navigate('/flowsheets', {replace: true})
+                    window.location = '/flowsheets';
+
+                }).catch((err)=>{
+                    console.error("error on file upload: ",err)
+                })
+            }
+            /*
+                in the case of bad file type
+            */
+            else if (response.status === 400) {
+                console.error("error on file upload: ",response.statusText)
+            }
+            })
 
             setShowWarning(false)
             handleClose()

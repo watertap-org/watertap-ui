@@ -44,6 +44,7 @@ class FlowsheetInfo(BaseModel):
     built: bool = False
     ts: float = 0  # time last updated (including built)
     last_run: str = ""
+    custom: bool = False
 
     # Make sure name is lowercase
     @validator("name")
@@ -114,7 +115,7 @@ class FlowsheetManager:
             )
             
 
-    def add_flowsheet_interface(self, module_name: str, fsi: FlowsheetInterface):
+    def add_flowsheet_interface(self, module_name: str, fsi: FlowsheetInterface, custom: bool = False):
         """Add a flowsheet interface associated with the given module (full dotted
         module path). This will replace any existing interface for this module.
 
@@ -141,6 +142,7 @@ class FlowsheetManager:
             name=export.name,
             description=export.description,
             module=module_name,
+            custom=custom,
         )
         self._flowsheets[module_name] = info
         self._objs[module_name] = fsi
@@ -176,16 +178,22 @@ class FlowsheetManager:
         """
         data = b""
         info = self.get_info(id_)
+        _log.info(f'inide get diagram:: info is - {info}')
+        if info.custom:
+            # do this
+            data_path = Path.home() / ".watertap" / "custom_flowsheets" / f'{info.id_}.png'
+            data = data_path.read_bytes()
 
-        dot = info.module.rfind(".")
-        if dot < 0:
-            _log.error(f"Cannot get diagram for a package ({info.module})")
         else:
-            p, m = info.module[:dot], info.module[dot + 1 :]
-            try:
-                data = files(p).joinpath(f"{m}.png").read_bytes()
-            except (FileNotFoundError, IOError) as err:
-                _log.error(f"Cannot read diagram for flowsheet '{id_}': {err}")
+            dot = info.module.rfind(".")
+            if dot < 0:
+                _log.error(f"Cannot get diagram for a package ({info.module})")
+            else:
+                p, m = info.module[:dot], info.module[dot + 1 :]
+                try:
+                    data = files(p).joinpath(f"{m}.png").read_bytes()
+                except (FileNotFoundError, IOError) as err:
+                    _log.error(f"Cannot read diagram for flowsheet '{id_}': {err}")
 
         return data
 
@@ -318,7 +326,11 @@ class FlowsheetManager:
         last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
         if(len(last_run_dict) > 0):
             last_run_dict = last_run_dict[0]["last_run_dict"]
-            last_run = last_run_dict[id_]
+            try:
+                last_run = last_run_dict[id_]
+            except Exception as e:
+                _log.error('unable to access last run dictionary')
+                last_run = ""
         else:
             _log.error('unable to access last run dictionary')
             last_run = ""
@@ -402,7 +414,7 @@ class FlowsheetManager:
                     module_name = f.replace('.py','')
                     custom_module = importlib.import_module(module_name)
                     fsi = self._get_flowsheet_interface(custom_module)
-                    self.add_flowsheet_interface(module_name, fsi)
+                    self.add_flowsheet_interface(module_name, fsi, custom=True)
                 except Exception as e:
                     _log.error(f'unable to add flowsheet module: {e}')
 

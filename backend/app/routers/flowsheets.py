@@ -4,10 +4,11 @@ Handle flowsheet-related API requests from web client.
 # stdlib
 import csv
 import io
+import aiofiles
 from pathlib import Path
 from typing import List
 # third-party
-from fastapi import Request, APIRouter, HTTPException
+from fastapi import Request, APIRouter, HTTPException, File, UploadFile
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
 import pandas as pd
@@ -206,6 +207,36 @@ async def save_config(flowsheet_id: str, request: Request, version: int, name: s
     data = await request.json()
     name = flowsheet_manager.put_flowsheet_data(id_=flowsheet_id, name=name, data=data, version=version)
     return name
+
+@router.post("/upload_flowsheet")
+async def upload_flowsheet(files: List[UploadFile]) -> str:
+    """Upload a new flowsheet`.
+
+    Request should contain a model file, an export file, a diagram file, and optional data files.
+
+    Args:
+        request: Request object
+
+    Returns:
+        Updated flowsheet list
+    """
+    custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
+    try:
+    # get file contents
+
+        print('trying to read files with aiofiles')
+        for file in files:
+            # for file in files:
+            print(file.filename)
+            async with aiofiles.open(f'{str(custom_flowsheets_path)}/{file.filename}', 'wb') as out_file:
+                content = await file.read()  # async read
+                await out_file.write(content) 
+        flowsheet_manager.add_custom_flowsheets()
+        return {'return': 'success boy'}
+
+    except Exception as e:
+        _log.error(f"error on file upload: {str(e)}")
+        raise HTTPException(400, detail=f"File upload failed: {e}")
 
 
 @router.get("/{flowsheet_id}/load")
