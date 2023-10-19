@@ -7,8 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 import { FileUploader } from "react-drag-drop-files";
-import { uploadFlowsheet } from "../../services/flowsheetsList.service"; 
-import { useNavigate } from "react-router-dom";
+import { uploadFlowsheet } from "../../services/flowsheetsList.service";
 
 export default function NewFlowsheetDialog(props) {
   const { onClose, open } = props;
@@ -16,7 +15,6 @@ export default function NewFlowsheetDialog(props) {
   const [ warningMessage, setWarningMessage ] = useState("")
   const [ files, setFiles ] = useState({"Model File": null, "Export File": null, "Diagram File": null, "Data Files": []})
   const fileTypes = {"Model File": ["py"], "Export File": ["py"], "Diagram File": ["png"], "Data Files": ["yaml", "yml", "json", "csv"], };
-  let navigate = useNavigate();
    const styles = {
     modalStyle: {
       position: 'absolute',
