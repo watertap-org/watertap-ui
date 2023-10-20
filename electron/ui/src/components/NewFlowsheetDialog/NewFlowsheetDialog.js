@@ -29,23 +29,18 @@ export default function NewFlowsheetDialog(props) {
       p: 2,
     },
     header:{
-        color:"#0884b4",
+        // color:"#0884b4",
         marginTop:5
     },
     button: {
-        backgroundColor: '#0884b4',
+        // backgroundColor: '#0884b4',
         borderRadius: '8px', 
-        color:'white',
+        // color:'white',
         width: 200,
-        '&:hover': {
-            backgroundColor: '#0884b4',
-            opacity: 0.9
-        },
-    },
-    sampleFile:{
-        color:"#0884b4",
-        textDecoration: "none",
-        fontWeight: "bold"
+        // '&:hover': {
+        //     backgroundColor: '#0884b4',
+        //     opacity: 0.9
+        // },
     },
     fileUploaderOuterBox: {
         border: '2px dashed black',
@@ -281,8 +276,10 @@ export default function NewFlowsheetDialog(props) {
             {showWarning && <p style={{color:'red'}}>{warningMessage}</p>}
         </Grid>
         <Grid item xs={12}>
-            <Button id="create-scenario-button" style={styles.button} onClick={handleUploadFlowsheet}>Upload Flowsheet</Button>
-        </Grid>
+            <Box sx={{display: 'flex', justifyContent: 'center', marginRight:'10px'}}>
+                <Button id="create-scenario-button" variant="contained" style={styles.button} onClick={handleUploadFlowsheet}>Upload Flowsheet</Button>
+            </Box>
+            </Grid>
         </Grid>
     </Modal>
   );
