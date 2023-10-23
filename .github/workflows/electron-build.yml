@@ -3,7 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - "code-sign-setup"
+      - "streamline-flowsheet-imports"
 
 defaults:
   run:
