@@ -125,8 +125,8 @@ const startServer = () => {
             cwd: '../backend/app'
         }
     );
-      log.info("Python process started in dev mode");
-      console.log("Python process started in dev mode");
+      // log.info("Python process started in dev mode");
+      // console.log("Python process started in dev mode");
     } else {
       try {
       backendProcess = spawn(
@@ -168,8 +168,8 @@ const startServer = () => {
 app.whenReady().then(() => {
     // Entry point
     if (isDev) {
-      log.info('starting electron app in dev mode')
-      console.log('starting electron app in dev mode')
+      // log.info('starting electron app in dev mode')
+      // console.log('starting electron app in dev mode')
       createWindow()
     } else {
       let win = createWindow();

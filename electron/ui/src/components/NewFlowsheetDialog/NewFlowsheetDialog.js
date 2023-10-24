@@ -117,7 +117,8 @@ export default function NewFlowsheetDialog(props) {
                 .then((data)=>{
                     console.log('fileupload successful: ',data)
                     // navigate('/flowsheets', {replace: true})
-                    window.location = '/flowsheets';
+                    // window.location = '/flowsheets';
+                    window.location.reload()
 
                 }).catch((err)=>{
                     console.error("error on file upload: ",err)
