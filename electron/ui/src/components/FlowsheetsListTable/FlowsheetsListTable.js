@@ -9,9 +9,9 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 
 const CATEGORIES = {
-    "Desalination": [
+    // "Desalination": [
 
-    ],
+    // ],
     "Wastewater Recovery": [
       "amo 1690",
       "biomembrane filtration",
@@ -39,7 +39,7 @@ export default function FlowsheetsListTable(props) {
     const [ sortKey, setSortKey ] = useState("name")
     const [ sortDirection, setSortDirection ] = useState("ascending")
     const [ tableRows, setTableRows ] = useState([])
-    const [ category, setCategory ] = useState("")
+    const [ category, setCategory ] = useState("all")
 
     useEffect(() => {
       if (category === "all" || category === "") setTableRows([...props.rows])
