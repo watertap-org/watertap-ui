@@ -36,6 +36,7 @@ module.exports = async function (params) {
             appPath: appPath,
             appleId: process.env.APPLE_ID,
             appleIdPassword: process.env.APPLE_ID_PASSWORD,
+            tool: "notarytool",
         })
     } catch (error) {
         console.error(error)
