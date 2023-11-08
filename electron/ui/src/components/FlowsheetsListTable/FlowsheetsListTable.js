@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Icon, Button } from '@mui/material'
 import { useNavigate } from "react-router-dom";
+import { deleteFlowsheet } from "../../services/flowsheetsList.service";
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ClearIcon from '@mui/icons-material/Clear';
+
 
  
 export default function FlowsheetsListTable(props) {
@@ -56,6 +59,26 @@ export default function FlowsheetsListTable(props) {
         
     }
 
+    const handleRemoveCustomFlowsheet = (e, id) => {
+        e.stopPropagation()
+        deleteFlowsheet(id)
+        .then(response => {
+        if (response.status === 200) {
+            response.json()
+            .then((data)=>{
+                console.log('delete successful: ',data)
+                window.location.reload()
+
+            }).catch((err)=>{
+                console.error("error on flowshete deletion: ",err)
+            })
+        }
+        else if (response.status === 400) {
+            console.error("error on flowshete deletion: ",response.statusText)
+        }
+        })
+    }
+
     function compare( a, b ) {
         if ( a[sortKey] < b[sortKey] ){
             if(sortDirection === "ascending") return -1;
@@ -99,7 +122,13 @@ export default function FlowsheetsListTable(props) {
                 >
                 <TableCell>{row.description}</TableCell>
                 <TableCell align="right">{formatLastRun(row.last_run)}</TableCell>
-                <TableCell></TableCell>
+                <TableCell>
+                    {row.custom && 
+                        <IconButton size="small" onClick={(e) => handleRemoveCustomFlowsheet(e, row.id_)}>
+                            <ClearIcon sx={{fontSize: "15px"}}/>
+                        </IconButton>
+                    }
+                    </TableCell>
                 </TableRow>
             ))}
             </TableBody>

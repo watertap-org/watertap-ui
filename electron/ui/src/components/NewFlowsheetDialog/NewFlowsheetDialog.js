@@ -14,7 +14,7 @@ export default function NewFlowsheetDialog(props) {
   const [ showWarning, setShowWarning ] = useState(false)
   const [ warningMessage, setWarningMessage ] = useState("")
   const [ files, setFiles ] = useState({"Model File": null, "Export File": null, "Diagram File": null, "Data Files": []})
-  const fileTypes = {"Model File": ["py"], "Export File": ["py"], "Diagram File": ["png"], "Data Files": ["yaml", "yml", "json", "csv"], };
+  const fileTypes = {"Model File": ["py"], "Export File": ["py"], "Diagram File": ["png", "jpeg", "jpg"], "Data Files": ["yaml", "yml", "json", "csv", "txt", "zip"], };
    const styles = {
     modalStyle: {
       position: 'absolute',
@@ -148,7 +148,7 @@ export default function NewFlowsheetDialog(props) {
     try {
         let newWarningMessage = "Please choose a valid file type from these options: "
         for (let fileType of fileTypes[fileId]) {
-            newWarningMessage+= fileType+", "
+            newWarningMessage+= fileType+" "
         }
         setWarningMessage(newWarningMessage)
         setShowWarning(true)

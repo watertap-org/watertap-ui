@@ -223,20 +223,33 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
     custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
     try:
     # get file contents
-
+        new_files = []
+        
         print('trying to read files with aiofiles')
         for file in files:
             # for file in files:
             print(file.filename)
+            new_files.append(file.filename)
+            if '_ui.py' in file.filename:
+                new_id = file.filename.replace('.py', '')
             async with aiofiles.open(f'{str(custom_flowsheets_path)}/{file.filename}', 'wb') as out_file:
                 content = await file.read()  # async read
                 await out_file.write(content) 
-        flowsheet_manager.add_custom_flowsheets()
+        flowsheet_manager.add_custom_flowsheet(new_files, new_id)
         return {'return': 'success boy'}
 
     except Exception as e:
         _log.error(f"error on file upload: {str(e)}")
         raise HTTPException(400, detail=f"File upload failed: {e}")
+    
+@router.post("/{flowsheet_id}/remove_flowsheet")
+async def remove_flowsheet(flowsheet_id: str):
+    try:
+        flowsheet_manager.remove_custom_flowsheet(flowsheet_id)
+        return {'return': 'success boy'}
+    except Exception as e:
+        _log.error(f"error on flowsheet deletion: {str(e)}")
+        raise HTTPException(400, detail=f"failed: {e}")
 
 
 @router.get("/{flowsheet_id}/load")

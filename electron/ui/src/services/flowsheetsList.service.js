@@ -14,3 +14,10 @@ export const uploadFlowsheet = (data) => {
         body: data
     });
 }; 
+
+export const deleteFlowsheet = (id) => {
+    return fetch('http://localhost:8001/flowsheets/'+id+'/remove_flowsheet', {
+        method: 'POST',
+        mode: 'cors'
+    });
+}; 

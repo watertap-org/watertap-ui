@@ -2,6 +2,8 @@
 import sys
 import types
 from xml.etree.ElementTree import QName
+import os
+import importlib
 
 if sys.version_info < (3, 10):
     from importlib_resources import files
@@ -73,6 +75,10 @@ class FlowsheetManager:
         """
         self.app_settings = AppSettings(**kwargs)
         self._objs, self._flowsheets = {}, {}
+
+        # Add custom flowsheets path to the system path
+        self.custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
+        sys.path.append(str(self.custom_flowsheets_path))
 
         for package in self.app_settings.packages:
             _log.debug(f"Collect flowsheet interfaces from package '{package}'")
@@ -395,15 +401,71 @@ class FlowsheetManager:
 
         return interfaces
     
+    def add_custom_flowsheet(self, new_files, new_id):
+        """Add new custom flowsheet to the mini db."""
+
+        query = tinydb.Query()
+        try:
+            custom_flowsheets_dict = self._histdb.search(query.fragment({"custom_flowsheets_version": VERSION}))
+            if(len(custom_flowsheets_dict) == 0):
+                _log.error('unable to find custom flowsheets dictionary')
+                custom_flowsheets_dict = {}
+            else:
+                custom_flowsheets_dict = custom_flowsheets_dict[0]["custom_flowsheets_dict"]
+        except Exception as e:
+            _log.error(f'error trying to find custom flowsheets dictionary: {e}')
+            _log.error(f'setting it as empty dictionary')
+            custom_flowsheets_dict = {}
+        custom_flowsheets_dict[new_id] = new_files
+
+        self._histdb.upsert(
+                {"custom_flowsheets_version": VERSION, "custom_flowsheets_dict": custom_flowsheets_dict},
+                (query.custom_flowsheets_version == VERSION),
+            )
+
+        self.add_custom_flowsheets()
+
+    def remove_custom_flowsheet(self, id_):
+        """Remove a custom flowsheet from the mini db."""
+        query = tinydb.Query()
+        try:
+            custom_flowsheets_dict = self._histdb.search(query.fragment({"custom_flowsheets_version": VERSION}))
+            if(len(custom_flowsheets_dict) == 0):
+                _log.error('unable to find custom flowsheets dictionary')
+                custom_flowsheets_dict = {}
+            else:
+                custom_flowsheets_dict = custom_flowsheets_dict[0]["custom_flowsheets_dict"]
+        except Exception as e:
+            _log.error(f'error trying to find custom flowsheets dictionary: {e}')
+            _log.error(f'setting it as empty dictionary')
+            custom_flowsheets_dict = {}
+
+        # remove each file
+        flowsheet_files = custom_flowsheets_dict[id_]
+        for flowsheet_file in flowsheet_files:
+            flowsheet_file_path = self.custom_flowsheets_path / flowsheet_file
+            _log.info(f'flowsheet file path: {flowsheet_file_path}')
+            if os.path.isfile(flowsheet_file_path):
+                _log.info(f'removing file: {flowsheet_file_path}')
+                os.remove(flowsheet_file_path)
+        
+
+        # delete from DB
+        del custom_flowsheets_dict[id_]
+        self._histdb.upsert(
+                {"custom_flowsheets_version": VERSION, "custom_flowsheets_dict": custom_flowsheets_dict},
+                (query.custom_flowsheets_version == VERSION),
+            )
+        
+        # remove from flowsheets list
+        del self._flowsheets[id_]
+
+        self.add_custom_flowsheets()
+
     def add_custom_flowsheets(self):
         """Search for user uploaded flowsheets. If found, add them as flowsheet interfaces."""
-        from os import walk
-        import importlib
-        custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
-        sys.path.append(str(custom_flowsheets_path))
-
         files = [] 
-        for (_, _, filenames) in walk(custom_flowsheets_path):
+        for (_, _, filenames) in os.walk(self.custom_flowsheets_path):
             files.extend(filenames)
             break
 
