@@ -9,9 +9,9 @@ describe('Display Data Rounding', () => {
         cy.wait (5000)
 
         //click on all flowsheets  
-        cy.findByText("All Flowsheets").click()
-        cy.screenshot(sc_count+'_clicked all flowsheets')
-        sc_count+=1
+        // cy.findByText("All Flowsheets").click()
+        // cy.screenshot(sc_count+'_clicked all flowsheets')
+        // sc_count+=1
 
 
         //click flowsheet and wait for api response

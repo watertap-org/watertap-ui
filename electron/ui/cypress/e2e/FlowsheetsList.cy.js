@@ -4,7 +4,7 @@ describe('flowsheetslist', () => {
         cy.visit('/')
 
         //click on all flowsheets  
-        cy.findByText("All Flowsheets").click()
+        // cy.findByText("All Flowsheets").click()
 
         //locate heading
         cy.findByRole('heading', {  name: /flowsheets/i})
