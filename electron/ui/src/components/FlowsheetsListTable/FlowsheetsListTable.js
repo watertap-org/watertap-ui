@@ -5,6 +5,7 @@ import { deleteFlowsheet } from "../../services/flowsheetsList.service";
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ClearIcon from '@mui/icons-material/Clear';
+import PopupModal from '../PopupModal/PopupModal';
 
 
  
@@ -12,6 +13,8 @@ export default function FlowsheetsListTable(props) {
     let navigate = useNavigate();
     const [ sortKey, setSortKey ] = useState("name")
     const [ sortDirection, setSortDirection ] = useState("ascending")
+    const [ showModal, setShowModal ] = useState(false)
+    const [ removeFlowsheetId, setRemoveFlowsheetId ] = useState(null)
     const handleFlowsheetClick = (id) => {
         navigate("/flowsheet/" + id + "/config", {replace: true})
     }
@@ -59,9 +62,8 @@ export default function FlowsheetsListTable(props) {
         
     }
 
-    const handleRemoveCustomFlowsheet = (e, id) => {
-        e.stopPropagation()
-        deleteFlowsheet(id)
+    const handleRemoveCustomFlowsheet = () => {
+        deleteFlowsheet(removeFlowsheetId)
         .then(response => {
         if (response.status === 200) {
             response.json()
@@ -77,6 +79,14 @@ export default function FlowsheetsListTable(props) {
             console.error("error on flowshete deletion: ",response.statusText)
         }
         })
+        setRemoveFlowsheetId(null)
+        setShowModal(false)
+    }
+
+    const handleShowModal = (e, id) => {
+        e.stopPropagation()
+        setShowModal(true)
+        setRemoveFlowsheetId(id)
     }
 
     function compare( a, b ) {
@@ -124,7 +134,10 @@ export default function FlowsheetsListTable(props) {
                 <TableCell align="right">{formatLastRun(row.last_run)}</TableCell>
                 <TableCell>
                     {row.custom && 
-                        <IconButton size="small" onClick={(e) => handleRemoveCustomFlowsheet(e, row.id_)}>
+                        // <IconButton size="small" onClick={(e) => handleRemoveCustomFlowsheet(e, row.id_)}>
+                        //     <ClearIcon sx={{fontSize: "15px"}}/>
+                        // </IconButton>
+                        <IconButton size="small" onClick={(e) => handleShowModal(e, row.id_)}>
                             <ClearIcon sx={{fontSize: "15px"}}/>
                         </IconButton>
                     }
@@ -133,6 +146,16 @@ export default function FlowsheetsListTable(props) {
             ))}
             </TableBody>
             </Table>
+            <PopupModal
+                open={showModal}
+                handleClose={() => setShowModal(false)}
+                text="Are you sure you want to remove this flowsheet?"
+                handleSave={handleRemoveCustomFlowsheet}
+                buttonText='Remove'
+                buttonColor='error'
+                buttonVariant='contained'
+                width={400}
+            />
         </TableContainer>
     );
 
