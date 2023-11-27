@@ -2,9 +2,6 @@ import './FlowsheetsList.css';
 import {useEffect, useState} from 'react';
 import { useLocation } from 'react-router-dom'
 import FlowsheetsListTable from "../../components/FlowsheetsListTable/FlowsheetsListTable";
-import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import { getFlowsheetsList } from "../../services/flowsheetsList.service"; 
 import NewFlowsheetDialog from "../../components/NewFlowsheetDialog/NewFlowsheetDialog";
@@ -45,7 +42,7 @@ export default function FlowsheetsList() {
   };
   
   return ( 
-    <Container>
+    <Container maxWidth="xl">
       <h2 style={{textAlign:"left"}}>Flowsheets</h2>  
 
       <FlowsheetsListTable rows={rows} handleNewFlowsheetDialogClickOpen={handleNewFlowsheetDialogClickOpen}></FlowsheetsListTable> 

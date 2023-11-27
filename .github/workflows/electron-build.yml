@@ -3,7 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - "streamline-flowsheet-imports"
+      - "0.10.0"
 
 defaults:
   run:
@@ -44,13 +44,13 @@ jobs:
       - name: Get idaes extensions
         run: idaes get-extensions
 
-      # - name: Install Watertap locally
-      #   working-directory: ../
-      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout springmeeting-2023 && pip install --progress-bar off .
-
       - name: Install Watertap locally
         working-directory: ../
-        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 0.9.0rc0 && pip install --progress-bar off .
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout 0.10.0_michael && pip install --progress-bar off .
+
+      # - name: Install Watertap locally
+      #   working-directory: ../
+      #   run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 0.10.0 && pip install --progress-bar off .
 
       - name: Transfer Entry points
         run: |
@@ -59,6 +59,16 @@ jobs:
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
+
+      # install slightly older versions of numpy, pandas, and scipy. 
+      # having issues when freezing the latest packages of each (numpy 1.26, pandas 2.1, scipy 1.11)
+      - name: Install numpy 1.24.3
+        run: |
+          pip uninstall -y numpy && pip install numpy==1.24.3
+      
+      - name: Install pandas 2.0.3
+        run: |
+          pip uninstall -y pandas && pip install pandas==2.0.3
 
       - name: Install scipy 1.9.1
         run: |
@@ -75,7 +85,7 @@ jobs:
 
       - name: Sign Windows Distribution
         run: |
-          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_09.18.23_win64.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_23.10.06_win64.exe
 
 
       - name: Upload artifact for windows build
@@ -84,7 +94,7 @@ jobs:
         with:
             name: windows-dist
             path: |
-              electron/dist/WaterTAP-UI_09.18.23_win64.exe
+              electron/dist/WaterTAP-UI_23.10.06_win64.exe
   # windows-build:
   #   name: Windows Build
 
@@ -223,46 +233,3 @@ jobs:
             path: |
               electron/dist/watertap-ui_0.1.0_amd64.deb
 
-  # Mac-Build:
-  #   name: Mac Build
-
-  #   runs-on: macos-latest
-
-  #   strategy:
-  #     fail-fast: false
-
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: conda-incubator/setup-miniconda@v2
-  #       with:
-  #         environment-file: environment.yml
-  #         activate-environment: watertap-ui-env
-
-  #     - name: Install Electron JS dependencies
-  #       run: |
-  #         npm --prefix electron clean-install
-
-  #     - name: Install frontend JS dependencies
-  #       run: |
-  #         npm --prefix electron/ui clean-install
-
-  #     - name: Get idaes extensions
-  #       run: idaes get-extensions
-
-  #     - name: Install Watertap locally
-  #       working-directory: ../
-  #       run: git clone https://github.com/watertap-org/watertap.git && cd watertap && pip install --progress-bar off .
-
-  #     - name: Transfer Entry points
-  #       run: # execute some bat file that moves the entry points 
-
-  #     - name: Install watertap-ui Python package
-  #       run: |
-  #         pip install --progress-bar off .
-
-  #     - name: Create idaes extensions installer
-  #       run: |
-  #         npm --prefix electron get-extensions-installer
-
-  #     - name: Run dist:mac
-  #       run: npm --prefix electron dist:mac
