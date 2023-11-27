@@ -18,24 +18,24 @@ const CATEGORIES = {
     // "Desalination": [
 
     // ],
-    "Wastewater Recovery": [
-      "amo 1690",
-      "biomembrane filtration",
-      "dye desalination",
-      "electrochemical nutrient removal",
-      "glsd anaerobic digestion",
-      "groundwater treatment",
-      "hrcs",
-      "magprex",
-      "metab",
-      "photothermal membrane cando_p",
-      "peracetic acid disinfection",
-      "suboxic asm",
-      "supercritical sludge to gas",
-      "swine wastewater treatment",
-      "nf-dspm-de",
-      "nf-dspm-de with bypass"
-    ]
+    // "Wastewater Recovery": [
+    //   "amo 1690",
+    //   "biomembrane filtration",
+    //   "dye desalination",
+    //   "electrochemical nutrient removal",
+    //   "glsd anaerobic digestion",
+    //   "groundwater treatment",
+    //   "hrcs",
+    //   "magprex",
+    //   "metab",
+    //   "photothermal membrane cando_p",
+    //   "peracetic acid disinfection",
+    //   "suboxic asm",
+    //   "supercritical sludge to gas",
+    //   "swine wastewater treatment",
+    //   "nf-dspm-de",
+    //   "nf-dspm-de with bypass"
+    // ]
   }
   
 
@@ -171,7 +171,7 @@ export default function FlowsheetsListTable(props) {
                       </span>
                   </TableCell>
                   {/* <TableCell>Tags</TableCell> */}
-                  <TableCell align="right"></TableCell> 
+                  <TableCell align="right"><Button variant="contained" onClick={props.handleNewFlowsheetDialogClickOpen}>New Flowsheet +</Button></TableCell> 
               </TableRow>
               </TableHead>
               <TableBody>
@@ -198,37 +198,10 @@ export default function FlowsheetsListTable(props) {
                       <IconButton><ArrowRightAltIcon/></IconButton>
                     </span>
                 </TableCell> 
-                <TableCell align="right" sx={{width: "20%"}}><Button variant="contained" onClick={props.handleNewFlowsheetDialogClickOpen}>New Flowsheet +</Button></TableCell>
+                <TableCell align="right" sx={{width: "20%"}}></TableCell>
             </TableRow>
-            {/* </TableHead> */}
-            {/* <TableBody> */}
-            {sortRows(props.rows).map((row) => (
-                <TableRow
-                    key={row.name}
-                    sx={styles.listRow}
-                    onClick={()=>handleFlowsheetClick(row.id_)}
-                >
-                <TableCell>{row.description}</TableCell>
-                <TableCell align="right">{formatLastRun(row.last_run)}</TableCell>
-                <TableCell>
-                    {row.custom && 
-                        // <IconButton size="small" onClick={(e) => handleRemoveCustomFlowsheet(e, row.id_)}>
-                        //     <ClearIcon sx={{fontSize: "15px"}}/>
-                        // </IconButton>
-                        <IconButton size="small" onClick={(e) => handleShowModal(e, row.id_)}>
-                            <ClearIcon sx={{fontSize: "15px"}}/>
-                        </IconButton>
-                    }
-                    </TableCell>
-                </TableRow>
-            ))}
             </TableBody>
             </Table>
-
-            //       </TableCell>
-            //     </TableRow>
-            //   </TableBody>
-            //   </Table> 
 
               :
 
@@ -249,11 +222,13 @@ export default function FlowsheetsListTable(props) {
                             <IconButton>{sortKey==="last_run" && (sortDirection === "ascending" ? <KeyboardArrowDownIcon/> : sortDirection === "descending" &&  <KeyboardArrowUpIcon/>)}</IconButton>
                         </span>
                     </TableCell> 
-                    <TableCell></TableCell>
+                    <TableCell align="right" sx={{width: "20%"}}>
+                        <Button variant="contained" onClick={props.handleNewFlowsheetDialogClickOpen}>New Flowsheet +</Button>
+                    </TableCell>
                 </TableRow>
                 </TableHead>
                 <TableBody>
-                {sortRows(tableRows).map((row) => (
+                {sortRows(props.rows).map((row) => (
                     <TableRow
                         key={row.name}
                         sx={styles.listRow}
@@ -261,7 +236,16 @@ export default function FlowsheetsListTable(props) {
                     >
                     <TableCell>{row.description}</TableCell>
                     <TableCell align="right">{formatLastRun(row.last_run)}</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell>
+                        {row.custom && 
+                            // <IconButton size="small" onClick={(e) => handleRemoveCustomFlowsheet(e, row.id_)}>
+                            //     <ClearIcon sx={{fontSize: "15px"}}/>
+                            // </IconButton>
+                            <IconButton size="small" onClick={(e) => handleShowModal(e, row.id_)}>
+                                <ClearIcon sx={{fontSize: "15px"}}/>
+                            </IconButton>
+                        }
+                        </TableCell>
                     </TableRow>
                 ))}
                 </TableBody>
