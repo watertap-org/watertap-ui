@@ -61,9 +61,28 @@ async def get_config(id_: str, build: str = "0") -> FlowsheetExport:
     flowsheet = flowsheet_manager.get_obj(id_)
     if build == "1":
         info = flowsheet_manager.get_info(id_)
-        if not info.built:
-            flowsheet.build()
-            info.updated(built=True)
+        flowsheet.build(build_options=flowsheet.fs_exp.build_options)
+        info.updated(built=True)
+    return flowsheet.fs_exp
+
+@router.post("/{id_}/select_option", response_model=FlowsheetExport)
+async def select_option(id_: str, request: Request) -> FlowsheetExport:
+    """Get flowsheet configuration.
+
+    Args:
+        id_: Flowsheet identifier
+        option_name: name of option to select
+
+    Returns:
+        Flowsheet export model
+    """
+    req = await request.json()
+    # input_data = req["input_data"]
+    option_name = req["option_name"]
+    new_option = req["new_option"]
+
+    flowsheet = flowsheet_manager.get_obj(id_)
+    flowsheet.select_option(option_name, new_option)
     return flowsheet.fs_exp
 
 
@@ -96,11 +115,8 @@ async def solve(flowsheet_id: str, request: Request):
     # ensure flowsheet is built
     if not info.built:
         try:
-            flowsheet.build()
+            flowsheet.build(build_options=flowsheet.fs_exp.build_options)
         except Exception as err:
-            # flowsheet = flowsheet_manager.get_obj(flowsheet_id)
-            # flowsheet.build()
-            # flowsheet_manager.get_info(flowsheet_id).updated(built=True)
             raise HTTPException(500, detail=f"Build failed: {err}")
         info.updated(built=True)
 
@@ -110,9 +126,6 @@ async def solve(flowsheet_id: str, request: Request):
         # set last run in tiny db
         flowsheet_manager.set_last_run(info.id_)
     except Exception as err:
-        # flowsheet = flowsheet_manager.get_obj(flowsheet_id)
-        # flowsheet.build()
-        # flowsheet_manager.get_info(flowsheet_id).updated(built=True)
         raise HTTPException(500, detail=f"Solve failed: {err}")
     return flowsheet.fs_exp
 
@@ -138,7 +151,7 @@ async def sweep(flowsheet_id: str, request: Request):
 
     if not info.built:
         try:
-            flowsheet.build()
+            flowsheet.build(build_options=flowsheet.fs_exp.build_options)
         except Exception as err:
             raise HTTPException(500, detail=f"Build failed: {err}")
         info.updated(built=True)
@@ -159,8 +172,25 @@ async def sweep(flowsheet_id: str, request: Request):
 @router.get("/{flowsheet_id}/reset", response_model=FlowsheetExport)
 async def reset(flowsheet_id: str):
     flowsheet = flowsheet_manager.get_obj(flowsheet_id)
-    flowsheet.build()
+    flowsheet.build(build_options=flowsheet.fs_exp.build_options)
     flowsheet_manager.get_info(flowsheet_id).updated(built=True)
+    return flowsheet.fs_exp
+
+
+@router.get("/{flowsheet_id}/unbuild", response_model=FlowsheetExport)
+async def unbuild_config(flowsheet_id: str):
+    flowsheet = flowsheet_manager.get_obj(flowsheet_id)
+    
+    ## reset everything:
+    fs_exp = flowsheet.fs_exp
+    fs_exp.m=None
+    fs_exp.obj=None 
+    fs_exp.model_objects={} 
+    fs_exp.dof=0 
+    fs_exp.sweep_results={} 
+    fs_exp.build_options={}
+    flowsheet_manager.get_info(flowsheet_id).updated(built=False)
+
     return flowsheet.fs_exp
 
 

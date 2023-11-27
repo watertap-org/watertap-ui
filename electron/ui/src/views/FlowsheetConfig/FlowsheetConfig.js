@@ -1,16 +1,21 @@
 //import './Page.css';
 import React from 'react'; 
 import {useEffect, useState } from 'react';   
-import { useParams, useNavigate } from "react-router-dom";
-import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
-import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent } from '@mui/material'
-import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar, Stack } from '@mui/material';
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { getFlowsheet, saveFlowsheet, resetFlowsheet, unbuildFlowsheet } from "../../services/flowsheet.service"; 
+import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
+import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar, Stack, Divider } from '@mui/material';
+import { Select, InputLabel, MenuItem, FormControl, TextField, Collapse, IconButton } from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import Graph from "../../components/Graph/Graph";
 import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
 import ErrorBar from "../../components/ErrorBar/ErrorBar";
 import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
+import BuildOptions from '../../components/BuildOptions/BuildOptions';
 
 
 function TabPanel(props) {
@@ -44,6 +49,7 @@ function a11yProps(index) {
 export default function FlowsheetConfig() {
     let navigate = useNavigate();
     let params = useParams(); 
+    const location = useLocation();
     const [flowsheetData, setFlowsheetData] = useState({inputData:{}, outputData:null}); 
     const [loadingFlowsheetData, setLoadingFlowsheetData] = useState(true);
     const [tabValue, setTabValue] = useState(0);
@@ -55,13 +61,31 @@ export default function FlowsheetConfig() {
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
     const [errorMessage, setErrorMessage] = useState("")
     const [ solveType, setSolveType ] = useState("solve")
+    const [ analysisName, setAnalysisName ] = useState("")
+    const [ isBuilt, setIsBuilt ] = useState(false)
+    const [ showBuildOptions, setShowBuildOptions ] = useState(false)
 
     useEffect(()=>{ 
       //console.log("params.id",params.id);
       if( !params.hasOwnProperty("id") || !params.id)
         return;
-
-      getFlowsheet(params.id)
+      // gotta find a way to figure out whether to build or not
+      let to_build = 1
+      try {
+        // 4 possibilities
+        // hasoptions AND built -> dont build, dont show build options
+        // hasoptions and !build -> dont build, show build options
+        // !hasoptions and built -> dont build, dont show build options
+        // !hasoptions and !built -> build, dont show build options
+        if(location.state.built) to_build = 0
+        else if(location.state.hasOptions) {
+          to_build = 0
+          setShowBuildOptions(true)
+        }
+      } catch(e) {
+        console.log('unable to check for built status; defaulting to build flowsheet')
+      }
+      getFlowsheet(params.id, to_build)
       .then(response => response.json())
       .then((data)=>{
         console.log("Flowsheet Data:", data);
@@ -73,6 +97,55 @@ export default function FlowsheetConfig() {
         navigateHome(e)
       });
     }, [params.id]);
+
+    useEffect(() => {
+      try {
+        if (Object.keys(flowsheetData.inputData.model_objects).length > 0) {
+          console.log('flowsheet is indeed built')
+          setIsBuilt(true)
+        } else console.log('flowsheet is not built')
+      } catch (e){
+        console.log('unable to check for model objects: ',e)
+      }
+      
+    }, [flowsheetData])
+
+    useEffect(() => {
+      if (tabValue !== 0) setShowBuildOptions(false)
+      
+    }, [tabValue])
+
+    const runBuildFlowsheet = () => {
+      setLoadingFlowsheetData(true)
+      getFlowsheet(params.id, 1)
+      .then(response => response.json())
+      .then((data)=>{
+        console.log("Flowsheet Data:", data);
+        setLoadingFlowsheetData(false)
+        setFlowsheetData({outputData:null, inputData: data, name: data.name});
+        setTitle(getTitle(data)); 
+      }).catch((e) => {
+        console.error('error getting flowsheet: ',e)
+        navigateHome(e)
+      });
+    }
+
+    // const rebuildFlowsheet = () => {
+    //   unbuildFlowsheet(params.id, 1)
+    //   .then(response => response.json())
+    //   .then((data)=>{
+    //     console.log("Flowsheet Data:", data);
+    //     setLoadingFlowsheetData(false)
+    //     setFlowsheetData({outputData:null, inputData: data, name: data.name});
+    //     setTitle(getTitle(data));
+    //     setIsBuilt(false)
+    //     setTabValue(0)
+    //     runBuildFlowsheet()
+    //   }).catch((e) => {
+    //     console.error('error getting flowsheet: ',e)
+    //     navigateHome(e)
+    //   });
+    // }
 
     const navigateHome = (e) => {
       navigate("/flowsheets", {replace: true, state:{error:e}})
@@ -192,8 +265,34 @@ export default function FlowsheetConfig() {
       });
     }
 
+    const handleSelectSolveType = (event) => {
+      setSolveType(event.target.value)
+    }
+
     const handleToggleSolveType = (event, nextType) => {
       setSolveType(nextType)
+    }
+
+    const handleChangeAnalysisName = (event) => {
+      let newName = event.target.value
+      setAnalysisName(newName)
+    }
+
+    const handleSaveConfiguration = () => {
+      if(analysisName.length > 0) {
+
+      } else {
+        setOpenErrorMessage(true)
+        setErrorMessage("Please provide a name for analysis.")
+      }
+    }
+
+    const formatOptionType = (option) => {
+      try {
+        return option.toString()
+      } catch(e) {
+        return option
+      }
     }
 
     return ( 
@@ -237,58 +336,66 @@ export default function FlowsheetConfig() {
 
             <Box sx={{ width: '100%', border: '0px solid #ddd' }}>
 
-              
-                <Grid container>
-                <Grid item xs={12}>
-                  <Stack
-                    direction="row"
-                    justifyContent="left"
-                    alignItems="left"
-                    spacing={2}
-                  >
-                    <ToggleButtonGroup
-                        orientation="horizontal"
-                        value={solveType}
-                        exclusive
-                        onChange={handleToggleSolveType}
-                        disabled={tabValue!==0}
-                    >
-                        <ToggleButton value="solve" aria-label="solve">
-                        <Typography>Solve</Typography>
-                        </ToggleButton>
-                        <ToggleButton value="sweep" aria-label="sweep">
-                        <Typography>Sweep</Typography>
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                  </Stack>
-                  
-                  </Grid>
-                  <Grid item xs={12}>
-                  <Tabs value={tabValue} onChange={handleTabChange} aria-label="process tabs">
-                    <Tab label="Input" {...a11yProps(0)} />
-                    <Tab label="Output" disabled={!flowsheetData.outputData} {...a11yProps(1)} /> 
-                    {solveType === "solve" && <Tab label="Compare" disabled={!flowsheetData.outputData} {...a11yProps(2)} /> }
-                  </Tabs>
-                  </Grid>
+              {/* 
+                build options component
+              */}
+              {flowsheetData.inputData.build_options && Object.keys(flowsheetData.inputData.build_options).length > 0 &&
+                <BuildOptions
+                  flowsheetData={flowsheetData} 
+                  tabValue={tabValue} 
+                  isBuilt={isBuilt} 
+                  showBuildOptions={showBuildOptions}
+                  setShowBuildOptions={setShowBuildOptions} 
+                  runBuildFlowsheet={runBuildFlowsheet}
+                  setFlowsheetData={setFlowsheetData}
+                >
 
-                </Grid>
+                </BuildOptions>
+              }
               
-              <TabPanel value={tabValue} index={0}>
-                <ConfigInput flowsheetData={flowsheetData} 
-                            updateFlowsheetData={updateFlowsheetData}
-                            reset={reset}
-                            solveType={solveType}
-                            >
-                </ConfigInput>
-              </TabPanel>
-              <TabPanel value={tabValue} index={1}>
-                <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData} isSweep={sweep} solveType={solveType}>
-                </ConfigOutput>
-              </TabPanel> 
-              <TabPanel value={tabValue} index={2}>
-                <ConfigOutputComparisonTable outputData={flowsheetData}>
-                </ConfigOutputComparisonTable>
-              </TabPanel> 
+
+              {isBuilt && 
+    
+                <Box>
+                  <Grid container>
+                  <Grid item xs={12}>
+                    
+                    </Grid>
+                    <Grid item xs={12}>
+                    <div style={{backgroundColor: '#F1F3F3'}}>
+                      <Tabs value={tabValue} onChange={handleTabChange} aria-label="process tabs" centered 
+                        textColor='#727272'
+                        TabIndicatorProps={{style: {background:'#727272'}}}
+                      >
+                        <Tab label="Input" {...a11yProps(0)} />
+                        <Tab label="Output" disabled={!flowsheetData.outputData} {...a11yProps(1)} /> 
+                        {solveType === "solve" && <Tab label="Compare" disabled={!flowsheetData.outputData} {...a11yProps(2)} /> }
+                      </Tabs>
+                    </div>
+                      
+                    </Grid>
+
+                  </Grid>
+                
+                <TabPanel value={tabValue} index={0}>
+                  <ConfigInput flowsheetData={flowsheetData} 
+                              updateFlowsheetData={updateFlowsheetData}
+                              reset={reset}
+                              solveType={solveType}
+                              handleSelectSolveType={handleSelectSolveType}
+                              >
+                  </ConfigInput>
+                </TabPanel>
+                <TabPanel value={tabValue} index={1}>
+                  <ConfigOutput outputData={flowsheetData} updateFlowsheetData={updateFlowsheetData} isSweep={sweep} solveType={solveType}>
+                  </ConfigOutput>
+                </TabPanel> 
+                <TabPanel value={tabValue} index={2}>
+                  <ConfigOutputComparisonTable outputData={flowsheetData}>
+                  </ConfigOutputComparisonTable>
+                </TabPanel> 
+                </Box>
+              }
             </Box>
           </>
           )

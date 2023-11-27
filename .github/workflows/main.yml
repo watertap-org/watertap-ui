@@ -56,13 +56,13 @@ jobs:
         run: |
           pip install --progress-bar off .
 
+      # - name: Install my fork of watertap
+      #   working-directory: ../
+      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout build-options && pip install --progress-bar off .
+
       # - name: Install correct branch of watertap
       #   working-directory: ../
-      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git checkout dof && pip install --progress-bar off .
-
-      - name: Install correct branch of watertap
-        working-directory: ../
-        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
+      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
 
       - name: Display installed environment
         run: |
@@ -122,11 +122,18 @@ jobs:
         with:
           environment-file: environment.yml
           activate-environment: watertap-ui-env
+
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
+
+      # - name: Install my fork of watertap
+      #   working-directory: ../
+      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout build-options && pip install --progress-bar off .
+
       - name: get idaes extensions
         run: idaes get-extensions
+
       - name: Run pytest
         working-directory: backend
         run: |
