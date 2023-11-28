@@ -46,9 +46,6 @@ export default function FlowsheetsListTable(props) {
     const [ sortDirection, setSortDirection ] = useState("ascending")
     const [ showModal, setShowModal ] = useState(false)
     const [ removeFlowsheetId, setRemoveFlowsheetId ] = useState(null)
-    // const handleFlowsheetClick = (id) => {
-    //     navigate("/flowsheet/" + id + "/config", {replace: true})
-    // }
     const [ tableRows, setTableRows ] = useState([])
     const [ category, setCategory ] = useState("all")
 
@@ -170,7 +167,7 @@ export default function FlowsheetsListTable(props) {
                         Category
                       </span>
                   </TableCell>
-                  {/* <TableCell>Tags</TableCell> */}
+                  <TableCell></TableCell>
                   <TableCell align="right"><Button variant="contained" onClick={props.handleNewFlowsheetDialogClickOpen}>New Flowsheet +</Button></TableCell> 
               </TableRow>
               </TableHead>
@@ -193,12 +190,14 @@ export default function FlowsheetsListTable(props) {
               <TableRow sx={styles.listRow} onClick={()=>setCategory("all")}>
                   <TableCell>All Flowsheets</TableCell>
                   {/* <TableCell></TableCell> */}
-                  <TableCell align="right">
+                  <TableCell>
+                    
+                </TableCell> 
+                <TableCell align="right" sx={{paddingRight: 5}}>
                     <span>
                       <IconButton><ArrowRightAltIcon/></IconButton>
                     </span>
-                </TableCell> 
-                <TableCell align="right" sx={{width: "20%"}}></TableCell>
+                </TableCell>
             </TableRow>
             </TableBody>
             </Table>
