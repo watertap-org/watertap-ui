@@ -85,11 +85,8 @@ export default function NewFlowsheetDialog(props) {
         let modelFileName = files["Model File"].name.replace('.py', '')
         let exportFileName = files["Export File"].name.replace('.py', '')
         let diagramFileName
-        if (files["Diagram File"] === null) diagramFileName = exportFileName
-        else {
-            console.log('diagram file is not null bpi')
-            diagramFileName = files["Diagram File"].name.replace('.png', '')
-        }
+        if (files["Diagram File"] === null) diagramFileName = exportFileName // removes the need for an additional check below
+        else diagramFileName = files["Diagram File"].name.replace('.png', '')
         let filesAreValid
         try {
             if (    
