@@ -74,17 +74,22 @@ export default function NewFlowsheetDialog(props) {
         setTimeout(function() {
             setShowWarning(false)
           }, 5000)
-    } else if (files["Diagram File"] === null) {
-        setWarningMessage("Please upload a valid diagram file")
-        setShowWarning(true)
-        setTimeout(function() {
-            setShowWarning(false)
-          }, 5000)
+    // } else if (files["Diagram File"] === null) {
+    //     setWarningMessage("Please upload a valid diagram file")
+    //     setShowWarning(true)
+    //     setTimeout(function() {
+    //         setShowWarning(false)
+    //       }, 5000)
     } else {
         // ensure that files are all named in correct format
         let modelFileName = files["Model File"].name.replace('.py', '')
         let exportFileName = files["Export File"].name.replace('.py', '')
-        let diagramFileName = files["Diagram File"].name.replace('.png', '')
+        let diagramFileName
+        if (files["Diagram File"] === null) diagramFileName = exportFileName
+        else {
+            console.log('diagram file is not null bpi')
+            diagramFileName = files["Diagram File"].name.replace('.png', '')
+        }
         let filesAreValid
         try {
             if (    
@@ -104,7 +109,7 @@ export default function NewFlowsheetDialog(props) {
             const formData = new FormData();
             formData.append('files', files['Model File'], files['Model File'].name);
             formData.append('files', files['Export File'], files['Export File'].name);
-            formData.append('files', files['Diagram File'], files['Diagram File'].name);
+            if (files["Diagram File"] !== null) formData.append('files', files['Diagram File'], files['Diagram File'].name);
             for (let dataFile of files['Data Files']) {
                 formData.append('files', dataFile, dataFile.name);
             }
@@ -202,7 +207,7 @@ export default function NewFlowsheetDialog(props) {
     return (
         <Box 
                 sx={styles.fileUploaderOuterBox} 
-                style={fileId === "Data Files" ? {backgroundColor: "#D4EFFF"} : 
+                style={(fileId === "Data Files" || fileId === "Diagram File") ? {backgroundColor: "#D4EFFF"} : 
                 files[fileId] !== null ? {backgroundColor: "#D7F5D7"} : 
                 {backgroundColor: "#FEF1F0"}}
         >
