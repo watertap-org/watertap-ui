@@ -169,6 +169,16 @@ export default function FlowsheetsListTable(props) {
         return 0;
     }
       
+    const checkForCustomFlowsheets = () => {
+        // console.log('checking for custom flowsheets')
+        for (let each of tableRows) {
+            if (each.custom) {
+                return true
+            }
+            
+        }
+        return false
+    }
 
     return (
         <TableContainer sx={{p: 3}}>
@@ -189,7 +199,8 @@ export default function FlowsheetsListTable(props) {
               </TableRow>
               </TableHead>
               <TableBody>
-              {Object.keys(CATEGORIES).map((key) => (
+              {Object.keys(CATEGORIES).map((key) => {
+                if ((key === 'Custom Flowsheets' && checkForCustomFlowsheets()) || CATEGORIES[key].length > 0) return (
                   <TableRow
                       key={key}
                       sx={styles.listRow}
@@ -203,7 +214,7 @@ export default function FlowsheetsListTable(props) {
                     </span>
                   </TableCell>
                   </TableRow>
-              ))}
+                )})}
               <TableRow sx={styles.listRow} onClick={()=>setCategory("All Flowsheets")}>
                   <TableCell>All Flowsheets</TableCell>
                   <TableCell></TableCell> 
