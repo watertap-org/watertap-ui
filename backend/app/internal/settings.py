@@ -15,6 +15,7 @@ class AppSettings(BaseSettings):
     packages: List[str] = ["watertap"]
     data_basedir: Path = None
     log_dir: Path = None
+    custom_flowsheets_dir: Path = None
 
     @validator("data_basedir", always=True)
     def validate_data_basedir(cls, v):
@@ -32,6 +33,13 @@ class AppSettings(BaseSettings):
         loggingFormat = "[%(levelname)s] %(asctime)s %(name)s (%(filename)s:%(lineno)s): %(message)s"
         loggingFileHandler = logging.handlers.RotatingFileHandler(v / "ui_backend_logs.log", backupCount=2, maxBytes=5000000)
         logging.basicConfig(level=logging.INFO, format=loggingFormat, handlers=[loggingFileHandler])
+        return v
+    
+    @validator("custom_flowsheets_dir", always=True)
+    def validate_custom_flowsheets_dir(cls, v):
+        if v is None:
+            v = Path.home() / ".watertap" / "custom_flowsheets"
+        v.mkdir(parents=True, exist_ok=True)
         return v
 
     class Config:

@@ -4,7 +4,7 @@ channels:
 dependencies:
   - python=3.9
   - pip
-  - nodejs=17.9.0
+  - nodejs=20.9.0
   - pip:
     - -r backend/requirements.txt
 #    - git+https://github.com/watertap-org/watertap@workshop_tutorial

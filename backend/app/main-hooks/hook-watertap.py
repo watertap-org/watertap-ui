@@ -15,7 +15,6 @@ datas = []
 # add all modules to watertap modules hidden imports
 for package in ["watertap"]:
     pkg = importlib.import_module(package)
-    
     try:
         pkg_path = Path(pkg.__file__).parent
     except TypeError:  # missing __init__.py perhaps
@@ -30,16 +29,18 @@ for package in ["watertap"]:
         )
 
     skip_expr = re.compile(r"_test|test_|__")
-
+    print('beginning python files')
     for python_file in pkg_path.glob("**/*.py"):
         if skip_expr.search(str(python_file)):
             continue
+        # print(python_file)
         relative_path = python_file.relative_to(pkg_path)
         dotted_name = relative_path.as_posix()[:-3].replace("/", ".")
         module_name = package + "." + dotted_name
         try:
-            # module = importlib.import_module(module_name)
+            module = importlib.import_module(module_name)
             imports.add(module_name)
+            # print(module_name)
         except Exception as err:  # assume the import could do bad things
             print(f"Import of file '{python_file}' failed: {err}")
             continue
@@ -50,6 +51,7 @@ for package in ["watertap"]:
             dotted_name = relative_path.as_posix().replace("/", ".")
             module_name = package + "." + dotted_name
             try:
+                module = importlib.import_module(module_name)
                 imports.add(module_name)
                 relative_path=relative_path.parent
             except:
@@ -60,7 +62,7 @@ for package in ["watertap"]:
     # add all png files to pyinstaller data
     for png_file in pkg_path.glob("**/*.png"):
         file_name = '/' + png_file.as_posix().split('/')[-1]
-        print(file_name)
+        # print(file_name)
         if skip_expr.search(str(png_file)):
             continue
         relative_path = png_file.relative_to(pkg_path)
@@ -76,7 +78,7 @@ for package in ["watertap"]:
     # add all yaml files to pyinstaller data
     for yaml_file in pkg_path.glob("**/*.yaml"):
         file_name = '/' + yaml_file.as_posix().split('/')[-1]
-        print(file_name)
+        # print(file_name)
         if skip_expr.search(str(yaml_file)):
             continue
         relative_path = yaml_file.relative_to(pkg_path)
@@ -90,7 +92,8 @@ for package in ["watertap"]:
             continue
 
 hiddenimports = list(imports)
-
+# print("hiddenimports")
+# print(hiddenimports)
 # manually add all pyomo hidden imports 
 pyomo_imports = [
     'networkx', 'pyomo.contrib.ampl_function_demo.plugins', 'pyomo.contrib.appsi.plugins', 

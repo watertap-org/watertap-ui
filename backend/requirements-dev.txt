@@ -1,3 +1,4 @@
+aiofiles==23.2.1
 anyio==3.6.1
 asgiref==3.5.2
 certifi==2021.10.8
@@ -8,6 +9,7 @@ idna==3.3
 pydantic==1.9.1
 pyinstaller==5.3
 pyinstaller-hooks-contrib==2022.9
+python-multipart==0.0.5
 chardet
 pyyaml
 sniffio==1.2.0
