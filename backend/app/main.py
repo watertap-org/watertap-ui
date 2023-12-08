@@ -1,6 +1,6 @@
 import sys
 import os
-import logging 
+import logging
 import uvicorn
 import multiprocessing
 import idaes.logger as idaeslog
@@ -27,18 +27,19 @@ app.add_middleware(
 
 app.include_router(flowsheets.router)
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello FastAPI"}
 
 
-if __name__ == '__main__':
-    if('i' in sys.argv or 'install' in sys.argv):
-        _log.info('running get_extensions()')
+if __name__ == "__main__":
+    if "i" in sys.argv or "install" in sys.argv:
+        _log.info("running get_extensions()")
         if not check_for_idaes_extensions():
             get_idaes_extensions()
 
-    elif('d' in sys.argv or 'dev' in sys.argv):
+    elif "d" in sys.argv or "dev" in sys.argv:
         _log.info(f"starting app")
         multiprocessing.freeze_support()
         uvicorn.run("__main__:app", host="127.0.0.1", port=8001, reload=True)
