@@ -15,9 +15,9 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 
 const CATEGORIES = {
-    // "Desalination": [
+    "Custom Flowsheets": [
 
-    // ],
+    ],
     // "Wastewater Recovery": [
     //   "amo 1690",
     //   "biomembrane filtration",
@@ -50,18 +50,35 @@ export default function FlowsheetsListTable(props) {
     const [ category, setCategory ] = useState("all")
 
     useEffect(() => {
-      if (category === "all" || category === "") setTableRows([...props.rows])
-      else {
-        try {
-          let tempRows = []
-          for (let fs of props.rows) {
-            if (CATEGORIES[category].includes(fs.name)) tempRows.push(fs)
-          }
-          setTableRows(tempRows)
-        } catch(e) {
-          setTableRows([...props.rows])
+        if (category === "All Flowsheets" || category === "") setTableRows([...props.rows])
+        else if (category === "Custom Flowsheets") {
+            try {
+                let tempRows = []
+                for (let fs of props.rows) {
+                    
+                    if (fs.custom) {
+                        console.log(fs.name+" is custom: "+fs.custom)
+                        tempRows.push(fs)
+                    }
+                }
+                console.log('setting table rows: ')
+                console.log(tempRows)
+                setTableRows(tempRows)
+            } catch(e) {
+                setTableRows([...props.rows])
+            }
         }
-      }
+        else {
+            try {
+                let tempRows = []
+                for (let fs of props.rows) {
+                    if (CATEGORIES[category].includes(fs.name)) tempRows.push(fs)
+                }
+                setTableRows(tempRows)
+            } catch(e) {
+                setTableRows([...props.rows])
+            }
+        }
     }, [props.rows, category])
 
     const handleFlowsheetClick = (id, built, options) => {
@@ -179,20 +196,17 @@ export default function FlowsheetsListTable(props) {
                       onClick={()=>setCategory(key)}
                   >
                   <TableCell>{key}</TableCell>
-                  {/* <TableCell></TableCell> */}
-                  <TableCell align="right">
+                  <TableCell></TableCell>
+                  <TableCell align="right" sx={{paddingRight: 5}}>
                     <span>
                       <IconButton><ArrowRightAltIcon/></IconButton>
                     </span>
                   </TableCell>
                   </TableRow>
               ))}
-              <TableRow sx={styles.listRow} onClick={()=>setCategory("all")}>
+              <TableRow sx={styles.listRow} onClick={()=>setCategory("All Flowsheets")}>
                   <TableCell>All Flowsheets</TableCell>
-                  {/* <TableCell></TableCell> */}
-                  <TableCell>
-                    
-                </TableCell> 
+                  <TableCell></TableCell> 
                 <TableCell align="right" sx={{paddingRight: 5}}>
                     <span>
                       <IconButton><ArrowRightAltIcon/></IconButton>
@@ -227,7 +241,7 @@ export default function FlowsheetsListTable(props) {
                 </TableRow>
                 </TableHead>
                 <TableBody>
-                {sortRows(props.rows).map((row) => (
+                {sortRows(tableRows).map((row) => (
                     <TableRow
                         key={row.name}
                         sx={styles.listRow}
