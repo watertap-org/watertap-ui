@@ -107,7 +107,9 @@ def run_parameter_sweep(flowsheet, info):
                                 "name": flowsheet.fs_exp.model_objects[key].name,
                                 "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
                                 "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
-                                "num_samples": flowsheet.fs_exp.model_objects[key].num_samples,
+                                "num_samples": flowsheet.fs_exp.model_objects[
+                                    key
+                                ].num_samples,
                                 "param": flowsheet.fs_exp.model_objects[key].obj,
                             }
                         )
@@ -154,7 +156,7 @@ def run_parameter_sweep(flowsheet, info):
         results = run_analysis(
             m=flowsheet.fs_exp.m,
             # flowsheet=info.module[0:-3], # replace _ui instead?
-            flowsheet=info.module.replace('_ui',''),
+            flowsheet=info.module.replace("_ui", ""),
             parameters=parameters,
             output_params=output_params,
             results_path=output_path,
