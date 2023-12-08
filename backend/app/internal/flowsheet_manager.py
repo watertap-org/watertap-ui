@@ -84,8 +84,10 @@ class FlowsheetManager:
         for package in self.app_settings.packages:
             _log.debug(f"Collect flowsheet interfaces from package '{package}'")
             for name, fsi in self._get_flowsheet_interfaces(package).items():
-                _log.debug(f"Add flowsheet interface '{fsi.fs_exp.name}' "
-                           f"for module '{name}'")
+                _log.debug(
+                    f"Add flowsheet interface '{fsi.fs_exp.name}' "
+                    f"for module '{name}'"
+                )
                 # _log.info(f'adding flowsheet with name: {name} and fsi: {fsi}')
                 self.add_flowsheet_interface(name, fsi)
 
@@ -98,9 +100,11 @@ class FlowsheetManager:
 
         # check for (and set if necessary) the last_run dictionary
         query = tinydb.Query()
-        last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
-        if(len(last_run_dict) == 0):
-            _log.debug('setting last run dictionary')
+        last_run_dict = self._histdb.search(
+            query.fragment({"last_run_dict_version": VERSION})
+        )
+        if len(last_run_dict) == 0:
+            _log.debug("setting last run dictionary")
             last_run_dict = {}
             flowsheet_list = self._flowsheets.values()
             for each in flowsheet_list:
@@ -110,8 +114,8 @@ class FlowsheetManager:
                 (query.last_run_dict_version == VERSION),
             )
         else:
-            _log.debug('found last run dictionary')
-            last_run_dict=last_run_dict[0]["last_run_dict"]
+            _log.debug("found last run dictionary")
+            last_run_dict = last_run_dict[0]["last_run_dict"]
             flowsheet_list = self._flowsheets.values()
             for each in flowsheet_list:
                 if not each.id_ in last_run_dict:
@@ -120,9 +124,10 @@ class FlowsheetManager:
                 {"last_run_dict_version": VERSION, "last_run_dict": last_run_dict},
                 (query.last_run_dict_version == VERSION),
             )
-            
 
-    def add_flowsheet_interface(self, module_name: str, fsi: FlowsheetInterface, custom: bool = False):
+    def add_flowsheet_interface(
+        self, module_name: str, fsi: FlowsheetInterface, custom: bool = False
+    ):
         """Add a flowsheet interface associated with the given module (full dotted
         module path). This will replace any existing interface for this module.
 
@@ -140,8 +145,9 @@ class FlowsheetManager:
             None
         """
         if module_name in self._flowsheets:
-            _log.warning(f"Replacing existing flowsheet interface for module "
-                         f"'{module_name}'")
+            _log.warning(
+                f"Replacing existing flowsheet interface for module " f"'{module_name}'"
+            )
 
         export = fsi.fs_exp  # exported flowsheet
         info = FlowsheetInfo(
@@ -188,16 +194,20 @@ class FlowsheetManager:
         # check if get_diagram function was provided by export
         flowsheet = self.get_obj(id_)
         try:
-            img_name = flowsheet.get_diagram(build_options=flowsheet.fs_exp.build_options)
+            img_name = flowsheet.get_diagram(
+                build_options=flowsheet.fs_exp.build_options
+            )
         except:
             img_name = None
-        
+
         data = b""
         info = self.get_info(id_)
-        _log.info(f'inide get diagram:: info is - {info}')
+        _log.info(f"inide get diagram:: info is - {info}")
         if info.custom:
             # do this
-            data_path = Path.home() / ".watertap" / "custom_flowsheets" / f'{info.id_}.png'
+            data_path = (
+                Path.home() / ".watertap" / "custom_flowsheets" / f"{info.id_}.png"
+            )
             data = data_path.read_bytes()
 
         else:
@@ -213,9 +223,9 @@ class FlowsheetManager:
 
             p, m = info.module[:dot], info.module[dot + 1 :]
             try:
-                if img_name is not None: # export provided diagram name
+                if img_name is not None:  # export provided diagram name
                     data = files(p).joinpath(img_name).read_bytes()
-                else: # export did not provide diagram. check for image with same name as export:
+                else:  # export did not provide diagram. check for image with same name as export:
                     data = files(p).joinpath(f"{m}.png").read_bytes()
             except (FileNotFoundError, IOError) as err:
                 _log.error(f"Cannot read diagram for flowsheet '{id_}': {err}")
@@ -274,7 +284,7 @@ class FlowsheetManager:
         return [item["data"] for item in items]
 
     def put_flowsheet_data(
-        self, id_: str = None, name: str = None, data: Dict = None, version = None
+        self, id_: str = None, name: str = None, data: Dict = None, version=None
     ) -> str:
         """Create or update the data for the flowsheet with given identifier + name.
 
@@ -292,19 +302,31 @@ class FlowsheetManager:
         _log.debug(f"Saving/replacing name='{name}' for id='{id_}'")
         print(f"Saving/replacing name='{name}' for id='{id_}'")
         if version is not None:
-            _log.debug(f'saving id {id_} with version {version}')
+            _log.debug(f"saving id {id_} with version {version}")
             try:
                 self._histdb.upsert(
-                    {"name": name, "id_": id_, "version": version, "ts": info.ts, "data": data},
+                    {
+                        "name": name,
+                        "id_": id_,
+                        "version": version,
+                        "ts": info.ts,
+                        "data": data,
+                    },
                     (fs_q.id_ == id_) & (fs_q.name == name),
                 )
             except:
                 self._histdb.upsert(
-                {"name": name, "id_": id_, "version": version, "ts": info.ts, "data": data},
-                (fs_q.id_ == id_) & (fs_q.name == name),
-            )
+                    {
+                        "name": name,
+                        "id_": id_,
+                        "version": version,
+                        "ts": info.ts,
+                        "data": data,
+                    },
+                    (fs_q.id_ == id_) & (fs_q.name == name),
+                )
         else:
-            _log.debug(f'version is none, saving {id_} without version')
+            _log.debug(f"version is none, saving {id_} without version")
             self._histdb.upsert(
                 {"name": name, "id_": id_, "ts": info.ts, "data": data},
                 (fs_q.id_ == id_) & (fs_q.name == name),
@@ -338,33 +360,39 @@ class FlowsheetManager:
         """
         query = tinydb.Query()
         if version is not None:
-            _log.debug(f'searching for id {id_} with version {version}')
-            items = self._histdb.search(query.fragment({"id_": id_, "version": version}))
+            _log.debug(f"searching for id {id_} with version {version}")
+            items = self._histdb.search(
+                query.fragment({"id_": id_, "version": version})
+            )
         else:
-            _log.debug(f'version is none, searching for id {id_} without version')
+            _log.debug(f"version is none, searching for id {id_} without version")
             items = self._histdb.search(query.fragment({"id_": id_}))
         return [item["name"] for item in items]
-    
+
     def get_last_run(self, id_: str = None) -> str:
         query = tinydb.Query()
-        last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
-        if(len(last_run_dict) > 0):
+        last_run_dict = self._histdb.search(
+            query.fragment({"last_run_dict_version": VERSION})
+        )
+        if len(last_run_dict) > 0:
             last_run_dict = last_run_dict[0]["last_run_dict"]
             try:
                 last_run = last_run_dict[id_]
             except Exception as e:
-                _log.error('unable to access last run dictionary')
+                _log.error("unable to access last run dictionary")
                 last_run = ""
         else:
-            _log.error('unable to access last run dictionary')
+            _log.error("unable to access last run dictionary")
             last_run = ""
         return last_run
-    
+
     def set_last_run(self, id_: str = None) -> dict:
         _log.debug(f"setting last run for id='{id_}' with version {VERSION}")
         query = tinydb.Query()
-        last_run_dict = self._histdb.search(query.fragment({"last_run_dict_version": VERSION}))
-        if(len(last_run_dict) > 0):
+        last_run_dict = self._histdb.search(
+            query.fragment({"last_run_dict_version": VERSION})
+        )
+        if len(last_run_dict) > 0:
             last_run_dict = last_run_dict[0]["last_run_dict"]
             curr_date = time.time()
             last_run_dict[id_] = curr_date
@@ -373,7 +401,7 @@ class FlowsheetManager:
                 (query.last_run_dict_version == VERSION),
             )
         else:
-            _log.error('unable to access last run dictionary')
+            _log.error("unable to access last run dictionary")
 
         return last_run_dict
 
@@ -418,28 +446,35 @@ class FlowsheetManager:
                 interfaces[module_name] = interface
 
         return interfaces
-    
+
     def add_custom_flowsheet(self, new_files, new_id):
         """Add new custom flowsheet to the mini db."""
 
         query = tinydb.Query()
         try:
-            custom_flowsheets_dict = self._histdb.search(query.fragment({"custom_flowsheets_version": VERSION}))
-            if(len(custom_flowsheets_dict) == 0):
-                _log.error('unable to find custom flowsheets dictionary')
+            custom_flowsheets_dict = self._histdb.search(
+                query.fragment({"custom_flowsheets_version": VERSION})
+            )
+            if len(custom_flowsheets_dict) == 0:
+                _log.error("unable to find custom flowsheets dictionary")
                 custom_flowsheets_dict = {}
             else:
-                custom_flowsheets_dict = custom_flowsheets_dict[0]["custom_flowsheets_dict"]
+                custom_flowsheets_dict = custom_flowsheets_dict[0][
+                    "custom_flowsheets_dict"
+                ]
         except Exception as e:
-            _log.error(f'error trying to find custom flowsheets dictionary: {e}')
-            _log.error(f'setting it as empty dictionary')
+            _log.error(f"error trying to find custom flowsheets dictionary: {e}")
+            _log.error(f"setting it as empty dictionary")
             custom_flowsheets_dict = {}
         custom_flowsheets_dict[new_id] = new_files
 
         self._histdb.upsert(
-                {"custom_flowsheets_version": VERSION, "custom_flowsheets_dict": custom_flowsheets_dict},
-                (query.custom_flowsheets_version == VERSION),
-            )
+            {
+                "custom_flowsheets_version": VERSION,
+                "custom_flowsheets_dict": custom_flowsheets_dict,
+            },
+            (query.custom_flowsheets_version == VERSION),
+        )
 
         self.add_custom_flowsheets()
 
@@ -447,34 +482,40 @@ class FlowsheetManager:
         """Remove a custom flowsheet from the mini db."""
         query = tinydb.Query()
         try:
-            custom_flowsheets_dict = self._histdb.search(query.fragment({"custom_flowsheets_version": VERSION}))
-            if(len(custom_flowsheets_dict) == 0):
-                _log.error('unable to find custom flowsheets dictionary')
+            custom_flowsheets_dict = self._histdb.search(
+                query.fragment({"custom_flowsheets_version": VERSION})
+            )
+            if len(custom_flowsheets_dict) == 0:
+                _log.error("unable to find custom flowsheets dictionary")
                 custom_flowsheets_dict = {}
             else:
-                custom_flowsheets_dict = custom_flowsheets_dict[0]["custom_flowsheets_dict"]
+                custom_flowsheets_dict = custom_flowsheets_dict[0][
+                    "custom_flowsheets_dict"
+                ]
         except Exception as e:
-            _log.error(f'error trying to find custom flowsheets dictionary: {e}')
-            _log.error(f'setting it as empty dictionary')
+            _log.error(f"error trying to find custom flowsheets dictionary: {e}")
+            _log.error(f"setting it as empty dictionary")
             custom_flowsheets_dict = {}
 
         # remove each file
         flowsheet_files = custom_flowsheets_dict[id_]
         for flowsheet_file in flowsheet_files:
             flowsheet_file_path = self.custom_flowsheets_path / flowsheet_file
-            _log.info(f'flowsheet file path: {flowsheet_file_path}')
+            _log.info(f"flowsheet file path: {flowsheet_file_path}")
             if os.path.isfile(flowsheet_file_path):
-                _log.info(f'removing file: {flowsheet_file_path}')
+                _log.info(f"removing file: {flowsheet_file_path}")
                 os.remove(flowsheet_file_path)
-        
 
         # delete from DB
         del custom_flowsheets_dict[id_]
         self._histdb.upsert(
-                {"custom_flowsheets_version": VERSION, "custom_flowsheets_dict": custom_flowsheets_dict},
-                (query.custom_flowsheets_version == VERSION),
-            )
-        
+            {
+                "custom_flowsheets_version": VERSION,
+                "custom_flowsheets_dict": custom_flowsheets_dict,
+            },
+            (query.custom_flowsheets_version == VERSION),
+        )
+
         # remove from flowsheets list
         del self._flowsheets[id_]
 
@@ -482,22 +523,21 @@ class FlowsheetManager:
 
     def add_custom_flowsheets(self):
         """Search for user uploaded flowsheets. If found, add them as flowsheet interfaces."""
-        files = [] 
-        for (_, _, filenames) in os.walk(self.custom_flowsheets_path):
+        files = []
+        for _, _, filenames in os.walk(self.custom_flowsheets_path):
             files.extend(filenames)
             break
 
         for f in files:
-            if '_ui.py' in f:
+            if "_ui.py" in f:
                 try:
-                    _log.info(f'attempting to add custom flowsheet module: {f}')
-                    module_name = f.replace('.py','')
+                    _log.info(f"attempting to add custom flowsheet module: {f}")
+                    module_name = f.replace(".py", "")
                     custom_module = importlib.import_module(module_name)
                     fsi = self._get_flowsheet_interface(custom_module)
                     self.add_flowsheet_interface(module_name, fsi, custom=True)
                 except Exception as e:
-                    _log.error(f'unable to add flowsheet module: {e}')
-
+                    _log.error(f"unable to add flowsheet module: {e}")
 
     @staticmethod
     def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:
