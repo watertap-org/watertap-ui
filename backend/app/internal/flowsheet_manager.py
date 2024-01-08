@@ -203,7 +203,7 @@ class FlowsheetManager:
 
         data = b""
         info = self.get_info(id_)
-        _log.info(f"inide get diagram:: info is - {info}")
+        # _log.info(f"inside get diagram:: info is - {info}")
         if info.custom:
             # do this
             data_path = (
