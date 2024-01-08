@@ -17,8 +17,16 @@ let uiReady = false
 const serverURL = `http://localhost:${PY_PORT}`
 const uiURL = `http://localhost:${UI_PORT}`
 
-log.transports.file.resolvePath = () => path.join(__dirname, '/logsmain.log');
+if(isDev) {
+  log.transports.file.resolvePath = () => path.join(__dirname, '/logsdev.log');
+} else {
+  log.transports.file.resolvePath = () => path.join(__dirname, '/logsmain.log');
+}
+
 log.transports.file.level = "info";
+// log.transports.console.format = '{h}:{i}:{s} {text}'
+log.transports.console.format = '{text}'
+log.transports.file.format = '{text}'
 
 exports.log = (entry) => log.info(entry)
 
@@ -62,6 +70,7 @@ function createWindow() {
   } 
   
   console.log("storing user preferences in: ",app.getPath('userData'));
+  log.info("storing user preferences in: ",app.getPath('userData'))
   
   // save size of window when resized
   win.on("resized", () => saveBounds(win.getSize()));
@@ -85,22 +94,20 @@ const installExtensions = () => {
       ]
     );
 
-  log.info("installation started");
-  console.log("installation started");
+  log.info("installing idaes extensions");
+  console.log("installing idaes extensions");
 
     var scriptOutput = "";
     installationProcess.stdout.setEncoding('utf8');
     installationProcess.stdout.on('data', function(data) {
-        // console.log('stdout: ' + data);
-        log.info('stdout: ' + data);
+        log.info('backend: ' + data);
         data=data.toString();
         scriptOutput+=data;
     });
 
     installationProcess.stderr.setEncoding('utf8');
     installationProcess.stderr.on('data', function(data) {
-        // console.log('stderr: ' + data);
-        log.info('stderr: ' + data);
+        log.info('backend: ' + data);
         data=data.toString();
         scriptOutput+=data;
     });
@@ -124,7 +131,7 @@ const startServer = () => {
         {
             cwd: '../backend/app'
         }
-    );
+      );
       // log.info("Python process started in dev mode");
       // console.log("Python process started in dev mode");
     } else {
@@ -139,7 +146,7 @@ const startServer = () => {
         backendProcess.stdout.setEncoding('utf8');
         backendProcess.stdout.on('data', function(data) {
             console.log('stdout: ' + data);
-            log.info('stdout: ' + data);
+            log.info('backend: ' + data);
             data=data.toString();
             scriptOutput+=data;
         });
@@ -147,7 +154,7 @@ const startServer = () => {
         backendProcess.stderr.setEncoding('utf8');
         backendProcess.stderr.on('data', function(data) {
             console.log('stderr: ' + data);
-            log.info('stderr: ' + data);
+            log.info('backend: ' + data);
             data=data.toString();
             scriptOutput+=data;
         });
@@ -176,8 +183,8 @@ app.whenReady().then(() => {
       let serverProcess
       let installationProcess = installExtensions()
       installationProcess.on('exit', code => {
-        log.info('installation exit code is', code)
-        console.log('installation exit code is', code)
+        // log.info('installation exit code is', code)
+        // console.log('installation exit code is', code)
         log.info('starting server')
         console.log('starting server')
         serverProcess = startServer()
