@@ -47,6 +47,7 @@ export default function LoggingPanel(props) {
         dialogContentText: {
             backgroundColor: "black",
             color: "white",
+            // overflowX: "auto"
         },
         dialog: {
             // maxWidth: "80vw",
@@ -64,6 +65,13 @@ export default function LoggingPanel(props) {
         onClose()
     };
     
+    const getTextColor = (line) => {
+        if (line.includes('ERROR')) return "#FF042E"
+        else if (line.includes('INFO')) return "#28FF24"
+        else if (line.includes('DEBUG')) return "#3B90FF"
+        else if (line.includes('WARNING')) return "#FFF42C"
+        else return "white"
+    }
 
     const descriptionElementRef = useRef(null);
     useEffect(() => {
@@ -97,30 +105,7 @@ export default function LoggingPanel(props) {
                 aria-labelledby="console-dialog-content-text"
             >   
                     {logData.map((line, idx) => {
-                        if (line.includes('ERROR')) {
-                            return (
-                                <p style={{color: "#FF042E"}} key={idx}>{line}</p>
-                            )
-                        } else if (line.includes('INFO')) {
-                            return (
-                                <p style={{color: "#28FF24"}} key={idx}>{line}</p>
-                            )
-                        }
-                        else if (line.includes('DEBUG')) {
-                            return (
-                                <p style={{color: "#3B90FF"}} key={idx}>{line}</p>
-                            )
-                        }
-                        else if (line.includes('WARNING')) {
-                            return (
-                                <p style={{color: "#FFF42C"}} key={idx}>{line}</p>
-                            )
-                        }
-                        else {
-                            return (
-                                <p style={{color: "WHITE"}} key={idx}>{line}</p>
-                            )
-                        }
+                        return <Typography style={{color: getTextColor(line), overflowWrap: "break-word"}} key={idx}>{line}</Typography>
                     })}
                 <div id="bottom-div" ref={divRef} ></div>
             </DialogContentText>
