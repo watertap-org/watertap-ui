@@ -1,6 +1,6 @@
 import {useEffect, useState, useRef } from 'react';
-import { Grid, Box, Modal, TextField, IconButton, Typography, Button } from '@mui/material';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Grid, Box, Modal, TextField, IconButton, Button } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { getLogs } from '../../services/flowsheet.service';
 
@@ -26,8 +26,6 @@ export default function LoggingPanel(props) {
 
     useEffect(() => {
         if (open) {
-            console.log('log data was updated')
-            // scrollToBottom("test-div")
             divRef.current.scrollIntoView({ behavior: 'smooth' });
         }
         
@@ -96,6 +94,18 @@ export default function LoggingPanel(props) {
             
         >
             <DialogTitle id="dialog-title" style={styles.dialogTitle}>Backend Logs</DialogTitle>
+            <IconButton
+                aria-label="close"
+                onClick={handleClose}
+                sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: "white",
+                }}
+                >
+                <CloseIcon />
+            </IconButton>
             <DialogContent style={styles.dialogContent} dividers={true}>
             <DialogContentText
                 id="scroll-dialog-description"
