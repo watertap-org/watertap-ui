@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import { Grid, Box, Modal, TextField, IconButton, Typography, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { getLogs } from '../../services/flowsheet.service';
 
 const sampleData = [
     "[2024-01-08 08:30:53.961] [info]  stdout: 2024-01-08 08:30:53 [INFO] idaes.init.fs.feed.properties: Initialization Complete.\n",
@@ -42,6 +43,17 @@ const sampleData = [
 export default function LoggingPanel(props) {
     const { open, onClose } = props;
     const [ logData, setLogData ] = useState(sampleData)
+
+    useEffect(() => {
+        getLogs()
+        .then(response => response.json())
+        .then((data) => {
+            console.log('got logs: ')
+            setLogData(data)
+            // console.log(data)
+        })
+    },[props])
+
     // const [ open, setOpen ] = useState(true)
     const styles = {
         modalStyle: {
@@ -108,9 +120,24 @@ export default function LoggingPanel(props) {
                             return (
                                 <p style={{color: "#FF042E"}} key={idx}>{line}</p>
                             )
-                        } else {
+                        } else if (line.includes('INFO')) {
                             return (
                                 <p style={{color: "#28FF24"}} key={idx}>{line}</p>
+                            )
+                        }
+                        else if (line.includes('DEBUG')) {
+                            return (
+                                <p style={{color: "#3B90FF"}} key={idx}>{line}</p>
+                            )
+                        }
+                        else if (line.includes('WARNING')) {
+                            return (
+                                <p style={{color: "#FFF42C"}} key={idx}>{line}</p>
+                            )
+                        }
+                        else {
+                            return (
+                                <p style={{color: "WHITE"}} key={idx}>{line}</p>
                             )
                         }
                     })}

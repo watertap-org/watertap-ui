@@ -76,6 +76,7 @@ class FlowsheetManager:
         """
         self.app_settings = AppSettings(**kwargs)
         self._objs, self._flowsheets = {}, {}
+        self.startup_time = time.time()
 
         # Add custom flowsheets path to the system path
         self.custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
@@ -538,6 +539,10 @@ class FlowsheetManager:
                     self.add_flowsheet_interface(module_name, fsi, custom=True)
                 except Exception as e:
                     _log.error(f"unable to add flowsheet module: {e}")
+
+    def get_logs_path(self):
+        """Return logs path."""
+        return self.app_settings.log_dir
 
     @staticmethod
     def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:

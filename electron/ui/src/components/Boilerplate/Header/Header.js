@@ -13,7 +13,7 @@ export default function Header(props) {
   const [ anchorEl, setAnchorEl ] = React.useState(null);
 
   const handleNavigateHome = () => {
-      setActionsList(!actionsList)
+      // setActionsList(!actionsList)
       navigate("/flowsheets", {replace: true})
   }
 
@@ -38,7 +38,6 @@ export default function Header(props) {
           WaterTAP
         </div>
         <div  className="right" >
-        {/* <Button style={{ color:"white" }} onClick={handleShowActions}>Actions</Button> */}
         <IconButton style={{ color:"white" }} onClick={handleShowActions}><ListIcon/></IconButton>
         <Menu
           id="actions-list"

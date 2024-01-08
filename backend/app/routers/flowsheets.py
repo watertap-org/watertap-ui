@@ -2,7 +2,7 @@
 Handle flowsheet-related API requests from web client.
 """
 # stdlib
-import csv
+import time
 import io
 import aiofiles
 from pathlib import Path
@@ -130,6 +130,7 @@ async def solve(flowsheet_id: str, request: Request):
         # set last run in tiny db
         flowsheet_manager.set_last_run(info.id_)
     except Exception as err:
+        _log.error(f"Solve failed: {err}")
         raise HTTPException(500, detail=f"Solve failed: {err}")
     return flowsheet.fs_exp
 
@@ -472,3 +473,27 @@ async def download_sweep(flowsheet_id: str) -> Path:
     df.to_csv(path, index=False)
     # # User can now download the contents of that file
     return path
+
+@router.get("/get_logs")
+async def get_logs() -> List[str]:
+    """Get backend logs.
+
+    Returns:
+        Logs formatted as a list
+    """
+    result = []
+    logs_path = flowsheet_manager.get_logs_path() / "ui_backend_logs.log"
+    log_file = open(logs_path, 'r')
+    all_logs = log_file.read()
+    logs = all_logs.split('\n[')
+    for line in logs:
+        log_time = line.split(' ')[1:3]
+        log_time_string = f'{log_time[0]} {log_time[1]}'.split(',')[0]
+        stripped_time = time.strptime(log_time_string, "%Y-%m-%d %H:%M:%S")
+        asctime = time.mktime(stripped_time)
+        if asctime > flowsheet_manager.startup_time:
+            result.append(line)
+        # print(f'asctime: {asctime}')
+        # break
+    # print(f'app startup time was : {flowsheet_manager.startup_time}')
+    return result
