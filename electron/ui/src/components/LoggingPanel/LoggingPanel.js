@@ -1,5 +1,6 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import { Grid, Box, Modal, TextField, IconButton, Typography, Button } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { getLogs } from '../../services/flowsheet.service';
 
@@ -45,16 +46,18 @@ export default function LoggingPanel(props) {
     const [ logData, setLogData ] = useState(sampleData)
 
     useEffect(() => {
-        getLogs()
-        .then(response => response.json())
-        .then((data) => {
-            console.log('got logs: ')
-            setLogData(data)
-            // console.log(data)
-        })
+        if (open)(
+            getLogs()
+            .then(response => response.json())
+            .then((data) => {
+                console.log('got logs: ')
+                setLogData(data)
+                // console.log(data)
+            })
+        )
+        
     },[props])
 
-    // const [ open, setOpen ] = useState(true)
     const styles = {
         modalStyle: {
             position: 'absolute',
@@ -68,8 +71,9 @@ export default function LoggingPanel(props) {
             borderRadius:2,
             boxShadow: 24,
             p: 2,
-            overflowY: "scroll",
-            overflowX: "scroll",
+            // overflowY: "scroll",
+            // overflowX: "scroll",
+            overflow: "hidden",
             color: "white"
         },
         header:{
@@ -80,11 +84,32 @@ export default function LoggingPanel(props) {
             width: 200,
         },
         console: {
-            overflowX: "scroll"
+            overflow: "scroll",
         },
         consoleText: {
             // display: "flex",
             // overflowX: "scroll",
+        },
+        dialogTitle: {
+            backgroundColor: "black",
+            color: "white",
+        },
+        dialogContent: {
+            backgroundColor: "black",
+            color: "white",
+        },
+        dialogContentText: {
+            backgroundColor: "black",
+            color: "white",
+        },
+        dialog: {
+            // maxWidth: "80vw",
+        },
+        dialogPaper: {
+            minHeight: '60vh',
+            maxHeight: '60vh',
+            minWidth: '60vw',
+            maxWidth: '60vw',
         },
 
     }
@@ -93,60 +118,65 @@ export default function LoggingPanel(props) {
         onClose()
     };
 
+    const descriptionElementRef = useRef(null);
+    useEffect(() => {
+      if (open) {
+        const { current: descriptionElement } = descriptionElementRef;
+        if (descriptionElement !== null) {
+          descriptionElement.focus();
+        }
+      }
+    }, [open]);
 
-  return (
-      <Modal
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-      >
-        <Grid container sx={styles.modalStyle} spacing={1}>
-
-            <Grid item xs={9}>
-                <h2 style={styles.header}>Backend Logs</h2>
-            </Grid>
-            <Grid item xs={3}>
-                <Box sx={{display: 'flex', justifyContent: 'flex-end', marginRight:'10px'}}>
-                    <IconButton onClick={handleClose}><CloseIcon style={{color: "white"}}/></IconButton>
-                </Box>
-            </Grid>
-
-            <Grid item xs={12}>
-                <Box sx={styles.console}>
-                <Typography sx={styles.consoleText}>
-                    {logData.map((line, idx) => {
-                        if (line.includes('ERROR')) {
-                            return (
-                                <p style={{color: "#FF042E"}} key={idx}>{line}</p>
-                            )
-                        } else if (line.includes('INFO')) {
-                            return (
-                                <p style={{color: "#28FF24"}} key={idx}>{line}</p>
-                            )
-                        }
-                        else if (line.includes('DEBUG')) {
-                            return (
-                                <p style={{color: "#3B90FF"}} key={idx}>{line}</p>
-                            )
-                        }
-                        else if (line.includes('WARNING')) {
-                            return (
-                                <p style={{color: "#FFF42C"}} key={idx}>{line}</p>
-                            )
-                        }
-                        else {
-                            return (
-                                <p style={{color: "WHITE"}} key={idx}>{line}</p>
-                            )
-                        }
-                    })}
-                </Typography>
-                    
-                </Box>
-            </Grid>
-        </Grid>
-    </Modal>
-  );
+    return (
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            scroll={"paper"}
+            aria-labelledby="console-dialog"
+            aria-describedby="console-dialog-description"
+            PaperProps={{
+                sx: styles.dialogPaper
+              }}
+            
+        >
+            <DialogTitle id="dialog-title" style={styles.dialogTitle}>Backend Logs</DialogTitle>
+            <DialogContent style={styles.dialogContent} dividers={true}>
+            <DialogContentText
+                id="scroll-dialog-description"
+                ref={descriptionElementRef}
+                tabIndex={-1}
+                style={styles.dialogContentText}
+            >
+                {logData.map((line, idx) => {
+                    if (line.includes('ERROR')) {
+                        return (
+                            <p style={{color: "#FF042E"}} key={idx}>{line}</p>
+                        )
+                    } else if (line.includes('INFO')) {
+                        return (
+                            <p style={{color: "#28FF24"}} key={idx}>{line}</p>
+                        )
+                    }
+                    else if (line.includes('DEBUG')) {
+                        return (
+                            <p style={{color: "#3B90FF"}} key={idx}>{line}</p>
+                        )
+                    }
+                    else if (line.includes('WARNING')) {
+                        return (
+                            <p style={{color: "#FFF42C"}} key={idx}>{line}</p>
+                        )
+                    }
+                    else {
+                        return (
+                            <p style={{color: "WHITE"}} key={idx}>{line}</p>
+                        )
+                    }
+                })}
+            </DialogContentText>
+            </DialogContent>
+        </Dialog>
+    )
 }
 
