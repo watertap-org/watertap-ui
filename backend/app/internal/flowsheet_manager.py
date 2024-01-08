@@ -532,7 +532,7 @@ class FlowsheetManager:
         for f in files:
             if "_ui.py" in f:
                 try:
-                    _log.info(f"attempting to add custom flowsheet module: {f}")
+                    _log.info(f"adding imported flowsheet module: {f}")
                     module_name = f.replace(".py", "")
                     custom_module = importlib.import_module(module_name)
                     fsi = self._get_flowsheet_interface(custom_module)
