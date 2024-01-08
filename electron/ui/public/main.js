@@ -100,14 +100,14 @@ const installExtensions = () => {
     var scriptOutput = "";
     installationProcess.stdout.setEncoding('utf8');
     installationProcess.stdout.on('data', function(data) {
-        log.info('backend: ' + data);
+        log.info('(backend): ' + data);
         data=data.toString();
         scriptOutput+=data;
     });
 
     installationProcess.stderr.setEncoding('utf8');
     installationProcess.stderr.on('data', function(data) {
-        log.info('backend: ' + data);
+        log.info('(backend): ' + data);
         data=data.toString();
         scriptOutput+=data;
     });
@@ -146,7 +146,7 @@ const startServer = () => {
         backendProcess.stdout.setEncoding('utf8');
         backendProcess.stdout.on('data', function(data) {
             console.log('stdout: ' + data);
-            log.info('backend: ' + data);
+            log.info('(backend): ' + data);
             data=data.toString();
             scriptOutput+=data;
         });
@@ -154,7 +154,7 @@ const startServer = () => {
         backendProcess.stderr.setEncoding('utf8');
         backendProcess.stderr.on('data', function(data) {
             console.log('stderr: ' + data);
-            log.info('backend: ' + data);
+            log.info('(backend): ' + data);
             data=data.toString();
             scriptOutput+=data;
         });
