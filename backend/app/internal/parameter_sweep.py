@@ -3,13 +3,15 @@ from fastapi import HTTPException
 import numpy as np
 from watertap.tools.parameter_sweep import LinearSample, ParameterSweep, parameter_sweep
 import watertap.examples.flowsheets.case_studies.wastewater_resource_recovery.amo_1575_magprex.magprex as magprex
+from watertap.tools.parameter_sweep import ParameterSweepReader
+
 from importlib import import_module
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
 
 
-def set_up_sensitivity(m, solve, output_params):
+def set_up_sensitivity(solve, output_params):
     outputs = {}
     # optimize_kwargs = {"fail_flag": False}
     optimize_kwargs = {}
@@ -19,14 +21,21 @@ def set_up_sensitivity(m, solve, output_params):
     # we should have the user provide outputs as a parameter
     i = 0
     for each in output_params:
-        outputs[f'{i}: {each["name"]}'] = each["param"]
+        outputs[each["name"]] = each["param"]
         i += 1
 
     return outputs, optimize_kwargs, opt_function
 
 
+def build_outputs(model, output_keys):
+    outputs = {}
+    for key, pyo_object in output_keys.items():
+        outputs[key] = model.find_component(pyo_object)
+    return outputs
+
+
 def run_analysis(
-    m,
+    ui_config,
     flowsheet,
     parameters,
     output_params,
@@ -34,23 +43,39 @@ def run_analysis(
     interpolate_nan_outputs=True,
     custom_do_param_sweep_kwargs=None,
 ):
-    flowsheet = import_module(flowsheet)
+    flowsheet_ui = import_module(flowsheet)
+    flowsheet = import_module(flowsheet.replace("_ui", ""))
+    # try:
+    #     solve_function = flowsheet_ui.solve_flowsheet
+    # except:
     try:
-        solve_function = flowsheet.solve
-    except:
         solve_function = flowsheet.optimize
+    except:
+        solve_function = flowsheet.solve
+
     outputs, optimize_kwargs, opt_function = set_up_sensitivity(
-        m, solve_function, output_params
+        solve_function, output_params
     )
 
+    try:
+        build_function = flowsheet_ui.build_flowsheet
+        build_kwargs = {"build_options": ui_config.fs_exp.build_options}
+    except:
+        build_function = flowsheet.build
+        build_kwargs = {}
     sweep_params = {}
     # sensitivity analysis
     i = 0
     for each in parameters:
-        sweep_params[f'{i}: {each["name"]}'] = LinearSample(
-            each["param"], each["lb"], each["ub"], int(each["num_samples"])
-        )
+        sweep_params[each["param"]] = {
+            "type": "LinearSample",
+            "param": each["param"],
+            "lower_limit": each["lb"],
+            "upper_limit": each["ub"],
+            "num_samples": int(each["num_samples"]),
+        }
         i += 1
+    print(sweep_params)
     # Check if user provided custom kwargs, if not don't use cutm swep param
     # else check if user provided custom sweep function, if not use watertap default (will be merged)
     if custom_do_param_sweep_kwargs is None:
@@ -64,17 +89,22 @@ def run_analysis(
 
     ps = ParameterSweep(
         csv_results_file_name=results_path,
-        optimize_function=opt_function,
-        optimize_kwargs=optimize_kwargs,
+        optimize_function=solve_function,
+        # optimize_kwargs=optimize_kwargs,
         interpolate_nan_outputs=False,
         custom_do_param_sweep=custom_do_param_sweep,
         custom_do_param_sweep_kwargs=custom_do_param_sweep_kwargs,
         reinitialize_before_sweep=False,
+        parallel_back_end="MultiProcessing",
+        number_of_subprocesses=18,
     )
     global_results = ps.parameter_sweep(
-        m,
-        sweep_params,
-        outputs,
+        build_model=build_function,
+        build_sweep_params=ParameterSweepReader()._dict_to_params,
+        build_sweep_params_kwargs={"input_dict": sweep_params},
+        build_model_kwargs=build_kwargs,
+        build_outputs=build_outputs,
+        build_outputs_kwargs={"output_keys": outputs},
     )
 
     return global_results
@@ -110,7 +140,7 @@ def run_parameter_sweep(flowsheet, info):
                                 "num_samples": flowsheet.fs_exp.model_objects[
                                     key
                                 ].num_samples,
-                                "param": flowsheet.fs_exp.model_objects[key].obj,
+                                "param": flowsheet.fs_exp.model_objects[key].obj.name,
                             }
                         )
                     except:
@@ -120,7 +150,7 @@ def run_parameter_sweep(flowsheet, info):
                                 "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
                                 "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
                                 "num_samples": "5",
-                                "param": flowsheet.fs_exp.model_objects[key].obj,
+                                "param": flowsheet.fs_exp.model_objects[key].obj.name,
                             }
                         )
                     # HTTPException(500, detail=f"Sweep failed: {parameters}")
@@ -146,7 +176,7 @@ def run_parameter_sweep(flowsheet, info):
                 output_params.append(
                     {
                         "name": flowsheet.fs_exp.model_objects[key].name,
-                        "param": flowsheet.fs_exp.model_objects[key].obj,
+                        "param": flowsheet.fs_exp.model_objects[key].obj.name,
                     }
                 )
                 keys.append(key)
@@ -154,14 +184,16 @@ def run_parameter_sweep(flowsheet, info):
             Path.home() / ".watertap" / "sweep_outputs" / f"{info.name}_sweep.csv"
         )
         results = run_analysis(
-            m=flowsheet.fs_exp.m,
-            # flowsheet=info.module[0:-3], # replace _ui instead?
-            flowsheet=info.module.replace("_ui", ""),
+            ui_config=flowsheet,
+            flowsheet=info.module,
+            # # flowsheet=info.module[0:-3], # replace _ui instead?
+            # flowsheet=info.module.replace("_ui", ""),
             parameters=parameters,
             output_params=output_params,
             results_path=output_path,
             # custom_do_param_sweep_kwargs=flowsheet.custom_do_param_sweep_kwargs,
         )
+        print(results)
     except Exception as err:
         _log.error(f"err: {err}")
         raise HTTPException(500, detail=f"Sweep failed: {err}")
