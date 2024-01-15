@@ -42,12 +42,11 @@ def run_analysis(
     results_path="output.csv",
     interpolate_nan_outputs=True,
     custom_do_param_sweep_kwargs=None,
+    fixed_parameters=None,
 ):
     flowsheet_ui = import_module(flowsheet)
     flowsheet = import_module(flowsheet.replace("_ui", ""))
-    # try:
-    #     solve_function = flowsheet_ui.solve_flowsheet
-    # except:
+
     try:
         solve_function = flowsheet.optimize
     except:
@@ -75,7 +74,45 @@ def run_analysis(
             "num_samples": int(each["num_samples"]),
         }
         i += 1
-    print(sweep_params)
+    # generating paramters that are fixed- length 1!
+    for f_param in fixed_parameters:
+        if f_param["fixed"]:
+            sweep_params[f_param["param"] + "_fixed_state"] = {
+                "type": "LinearSample",
+                "param": f_param["param"],
+                "lower_limit": f_param["value"],
+                "upper_limit": f_param["value"],
+                "num_samples": 1,
+            }
+        else:
+            sweep_params[f_param["param"] + "_fixed_state"] = {
+                "type": "LinearSample",
+                "param": f_param["param"],
+                "lower_limit": 0,
+                "upper_limit": 0,
+                "num_samples": 1,
+                "set_mode": "set_fixed_state",
+                "default_value": f_param["value"],
+            }
+            if f_param["lb"] is not None:
+                sweep_params[f_param["param"] + "_lb"] = {
+                    "type": "LinearSample",
+                    "param": f_param["param"],
+                    "lower_limit": f_param["lb"],
+                    "upper_limit": f_param["lb"],
+                    "num_samples": 1,
+                    "set_mode": "set_lb",
+                }
+            if f_param["ub"] is not None:
+                sweep_params[f_param["param"] + "_ub"] = {
+                    "type": "LinearSample",
+                    "param": f_param["param"],
+                    "lower_limit": f_param["ub"],
+                    "upper_limit": f_param["ub"],
+                    "num_samples": 1,
+                    "set_mode": "set_ub",
+                }
+    print("sweep_params", sweep_params)
     # Check if user provided custom kwargs, if not don't use cutm swep param
     # else check if user provided custom sweep function, if not use watertap default (will be merged)
     if custom_do_param_sweep_kwargs is None:
@@ -86,7 +123,7 @@ def run_analysis(
         )
         if custom_do_param_sweep is None:
             custom_do_param_sweep_kwargs = None
-
+    print(fixed_parameters)
     ps = ParameterSweep(
         csv_results_file_name=results_path,
         optimize_function=solve_function,
@@ -96,7 +133,7 @@ def run_analysis(
         custom_do_param_sweep_kwargs=custom_do_param_sweep_kwargs,
         reinitialize_before_sweep=False,
         parallel_back_end="MultiProcessing",
-        number_of_subprocesses=18,
+        number_of_subprocesses=10,
     )
     global_results = ps.parameter_sweep(
         build_model=build_function,
@@ -114,7 +151,13 @@ def run_parameter_sweep(flowsheet, info):
     try:
         _log.info("trying to sweep")
         parameters = []
+        # for keeping track of user defined paramters in flowsheet that are changed
+        fixed_parameters = []
+        fixed_parameters_keys = []
         output_params = []
+        # for keeping track of key to export, will be a list in same order a keys, and conversion factors
+        # but defines sweep_params and outputs.
+        export_keys = []
         keys = []
         conversion_factors = []
         results_table = {"headers": []}
@@ -134,7 +177,7 @@ def run_parameter_sweep(flowsheet, info):
                     try:
                         parameters.append(
                             {
-                                "name": flowsheet.fs_exp.model_objects[key].name,
+                                "name": flowsheet.fs_exp.model_objects[key].obj.name,
                                 "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
                                 "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
                                 "num_samples": flowsheet.fs_exp.model_objects[
@@ -146,17 +189,33 @@ def run_parameter_sweep(flowsheet, info):
                     except:
                         parameters.append(
                             {
-                                "name": flowsheet.fs_exp.model_objects[key].name,
+                                "name": flowsheet.fs_exp.model_objects[key].obj.name,
                                 "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
                                 "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
                                 "num_samples": "5",
                                 "param": flowsheet.fs_exp.model_objects[key].obj.name,
                             }
                         )
+                    export_keys.append(
+                        ["sweep_params", flowsheet.fs_exp.model_objects[key].obj.name]
+                    )
                     # HTTPException(500, detail=f"Sweep failed: {parameters}")
                     flowsheet.fs_exp.model_objects[key].obj.fix()
                     conversion_factors.append(conversion_factor)
                     keys.append(key)
+            elif flowsheet.fs_exp.model_objects[key].is_input:
+                fixed_parameters.append(
+                    {
+                        "name": flowsheet.fs_exp.model_objects[key].obj.name,
+                        "value": flowsheet.fs_exp.model_objects[key].obj.value,
+                        "num_samples": "1",
+                        "param": flowsheet.fs_exp.model_objects[key].obj.name,
+                        "fixed": flowsheet.fs_exp.model_objects[key].fixed,
+                        "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
+                        "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
+                    }
+                )
+                fixed_parameters_keys.append(flowsheet.fs_exp.model_objects[key].name)
         for key in flowsheet.fs_exp.model_objects:
             if (
                 flowsheet.fs_exp.model_objects[key].is_output
@@ -175,15 +234,18 @@ def run_parameter_sweep(flowsheet, info):
                 conversion_factors.append(conversion_factor)
                 output_params.append(
                     {
-                        "name": flowsheet.fs_exp.model_objects[key].name,
+                        "name": flowsheet.fs_exp.model_objects[key].obj.name,
                         "param": flowsheet.fs_exp.model_objects[key].obj.name,
                     }
+                )
+                export_keys.append(
+                    ["outputs", flowsheet.fs_exp.model_objects[key].obj.name]
                 )
                 keys.append(key)
         output_path = (
             Path.home() / ".watertap" / "sweep_outputs" / f"{info.name}_sweep.csv"
         )
-        results = run_analysis(
+        results_arr, output_dict = run_analysis(
             ui_config=flowsheet,
             flowsheet=info.module,
             # # flowsheet=info.module[0:-3], # replace _ui instead?
@@ -191,29 +253,29 @@ def run_parameter_sweep(flowsheet, info):
             parameters=parameters,
             output_params=output_params,
             results_path=output_path,
+            fixed_parameters=fixed_parameters,
             # custom_do_param_sweep_kwargs=flowsheet.custom_do_param_sweep_kwargs,
         )
-        print(results)
+        # print(results)
     except Exception as err:
         _log.error(f"err: {err}")
         raise HTTPException(500, detail=f"Sweep failed: {err}")
-    results_table["values"] = results[0].tolist()
-    for value in results_table["values"]:
-        for i in range(len(value)):
-            if np.isnan(value[i]):
-                value[i] = None
-                # error_params = ""
-                # for j in range(len(parameters)):
-                #     error_param = parameters[j]["name"]
-                #     error_value = value[j]
-                #     error_params += f'{error_param}: {error_value}, '
-                # error_params = error_params[:-2]
-                # _log.error(f'Sweep produced invalid results: {error_params}')
-                # raise HTTPException(500, detail=f"Sweep produced invalid results for input parameters: {error_params}")
+    num_samples = output_dict[export_keys[0][0]][export_keys[0][1]]["value"].size
+    result_arr = []
+    for ns in range(num_samples):
+        result_arr.append([])
+        for i, (result_type, key) in enumerate(export_keys):
+            value = output_dict[export_keys[i][0]][export_keys[i][1]]["value"][ns]
+
+            if np.isnan(value) or output_dict["solve_successful"][ns] == False:
+                value = None
             else:
                 conversion_factor = conversion_factors[i]
-                value[i] = value[i] * conversion_factor
+                value = value * conversion_factor
+            result_arr[-1].append(value)
+    results_table["values"] = result_arr
     results_table["keys"] = keys
     results_table["num_parameters"] = len(parameters)
     results_table["num_outputs"] = len(output_params)
+    print(results_table)
     return results_table
