@@ -37,7 +37,7 @@ export default function BuildOptions(props) {
         </h3>
         </div>
         <Divider light sx={{marginBottom:"20px"}}/>
-        <Collapse in={showBuildOptions} timeout="auto" unmountOnExit>
+        <Collapse in={showBuildOptions} timeout={0}>
         <Grid container sx={{marginBottom: "50px"}}>
         {Object.entries(flowsheetData.inputData.build_options).map(([k,v]) => (
             <BuildOption key={k} v={v} k={k} params={params} setFlowsheetData={setFlowsheetData} flowsheetData={flowsheetData} disabled={tabValue!==0}/>
