@@ -83,7 +83,7 @@ export default function FlowsheetsListTable(props) {
 
     const handleFlowsheetClick = (id, built, options) => {
         let hasOptions = false
-        if(Object.keys(options).length > 0) hasOptions = true
+        if(Object.keys(options).length > 1) hasOptions = true
         navigate("/flowsheet/" + id + "/config", {replace: true, state:{built: built, hasOptions: hasOptions}})
     }
     const styles = {
@@ -274,8 +274,6 @@ export default function FlowsheetsListTable(props) {
                 ))}
                 </TableBody>
               </Table>
-
-              
               
             }
             
