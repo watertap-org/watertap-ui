@@ -362,9 +362,9 @@ export default function FlowsheetConfig() {
                     
                     </Grid>
                     <Grid item xs={12}>
-                    <div style={{backgroundColor: '#F1F3F3'}}>
+                    <div style={{backgroundColor: '#F1F3F3', color: '#727272'}}>
                       <Tabs value={tabValue} onChange={handleTabChange} aria-label="process tabs" centered 
-                        textColor='#727272'
+                        textColor='inherit'
                         TabIndicatorProps={{style: {background:'#727272'}}}
                       >
                         <Tab label="Input" {...a11yProps(0)} />
