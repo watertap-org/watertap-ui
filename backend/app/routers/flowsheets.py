@@ -25,6 +25,7 @@ import idaes.logger as idaeslog
 CURRENT = "current"
 
 _log = idaeslog.getLogger(__name__)
+_solver_log = idaeslog.getLogger(__name__+'.solver')
 
 router = APIRouter(
     prefix="/flowsheets",
@@ -126,7 +127,8 @@ async def solve(flowsheet_id: str, request: Request):
 
     # run solve
     try:
-        flowsheet.solve()
+        with idaeslog.solver_log(_log, level=idaeslog.INFO) as slc:
+            flowsheet.solve()
         # set last run in tiny db
         flowsheet_manager.set_last_run(info.id_)
     except Exception as err:
