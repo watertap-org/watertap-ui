@@ -11,19 +11,6 @@ import { selectOption } from '../../services/flowsheet.service';
 export default function BuildOptions(props) {
     let params = useParams(); 
     const { flowsheetData, tabValue, isBuilt, showBuildOptions, setShowBuildOptions, runBuildFlowsheet, setFlowsheetData } = props
-    // const [ invalid, setInvalid ] = useState(false)
-    // const [ optionsValid, setOptionsValid ] = useState([])
-
-    // useEffect(() => {
-    //     let tempInvalid = false
-    //     for (let valid in optionsValid) {
-    //         if (!valid) {
-    //             tempInvalid = true
-    //             break
-    //         }
-    //     }
-    //     setInvalid(tempInvalid)
-    // }, [optionsValid])
 
     return ( 
 
@@ -93,9 +80,6 @@ function BuildOption(props) {
                 }
                 
             }
-            
-            
-            
         }
         else if (type === "float") {
             let newVal
@@ -128,38 +112,6 @@ function BuildOption(props) {
             console.error('error selecting option: ',e)
         });
       }
-
-    //   const handleUpdateValue = (event, type, min, max) => {
-    //     let body
-    //     if (type === "int") {
-    //         // console.log(event.target)
-    //         let newVal = parseInt(event.target.value)
-    //         if (newVal <= max && newVal >= min) {
-    //             body = {option_name: event.target.name, new_option: parseInt(event.target.value)}
-    //         } else {
-    //             console.log('int value is outside valid boundary')
-    //             return
-    //         }
-            
-    //     }
-    //     else if (type === "float") {
-    //         return
-    //     }
-    //     else if (type === "string") {
-    //         return
-    //     } 
-    //     else {
-    //         body = {option_name: event.target.name, new_option: event.target.value}
-    //     }
-    //     selectOption(params.id, body)
-    //     .then(response => response.json())
-    //     .then((data)=>{
-    //         console.log("selected option successfully:", data);
-    //         setFlowsheetData({outputData:flowsheetData.outputData, inputData: data, name: data.name});
-    //     }).catch((e) => {
-    //         console.error('error selecting option: ',e)
-    //     });
-    //   }
 
     return (
         <Fragment key={k}>
