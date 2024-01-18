@@ -2,13 +2,9 @@
 import React from 'react'; 
 import {useEffect, useState } from 'react';   
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { getFlowsheet, saveFlowsheet, resetFlowsheet, unbuildFlowsheet } from "../../services/flowsheet.service"; 
-import { ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
-import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar, Stack, Divider } from '@mui/material';
-import { Select, InputLabel, MenuItem, FormControl, TextField, Collapse, IconButton } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import { getFlowsheet, saveFlowsheet, resetFlowsheet } from "../../services/flowsheet.service"; 
+import { Dialog, DialogTitle, DialogActions, DialogContent } from '@mui/material'
+import { Typography, CircularProgress, Tabs, Tab, Box, Grid, Container, Snackbar } from '@mui/material';
 import Graph from "../../components/Graph/Graph";
 import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
@@ -46,7 +42,7 @@ function a11yProps(index) {
   };
 }
 
-export default function FlowsheetConfig() {
+export default function FlowsheetConfig(props) {
     let navigate = useNavigate();
     let params = useParams(); 
     const location = useLocation();
@@ -378,12 +374,14 @@ export default function FlowsheetConfig() {
                   </Grid>
                 
                 <TabPanel value={tabValue} index={0}>
-                  <ConfigInput flowsheetData={flowsheetData} 
-                              updateFlowsheetData={updateFlowsheetData}
-                              reset={reset}
-                              solveType={solveType}
-                              handleSelectSolveType={handleSelectSolveType}
-                              >
+                  <ConfigInput 
+                    flowsheetData={flowsheetData} 
+                    updateFlowsheetData={updateFlowsheetData}
+                    reset={reset}
+                    solveType={solveType}
+                    handleSelectSolveType={handleSelectSolveType}
+                    numberOfSubprocesses={props.numberOfSubprocesses}
+                  >
                   </ConfigInput>
                 </TabPanel>
                 <TabPanel value={tabValue} index={1}>

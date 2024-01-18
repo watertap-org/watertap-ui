@@ -6,7 +6,7 @@ import csv
 import io
 import aiofiles
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Union
 
 # third-party
 from fastapi import Request, APIRouter, HTTPException, File, UploadFile
@@ -35,7 +35,7 @@ router = APIRouter(
 flowsheet_manager = FlowsheetManager()
 
 
-@router.get("/", response_model=List[FlowsheetInfo])
+@router.get("/", response_model=Dict[str, Union[List[FlowsheetInfo], int]])
 async def get_all():
     """Get basic information about all available flowsheets.
 
@@ -46,7 +46,19 @@ async def get_all():
     for each in flowsheet_list:
         # gotta fetch last run for each from tiny db
         each.set_last_run(flowsheet_manager.get_last_run(each.id_))
-    return flowsheet_list
+
+    try:
+        currentNumberOfSubprocesses, maxNumberOfSubprocesses = flowsheet_manager.get_number_of_subprocesses()
+    except Exception as e:
+        _log.info(f'unable to get number of subprocesses: {e}')
+        currentNumberOfSubprocesses = 1
+        maxNumberOfSubprocesses = 8
+    
+    return {
+        "flowsheet_list": flowsheet_list, 
+        "currentNumberOfSubprocesses": currentNumberOfSubprocesses,
+        "maxNumberOfSubprocesses": maxNumberOfSubprocesses,
+    }
 
 
 @router.get("/{id_}/config", response_model=FlowsheetExport)

@@ -8,7 +8,8 @@ import NewFlowsheetDialog from "../../components/NewFlowsheetDialog/NewFlowsheet
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 
-export default function FlowsheetsList() {
+export default function FlowsheetsList(props) {
+  const {setNumberOfSubprocesses} = props
 
   const [rows, setRows] = useState([]); 
   const [errorMessage, setErrorMessage] = useState(false); 
@@ -22,8 +23,9 @@ export default function FlowsheetsList() {
       getFlowsheetsList()
       .then(response => response.json())
       .then((data)=>{
-        console.log("f list:",data);
-          setRows(data);
+          console.log("f list:",data.flowsheet_list);
+          setRows(data.flowsheet_list);
+          setNumberOfSubprocesses({current: data.currentNumberOfSubprocesses, max: data.maxNumberOfSubprocesses});
       }).catch(e => {
         console.log("error getting flowsheets list: "+e)
     });

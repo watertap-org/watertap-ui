@@ -5,24 +5,23 @@ import InputAccordion from "../../../components/InputAccordion/InputAccordion";
 import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
 import { deleteConfig }  from '../../../services/input.service.js'
-import { Button, Box, Modal, Select, Stack, Toolbar, Tooltip } from '@mui/material';
+import { Button, Box, Modal, Select, Stack, TextField, Tooltip } from '@mui/material';
 import { Grid, InputLabel, MenuItem, FormControl } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
-
-
-
-
 export default function ConfigInput(props) {
     let params = useParams(); 
-    const { flowsheetData, updateFlowsheetData, reset, solveType } = props; 
+    const { flowsheetData, updateFlowsheetData, reset, solveType, numberOfSubprocesses } = props; 
     const [ displayData, setDisplayData ] = useState({}) 
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
     const [ openDeleteConfig, setOpenDeleteConfig] = useState(false)
     const [ openErrorMessage, setOpenErrorMessage ] = useState(false);
     const [ disableRun, setDisableRun ] = useState(false)
+    const [ currentNumberOfSubprocesses, setCurrentNumberOfSubprocesses ] = useState(null)
+    const [ maxNumberOfSubprocesses, setMaxNumberOfSubprocesses ] = useState(null)
+    const [ numberOfSubprocessesIsValid, setNumberOfSubprocessesIsValid ] = useState(true)
 
     const modalStyle = {
         position: 'absolute',
@@ -72,6 +71,30 @@ export default function ConfigInput(props) {
         }
 
     }, [flowsheetData.inputData, solveType]);
+
+    useEffect(() => {
+        console.log(`setting number of subprocesses current: ${numberOfSubprocesses.current}, max: ${numberOfSubprocesses.max}`)
+        setCurrentNumberOfSubprocesses(numberOfSubprocesses.current)
+        setMaxNumberOfSubprocesses(numberOfSubprocesses.max)
+    }, [numberOfSubprocesses])
+
+    const handleUpdateNumberOfSubprocesses = (event) => {
+        console.log('updating number of subprocesses')
+        setCurrentNumberOfSubprocesses(event.target.value)
+        if (isNaN(event.target.value) || event.target.value === "") {
+            // NOT VALID
+            setNumberOfSubprocessesIsValid(false)
+        } else {
+            // CHECK IF WITHIN VALID BOUNDS: [1-MAX]
+            let newValue = parseInt(event.target.value)
+            if (newValue > 0 && newValue <= maxNumberOfSubprocesses) {
+                // CALL API TO UPDATE NUMBER OF SUBPROCESSES
+                setNumberOfSubprocessesIsValid(true)
+            } else{
+                setNumberOfSubprocessesIsValid(false)
+            }
+        }
+    }
  
     const handleConfigSelection = (event) => {
         const {
@@ -274,6 +297,21 @@ export default function ConfigInput(props) {
 
                     <Grid item xs={6}>
                         <Stack direction="row" spacing={2} justifyContent={'flex-end'} alignItems={'flex-end'} sx={{marginBottom: 2}}>
+                            {solveType === 'sweep' &&
+                                <TextField
+                                    label={"Number of subprocesses"}
+                                    // fullWidth
+                                    // type="number"
+                                    // placeholder={'[1-16]'}
+                                    id={'number-of-subprocesses-input'}
+                                    onChange={handleUpdateNumberOfSubprocesses}
+                                    value={currentNumberOfSubprocesses}
+                                    size="small"
+                                    // sx={{marginBottom: 2}}
+                                    error={!numberOfSubprocessesIsValid}
+                                />
+                            }
+                            
                             <FormControl >
                                 <InputLabel id="solve-sweep-label">Analysis Type</InputLabel>
                                 <Select labelId="solve-sweep-label" id="solve-sweep-select" label="Analysis Type" size="small" 
@@ -286,7 +324,7 @@ export default function ConfigInput(props) {
                                 </Select>
                             </FormControl>
                             <div>
-                                <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset} fullWidth>RESET FLOWSHEET</Button>
+                                <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset} fullWidth>RESET</Button>
                             </div>
                             <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
                                 <div>
