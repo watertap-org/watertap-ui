@@ -484,3 +484,11 @@ async def download_sweep(flowsheet_id: str) -> Path:
     df.to_csv(path, index=False)
     # # User can now download the contents of that file
     return path
+
+@router.post("/update_number_of_subprocesses")
+async def remove_flowsheet(request: Request):
+    data = await request.json()
+    new_value = data['value']
+    flowsheet_manager.set_number_of_subprocesses(new_value)
+
+    return {"new_value": new_value}
