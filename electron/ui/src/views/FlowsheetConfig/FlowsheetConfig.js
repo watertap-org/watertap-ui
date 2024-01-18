@@ -381,6 +381,7 @@ export default function FlowsheetConfig(props) {
                     solveType={solveType}
                     handleSelectSolveType={handleSelectSolveType}
                     numberOfSubprocesses={props.numberOfSubprocesses}
+                    setNumberOfSubprocesses={props.setNumberOfSubprocesses}
                   >
                   </ConfigInput>
                 </TabPanel>

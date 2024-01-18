@@ -43,7 +43,7 @@ function App() {
     <div className="App">  
       <Header show={showHeader}/>
       <Routes> 
-        <Route path="flowsheet/:id/config" element={<FlowsheetConfig numberOfSubprocesses={numberOfSubprocesses}/>} /> 
+        <Route path="flowsheet/:id/config" element={<FlowsheetConfig numberOfSubprocesses={numberOfSubprocesses} setNumberOfSubprocesses={setNumberOfSubprocesses}/>} /> 
         <Route path="flowsheets" element={<FlowsheetsList setNumberOfSubprocesses={setNumberOfSubprocesses}/>} />
         <Route path="/" element={<SplashPage />} />
         <Route path="*" element={<Navigate replace to="flowsheets" />}/>

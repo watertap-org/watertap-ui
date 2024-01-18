@@ -4,7 +4,7 @@ import {useEffect, useState } from 'react';
 import InputAccordion from "../../../components/InputAccordion/InputAccordion"; 
 import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
-import { deleteConfig }  from '../../../services/input.service.js'
+import { deleteConfig, updateNumberOfSubprocesses }  from '../../../services/input.service.js'
 import { Button, Box, Modal, Select, Stack, TextField, Tooltip } from '@mui/material';
 import { Grid, InputLabel, MenuItem, FormControl } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -12,7 +12,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 export default function ConfigInput(props) {
     let params = useParams(); 
-    const { flowsheetData, updateFlowsheetData, reset, solveType, numberOfSubprocesses } = props; 
+    const { flowsheetData, updateFlowsheetData, reset, solveType, numberOfSubprocesses, setNumberOfSubprocesses } = props; 
     const [ displayData, setDisplayData ] = useState({}) 
     const [ previousConfigs, setPreviousConfigs ] = useState([]) 
     const [ configName, setConfigName ] = React.useState("");
@@ -89,6 +89,16 @@ export default function ConfigInput(props) {
             let newValue = parseInt(event.target.value)
             if (newValue > 0 && newValue <= maxNumberOfSubprocesses) {
                 // CALL API TO UPDATE NUMBER OF SUBPROCESSES
+                updateNumberOfSubprocesses({value: newValue})
+                .then(response=> response.json())
+                .then((data)=> {
+                    console.log('successfully updated number of subprocesses')
+                    console.log(data)
+                    setNumberOfSubprocesses({current: data.new_value, max: maxNumberOfSubprocesses})
+                }).catch((e)=>{
+                    console.error('unable to update number of subprocesses')
+                    console.error(e)
+                })
                 setNumberOfSubprocessesIsValid(true)
             } else{
                 setNumberOfSubprocessesIsValid(false)
@@ -300,14 +310,11 @@ export default function ConfigInput(props) {
                             {solveType === 'sweep' &&
                                 <TextField
                                     label={"Number of subprocesses"}
-                                    // fullWidth
-                                    // type="number"
                                     // placeholder={'[1-16]'}
                                     id={'number-of-subprocesses-input'}
                                     onChange={handleUpdateNumberOfSubprocesses}
-                                    value={currentNumberOfSubprocesses}
+                                    value={currentNumberOfSubprocesses === null ? '' : currentNumberOfSubprocesses}
                                     size="small"
-                                    // sx={{marginBottom: 2}}
                                     error={!numberOfSubprocessesIsValid}
                                 />
                             }
