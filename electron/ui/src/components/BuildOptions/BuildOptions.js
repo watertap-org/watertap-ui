@@ -76,42 +76,47 @@ function BuildOption(props) {
 
       const handleUpdateValue = (event, type, min, max) => {
         let body
+        setValue(event.target.value)
         if (type === "int") {
             let newVal
             if (isNaN(event.target.value) || event.target.value === "") {
-                newVal = event.target.value
-            } else newVal = parseInt(event.target.value)
-            setValue(newVal)
-            if (newVal <= max && newVal >= min) {
-                setIsValid(true)
-                body = {option_name: event.target.name, new_option: newVal}
-            } else {
                 setIsValid(false)
                 return
+            } else {
+                newVal = parseInt(event.target.value)
+                if (newVal <= max && newVal >= min) {
+                    setIsValid(true)
+                    body = {option_name: event.target.name, new_option: newVal}
+                } else {
+                    setIsValid(false)
+                    return
+                }
+                
             }
+            
+            
             
         }
         else if (type === "float") {
             let newVal
             if (isNaN(event.target.value) || event.target.value === "") {
-                newVal = event.target.value
-            } else newVal = parseFloat(event.target.value)
-            setValue(newVal)
-            if (newVal <= max && newVal >= min) {
-                setIsValid(true)
-                body = {option_name: event.target.name, new_option: newVal}
-            } else {
                 setIsValid(false)
-
                 return
+            } else {
+                newVal = parseFloat(event.target.value)
+                if (newVal <= max && newVal >= min) {
+                    setIsValid(true)
+                    body = {option_name: event.target.name, new_option: newVal}
+                } else {
+                    setIsValid(false)
+                    return
+                }
             }
         }
         else if (type === "string") {
-            setValue(event.target.value)
             body = {option_name: event.target.name, new_option: event.target.value}
         } 
         else {
-            setValue(event.target.value)
             body = {option_name: event.target.name, new_option: event.target.value}
         }
         selectOption(params.id, body)
@@ -164,7 +169,7 @@ function BuildOption(props) {
                         label={v.display_name}
                         fullWidth
                         // type="number"
-                        placeholder={`[${v.min_val}-${v.max_val}]`}
+                        placeholder={['int', 'float'].includes(v.values_allowed) ? `[${v.min_val}-${v.max_val}]` : ''}
                         id={v.values_allowed+"-input-"+k}
                         onChange={(e) => handleUpdateValue(e, v.values_allowed, v.min_val, v.max_val)}
                         value={value}
