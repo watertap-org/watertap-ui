@@ -115,7 +115,7 @@ export default function LoggingPanel(props) {
                 aria-labelledby="console-dialog-content-text"
             >   
                     {logData.map((line, idx) => {
-                        return <Typography style={{color: getTextColor(line), overflowWrap: "break-word"}} key={idx}>{line}</Typography>
+                        return <Typography style={{color: getTextColor(line.log_level), overflowWrap: "break-word"}} key={idx}>[{line.log_level}] {line.log_name}: {line.log_message}</Typography>
                     })}
                 <div id="bottom-div" ref={divRef} ></div>
             </DialogContentText>
