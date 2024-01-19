@@ -4,11 +4,17 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, T
 import CloseIcon from '@mui/icons-material/Close';
 import { getLogs } from '../../services/flowsheet.service';
 import Draggable from 'react-draggable';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
+import DownloadIcon from '@mui/icons-material/Download';
 
 
 export default function LoggingPanel(props) {
     const { open, onClose } = props;
     const [ logData, setLogData ] = useState([])
+    const [ dialogHeight, setDialogHeight ] = useState('60vh')
+    const [ dialogWidth, setDialogWidth ] = useState('60vw')
+    const [ fullscreen, setFullscreen] = useState(false)
     const divRef = useRef(null);
 
     useEffect(() => {
@@ -52,18 +58,31 @@ export default function LoggingPanel(props) {
             // maxWidth: "80vw",
         },
         dialogPaper: {
-            minHeight: '60vh',
-            maxHeight: '60vh',
-            minWidth: '60vw',
-            maxWidth: '60vw',
-            // backgroundColor: "transparent",
-            // boxShadow: 'none',
+            minHeight: dialogHeight,
+            maxHeight: dialogHeight,
+            minWidth: dialogWidth,
+            maxWidth: dialogWidth,
         },
 
     }
 
     const handleClose = () => {
         onClose()
+    };
+
+    const handleFullscreen = () => {
+        if (fullscreen) {
+            setDialogHeight('60vh')
+            setDialogWidth('60vw')
+        } else {
+            setDialogHeight('100vh')
+            setDialogWidth('100vw')
+        }
+        setFullscreen(!fullscreen)
+    }
+
+    const handleDownloadLogs = () => {
+        console.log('call api to download logs')
     };
     
     const getTextColor = (line) => {
@@ -98,15 +117,38 @@ export default function LoggingPanel(props) {
             BackdropProps={{
                 sx: {backgroundColor: "transparent"}
             }}
-            
         >
             <DialogTitle id="dialog-title" style={styles.dialogTitle}>Backend Logs</DialogTitle>
+            <IconButton
+                aria-label="close"
+                onClick={handleDownloadLogs}
+                sx={{
+                    position: 'absolute',
+                    right: 80,
+                    top: 8,
+                    color: "white",
+                }}
+                >
+                <DownloadIcon/>
+            </IconButton>
+            <IconButton
+                aria-label="close"
+                onClick={handleFullscreen}
+                sx={{
+                    position: 'absolute',
+                    right: 40,
+                    top: 8,
+                    color: "white",
+                }}
+                >
+                {fullscreen ? <FullscreenExitIcon/> : <FullscreenIcon />}
+            </IconButton>
             <IconButton
                 aria-label="close"
                 onClick={handleClose}
                 sx={{
                     position: 'absolute',
-                    right: 8,
+                    right: 0,
                     top: 8,
                     color: "white",
                 }}
