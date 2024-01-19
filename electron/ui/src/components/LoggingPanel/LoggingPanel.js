@@ -3,6 +3,7 @@ import { Grid, Box, Modal, TextField, IconButton, Button } from '@mui/material';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { getLogs } from '../../services/flowsheet.service';
+import Draggable from 'react-draggable';
 
 
 export default function LoggingPanel(props) {
@@ -55,6 +56,8 @@ export default function LoggingPanel(props) {
             maxHeight: '60vh',
             minWidth: '60vw',
             maxWidth: '60vw',
+            // backgroundColor: "transparent",
+            // boxShadow: 'none',
         },
 
     }
@@ -82,6 +85,7 @@ export default function LoggingPanel(props) {
     }, [open]);
 
     return (
+        <Draggable>
         <Dialog
             open={open}
             onClose={handleClose}
@@ -91,6 +95,9 @@ export default function LoggingPanel(props) {
             PaperProps={{
                 sx: styles.dialogPaper
               }}
+            BackdropProps={{
+                sx: {backgroundColor: "transparent"}
+            }}
             
         >
             <DialogTitle id="dialog-title" style={styles.dialogTitle}>Backend Logs</DialogTitle>
@@ -121,6 +128,7 @@ export default function LoggingPanel(props) {
             </DialogContentText>
             </DialogContent>
         </Dialog>
+        </Draggable>
     )
 }
 
