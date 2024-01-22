@@ -69,7 +69,18 @@ export default function LoggingPanel(props) {
             minWidth: dialogWidth,
             maxWidth: dialogWidth,
         },
-
+        DEBUG: {
+            color: "#3B90FF",
+        },
+        INFO: {
+            color: "#28FF24",
+        },
+        WARNING: {
+            color: "#FFF42C",
+        },
+        ERROR: {
+            color: "#FF042E",
+        }
     }
 
     const handleClose = () => {
@@ -120,10 +131,10 @@ export default function LoggingPanel(props) {
     }
     
     const getTextColor = (line) => {
-        if (line.includes('ERROR')) return "#FF042E"
-        else if (line.includes('INFO')) return "#28FF24"
-        else if (line.includes('DEBUG')) return "#3B90FF"
-        else if (line.includes('WARNING')) return "#FFF42C"
+        if (line.includes('ERROR')) return styles.ERROR.color
+        else if (line.includes('INFO')) return styles.INFO.color
+        else if (line.includes('DEBUG')) return styles.DEBUG.color
+        else if (line.includes('WARNING')) return styles.WARNING.color
         else return "white"
     }
 
@@ -194,23 +205,26 @@ export default function LoggingPanel(props) {
                     anchorEl={anchorEl}
                     open={showFilters}
                     onClose={() => setShowFilters(false)}
+                    sx={{
+                        "& .MuiPaper-root": {
+                            backgroundColor: "#292f30"
+                        }
+                    }}
                 >
-                    <MenuItem value={"DEBUG"} onClick={() => handleFilter("DEBUG")}>  
-                        <Checkbox checked={filters.includes("DEBUG")} />
-                        <ListItemText primary={"DEBUG"} />
-                    </MenuItem>
-                    <MenuItem value={"INFO"} onClick={() => handleFilter("INFO")}>  
-                        <Checkbox checked={filters.includes("INFO")} />
-                        <ListItemText primary={"INFO"} />
-                    </MenuItem>
-                    <MenuItem value={"WARNING"} onClick={() => handleFilter("WARNING")}>  
-                        <Checkbox checked={filters.includes("WARNING")} />
-                        <ListItemText primary={"WARNING"} />
-                    </MenuItem>
-                    <MenuItem value={"ERROR"} onClick={() => handleFilter("ERROR")}>  
-                        <Checkbox checked={filters.includes("ERROR")} />
-                        <ListItemText primary={"ERROR"} />
-                    </MenuItem>
+                    {["DEBUG", "INFO", "WARNING", "ERROR"].map((loglevel, idx) => (
+                        <MenuItem value={loglevel} onClick={() => handleFilter(loglevel)} sx={{color: "white"}}>  
+                            <Checkbox 
+                                checked={filters.includes(loglevel)} 
+                                sx={{
+                                    color: styles[loglevel].color,
+                                    '&.Mui-checked': {
+                                    color: styles[loglevel].color,
+                                    },
+                                }}
+                            />
+                            <ListItemText primary={loglevel} />
+                        </MenuItem>
+                    ))}
                 </Menu>
 
             <Tooltip title={"Download full logs"}>
