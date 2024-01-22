@@ -1,5 +1,5 @@
 import {useEffect, useState, useRef } from 'react';
-import { Grid, Box, InputAdornment, TextField, IconButton, Button, Tooltip } from '@mui/material';
+import { InputAdornment, TextField, IconButton, Tooltip, MenuItem, Checkbox, ListItemText, Menu } from '@mui/material';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { getLogs, downloadLogs } from '../../services/flowsheet.service';
@@ -8,6 +8,7 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import DownloadIcon from '@mui/icons-material/Download';
 import SearchIcon from '@mui/icons-material/Search';
+import FilterListIcon from '@mui/icons-material/FilterList';
 
 
 export default function LoggingPanel(props) {
@@ -17,6 +18,9 @@ export default function LoggingPanel(props) {
     const [ dialogWidth, setDialogWidth ] = useState('60vw')
     const [ fullscreen, setFullscreen] = useState(false)
     const [ searchTerm, setSearchTerm ] = useState("")
+    const [ filters, setFilters ] = useState(["DEBUG", "INFO", "WARNING", "ERROR"])
+    const [ showFilters, setShowFilters ] = useState(false)
+    const [ anchorEl, setAnchorEl ] = useState(null);
     const divRef = useRef(null);
 
     useEffect(() => {
@@ -70,6 +74,8 @@ export default function LoggingPanel(props) {
 
     const handleClose = () => {
         setSearchTerm("")
+        setShowFilters(false)
+        setFilters(["DEBUG", "INFO", "WARNING", "ERROR"])
         if(fullscreen) handleFullscreen()
         onClose()
     };
@@ -96,6 +102,22 @@ export default function LoggingPanel(props) {
             tempLink.click();
         })
     };
+
+    const handleShowLogFilters = (event) => {
+        setShowFilters(!showFilters)
+        setAnchorEl(event.currentTarget);
+    }
+
+    const handleFilter = (level) => {
+        let tempFilters = [...filters]
+        const index = tempFilters.indexOf(level);
+        if (index > -1) {
+            tempFilters.splice(index, 1);
+        } else {
+            tempFilters.push(level)
+        }
+        setFilters(tempFilters)
+    }
     
     const getTextColor = (line) => {
         if (line.includes('ERROR')) return "#FF042E"
@@ -140,7 +162,7 @@ export default function LoggingPanel(props) {
                     onChange={(event) => setSearchTerm(event.target.value)}
                     sx={{
                         position: 'absolute',
-                        left: 160,
+                        right: 160,
                         top: 12,
                         color: "white",
                         backgroundColor: "#292f30",
@@ -154,9 +176,43 @@ export default function LoggingPanel(props) {
                           </InputAdornment>
                         ),
                       }}
-                    // fullWidth 
-                    // disabled={disabled}
             />
+            <IconButton
+                aria-label="close"
+                onClick={handleShowLogFilters}
+                sx={{
+                    position: 'absolute',
+                    right: 120,
+                    top: 8,
+                    color: "white",
+                }}
+                >
+                <FilterListIcon/>
+            </IconButton>
+                <Menu
+                    id="log-filter"
+                    anchorEl={anchorEl}
+                    open={showFilters}
+                    onClose={() => setShowFilters(false)}
+                >
+                    <MenuItem value={"DEBUG"} onClick={() => handleFilter("DEBUG")}>  
+                        <Checkbox checked={filters.includes("DEBUG")} />
+                        <ListItemText primary={"DEBUG"} />
+                    </MenuItem>
+                    <MenuItem value={"INFO"} onClick={() => handleFilter("INFO")}>  
+                        <Checkbox checked={filters.includes("INFO")} />
+                        <ListItemText primary={"INFO"} />
+                    </MenuItem>
+                    <MenuItem value={"WARNING"} onClick={() => handleFilter("WARNING")}>  
+                        <Checkbox checked={filters.includes("WARNING")} />
+                        <ListItemText primary={"WARNING"} />
+                    </MenuItem>
+                    <MenuItem value={"ERROR"} onClick={() => handleFilter("ERROR")}>  
+                        <Checkbox checked={filters.includes("ERROR")} />
+                        <ListItemText primary={"ERROR"} />
+                    </MenuItem>
+                </Menu>
+
             <Tooltip title={"Download full logs"}>
                 <IconButton
                     aria-label="close"
@@ -204,7 +260,7 @@ export default function LoggingPanel(props) {
                 aria-labelledby="console-dialog-content-text"
             >   
                     {logData.map((line, idx) => {
-                        if (line.log_message.toLowerCase().includes(searchTerm.toLowerCase())) {
+                        if (line.log_message.toLowerCase().includes(searchTerm.toLowerCase()) && filters.includes(line.log_level)) {
                             return <Typography style={{color: getTextColor(line.log_level), overflowWrap: "break-word"}} key={idx}>[{line.log_level}] {line.log_name}: {line.log_message}</Typography>
                         }
                         
