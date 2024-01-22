@@ -167,10 +167,11 @@ async def sweep(flowsheet_id: str, request: Request):
         info.updated(built=True)
 
     _log.info("trying to sweep")
-    results_table = run_parameter_sweep(
-        flowsheet=flowsheet,
-        info=info,
-    )
+    with idaeslog.solver_log(_log, level=idaeslog.INFO) as slc:
+        results_table = run_parameter_sweep(
+            flowsheet=flowsheet,
+            info=info,
+        )
     flowsheet.fs_exp.sweep_results = results_table
     # set last run in tiny db
     flowsheet_manager.set_last_run(info.id_)
@@ -268,11 +269,9 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
     try:
         # get file contents
         new_files = []
-
-        print("trying to read files with aiofiles")
         for file in files:
             # for file in files:
-            print(file.filename)
+            _log.info(f'reading {file.filename}')
             new_files.append(file.filename)
             if "_ui.py" in file.filename:
                 new_id = file.filename.replace(".py", "")
@@ -489,54 +488,42 @@ async def get_logs() -> List[str]:
     logs_path = flowsheet_manager.get_logs_path() / "ui_backend_logs.log"
     log_file = open(logs_path, 'r')
     all_logs = log_file.read()
+    log_file.close()
     logs = all_logs.split('\n[')
     for line in logs:
-        log_split = line.split(' ')
-        log_time = log_split[1:3]
-        log_time_string = f'{log_time[0]} {log_time[1]}'.split(',')[0]
-        stripped_time = time.strptime(log_time_string, "%Y-%m-%d %H:%M:%S")
-        asctime = time.mktime(stripped_time)
-        if asctime > flowsheet_manager.startup_time:
-            result.append(line)
+        try:
+            log_split = line.split(' ')
+            log_time = log_split[1:3]
+            log_time_string = f'{log_time[0]} {log_time[1]}'.split(',')[0]
+            stripped_time = time.strptime(log_time_string, "%Y-%m-%d %H:%M:%S")
+            asctime = time.mktime(stripped_time)
+            if asctime > flowsheet_manager.startup_time:
+                result.append(line)
 
-            
-            log_level = line.split(']')[0]
-            log_name = log_split[3]
-            log_file_lineno = log_split[4]
-            log_file = log_file_lineno.split(":")[0]
-            log_lineno = log_file_lineno.split(":")[1]
-            log_message = line.split(log_file_lineno)[1]
-            if len(log_file) > 0:
-                log_file = log_file[1:]
-            if len(log_lineno) > 0:
-                log_lineno = log_lineno[:-1]
-            if len(log_message) > 0:
-                log_message = log_message[1:]
-            log_entry = {
-                "log_time": asctime,
-                "log_level": log_level,
-                "log_name": log_name,
-                "log_file": log_file,
-                "log_lineno": log_lineno,
-                "log_message": log_message,
-            }
-            log_entries.append(log_entry)
-        # print(f'asctime: {asctime}')
-        # break
-    # print(f'log_entries: {log_entries}')
-    # logLevelRegex = "(\[^DEBUG$|^INFO$|^WARNING$|^ERROR$\])"
-    # logLevelRegex = "(?:\[(DEBUG)|(INFO)|(WARNING)|(ERROR)\])"
-    # logLevelRegex = r"(\[(?:DEBUG|INFO|WARNING|ERROR)\])"
-    # split_logs = re.split(logLevelRegex, all_logs)
-    # logLevelRegex = r"^\[(?:DEBUG|INFO|WARNING|ERROR)].*"
-    # split_logs = re.findall(logLevelRegex, all_logs, re.M)
-    # for line in split_logs:
-    #     log_time = line.split(' ')[1:3]
-    #     log_time_string = f'{log_time[0]} {log_time[1]}'.split(',')[0]
-    #     stripped_time = time.strptime(log_time_string, "%Y-%m-%d %H:%M:%S")
-    #     asctime = time.mktime(stripped_time)
-    #     if asctime > flowsheet_manager.startup_time:
-    #         result.append(line)
+                
+                log_level = line.split(']')[0]
+                log_name = log_split[3]
+                log_file_lineno = log_split[4]
+                log_file = log_file_lineno.split(":")[0]
+                log_lineno = log_file_lineno.split(":")[1]
+                log_message = line.split(log_file_lineno)[1]
+                if len(log_file) > 0:
+                    log_file = log_file[1:]
+                if len(log_lineno) > 0:
+                    log_lineno = log_lineno[:-1]
+                if len(log_message) > 0:
+                    log_message = log_message[1:]
+                log_entry = {
+                    "log_time": asctime,
+                    "log_level": log_level,
+                    "log_name": log_name,
+                    "log_file": log_file,
+                    "log_lineno": log_lineno,
+                    "log_message": log_message,
+                }
+                log_entries.append(log_entry)
+        except Exception as e:
+            _log.error(f'unable to parse log line: {e}')
 
     return log_entries
 
