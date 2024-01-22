@@ -70,6 +70,7 @@ export default function LoggingPanel(props) {
 
     const handleClose = () => {
         setSearchTerm("")
+        if(fullscreen) handleFullscreen()
         onClose()
     };
 
@@ -115,7 +116,7 @@ export default function LoggingPanel(props) {
     }, [open]);
 
     return (
-        <Draggable>
+        <Draggable handle="#console-dialog">
         <Dialog
             open={open}
             onClose={handleClose}
@@ -130,6 +131,7 @@ export default function LoggingPanel(props) {
             }}
         >
             <DialogTitle id="dialog-title" style={styles.dialogTitle}>Backend Logs</DialogTitle>
+            
             <TextField id={'searchBar'} 
                     label={'Search'}
                     variant="outlined" 
