@@ -2,7 +2,6 @@
 Handle flowsheet-related API requests from web client.
 """
 # stdlib
-import time
 import io
 import aiofiles
 from pathlib import Path
@@ -20,6 +19,7 @@ import re
 # package-local
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
 from app.internal.parameter_sweep import run_parameter_sweep
+from app.internal.log_parser import parse_logs
 from watertap.ui.fsapi import FlowsheetInterface, FlowsheetExport
 import idaes.logger as idaeslog
 
@@ -483,49 +483,8 @@ async def get_logs() -> List[str]:
     Returns:
         Logs formatted as a list
     """
-    result = []
-    log_entries = []
     logs_path = flowsheet_manager.get_logs_path() / "ui_backend_logs.log"
-    log_file = open(logs_path, 'r')
-    all_logs = log_file.read()
-    log_file.close()
-    logs = all_logs.split('\n[')
-    for line in logs:
-        try:
-            log_split = line.split(' ')
-            log_time = log_split[1:3]
-            log_time_string = f'{log_time[0]} {log_time[1]}'.split(',')[0]
-            stripped_time = time.strptime(log_time_string, "%Y-%m-%d %H:%M:%S")
-            asctime = time.mktime(stripped_time)
-            if asctime > flowsheet_manager.startup_time:
-                result.append(line)
-
-                
-                log_level = line.split(']')[0]
-                log_name = log_split[3]
-                log_file_lineno = log_split[4]
-                log_file = log_file_lineno.split(":")[0]
-                log_lineno = log_file_lineno.split(":")[1]
-                log_message = line.split(log_file_lineno)[1]
-                if len(log_file) > 0:
-                    log_file = log_file[1:]
-                if len(log_lineno) > 0:
-                    log_lineno = log_lineno[:-1]
-                if len(log_message) > 0:
-                    log_message = log_message[1:]
-                log_entry = {
-                    "log_time": asctime,
-                    "log_level": log_level,
-                    "log_name": log_name,
-                    "log_file": log_file,
-                    "log_lineno": log_lineno,
-                    "log_message": log_message,
-                }
-                log_entries.append(log_entry)
-        except Exception as e:
-            _log.error(f'unable to parse log line: {e}')
-
-    return log_entries
+    return parse_logs(logs_path, flowsheet_manager.startup_time)
 
 @router.post("/download_logs", response_class=FileResponse)
 async def download_logs() -> Path:
@@ -534,6 +493,5 @@ async def download_logs() -> Path:
     Returns:
         Log file
     """
-    _log.info('DOWNLOADING LOGS')
-    path = Path.home() / ".watertap" / "logs" / "ui_backend_logs.log"
-    return path
+    logs_path = flowsheet_manager.get_logs_path() / "ui_backend_logs.log"
+    return logs_path
