@@ -539,3 +539,14 @@ async def get_logs() -> List[str]:
     #         result.append(line)
 
     return log_entries
+
+@router.post("/download_logs", response_class=FileResponse)
+async def download_logs() -> Path:
+    """Download full backend logs.
+
+    Returns:
+        Log file
+    """
+    _log.info('DOWNLOADING LOGS')
+    path = Path.home() / ".watertap" / "logs" / "ui_backend_logs.log"
+    return path

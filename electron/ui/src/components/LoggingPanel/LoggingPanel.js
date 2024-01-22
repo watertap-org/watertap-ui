@@ -2,7 +2,7 @@ import {useEffect, useState, useRef } from 'react';
 import { Grid, Box, Modal, TextField, IconButton, Button } from '@mui/material';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { getLogs } from '../../services/flowsheet.service';
+import { getLogs, downloadLogs } from '../../services/flowsheet.service';
 import Draggable from 'react-draggable';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
@@ -82,7 +82,15 @@ export default function LoggingPanel(props) {
     }
 
     const handleDownloadLogs = () => {
-        console.log('call api to download logs')
+        downloadLogs().then(response => response.blob())
+        .then((data) => {
+            console.log(data)
+            let logsUrl = window.URL.createObjectURL(data);
+            let tempLink = document.createElement('a');
+            tempLink.href = logsUrl;
+            tempLink.setAttribute('download', 'watertap-ui-logs.log');
+            tempLink.click();
+        })
     };
     
     const getTextColor = (line) => {

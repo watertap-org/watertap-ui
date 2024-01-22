@@ -44,3 +44,10 @@ export const getLogs = () => {
         mode: 'cors'
     });
 }
+
+export const downloadLogs = () => {
+    return fetch('http://localhost:8001/flowsheets/download_logs', {
+        method: 'POST', 
+        mode: 'cors'
+    });
+}
