@@ -1,5 +1,5 @@
 import {useEffect, useState, useRef } from 'react';
-import { Grid, Box, Modal, TextField, IconButton, Button } from '@mui/material';
+import { Grid, Box, Modal, TextField, IconButton, Button, Tooltip } from '@mui/material';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { getLogs, downloadLogs } from '../../services/flowsheet.service';
@@ -127,18 +127,20 @@ export default function LoggingPanel(props) {
             }}
         >
             <DialogTitle id="dialog-title" style={styles.dialogTitle}>Backend Logs</DialogTitle>
-            <IconButton
-                aria-label="close"
-                onClick={handleDownloadLogs}
-                sx={{
-                    position: 'absolute',
-                    right: 80,
-                    top: 8,
-                    color: "white",
-                }}
-                >
-                <DownloadIcon/>
-            </IconButton>
+            <Tooltip title={"Download full logs"}>
+                <IconButton
+                    aria-label="close"
+                    onClick={handleDownloadLogs}
+                    sx={{
+                        position: 'absolute',
+                        right: 80,
+                        top: 8,
+                        color: "white",
+                    }}
+                    >
+                    <DownloadIcon/>
+                </IconButton>
+            </Tooltip>
             <IconButton
                 aria-label="close"
                 onClick={handleFullscreen}
