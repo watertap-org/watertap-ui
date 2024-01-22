@@ -11,6 +11,26 @@ import { selectOption } from '../../services/flowsheet.service';
 export default function BuildOptions(props) {
     let params = useParams(); 
     const { flowsheetData, tabValue, isBuilt, showBuildOptions, setShowBuildOptions, runBuildFlowsheet, setFlowsheetData } = props
+    const [ optionsAreValid, setOptionsAreValid ] = useState({})
+    const [ disableBuildButton, setDisableBuildButton ] = useState(false)
+
+    useEffect(() => {
+        let tempOptionsAreValid = {}
+        for (let key of Object.keys(flowsheetData.inputData.build_options)) {
+            tempOptionsAreValid[key] = true
+        }
+        setOptionsAreValid(tempOptionsAreValid)
+    }, [])
+
+    useEffect(() => {
+        // console.log('options are valid: ')
+        // console.log(optionsAreValid)
+        let tempDisableBuildButton = false
+        for (let each of Object.keys(optionsAreValid)) {
+            if (!optionsAreValid[each]) tempDisableBuildButton = true
+        }
+        setDisableBuildButton(tempDisableBuildButton)
+    }, [optionsAreValid])
 
     return ( 
 
@@ -27,11 +47,21 @@ export default function BuildOptions(props) {
         <Collapse in={showBuildOptions} timeout={0}>
         <Grid container sx={{marginBottom: "50px"}}>
         {Object.entries(flowsheetData.inputData.build_options).map(([k,v]) => (
-            <BuildOption key={k} v={v} k={k} params={params} setFlowsheetData={setFlowsheetData} flowsheetData={flowsheetData} disabled={tabValue!==0}/>
+            <BuildOption 
+                key={k} 
+                v={v} 
+                k={k} 
+                params={params} 
+                setFlowsheetData={setFlowsheetData} 
+                flowsheetData={flowsheetData} 
+                disabled={tabValue!==0}
+                optionsAreValid={optionsAreValid}
+                setOptionsAreValid={setOptionsAreValid}
+            />
         ))}
         <Grid item xs={6}>
             <div style={{display:"flex"}}>
-            <Button size="small" variant="contained" color="primary" sx={{marginLeft: 1}} onClick={runBuildFlowsheet} disabled={tabValue!==0}>
+            <Button size="small" variant="contained" color="primary" sx={{marginLeft: 1}} onClick={runBuildFlowsheet} disabled={tabValue!==0 || disableBuildButton}>
                 {isBuilt ? "Re-build Flowsheet" : "Build Flowsheet"}
             </Button>
             </div>
@@ -48,7 +78,7 @@ export default function BuildOptions(props) {
  
 function BuildOption(props) {
 
-    const { v, k, params, setFlowsheetData, flowsheetData, disabled } = props;
+    const { v, k, params, setFlowsheetData, flowsheetData, disabled, optionsAreValid, setOptionsAreValid } = props;
     
     const [ value,setValue] = useState(v.value)
     const [ isValid, setIsValid ] = useState(true)
@@ -61,21 +91,28 @@ function BuildOption(props) {
         }
       }
 
+      const handleValidity = (valid) => {
+        setIsValid(valid)
+        let tempOptionsAreValid = {...optionsAreValid}
+        tempOptionsAreValid[k] = valid
+        setOptionsAreValid(tempOptionsAreValid)
+      }
+
       const handleUpdateValue = (event, type, min, max) => {
         let body
         setValue(event.target.value)
         if (type === "int") {
             let newVal
             if (isNaN(event.target.value) || event.target.value === "") {
-                setIsValid(false)
+                handleValidity(false)
                 return
             } else {
                 newVal = parseInt(event.target.value)
                 if (newVal <= max && newVal >= min) {
-                    setIsValid(true)
+                    handleValidity(true)
                     body = {option_name: event.target.name, new_option: newVal}
                 } else {
-                    setIsValid(false)
+                    handleValidity(false)
                     return
                 }
                 
@@ -84,15 +121,15 @@ function BuildOption(props) {
         else if (type === "float") {
             let newVal
             if (isNaN(event.target.value) || event.target.value === "") {
-                setIsValid(false)
+                handleValidity(false)
                 return
             } else {
                 newVal = parseFloat(event.target.value)
                 if (newVal <= max && newVal >= min) {
-                    setIsValid(true)
+                    handleValidity(true)
                     body = {option_name: event.target.name, new_option: newVal}
                 } else {
-                    setIsValid(false)
+                    handleValidity(false)
                     return
                 }
             }
@@ -120,7 +157,6 @@ function BuildOption(props) {
                     <TextField
                         label={v.display_name}
                         fullWidth
-                        // type="number"
                         placeholder={['int', 'float'].includes(v.values_allowed) ? `[${v.min_val}-${v.max_val}]` : ''}
                         id={v.values_allowed+"-input-"+k}
                         onChange={(e) => handleUpdateValue(e, v.values_allowed, v.min_val, v.max_val)}
