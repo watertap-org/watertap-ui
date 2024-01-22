@@ -1,5 +1,5 @@
 import {useEffect, useState, useRef } from 'react';
-import { Grid, Box, Modal, TextField, IconButton, Button, Tooltip } from '@mui/material';
+import { Grid, Box, InputAdornment, TextField, IconButton, Button, Tooltip } from '@mui/material';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { getLogs, downloadLogs } from '../../services/flowsheet.service';
@@ -7,6 +7,7 @@ import Draggable from 'react-draggable';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import DownloadIcon from '@mui/icons-material/Download';
+import SearchIcon from '@mui/icons-material/Search';
 
 
 export default function LoggingPanel(props) {
@@ -15,6 +16,7 @@ export default function LoggingPanel(props) {
     const [ dialogHeight, setDialogHeight ] = useState('60vh')
     const [ dialogWidth, setDialogWidth ] = useState('60vw')
     const [ fullscreen, setFullscreen] = useState(false)
+    const [ searchTerm, setSearchTerm ] = useState("")
     const divRef = useRef(null);
 
     useEffect(() => {
@@ -67,6 +69,7 @@ export default function LoggingPanel(props) {
     }
 
     const handleClose = () => {
+        setSearchTerm("")
         onClose()
     };
 
@@ -127,6 +130,31 @@ export default function LoggingPanel(props) {
             }}
         >
             <DialogTitle id="dialog-title" style={styles.dialogTitle}>Backend Logs</DialogTitle>
+            <TextField id={'searchBar'} 
+                    label={'Search'}
+                    variant="outlined" 
+                    size="small"
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    sx={{
+                        position: 'absolute',
+                        left: 160,
+                        top: 12,
+                        color: "white",
+                        backgroundColor: "#292f30",
+                        borderRadius: 10,
+                        input: { color: 'white' },
+                    }}
+                    InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start" sx={{color: "white"}}>
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    // fullWidth 
+                    // disabled={disabled}
+            />
             <Tooltip title={"Download full logs"}>
                 <IconButton
                     aria-label="close"
@@ -174,7 +202,10 @@ export default function LoggingPanel(props) {
                 aria-labelledby="console-dialog-content-text"
             >   
                     {logData.map((line, idx) => {
-                        return <Typography style={{color: getTextColor(line.log_level), overflowWrap: "break-word"}} key={idx}>[{line.log_level}] {line.log_name}: {line.log_message}</Typography>
+                        if (line.log_message.toLowerCase().includes(searchTerm.toLowerCase())) {
+                            return <Typography style={{color: getTextColor(line.log_level), overflowWrap: "break-word"}} key={idx}>[{line.log_level}] {line.log_name}: {line.log_message}</Typography>
+                        }
+                        
                     })}
                 <div id="bottom-div" ref={divRef} ></div>
             </DialogContentText>
