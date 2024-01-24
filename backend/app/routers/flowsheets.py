@@ -483,7 +483,7 @@ async def get_logs() -> List[str]:
     Returns:
         Logs formatted as a list
     """
-    logs_path = flowsheet_manager.get_logs_path() / "ui_backend_logs.log"
+    logs_path = flowsheet_manager.get_logs_path() / "watertap-ui_backend_logs.log"
     return parse_logs(logs_path, flowsheet_manager.startup_time)
 
 @router.post("/download_logs", response_class=FileResponse)
@@ -493,5 +493,5 @@ async def download_logs() -> Path:
     Returns:
         Log file
     """
-    logs_path = flowsheet_manager.get_logs_path() / "ui_backend_logs.log"
+    logs_path = flowsheet_manager.get_logs_path() / "watertap-ui_backend_logs.log"
     return logs_path
