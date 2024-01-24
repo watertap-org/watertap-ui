@@ -31,7 +31,7 @@ class AppSettings(BaseSettings):
         v.mkdir(parents=True, exist_ok=True)
         
         loggingFormat = "[%(levelname)s] %(asctime)s %(name)s (%(filename)s:%(lineno)s): %(message)s"
-        loggingFileHandler = logging.handlers.RotatingFileHandler(v / "ui_backend_logs.log", backupCount=2, maxBytes=5000000)
+        loggingFileHandler = logging.handlers.RotatingFileHandler(v / "watertap-ui_backend_logs.log", backupCount=2, maxBytes=5000000)
         logging.basicConfig(level=logging.INFO, format=loggingFormat, handlers=[loggingFileHandler])
         return v
     

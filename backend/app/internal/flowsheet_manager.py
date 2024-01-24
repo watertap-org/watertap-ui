@@ -76,6 +76,7 @@ class FlowsheetManager:
         """
         self.app_settings = AppSettings(**kwargs)
         self._objs, self._flowsheets = {}, {}
+        self.startup_time = time.time()
 
         # Add custom flowsheets path to the system path
         self.custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
@@ -202,7 +203,7 @@ class FlowsheetManager:
 
         data = b""
         info = self.get_info(id_)
-        _log.info(f"inide get diagram:: info is - {info}")
+        # _log.info(f"inside get diagram:: info is - {info}")
         if info.custom:
             # do this
             data_path = (
@@ -531,13 +532,17 @@ class FlowsheetManager:
         for f in files:
             if "_ui.py" in f:
                 try:
-                    _log.info(f"attempting to add custom flowsheet module: {f}")
+                    _log.info(f"adding imported flowsheet module: {f}")
                     module_name = f.replace(".py", "")
                     custom_module = importlib.import_module(module_name)
                     fsi = self._get_flowsheet_interface(custom_module)
                     self.add_flowsheet_interface(module_name, fsi, custom=True)
                 except Exception as e:
                     _log.error(f"unable to add flowsheet module: {e}")
+
+    def get_logs_path(self):
+        """Return logs path."""
+        return self.app_settings.log_dir
 
     @staticmethod
     def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:

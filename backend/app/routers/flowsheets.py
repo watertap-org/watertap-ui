@@ -2,7 +2,6 @@
 Handle flowsheet-related API requests from web client.
 """
 # stdlib
-import csv
 import io
 import aiofiles
 from pathlib import Path
@@ -15,16 +14,19 @@ from fastapi.responses import FileResponse
 import pandas as pd
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
+import re
 
 # package-local
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
 from app.internal.parameter_sweep import run_parameter_sweep
+from app.internal.log_parser import parse_logs
 from watertap.ui.fsapi import FlowsheetInterface, FlowsheetExport
 import idaes.logger as idaeslog
 
 CURRENT = "current"
 
 _log = idaeslog.getLogger(__name__)
+_solver_log = idaeslog.getLogger(__name__+'.solver')
 
 router = APIRouter(
     prefix="/flowsheets",
@@ -126,10 +128,12 @@ async def solve(flowsheet_id: str, request: Request):
 
     # run solve
     try:
-        flowsheet.solve()
+        with idaeslog.solver_log(_log, level=idaeslog.INFO) as slc:
+            flowsheet.solve()
         # set last run in tiny db
         flowsheet_manager.set_last_run(info.id_)
     except Exception as err:
+        _log.error(f"Solve failed: {err}")
         raise HTTPException(500, detail=f"Solve failed: {err}")
     return flowsheet.fs_exp
 
@@ -163,10 +167,11 @@ async def sweep(flowsheet_id: str, request: Request):
         info.updated(built=True)
 
     _log.info("trying to sweep")
-    results_table = run_parameter_sweep(
-        flowsheet=flowsheet,
-        info=info,
-    )
+    with idaeslog.solver_log(_log, level=idaeslog.INFO) as slc:
+        results_table = run_parameter_sweep(
+            flowsheet=flowsheet,
+            info=info,
+        )
     flowsheet.fs_exp.sweep_results = results_table
     # set last run in tiny db
     flowsheet_manager.set_last_run(info.id_)
@@ -264,11 +269,9 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
     try:
         # get file contents
         new_files = []
-
-        print("trying to read files with aiofiles")
         for file in files:
             # for file in files:
-            print(file.filename)
+            _log.info(f'reading {file.filename}')
             new_files.append(file.filename)
             if "_ui.py" in file.filename:
                 new_id = file.filename.replace(".py", "")
@@ -472,3 +475,23 @@ async def download_sweep(flowsheet_id: str) -> Path:
     df.to_csv(path, index=False)
     # # User can now download the contents of that file
     return path
+
+@router.get("/get_logs")
+async def get_logs() -> List[str]:
+    """Get backend logs.
+
+    Returns:
+        Logs formatted as a list
+    """
+    logs_path = flowsheet_manager.get_logs_path() / "watertap-ui_backend_logs.log"
+    return parse_logs(logs_path, flowsheet_manager.startup_time)
+
+@router.post("/download_logs", response_class=FileResponse)
+async def download_logs() -> Path:
+    """Download full backend logs.
+
+    Returns:
+        Log file
+    """
+    logs_path = flowsheet_manager.get_logs_path() / "watertap-ui_backend_logs.log"
+    return logs_path
