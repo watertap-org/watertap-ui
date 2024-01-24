@@ -37,3 +37,17 @@ export const selectOption = (id, data) => {
         body: JSON.stringify(data)
     });
 }; 
+
+export const getLogs = () => {
+    return fetch('http://localhost:8001/flowsheets/get_logs', {
+        method: 'GET', 
+        mode: 'cors'
+    });
+}
+
+export const downloadLogs = () => {
+    return fetch('http://localhost:8001/flowsheets/download_logs', {
+        method: 'POST', 
+        mode: 'cors'
+    });
+}
