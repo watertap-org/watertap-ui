@@ -212,7 +212,7 @@ export default function LoggingPanel(props) {
                     }}
                 >
                     {["DEBUG", "INFO", "WARNING", "ERROR"].map((loglevel, idx) => (
-                        <MenuItem value={loglevel} onClick={() => handleFilter(loglevel)} sx={{color: "white"}}>  
+                        <MenuItem key={loglevel} value={loglevel} onClick={() => handleFilter(loglevel)} sx={{color: "white"}}>  
                             <Checkbox 
                                 checked={filters.includes(loglevel)} 
                                 sx={{
@@ -272,6 +272,7 @@ export default function LoggingPanel(props) {
                 tabIndex={-1}
                 style={styles.dialogContentText}
                 aria-labelledby="console-dialog-content-text"
+                component="span"
             >   
                     {logData.map((line, idx) => {
                         if (line.log_message.toLowerCase().includes(searchTerm.toLowerCase()) && filters.includes(line.log_level)) {
