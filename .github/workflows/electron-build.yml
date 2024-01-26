@@ -3,7 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - "streamline-flowsheet-imports"
+      - "0.11.0"
 
 defaults:
   run:
