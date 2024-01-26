@@ -40,7 +40,14 @@ def get_idaes_extensions():
                 print(f'unable to set requests_ca_bundle and ssl_cert_file:\n{e}')
             print(f'trying to download binaries')
             from app.internal.download_binaries import download_binaries
-            download_binaries(release="3.4.0")
+            binaries_release_version="3.4.0"
+            try:
+                from idaes.config import default_binary_release
+                binaries_release_version = default_binary_release
+                print(f"got default binary release: {binaries_release_version}")
+            except Exception as e:
+                print(f"unable to get default binary release, rolling with {binaries_release_version}")
+            download_binaries(release=binaries_release_version)
             print(f'extensions have been gotten')
         print('successfully installed idaes extensions')
     except PermissionError as e:
