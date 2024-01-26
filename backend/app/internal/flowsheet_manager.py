@@ -559,11 +559,11 @@ class FlowsheetManager:
             )
         else:
             currentNumberOfSubprocesses = item[0]["value"]
-            _log.info(f'number of subprocesses is: {currentNumberOfSubprocesses}')
+            # _log.info(f'number of subprocesses is: {currentNumberOfSubprocesses}')
         return currentNumberOfSubprocesses, maxNumberOfSubprocesses
     
     def set_number_of_subprocesses(self, value):
-        _log.info(f'setting number of subprocesses to {value}')
+        # _log.info(f'setting number of subprocesses to {value}')
         query = tinydb.Query()
         self._histdb.upsert(
             {
