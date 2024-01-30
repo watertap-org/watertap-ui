@@ -79,7 +79,8 @@ def test_get_all(client):
     response = client.get("/flowsheets")
     assert response.status_code == 200
     body = response.json()
-    for item in body:
+    data = body["flowsheet_list"]
+    for item in data:
         # validates the result object, too
         info = fm.FlowsheetInfo.parse_obj(item)
         assert info.name != ""

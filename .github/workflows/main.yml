@@ -56,13 +56,17 @@ jobs:
         run: |
           pip install --progress-bar off .
 
+      # - name: Install watertap from yet unmerged PR
+      #   run: |
+      #     pip install git+https://github.com/watertap-org/watertap@refs/pull/1270/merge
+
       # - name: Install my fork of watertap
       #   working-directory: ../
       #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout build-options && pip install --progress-bar off .
 
-      # - name: Install correct branch of watertap
-      #   working-directory: ../
-      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
+      - name: Install correct branch of watertap
+        working-directory: ../
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
 
       - name: Display installed environment
         run: |

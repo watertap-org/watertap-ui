@@ -540,6 +540,41 @@ class FlowsheetManager:
                 except Exception as e:
                     _log.error(f"unable to add flowsheet module: {e}")
 
+    def get_number_of_subprocesses(self):
+        # _log.info(f'getting number of subprocesses')
+        maxNumberOfSubprocesses = 8
+        query = tinydb.Query()
+        item = self._histdb.search(query.fragment({"version": VERSION, "name": "numberOfSubprocesses"}))
+        # _log.info(f'item is : {item}')
+        if len(item) == 0:
+            _log.info(f'setting number of subprocesses to be 1')
+            currentNumberOfSubprocesses = 1
+            self._histdb.upsert(
+                {
+                    "version": VERSION,
+                    "name": "numberOfSubprocesses",
+                    "value": currentNumberOfSubprocesses
+                },
+                (query.version == VERSION and query.name == "numberOfSubprocesses"),
+            )
+        else:
+            currentNumberOfSubprocesses = item[0]["value"]
+            # _log.info(f'number of subprocesses is: {currentNumberOfSubprocesses}')
+        return currentNumberOfSubprocesses, maxNumberOfSubprocesses
+    
+    def set_number_of_subprocesses(self, value):
+        # _log.info(f'setting number of subprocesses to {value}')
+        query = tinydb.Query()
+        self._histdb.upsert(
+            {
+                "version": VERSION,
+                "name": "numberOfSubprocesses",
+                "value": value
+            },
+            (query.version == VERSION and query.name == "numberOfSubprocesses"),
+        )
+        return value
+
     def get_logs_path(self):
         """Return logs path."""
         return self.app_settings.log_dir

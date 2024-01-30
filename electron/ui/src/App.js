@@ -16,6 +16,7 @@ function App() {
   let navigate = useNavigate();
   const [ loadLandingPage, setLoadLandingPage ] = useState(1)
   const [ showHeader, setShowHeader ] = useState(false)
+  const [ numberOfSubprocesses, setNumberOfSubprocesses ] = useState({})
 
   useEffect(()=>{
     /*
@@ -42,8 +43,8 @@ function App() {
     <div className="App">  
       <Header show={showHeader}/>
       <Routes> 
-        <Route path="flowsheet/:id/config" element={<FlowsheetConfig />} /> 
-        <Route path="flowsheets" element={<FlowsheetsList />} />
+        <Route path="flowsheet/:id/config" element={<FlowsheetConfig numberOfSubprocesses={numberOfSubprocesses} setNumberOfSubprocesses={setNumberOfSubprocesses}/>} /> 
+        <Route path="flowsheets" element={<FlowsheetsList setNumberOfSubprocesses={setNumberOfSubprocesses}/>} />
         <Route path="/" element={<SplashPage />} />
         <Route path="*" element={<Navigate replace to="flowsheets" />}/>
       </Routes> 

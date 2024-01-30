@@ -5,7 +5,7 @@ Handle flowsheet-related API requests from web client.
 import io
 import aiofiles
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Union
 
 # third-party
 from fastapi import Request, APIRouter, HTTPException, File, UploadFile
@@ -37,7 +37,7 @@ router = APIRouter(
 flowsheet_manager = FlowsheetManager()
 
 
-@router.get("/", response_model=List[FlowsheetInfo])
+@router.get("/", response_model=Dict[str, Union[List[FlowsheetInfo], int]])
 async def get_all():
     """Get basic information about all available flowsheets.
 
@@ -48,7 +48,19 @@ async def get_all():
     for each in flowsheet_list:
         # gotta fetch last run for each from tiny db
         each.set_last_run(flowsheet_manager.get_last_run(each.id_))
-    return flowsheet_list
+
+    try:
+        currentNumberOfSubprocesses, maxNumberOfSubprocesses = flowsheet_manager.get_number_of_subprocesses()
+    except Exception as e:
+        _log.info(f'unable to get number of subprocesses: {e}')
+        currentNumberOfSubprocesses = 1
+        maxNumberOfSubprocesses = 8
+    
+    return {
+        "flowsheet_list": flowsheet_list, 
+        "currentNumberOfSubprocesses": currentNumberOfSubprocesses,
+        "maxNumberOfSubprocesses": maxNumberOfSubprocesses,
+    }
 
 
 @router.get("/{id_}/config", response_model=FlowsheetExport)
@@ -476,6 +488,13 @@ async def download_sweep(flowsheet_id: str) -> Path:
     # # User can now download the contents of that file
     return path
 
+@router.post("/update_number_of_subprocesses")
+async def remove_flowsheet(request: Request):
+    data = await request.json()
+    new_value = data['value']
+    flowsheet_manager.set_number_of_subprocesses(new_value)
+
+    return {"new_value": new_value}
 @router.get("/get_logs")
 async def get_logs() -> List[str]:
     """Get backend logs.
