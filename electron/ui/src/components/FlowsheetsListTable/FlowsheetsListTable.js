@@ -101,7 +101,7 @@ export default function FlowsheetsListTable(props) {
 
     const formatLastRun = (time) => {
         try {
-            if (time && time.length >= 11) {
+            if (time) {
                 let full_date = new Date(parseFloat(time) * 1000)
                 return full_date.toLocaleString().split(',')[0];
             }
