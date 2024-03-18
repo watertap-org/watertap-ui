@@ -12,8 +12,7 @@ from fastapi import Request, APIRouter, HTTPException, File, UploadFile
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
 import pandas as pd
-from pydantic import BaseModel
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 import re
 
 # package-local
