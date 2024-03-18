@@ -268,9 +268,7 @@ def test_download(client, flowsheet_id):
         client, flowsheet_id, "download", compare_data, get_body=False
     )
     assert response.status_code == 200
-    csv_data = ""
-    for chunk in response.iter_content(65536):
-        csv_data += str(chunk, encoding="utf-8")
+    csv_data = str(response.content, encoding="utf-8")
     if "\r\n" in csv_data:
         sep = "\r\n"
     else:
