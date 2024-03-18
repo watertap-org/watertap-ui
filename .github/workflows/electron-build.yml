@@ -44,9 +44,9 @@ jobs:
       - name: Get idaes extensions
         run: idaes get-extensions
 
-      # - name: Install Watertap locally
-      #   working-directory: ../
-      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout 0.11.0 && pip install --progress-bar off .
+      - name: Install Watertap locally
+        working-directory: ../
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout update-pydantic && pip install --progress-bar off .
 
       # - name: Install Watertap locally
       #   working-directory: ../
