@@ -62,17 +62,17 @@ jobs:
 
       # install slightly older versions of numpy, pandas, and scipy. 
       # having issues when freezing the latest packages of each (numpy 1.26, pandas 2.1, scipy 1.11)
-      # - name: Install numpy 1.24.3
-      #   run: |
-      #     pip uninstall -y numpy && pip install numpy==1.24.3
+      - name: Install numpy 1.24.3
+        run: |
+          pip uninstall -y numpy && pip install numpy==1.24.3
       
-      # - name: Install pandas 2.0.3
-      #   run: |
-      #     pip uninstall -y pandas && pip install pandas==2.0.3
+      - name: Install pandas 2.0.3
+        run: |
+          pip uninstall -y pandas && pip install pandas==2.0.3
 
-      # - name: Install scipy 1.9.1
-      #   run: |
-      #     pip uninstall -y scipy && pip install scipy==1.9.1
+      - name: Install scipy 1.9.1
+        run: |
+          pip uninstall -y scipy && pip install scipy==1.9.1
 
       - name: Build Backend
         run: npm --prefix electron run build-backend
