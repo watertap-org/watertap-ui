@@ -53,12 +53,6 @@ class FlowsheetInfo(BaseModel):
     @field_validator("name")
     def normalize_name(cls, v: str, info: ValidationInfo):
         return v.lower()
-    
-    @field_validator("description")
-    def validate_description(cls, v: str, info: ValidationInfo):
-        if not v or v == "":
-            v = f"{info.data['name']} flowsheet"
-        return v
 
     def updated(self, built: Optional[bool] = None):
         self.ts = time.time()
