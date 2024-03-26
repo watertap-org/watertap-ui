@@ -64,9 +64,9 @@ jobs:
       #   working-directory: ../
       #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout build-options && pip install --progress-bar off .
 
-      - name: Install correct branch of watertap
-        working-directory: ../
-        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
+      # - name: Install correct branch of watertap
+      #   working-directory: ../
+      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
 
       - name: Display installed environment
         run: |
@@ -129,9 +129,13 @@ jobs:
         run: |
           pip install --progress-bar off .
 
+      - name: Install httpx
+        run: |
+          pip install httpx
+
       # - name: Install my fork of watertap
       #   working-directory: ../
-      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout build-options && pip install --progress-bar off .
+      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout update-pydantic && pip install --progress-bar off .
 
       - name: get idaes extensions
         run: idaes get-extensions

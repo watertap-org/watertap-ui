@@ -16,12 +16,12 @@ except ImportError:
 from pathlib import Path
 import time
 from types import ModuleType
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 import app
 
 # third-party
 from fastapi import HTTPException
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, field_validator, ValidationInfo, Field
 import tinydb  # JSON single-file 'database'
 
 # package-local
@@ -40,18 +40,18 @@ class FlowsheetInfo(BaseModel):
     # static information
     id_: str
     name: str
-    description: str = ""
+    description: Union[None, str] = Field(default="", validate_default=True)
     module: str = ""
     build_options: dict = {}
     # current status of flowsheet
     built: bool = False
     ts: float = 0  # time last updated (including built)
-    last_run: str = ""
+    last_run: Union[str, float] = ""
     custom: bool = False
 
     # Make sure name is lowercase
-    @validator("name")
-    def normalize_name(cls, v: str, values):
+    @field_validator("name")
+    def normalize_name(cls, v: str, info: ValidationInfo):
         return v.lower()
 
     def updated(self, built: Optional[bool] = None):

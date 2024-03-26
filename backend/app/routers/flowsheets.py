@@ -12,8 +12,7 @@ from fastapi import Request, APIRouter, HTTPException, File, UploadFile
 from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
 import pandas as pd
-from pydantic import BaseModel
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 import re
 
 # package-local
@@ -37,7 +36,7 @@ router = APIRouter(
 flowsheet_manager = FlowsheetManager()
 
 
-@router.get("/", response_model=Dict[str, Union[List[FlowsheetInfo], int]])
+@router.get("/", response_model=Dict[str, Union[List, int]])
 async def get_all():
     """Get basic information about all available flowsheets.
 
@@ -77,8 +76,12 @@ async def get_config(id_: str, build: str = "0") -> FlowsheetExport:
     flowsheet = flowsheet_manager.get_obj(id_)
     if build == "1":
         info = flowsheet_manager.get_info(id_)
+        _log.info(f"build param is 1, got info")
         flowsheet.build(build_options=flowsheet.fs_exp.build_options)
+        _log.info(f"BUILT FLOWSHEET CHUZ")
         info.updated(built=True)
+        _log.info(f"updated has been confirmed")
+    _log.info(f"returning flowsheett .fs_exp")
     return flowsheet.fs_exp
 
 
