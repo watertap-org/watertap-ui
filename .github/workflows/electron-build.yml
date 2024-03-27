@@ -3,7 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - "update-package-versions"
+      - "0.12.0rc0"
 
 defaults:
   run:
@@ -85,7 +85,7 @@ jobs:
 
       - name: Sign Windows Distribution
         run: |
-          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.01.26_win64.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.03.27_win64.exe
 
 
       - name: Upload artifact for windows build
@@ -94,73 +94,8 @@ jobs:
         with:
             name: windows-dist
             path: |
-              electron/dist/WaterTAP-UI_24.01.26_win64.exe
-  # windows-build:
-  #   name: Windows Build
+              electron/dist/WaterTAP-UI_24.03.27_win64.exe
 
-  #   runs-on: windows-latest
-
-  #   env:
-  #     CSC_LINK: ${{ secrets.CSC_LINK }}
-  #     CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-
-  #   # strategy:
-  #   #   fail-fast: false
-
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: conda-incubator/setup-miniconda@v2
-  #       with:
-  #         environment-file: environment.yml
-  #         activate-environment: watertap-ui-env
-
-  #     - name: Install Electron JS dependencies
-  #       run: |
-  #         npm --prefix electron clean-install
-
-  #     - name: Install frontend JS dependencies
-  #       run: |
-  #         npm --prefix electron/ui clean-install
-
-  #     - name: Get idaes extensions
-  #       run: idaes get-extensions
-
-  #     # - name: Install Watertap locally
-  #     #   working-directory: ../
-  #     #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout springmeeting-2023 && pip install --progress-bar off .
-
-  #     - name: Install Watertap locally
-  #       working-directory: ../
-  #       run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 0.9.0rc0 && pip install --progress-bar off .
-
-  #     - name: Transfer Entry points
-  #       run: |
-  #         npm --prefix electron run move-entrypoints
-
-  #     - name: Install watertap-ui Python package
-  #       run: |
-  #         pip install --progress-bar off .
-
-  #     - name: Install scipy 1.9.1
-  #       run: |
-  #         pip uninstall -y scipy && pip install scipy==1.9.1
-
-  #     - name: Build Backend
-  #       run: npm --prefix electron run build-backend
-
-  #     - name: Build Frontend
-  #       run: npm --prefix electron run build-frontend-win
-
-  #     - name: Build Windows Distribution
-  #       run: npm --prefix electron run electron-build-win
-
-  #     - name: Upload artifact for windows build
-  #       uses: actions/upload-artifact@v3
-  #       if: always()
-  #       with:
-  #           name: windows-dist
-  #           path: |
-  #             electron/dist/WaterTAP-UI_Setup.exe
 
   linux-build:
     name: Linux Build
