@@ -58,7 +58,7 @@ export default function SplashPage() {
                 <Grid item xs={3}> </Grid>
                 <Grid item xs={6}> 
                     <Box>
-                        <p style={{paddingTop:0, marginTop: 0, color:"#9c9c9c"}}>v24.01.26 (WaterTAP v0.11.0)</p>
+                        <p style={{paddingTop:0, marginTop: 0, color:"#9c9c9c"}}>v24.03.29 (WaterTAP v0.12.0)</p>
                     </Box>
                 </Grid>
                 <Grid item xs={3}> </Grid>

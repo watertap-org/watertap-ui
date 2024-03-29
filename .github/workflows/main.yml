@@ -35,8 +35,8 @@ jobs:
             os-version: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: environment.yml
           activate-environment: watertap-ui-env
@@ -79,7 +79,7 @@ jobs:
       #   run: pytest tests -v
 
       - name: run backend server
-        run: uvicorn --app-dir backend/app main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
+        run: uvicorn --app-dir backend/app main:app --reload --host 127.0.0.1 --port 8001 & sleep 30
 
       - name: run frontend
         run: npm --prefix electron/ui start & sleep 30
@@ -93,7 +93,7 @@ jobs:
         run: npx cypress run
 
       - name: Upload artifact for screenshots & videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
             name: cypress_results-${{ matrix.os }}
@@ -119,8 +119,8 @@ jobs:
             os-version: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: environment.yml
           activate-environment: watertap-ui-env

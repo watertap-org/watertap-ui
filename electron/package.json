@@ -1,7 +1,7 @@
 {
   "name": "watertap-ui",
   "author": "Michael Pesce <mpesce@lbl.gov>",
-  "version": "24.01.26",
+  "version": "24.03.29",
   "private": true,
   "main": "build/main.js",
   "dependencies": {
@@ -70,7 +70,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "WaterTAP-UI_24.01.26_win64.exe"
+      "artifactName": "WaterTAP-UI_24.03.29_win64.exe"
     },
     "deb": {
       "depends": [
@@ -106,7 +106,7 @@
     "win": {
       "target": "nsis",
       "icon": "build/nawi-logo.ico",
-      "artifactName": "WaterTAP-UI_24.01.26_win64.exe"
+      "artifactName": "WaterTAP-UI_24.03.29_win64.exe"
     },
     "linux": {
       "target": "Deb",
