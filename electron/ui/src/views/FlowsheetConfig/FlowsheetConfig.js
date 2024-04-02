@@ -10,7 +10,7 @@ import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import SolveDialog from "../../components/SolveDialog/SolveDialog"; 
 import ErrorBar from "../../components/ErrorBar/ErrorBar";
-import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
+import ConfigOutputComparison from './ConfigOutput/OutputComparison'
 import BuildOptions from '../../components/BuildOptions/BuildOptions';
 
 
@@ -390,8 +390,7 @@ export default function FlowsheetConfig(props) {
                   </ConfigOutput>
                 </TabPanel> 
                 <TabPanel value={tabValue} index={2}>
-                  <ConfigOutputComparisonTable outputData={flowsheetData}>
-                  </ConfigOutputComparisonTable>
+                  <ConfigOutputComparison outputData={flowsheetData} />
                 </TabPanel> 
                 </Box>
               }

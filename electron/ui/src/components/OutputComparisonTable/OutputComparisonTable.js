@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Grid, Button, Box, Paper, Stack, Toolbar, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
-import { downloadCSV, loadConfig, listConfigNames }  from '../../../services/output.service.js'
+import { downloadCSV, loadConfig, listConfigNames }  from '../../services/output.service.js'
 
 export default function OutputComparisonTable(props) {
     let params = useParams(); 
