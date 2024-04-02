@@ -84,7 +84,7 @@ export default function FlowsheetConfig(props) {
       getFlowsheet(params.id, to_build)
       .then(response => response.json())
       .then((data)=>{
-        console.log("Flowsheet Data:", data);
+        // console.log("Flowsheet Data:", data);
         setLoadingFlowsheetData(false)
         setFlowsheetData({outputData:null, inputData: data, name: data.name});
         setTitle(getTitle(data)); 
@@ -97,9 +97,9 @@ export default function FlowsheetConfig(props) {
     useEffect(() => {
       try {
         if (Object.keys(flowsheetData.inputData.model_objects).length > 0) {
-          console.log('flowsheet is indeed built')
           setIsBuilt(true)
-        } else console.log('flowsheet is not built')
+        } 
+        // else console.log('flowsheet is not built')
       } catch (e){
         console.log('unable to check for model objects: ',e)
       }
@@ -116,7 +116,7 @@ export default function FlowsheetConfig(props) {
       getFlowsheet(params.id, 1)
       .then(response => response.json())
       .then((data)=>{
-        console.log("Flowsheet Data:", data);
+        // console.log("Flowsheet Data:", data);
         setLoadingFlowsheetData(false)
         setFlowsheetData({outputData:null, inputData: data, name: data.name});
         setTitle(getTitle(data)); 
@@ -125,23 +125,6 @@ export default function FlowsheetConfig(props) {
         navigateHome(e)
       });
     }
-
-    // const rebuildFlowsheet = () => {
-    //   unbuildFlowsheet(params.id, 1)
-    //   .then(response => response.json())
-    //   .then((data)=>{
-    //     console.log("Flowsheet Data:", data);
-    //     setLoadingFlowsheetData(false)
-    //     setFlowsheetData({outputData:null, inputData: data, name: data.name});
-    //     setTitle(getTitle(data));
-    //     setIsBuilt(false)
-    //     setTabValue(0)
-    //     runBuildFlowsheet()
-    //   }).catch((e) => {
-    //     console.error('error getting flowsheet: ',e)
-    //     navigateHome(e)
-    //   });
-    // }
 
     const navigateHome = (e) => {
       navigate("/flowsheets", {replace: true, state:{error:e}})
@@ -167,7 +150,7 @@ export default function FlowsheetConfig(props) {
 
     //send updated flowsheet data
     const updateFlowsheetData = (data, solve) => {
-      console.log(">main updateFlowsheetData:",data);
+      // console.log(">main updateFlowsheetData:",data);
       if(solve==="solve")
       { 
         setSolveDialogOpen(true);
@@ -201,7 +184,7 @@ export default function FlowsheetConfig(props) {
     };
 
     const handleSolved = (data) => {
-      console.log("handle solved.....",data);
+      // console.log("handle solved.....",data);
       let tempFlowsheetData = {...flowsheetData}
       tempFlowsheetData.outputData = data
       setFlowsheetData(tempFlowsheetData);
@@ -210,20 +193,19 @@ export default function FlowsheetConfig(props) {
     };
 
     const handleError = (msg) => {
-      console.log("handle error");
       setErrorMessage(msg)
       setOpenErrorMessage(true);
       setSolveDialogOpen(false);
     };
 
     const handleSave = (data) => {
-      console.log("handle save.....",data);
+      // console.log("handle save.....",data);
       saveFlowsheet(params.id, data)
       .then(response => {
         if(response.status === 200) {
           response.json()
           .then((data)=>{
-            console.log("new Flowsheet Data:", data); 
+            // console.log("new Flowsheet Data:", data);
             let tempFlowsheetData = {...flowsheetData}
             tempFlowsheetData.inputData = data
             setFlowsheetData(tempFlowsheetData)

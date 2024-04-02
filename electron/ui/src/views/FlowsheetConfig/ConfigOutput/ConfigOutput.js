@@ -42,7 +42,6 @@ export default function ConfigOutput(props) {
         saveConfig(params.id,{inputData: outputData.inputData, outputData: outputData.outputData},configName, outputData.inputData.version)
         .then(response => response.json())
         .then((data)=>{
-            console.log('successfully saved config')
             let tempFlowsheetData = {...outputData}
             tempFlowsheetData.name=configName
             updateFlowsheetData(tempFlowsheetData, "UPDATE_CONFIG")
@@ -130,14 +129,14 @@ export default function ConfigOutput(props) {
                 {
                     let factor = 1
                     let tempRounding = fieldData[key].rounding
-                    console.log('rounding is negative : ',fieldData[key].rounding)
+                    // console.log('rounding is negative : ',fieldData[key].rounding)
                     while (tempRounding < 0) {
                         factor *= 10
                         tempRounding += 1
                     }
                     roundedValue = Math.round((fieldData[key].value / factor)) * factor
-                    console.log("old value is: ", fieldData[key].value)
-                    console.log('new value is: ', roundedValue)
+                    // console.log("old value is: ", fieldData[key].value)
+                    // console.log('new value is: ', roundedValue)
                 }
             }else // if rounding is not provided, just use given value 
             {
