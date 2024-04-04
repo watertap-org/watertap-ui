@@ -96,7 +96,7 @@ export default function FlowsheetConfig(props) {
 
     useEffect(() => {
       try {
-        if (Object.keys(flowsheetData.inputData.model_objects).length > 0) {
+        if (flowsheetData.inputData.model_objects && Object.keys(flowsheetData.inputData.model_objects).length > 0) {
           setIsBuilt(true)
         } 
         // else console.log('flowsheet is not built')

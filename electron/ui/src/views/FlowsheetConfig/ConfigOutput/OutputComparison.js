@@ -54,16 +54,25 @@ export default function OutputComparison(props) {
     const organizeVariables = () => {
       var tempHistory = []
       for (const bvars of historyData) {
+        let raw_inputs = {}
+        let raw_outputs = {}
+        let raw_variables = {}
         let var_sections = {}
         let tempVariables = {}
         let tempName = bvars.name
         for (const [key, v] of Object.entries(bvars.data.outputData.model_objects)) {
-            
             let catg
             let is_input = v.is_input
             let is_output = v.is_output
-            if (is_input) catg = v.input_category
-            if (is_output) catg = v.output_category
+            raw_variables[key] = v
+            if (is_input) { 
+              raw_inputs[key] = v
+              catg = v.input_category
+            }
+            if (is_output) { 
+              raw_outputs[key] = v
+              catg = v.output_category
+            }
             if (catg === null) {
                 catg = ""
             }
@@ -80,7 +89,7 @@ export default function OutputComparison(props) {
               var_sections[catg]["output_variables"] = [...tempVariables[catg].output_variables];
             }
         }
-        tempHistory.push({name: tempName, data: var_sections})
+        tempHistory.push({name: tempName, data: var_sections, raw: {data: raw_variables, inputs: raw_inputs, outputs: raw_outputs}})
         setHistoryDataOrganized([...tempHistory])
       }
       
@@ -105,8 +114,8 @@ export default function OutputComparison(props) {
             }
             {  tabValue === 1 &&
                 <OutputComparisonChart 
-                  outputData={outputData}
-                  historyData={historyDataOrganized}  
+                  flowsheetData={outputData}
+                  historyData={historyDataOrganized}
                 />
             }
         </Box>

@@ -7,7 +7,7 @@ import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab,
 import Plot from 'react-plotly.js';
 
 export default function OutputComparisonChart(props) {
-    const { outputData } = props;
+    const { flowsheetData, historyData } = props;
     const [ plotData, setPlotData ] = useState({data: [], layout: []})
     const [ showPlot, setShowPlot ] = useState(false)
 
@@ -16,43 +16,41 @@ export default function OutputComparisonChart(props) {
     }
 
     useEffect(() => {
-        unpackData("line")
-    }, [outputData])
+        // unpackData("line")
+        // console.log("history data")
+        // console.log(historyData)
+        try {
+            unpackData(
+                'line', 
+                [historyData[0].data.Feed.variables[0].obj_key],
+                historyData[0].data['Levelized cost metrics'].variables[0].obj_key
+            )
+        } catch(e) {
+            console.error(e)
+        }
+        
+    }, [flowsheetData])
 
-    const unpackData = (plotType) => {
-        // console.log(outputData.outputData)
-        let keys = outputData.outputData.sweep_results.keys
+    const unpackData = (plotType, xVariables, yVariable) => {
+        let traces = []
         if (plotType==="line"){ // line plot
-            let x = []
-            let ys = []
-            for (let i = 0; i < outputData.outputData.sweep_results.num_outputs; i++) {
-                ys.push([])
-            }
-            for (let each of outputData.outputData.sweep_results.values) {
-                x.push(Math.round(each[0] * 1000) / 1000)
-                
-                for(let i = 1; i < each.length; i++) {
-                    let out=null
-                    if (each[i]!==null){
-                        out = Math.round(each[i] * 1000) / 1000}
-                    ys[i-1].push(out)
+            for (let xVariable of xVariables) {
+                let x = []
+                let y = []
+                for(let config of historyData) {
+                    let xValue = config.raw.data[xVariable].value
+                    let vValue = config.raw.data[yVariable].value
+                    x.push(Math.round(xValue * 100, 2) / 100)
+                    y.push(Math.round(vValue * 100, 2) / 100)
                 }
+                traces.push({
+                    x: x,
+                    y: y,
+                    type: 'scatter'
+                })
             }
-            let tempData = []
-            let keyIdx = 1
-            // for (let each of ys) {
-            //     if( keyIdx === yIndex){
-            //         let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.model_objects[keys[keyIdx]].display_units})`
-            //         let tempTrace = {x: x, y: each, type:"scatter", name: yName}
-            //         tempData.push(tempTrace)
-                    
-            //     }
-            //     keyIdx+=1
-            // }
-            
-            // let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.model_objects[keys[0]].display_units})`
-            // let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.model_objects[keys[yIndex]].display_units})`
-            let xLabel, yLabel
+            let xLabel = `${historyData[0].raw.data[xVariables[0]].name} (${historyData[0].raw.data[xVariables[0]].display_units})`
+            let yLabel = `${historyData[0].raw.data[yVariable].name} (${historyData[0].raw.data[yVariable].display_units})`
             let tempLayout = {
                 xaxis: {
                     title: {
@@ -72,7 +70,7 @@ export default function OutputComparisonChart(props) {
             // console.log('lineplot data: ')
             // console.log(tempData)
 
-            setPlotData({data: tempData, layout:tempLayout})
+            setPlotData({data: traces, layout:tempLayout})
             setShowPlot(true)
         } 
     }
