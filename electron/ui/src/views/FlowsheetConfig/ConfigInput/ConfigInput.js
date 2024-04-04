@@ -73,7 +73,7 @@ export default function ConfigInput(props) {
     }, [flowsheetData.inputData, solveType]);
 
     useEffect(() => {
-        console.log(`setting number of subprocesses current: ${numberOfSubprocesses.current}, max: ${numberOfSubprocesses.max}`)
+        // console.log(`setting number of subprocesses current: ${numberOfSubprocesses.current}, max: ${numberOfSubprocesses.max}`)
         setCurrentNumberOfSubprocesses(numberOfSubprocesses.current)
         setMaxNumberOfSubprocesses(numberOfSubprocesses.max)
     }, [numberOfSubprocesses])
