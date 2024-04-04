@@ -5,6 +5,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Select } from '@mui/material';
 import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab, Box } from '@mui/material';
 import Plot from 'react-plotly.js';
+import { round } from '../../assets/helperFunctions';
 
 export default function OutputComparisonChart(props) {
     const { flowsheetData, historyData } = props;
@@ -16,14 +17,20 @@ export default function OutputComparisonChart(props) {
     }
 
     useEffect(() => {
-        // unpackData("line")
-        // console.log("history data")
         // console.log(historyData)
         try {
+            let barChartKeys = []
+            for (let each of historyData[0].data['Operating costs'].variables) {
+                barChartKeys.push(each.obj_key)
+            }
             unpackData(
-                'line', 
-                [historyData[0].data.Feed.variables[0].obj_key],
-                historyData[0].data['Levelized cost metrics'].variables[0].obj_key
+                'bar', 
+                // [historyData[0].data.Feed.variables[0].obj_key],
+                barChartKeys
+                // [
+                //     historyData[0].data['Operating costs'].variables[0].obj_key,
+                //     historyData[0].data['Operating costs'].variables[1].obj_key,
+                // ]
             )
         } catch(e) {
             console.error(e)
@@ -31,48 +38,56 @@ export default function OutputComparisonChart(props) {
         
     }, [flowsheetData])
 
-    const unpackData = (plotType, xVariables, yVariable) => {
-        let traces = []
-        if (plotType==="line"){ // line plot
-            for (let xVariable of xVariables) {
-                let x = []
+    const unpackData = (plotType, yVariables) => {
+        if (plotType === "bar") {
+            let traces = []
+            let x = []
+            let ys = []
+            // x: the configuration names; will be the same for each trace
+            // y: the values for each y variable
+            for(let config of historyData) {
+                x.push(config.name)
+            }
+            let yNames = []
+            for(let yVariable of yVariables) {
                 let y = []
                 for(let config of historyData) {
-                    let xValue = config.raw.data[xVariable].value
-                    let vValue = config.raw.data[yVariable].value
-                    x.push(Math.round(xValue * 100, 2) / 100)
-                    y.push(Math.round(vValue * 100, 2) / 100)
+                    y.push(round(config.raw.data[yVariable].value, 3))
                 }
-                traces.push({
+                yNames.push(`${historyData[0].raw.data[yVariable].name} (${historyData[0].raw.data[yVariable].display_units})`)
+                ys.push(y)
+            }
+            console.log(ys)
+            for(let i = 0; i < ys.length; i++) {
+                let y = ys[i]
+                let yName = yNames[i]
+                let trace = {
                     x: x,
                     y: y,
-                    type: 'scatter'
-                })
+                    name: yName,
+                    type: 'bar'
+                };
+                traces.push(trace)
             }
-            let xLabel = `${historyData[0].raw.data[xVariables[0]].name} (${historyData[0].raw.data[xVariables[0]].display_units})`
-            let yLabel = `${historyData[0].raw.data[yVariable].name} (${historyData[0].raw.data[yVariable].display_units})`
-            let tempLayout = {
+            console.log(traces)
+            let layout =  {//barmode: 'stack'};
                 xaxis: {
                     title: {
-                        text: xLabel,
+                        text: "Optimization Name",
                     },
                 },
                 yaxis: {
                     title: {
-                        text: yLabel,
+                        text: "Operating costs",
                     },
-                    // type: 'log',
-                    // autorange: true,
                 },
                 width: 700,
                 height: 500,
+                barmode: 'stack'
             };
-            // console.log('lineplot data: ')
-            // console.log(tempData)
-
-            setPlotData({data: traces, layout:tempLayout})
+            setPlotData({data: traces, layout:layout})
             setShowPlot(true)
-        } 
+        }
     }
 
     
