@@ -11,32 +11,33 @@ export default function OutputComparisonChart(props) {
     const { flowsheetData, historyData } = props;
     const [ plotData, setPlotData ] = useState({data: [], layout: []})
     const [ showPlot, setShowPlot ] = useState(false)
+    const [ displayCategory, setDisplayCategory ] = useState(null)
 
     const styles = {
 
     }
 
     useEffect(() => {
-        // console.log(historyData)
         try {
-            let barChartKeys = []
-            for (let each of historyData[0].data['Operating costs'].variables) {
-                barChartKeys.push(each.obj_key)
-            }
-            unpackData(
-                'bar', 
-                // [historyData[0].data.Feed.variables[0].obj_key],
-                barChartKeys
-                // [
-                //     historyData[0].data['Operating costs'].variables[0].obj_key,
-                //     historyData[0].data['Operating costs'].variables[1].obj_key,
-                // ]
-            )
-        } catch(e) {
+            setDisplayCategory(Object.keys(historyData[0].data)[0])
+        } catch (e) {
             console.error(e)
         }
         
-    }, [flowsheetData])
+    }, [historyData])
+
+    useEffect(() => {
+        if (displayCategory) {
+            let barChartKeys = []
+            for (let each of historyData[0].data[displayCategory].variables) {
+                barChartKeys.push(each.obj_key)
+            }
+            unpackData(
+                'bar',
+                barChartKeys
+            )
+        }
+    }, [displayCategory])
 
     const unpackData = (plotType, yVariables) => {
         if (plotType === "bar") {
@@ -57,7 +58,7 @@ export default function OutputComparisonChart(props) {
                 yNames.push(`${historyData[0].raw.data[yVariable].name} (${historyData[0].raw.data[yVariable].display_units})`)
                 ys.push(y)
             }
-            console.log(ys)
+            // console.log(ys)
             for(let i = 0; i < ys.length; i++) {
                 let y = ys[i]
                 let yName = yNames[i]
@@ -69,7 +70,7 @@ export default function OutputComparisonChart(props) {
                 };
                 traces.push(trace)
             }
-            console.log(traces)
+            // console.log(traces)
             let layout =  {//barmode: 'stack'};
                 xaxis: {
                     title: {
@@ -90,11 +91,45 @@ export default function OutputComparisonChart(props) {
         }
     }
 
+    const handleParamaterSelection = (event) => {
+        setDisplayCategory(event.target.value)
+    }
     
     return ( 
         <Grid container spacing={2}> 
-                
-            <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={12}>
+            <Grid item xs={3}>
+            <InputLabel sx={{marginTop:1}} id="Parameter-Selection-label">Chart Category&nbsp;</InputLabel>
+            { showPlot && 
+
+                <FormControl>
+                <Select
+                    labelId="Parameter-Selection-label"
+                    id="Parameter-Selection"
+                    value={displayCategory}
+                    onChange={handleParamaterSelection}
+                    size="small"
+                    sx={{minWidth: 200}}
+                    MenuProps={{
+                        style: {
+                            maxHeight: 400,
+                                },
+                        }}
+                >
+                {Object.keys(historyData[0].data).map((k) => (
+                    <MenuItem
+                        key={`${k}`}
+                        value={k}
+                        >
+                        {k}
+                    </MenuItem>
+                ))}
+                </Select>
+                </FormControl>
+
+            }
+            
+            </Grid>
+            <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={9}>
                 {showPlot && 
                 <>
                 <Plot
