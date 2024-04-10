@@ -79,7 +79,7 @@ export default function OutputComparisonChart(props) {
                 },
                 yaxis: {
                     title: {
-                        text: "Operating costs",
+                        text: displayCategory,
                     },
                 },
                 width: 700,
