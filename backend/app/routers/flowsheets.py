@@ -499,7 +499,7 @@ async def remove_flowsheet(request: Request):
 
     return {"new_value": new_value}
 @router.get("/get_logs")
-async def get_logs() -> List[str]:
+async def get_logs() -> List:
     """Get backend logs.
 
     Returns:
