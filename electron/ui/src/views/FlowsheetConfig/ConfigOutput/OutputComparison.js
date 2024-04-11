@@ -11,6 +11,7 @@ export default function OutputComparison(props) {
     const [ pastConfigs, setPastConfigs ] = useState([])
     const [ historyData, setHistoryData ] = useState([])
     const [ historyDataOrganized, setHistoryDataOrganized ] = useState([])
+    const [ categoriesWithCharts, setCategoriesWithCharts ] = useState([])
     const [ tabValue, setTabValue ] = useState(0)
 
     useEffect(() => {
@@ -21,8 +22,6 @@ export default function OutputComparison(props) {
           console.error("unable to organize variables")
         }
       }
-      
-    
     }, [historyData])
 
     useEffect(()=>{
@@ -90,7 +89,33 @@ export default function OutputComparison(props) {
             }
         }
         tempHistory.push({name: tempName, data: var_sections, raw: {data: raw_variables, inputs: raw_inputs, outputs: raw_outputs}})
-        setHistoryDataOrganized([...tempHistory])
+        // setHistoryDataOrganized([...tempHistory])
+
+        let tempHistoryDataOrganized = [...tempHistory]
+        let tempCategoriesWithCharts = []
+        for (let optimization of tempHistoryDataOrganized) {
+            // let optimization = tempHistoryDataOrganized[optimizationKey]
+            let optimizationData = optimization.data
+            for (let categoryKey of Object.keys(optimizationData)) {
+                let categoryData = optimizationData[categoryKey]
+                let categoryVariables = categoryData.output_variables
+                if (categoryVariables.length > 0) {
+                    let displayUnits = categoryVariables[0].display_units
+                    categoryData.hasChart = true
+                    for(let output_variable of categoryVariables) {
+                        // check if display units match
+                        if (output_variable.display_units !== displayUnits) {
+                            categoryData.hasChart = false
+                        }
+                    }
+                    if(categoryData.hasChart && !tempCategoriesWithCharts.includes(categoryKey)) tempCategoriesWithCharts.push(categoryKey)
+                } else {
+                    categoryData.hasChart = false
+                }
+            }
+        }
+        setHistoryDataOrganized(tempHistoryDataOrganized)
+        setCategoriesWithCharts(tempCategoriesWithCharts)
       }
       
     }
@@ -116,6 +141,7 @@ export default function OutputComparison(props) {
                 <OutputComparisonChart 
                   flowsheetData={outputData}
                   historyData={historyDataOrganized}
+                  categoriesWithCharts={categoriesWithCharts}
                 />
             }
         </Box>

@@ -8,7 +8,7 @@ import Plot from 'react-plotly.js';
 import { round } from '../../assets/helperFunctions';
 
 export default function OutputComparisonChart(props) {
-    const { flowsheetData, historyData } = props;
+    const { flowsheetData, historyData, categoriesWithCharts } = props;
     const [ plotData, setPlotData ] = useState({data: [], layout: []})
     const [ showPlot, setShowPlot ] = useState(false)
     const [ displayCategory, setDisplayCategory ] = useState(null)
@@ -19,7 +19,8 @@ export default function OutputComparisonChart(props) {
 
     useEffect(() => {
         try {
-            setDisplayCategory(Object.keys(historyData[0].data)[0])
+            if (categoriesWithCharts.length > 0) setDisplayCategory(categoriesWithCharts[0])
+            // setDisplayCategory(Object.keys(historyData[0].data)[0])
         } catch (e) {
             console.error(e)
         }
@@ -28,6 +29,7 @@ export default function OutputComparisonChart(props) {
 
     useEffect(() => {
         if (displayCategory) {
+            // console.log(historyData)
             let barChartKeys = []
             for (let each of historyData[0].data[displayCategory].variables) {
                 barChartKeys.push(each.obj_key)
@@ -115,12 +117,20 @@ export default function OutputComparisonChart(props) {
                                 },
                         }}
                 >
-                {Object.keys(historyData[0].data).map((k) => (
+                {/* {Object.keys(historyData[0].data).map((k) => (
                     <MenuItem
                         key={`${k}`}
                         value={k}
                         >
                         {k}
+                    </MenuItem>
+                ))} */}
+                {categoriesWithCharts.map((v, idx) => (
+                    <MenuItem
+                        key={`${v}_${idx}`}
+                        value={v}
+                        >
+                        {v}
                     </MenuItem>
                 ))}
                 </Select>
