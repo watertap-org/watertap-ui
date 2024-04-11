@@ -46,6 +46,7 @@ export default function OutputComparisonChart(props) {
             let traces = []
             let x = []
             let ys = []
+            let displayUnits
             // x: the configuration names; will be the same for each trace
             // y: the values for each y variable
             for(let config of historyData) {
@@ -58,6 +59,7 @@ export default function OutputComparisonChart(props) {
                     y.push(round(config.raw.data[yVariable].value, 3))
                 }
                 yNames.push(`${historyData[0].raw.data[yVariable].name} (${historyData[0].raw.data[yVariable].display_units})`)
+                displayUnits = historyData[0].raw.data[yVariable].display_units
                 ys.push(y)
             }
             // console.log(ys)
@@ -81,7 +83,7 @@ export default function OutputComparisonChart(props) {
                 },
                 yaxis: {
                     title: {
-                        text: displayCategory,
+                        text: `${displayCategory} (${displayUnits})`,
                     },
                 },
                 width: 700,
@@ -117,14 +119,6 @@ export default function OutputComparisonChart(props) {
                                 },
                         }}
                 >
-                {/* {Object.keys(historyData[0].data).map((k) => (
-                    <MenuItem
-                        key={`${k}`}
-                        value={k}
-                        >
-                        {k}
-                    </MenuItem>
-                ))} */}
                 {categoriesWithCharts.map((v, idx) => (
                     <MenuItem
                         key={`${v}_${idx}`}
