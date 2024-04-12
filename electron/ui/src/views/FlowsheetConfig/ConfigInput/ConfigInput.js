@@ -1,6 +1,6 @@
  
 import React from 'react'; 
-import {useEffect, useState } from 'react';    
+import {useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react';    
 import InputAccordion from "../../../components/InputAccordion/InputAccordion"; 
 import { loadConfig, listConfigNames, solve }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
@@ -22,6 +22,7 @@ export default function ConfigInput(props) {
     const [ currentNumberOfSubprocesses, setCurrentNumberOfSubprocesses ] = useState(null)
     const [ maxNumberOfSubprocesses, setMaxNumberOfSubprocesses ] = useState(null)
     const [ numberOfSubprocessesIsValid, setNumberOfSubprocessesIsValid ] = useState(true)
+    const runButtonRef = useRef();
 
     const modalStyle = {
         position: 'absolute',
@@ -56,34 +57,11 @@ export default function ConfigInput(props) {
         })
     }, [flowsheetData.inputData]);
 
-    useEffect(()=>{
-        checkDisableRun()
-
-    }, [flowsheetData.inputData, solveType]);
-
     useEffect(() => {
         // console.log(`setting number of subprocesses current: ${numberOfSubprocesses.current}, max: ${numberOfSubprocesses.max}`)
         setCurrentNumberOfSubprocesses(numberOfSubprocesses.current)
         setMaxNumberOfSubprocesses(numberOfSubprocesses.max)
     }, [numberOfSubprocesses])
-
-    const checkDisableRun = () => {
-        // setTimeout(() => {
-            if (solveType === "solve") setDisableRun(false)
-            else {
-                let tempDisableRun = true
-                for(let each of Object.keys(flowsheetData.inputData.model_objects)) {
-                    let modelObject = flowsheetData.inputData.model_objects[each]
-                    if(modelObject.is_sweep) {
-                        tempDisableRun = false
-                        break
-                    }
-                }
-                setDisableRun(tempDisableRun)
-            }
-        // },1000)
-        
-    }
 
     const handleUpdateNumberOfSubprocesses = (event) => {
         console.log('updating number of subprocesses')
@@ -170,7 +148,8 @@ export default function ConfigInput(props) {
             tempFlowsheetData.inputData.model_objects[id].is_sweep = false
         }
         updateFlowsheetData(tempFlowsheetData, null)
-        checkDisableRun()
+        runButtonRef.current?.checkDisableRun()
+        // checkDisableRun()
     }
 
     const handleUpdateBounds = (id, value, bound) => {
@@ -355,6 +334,7 @@ export default function ConfigInput(props) {
                                 flowsheetData={flowsheetData}
                                 disableRun={disableRun}
                                 solveType={solveType}
+                                ref={runButtonRef}
                             />
                         </Stack>
                     </Grid>
@@ -396,11 +376,10 @@ export default function ConfigInput(props) {
   
 }
 
-
-function RunButton(props) {
+const RunButton = forwardRef(({ ...props }, ref) => {
+    // const [childDataApi, setChildDataApi] = useState(null);
     const { updateFlowsheetData, flowsheetData, solveType } = props;
     const [ disableRun, setDisableRun ] = useState(false) 
-
     useEffect(() => {
         checkDisableRun()
     }, [props])
@@ -419,7 +398,12 @@ function RunButton(props) {
             setDisableRun(tempDisableRun)
         }
     }
-
+    
+      useImperativeHandle(ref, () => ({
+        checkDisableRun
+      }));
+    
+    
     return (
         <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
             <div>
@@ -427,4 +411,4 @@ function RunButton(props) {
             </div>
         </Tooltip>
     );
-}
+});    
