@@ -2,7 +2,7 @@
 import React from 'react'; 
 import {useEffect, useState } from 'react';    
 import InputAccordion from "../../../components/InputAccordion/InputAccordion"; 
-import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
+import { loadConfig, listConfigNames, solve }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
 import { deleteConfig, updateNumberOfSubprocesses }  from '../../../services/input.service.js'
 import { Button, Box, Modal, Select, Stack, TextField, Tooltip } from '@mui/material';
@@ -345,11 +345,17 @@ export default function ConfigInput(props) {
                             <div>
                                 <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset} fullWidth>RESET</Button>
                             </div>
-                            <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
+                            {/* <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
                                 <div>
                                 <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)} disabled={disableRun}>RUN</Button>
                                 </div>
-                            </Tooltip>
+                            </Tooltip> */}
+                            <RunButton
+                                updateFlowsheetData={updateFlowsheetData}
+                                flowsheetData={flowsheetData}
+                                disableRun={disableRun}
+                                solveType={solveType}
+                            />
                         </Stack>
                     </Grid>
 
@@ -389,4 +395,36 @@ export default function ConfigInput(props) {
     );
   
 }
- 
+
+
+function RunButton(props) {
+    const { updateFlowsheetData, flowsheetData, solveType } = props;
+    const [ disableRun, setDisableRun ] = useState(false) 
+
+    useEffect(() => {
+        checkDisableRun()
+    }, [props])
+
+    const checkDisableRun = () => {
+        if (solveType === "solve") setDisableRun(false)
+        else {
+            let tempDisableRun = true
+            for(let each of Object.keys(flowsheetData.inputData.model_objects)) {
+                let modelObject = flowsheetData.inputData.model_objects[each]
+                if(modelObject.is_sweep) {
+                    tempDisableRun = false
+                    break
+                }
+            }
+            setDisableRun(tempDisableRun)
+        }
+    }
+
+    return (
+        <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
+            <div>
+            <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)} disabled={disableRun}>RUN</Button>
+            </div>
+        </Tooltip>
+    );
+}
