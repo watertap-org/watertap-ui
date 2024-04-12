@@ -57,26 +57,33 @@ export default function ConfigInput(props) {
     }, [flowsheetData.inputData]);
 
     useEffect(()=>{
-        if (solveType === "solve") setDisableRun(false)
-        else {
-            let tempDisableRun = true
-            for(let each of Object.keys(flowsheetData.inputData.model_objects)) {
-                let modelObject = flowsheetData.inputData.model_objects[each]
-                if(modelObject.is_sweep) {
-                    tempDisableRun = false
-                    break
-                }
-            }
-            setDisableRun(tempDisableRun)
-        }
+        checkDisableRun()
 
     }, [flowsheetData.inputData, solveType]);
 
     useEffect(() => {
-        console.log(`setting number of subprocesses current: ${numberOfSubprocesses.current}, max: ${numberOfSubprocesses.max}`)
+        // console.log(`setting number of subprocesses current: ${numberOfSubprocesses.current}, max: ${numberOfSubprocesses.max}`)
         setCurrentNumberOfSubprocesses(numberOfSubprocesses.current)
         setMaxNumberOfSubprocesses(numberOfSubprocesses.max)
     }, [numberOfSubprocesses])
+
+    const checkDisableRun = () => {
+        // setTimeout(() => {
+            if (solveType === "solve") setDisableRun(false)
+            else {
+                let tempDisableRun = true
+                for(let each of Object.keys(flowsheetData.inputData.model_objects)) {
+                    let modelObject = flowsheetData.inputData.model_objects[each]
+                    if(modelObject.is_sweep) {
+                        tempDisableRun = false
+                        break
+                    }
+                }
+                setDisableRun(tempDisableRun)
+            }
+        // },1000)
+        
+    }
 
     const handleUpdateNumberOfSubprocesses = (event) => {
         console.log('updating number of subprocesses')
@@ -154,9 +161,16 @@ export default function ConfigInput(props) {
     const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
         tempFlowsheetData.inputData.model_objects[id].fixed = value
-        if(type==="sweep") tempFlowsheetData.inputData.model_objects[id].is_sweep = true
-        else tempFlowsheetData.inputData.model_objects[id].is_sweep = false
+        if(type==="sweep") {
+            // flowsheetData.inputData.model_objects[id].is_sweep = true
+            tempFlowsheetData.inputData.model_objects[id].is_sweep = true
+        }
+        else {
+            // flowsheetData.inputData.model_objects[id].is_sweep = false
+            tempFlowsheetData.inputData.model_objects[id].is_sweep = false
+        }
         updateFlowsheetData(tempFlowsheetData, null)
+        checkDisableRun()
     }
 
     const handleUpdateBounds = (id, value, bound) => {

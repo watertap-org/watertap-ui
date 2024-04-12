@@ -547,7 +547,7 @@ class FlowsheetManager:
         item = self._histdb.search(query.fragment({"version": VERSION, "name": "numberOfSubprocesses"}))
         # _log.info(f'item is : {item}')
         if len(item) == 0:
-            _log.info(f'setting number of subprocesses to be 1')
+            # _log.info(f'setting number of subprocesses to be 1')
             currentNumberOfSubprocesses = 1
             self._histdb.upsert(
                 {

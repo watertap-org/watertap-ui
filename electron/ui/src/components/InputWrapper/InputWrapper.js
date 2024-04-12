@@ -8,14 +8,20 @@ export default function InputWrapper(props) {
     // const [ disabled, setDisabled ] = useState(false)
     const [value, setValue] = useState("");
     const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
-    const [ isSweep, setIsSweep ] = useState(fieldData.is_sweep)
+    // const [ isSweep, setIsSweep ] = useState(fieldData.is_sweep)
+    const [ isSweep, setIsSweep ] = useState(false)
     const disabled = false
 
-    useEffect(()=>{  
+    useEffect(()=>{
         if (fieldData.fixed === undefined) {
             fieldData.fixed = true
         } else if (!fieldData.fixed) {
             setShowBounds(true)
+        }
+        if (fieldData.fixed === true) {
+
+        } else if(fieldData.is_sweep) {
+            setIsSweep(true)
         }
     }, [fieldData]);
 
@@ -23,6 +29,7 @@ export default function InputWrapper(props) {
         // handleFixedChange({target: {name: fieldData.obj_key, value: false}})
         if (solveType === "solve" && fieldData.is_sweep) {
             fieldData.is_sweep = false
+            handleSetSweep(false)
             handleUpdateFixed(fieldData.obj_key, false, "free")
         }
         
@@ -39,32 +46,31 @@ export default function InputWrapper(props) {
         let value
         if(event.target.value === "fixed") { 
             value = true
-            setIsSweep(false)
+            
+            handleSetSweep(false)
         }
         else if(event.target.value === "free") {
             value = false
-            setIsSweep(false)
+            handleSetSweep(false)
         }
         else if(event.target.value === "sweep") {
             value = false
             fieldData.is_sweep = true
-            setIsSweep(true)
+            handleSetSweep(true)
             // add variable to sweep variables
         }
         // setDisabled(true)
         fieldData.fixed = value;
         handleUpdateFixed(event.target.name,value, event.target.value)
 
-        // if (showBounds) {
-        //     setShowBounds(!showBounds)
-        //     setTimeout(() => {
-        //         setShowBounds(!value)
-        //     }, 1)
-        // } else {
         setShowBounds(!value)
-        // }
         
     };
+
+    const handleSetSweep = (v) => {
+        // if (v) console.log("v is true")
+        setIsSweep(v)
+    }
 
     const handleBoundsChange = (event) => {
         let value = event.target.value;
@@ -112,6 +118,10 @@ export default function InputWrapper(props) {
         else return "free"
         // else if(!fieldData.fixed && fieldData.is_sweep) return "sweep"
     }
+
+    // const reallyGetVariableState = () => {
+    //     return 
+    // }
 
 
     const displayUnits = (d) => {
