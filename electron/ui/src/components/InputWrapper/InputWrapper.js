@@ -8,6 +8,7 @@ export default function InputWrapper(props) {
     // const [ disabled, setDisabled ] = useState(false)
     const [value, setValue] = useState("");
     const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
+    const [ isSweep, setIsSweep ] = useState(fieldData.is_sweep)
     const disabled = false
 
     useEffect(()=>{  
@@ -37,16 +38,29 @@ export default function InputWrapper(props) {
         console.log(`updating fixed for ${event.target.name} with value ${event.target.value}`)
         let value
         if(event.target.value === "fixed") value = true
-        else if(event.target.value === "free") value = false
+        else if(event.target.value === "free") {
+            value = false
+            setIsSweep(false)
+        }
         else if(event.target.value === "sweep") {
             value = false
             fieldData.is_sweep = true
+            setIsSweep(true)
             // add variable to sweep variables
         }
         // setDisabled(true)
         fieldData.fixed = value;
         handleUpdateFixed(event.target.name,value, event.target.value)
+
+        // if (showBounds) {
+        //     setShowBounds(!showBounds)
+        //     setTimeout(() => {
+        //         setShowBounds(!value)
+        //     }, 1)
+        // } else {
         setShowBounds(!value)
+        // }
+        
     };
 
     const handleBoundsChange = (event) => {
@@ -90,9 +104,10 @@ export default function InputWrapper(props) {
     // }
 
     const getVariableState = () => {
-        if (fieldData.fixed) return "fixed"
-        else if(!fieldData.fixed && !fieldData.is_sweep) return "free"
-        else if(!fieldData.fixed && fieldData.is_sweep) return "sweep"
+        if(isSweep) return "sweep"
+        else if (fieldData.fixed) return "fixed"
+        else return "free"
+        // else if(!fieldData.fixed && fieldData.is_sweep) return "sweep"
     }
 
 
@@ -180,7 +195,8 @@ export default function InputWrapper(props) {
                         <Grid item xs={0.25}></Grid>
 
                         {
-                        fieldData.is_sweep===true &&
+                        // fieldData.is_sweep===true &&
+                        isSweep &&
                         <>
                         <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}>
                             

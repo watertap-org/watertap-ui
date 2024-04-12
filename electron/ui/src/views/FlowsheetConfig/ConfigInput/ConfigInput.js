@@ -157,8 +157,6 @@ export default function ConfigInput(props) {
         if(type==="sweep") tempFlowsheetData.inputData.model_objects[id].is_sweep = true
         else tempFlowsheetData.inputData.model_objects[id].is_sweep = false
         updateFlowsheetData(tempFlowsheetData, null)
-
-        
     }
 
     const handleUpdateBounds = (id, value, bound) => {
