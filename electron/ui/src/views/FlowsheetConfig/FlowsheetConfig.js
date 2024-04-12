@@ -126,23 +126,6 @@ export default function FlowsheetConfig(props) {
       });
     }
 
-    // const rebuildFlowsheet = () => {
-    //   unbuildFlowsheet(params.id, 1)
-    //   .then(response => response.json())
-    //   .then((data)=>{
-    //     console.log("Flowsheet Data:", data);
-    //     setLoadingFlowsheetData(false)
-    //     setFlowsheetData({outputData:null, inputData: data, name: data.name});
-    //     setTitle(getTitle(data));
-    //     setIsBuilt(false)
-    //     setTabValue(0)
-    //     runBuildFlowsheet()
-    //   }).catch((e) => {
-    //     console.error('error getting flowsheet: ',e)
-    //     navigateHome(e)
-    //   });
-    // }
-
     const navigateHome = (e) => {
       navigate("/flowsheets", {replace: true, state:{error:e}})
     }
@@ -192,11 +175,11 @@ export default function FlowsheetConfig(props) {
       }
       else if(solve===null)
       {
-        handleSave(data.inputData);
+        handleSave(data.inputData, false);
       }
       else if(solve=== "UPDATE_CONFIG"){
-        setFlowsheetData(data)
-        handleSave(data.inputData);
+        // setFlowsheetData(data)
+        handleSave(data.inputData, true);
       }
     };
 
@@ -216,7 +199,7 @@ export default function FlowsheetConfig(props) {
       setSolveDialogOpen(false);
     };
 
-    const handleSave = (data) => {
+    const handleSave = (data, update) => {
       console.log("handle save.....",data);
       saveFlowsheet(params.id, data)
       .then(response => {
@@ -226,7 +209,11 @@ export default function FlowsheetConfig(props) {
             console.log("new Flowsheet Data:", data); 
             let tempFlowsheetData = {...flowsheetData}
             tempFlowsheetData.inputData = data
-            setFlowsheetData(tempFlowsheetData)
+            if (update) {
+              console.log("SETTING FLOWSHEET DATA")
+              setFlowsheetData(tempFlowsheetData)
+            }
+            
             // setOpenSuccessSaveConfirmation(true);
           });
         } else if(response.status === 400) {
