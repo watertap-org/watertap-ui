@@ -37,7 +37,10 @@ export default function InputWrapper(props) {
     const handleFixedChange = (event) => {
         console.log(`updating fixed for ${event.target.name} with value ${event.target.value}`)
         let value
-        if(event.target.value === "fixed") value = true
+        if(event.target.value === "fixed") { 
+            value = true
+            setIsSweep(false)
+        }
         else if(event.target.value === "free") {
             value = false
             setIsSweep(false)
