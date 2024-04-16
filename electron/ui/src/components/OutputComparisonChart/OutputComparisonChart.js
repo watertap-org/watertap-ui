@@ -108,6 +108,19 @@ export default function OutputComparisonChart(props) {
             }
             // console.log(traces)
 
+            //keep track of whether we found negative and positive values for each
+            let configTracker = {}
+            let categoryarray = []
+            for(let config of historyData) {
+                configTracker[config.name] = {
+                    positive: false,
+                    negative: false
+                }
+                categoryarray.push(config.name + " cost")
+                categoryarray.push(config.name + " revenue")
+                categoryarray.push(config.name + " net")
+            }
+
             let newTraces = []
             for (let variable of Object.keys(barChartData)) {
                 let variableData = barChartData[variable]
@@ -119,10 +132,12 @@ export default function OutputComparisonChart(props) {
                 for (let positive of positives) {
                     x.push(positive.key + " cost")
                     y.push(positive.value)
+                    configTracker[positive.key].positive = true
                 }
                 for (let negative of negatives) {
                     x.push(negative.key + " revenue")
                     y.push(negative.value)
+                    configTracker[negative.key].negative = true
                 }
                 // console.log(nets)
                 let trace = {
@@ -133,29 +148,49 @@ export default function OutputComparisonChart(props) {
                 }
                 newTraces.push(trace)
             }
-            for (let netValueKey of Object.keys(netValues)) {
-                let trace = {
-                    name: netValueKey+ " Total cost ($/m^3)",
-                    type: "bar",
-                    x: [netValueKey],
-                    // x: ["made up cost "],
-                    y: [netValues[netValueKey]],
+            // add any unfound positives and negatives
+            for (let config of Object.keys(configTracker)) {
+                if (!configTracker[config].positive) {
+                    let trace = {
+                        name: config + " cost",
+                        type: "bar",
+                        x: [config + " cost"],
+                        y: [0],
+                    }
+                    newTraces.push(trace)
                 }
-                
-                // console.log(trace)
-                newTraces.push(trace)
-                // break
+                if (!configTracker[config].negative) {
+                    let trace = {
+                        name: config + " revenue",
+                        type: "bar",
+                        x: [config + " revenue"],
+                        y: [0],
+                    }
+                    newTraces.push(trace)
+                }
             }
-            // console.log(netValues)
-            // console.log(traces)
-            // console.log(newTraces)
-            // console.log(barChartData)
-            // newTraces.push(test_guy)
+            // add net value for each config
+            let netX = []
+            let netY = []
+            for (let netValueKey of Object.keys(netValues)) {
+                netX.push(netValueKey+ " net")
+                netY.push(netValues[netValueKey])
+            }
+            let trace = {
+                name: "net",
+                    type: "bar",
+                    x: netX,
+                    y: netY,
+            }
+            newTraces.push(trace)
+
             let layout =  {
                 xaxis: {
                     title: {
                         text: "Optimization Name",
                     },
+                    categoryorder: "array",
+                    categoryarray:  categoryarray//["A", "B", "C", "D", "E"]
                 },
                 yaxis: {
                     title: {
