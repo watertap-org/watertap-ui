@@ -35,7 +35,8 @@ export default function OutputComparisonChart(props) {
                 barChartKeys.push(each.obj_key)
             }
             unpackData(
-                'bar',
+                // 'bar',
+                historyData[0].data[displayCategory].chartType,
                 barChartKeys
             )
         }
@@ -54,7 +55,7 @@ export default function OutputComparisonChart(props) {
       }
 
     const unpackData = (plotType, yVariables) => {
-        if (plotType === "bar") {
+        if (plotType === "stacked_bar_with_net") {
             let hovertemplate = //"<b>%{text}</b><br><br>" +
             "%{data.name}: %{y:,.3f}<br>" +
             //"%{xaxis.title.text}: %{x:.0%}<br>" +
