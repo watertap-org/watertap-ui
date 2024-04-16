@@ -101,7 +101,7 @@ export default function FlowsheetConfig(props) {
         } 
         // else console.log('flowsheet is not built')
       } catch (e){
-        console.log('unable to check for model objects: ',e)
+        // console.log('unable to check for model objects: ',e)
       }
       
     }, [flowsheetData])
@@ -175,11 +175,11 @@ export default function FlowsheetConfig(props) {
       }
       else if(solve===null)
       {
-        handleSave(data.inputData);
+        handleSave(data.inputData, false);
       }
       else if(solve=== "UPDATE_CONFIG"){
-        setFlowsheetData(data)
-        handleSave(data.inputData);
+        // setFlowsheetData(data)
+        handleSave(data.inputData, true);
       }
     };
 
@@ -193,22 +193,27 @@ export default function FlowsheetConfig(props) {
     };
 
     const handleError = (msg) => {
+      // console.log("handle error");
       setErrorMessage(msg)
       setOpenErrorMessage(true);
       setSolveDialogOpen(false);
     };
 
-    const handleSave = (data) => {
+    const handleSave = (data, update) => {
       // console.log("handle save.....",data);
       saveFlowsheet(params.id, data)
       .then(response => {
         if(response.status === 200) {
           response.json()
           .then((data)=>{
-            // console.log("new Flowsheet Data:", data);
+            // console.log("new Flowsheet Data:", data); 
             let tempFlowsheetData = {...flowsheetData}
             tempFlowsheetData.inputData = data
-            setFlowsheetData(tempFlowsheetData)
+            if (update) {
+              console.log("SETTING FLOWSHEET DATA")
+              setFlowsheetData(tempFlowsheetData)
+            }
+            
             // setOpenSuccessSaveConfirmation(true);
           });
         } else if(response.status === 400) {
