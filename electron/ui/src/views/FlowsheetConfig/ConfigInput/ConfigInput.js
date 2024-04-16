@@ -1,8 +1,8 @@
  
 import React from 'react'; 
-import {useEffect, useState } from 'react';    
+import {useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react';    
 import InputAccordion from "../../../components/InputAccordion/InputAccordion"; 
-import { loadConfig, listConfigNames }  from '../../../services/output.service.js'
+import { loadConfig, listConfigNames, solve }  from '../../../services/output.service.js'
 import { useParams } from "react-router-dom";
 import { deleteConfig, updateNumberOfSubprocesses }  from '../../../services/input.service.js'
 import { Button, Box, Modal, Select, Stack, TextField, Tooltip } from '@mui/material';
@@ -22,6 +22,7 @@ export default function ConfigInput(props) {
     const [ currentNumberOfSubprocesses, setCurrentNumberOfSubprocesses ] = useState(null)
     const [ maxNumberOfSubprocesses, setMaxNumberOfSubprocesses ] = useState(null)
     const [ numberOfSubprocessesIsValid, setNumberOfSubprocessesIsValid ] = useState(true)
+    const runButtonRef = useRef();
 
     const modalStyle = {
         position: 'absolute',
@@ -56,24 +57,8 @@ export default function ConfigInput(props) {
         })
     }, [flowsheetData.inputData]);
 
-    useEffect(()=>{
-        if (solveType === "solve") setDisableRun(false)
-        else {
-            let tempDisableRun = true
-            for(let each of Object.keys(flowsheetData.inputData.model_objects)) {
-                let modelObject = flowsheetData.inputData.model_objects[each]
-                if(modelObject.is_sweep) {
-                    tempDisableRun = false
-                    break
-                }
-            }
-            setDisableRun(tempDisableRun)
-        }
-
-    }, [flowsheetData.inputData, solveType]);
-
     useEffect(() => {
-        console.log(`setting number of subprocesses current: ${numberOfSubprocesses.current}, max: ${numberOfSubprocesses.max}`)
+        // console.log(`setting number of subprocesses current: ${numberOfSubprocesses.current}, max: ${numberOfSubprocesses.max}`)
         setCurrentNumberOfSubprocesses(numberOfSubprocesses.current)
         setMaxNumberOfSubprocesses(numberOfSubprocesses.max)
     }, [numberOfSubprocesses])
@@ -154,11 +139,17 @@ export default function ConfigInput(props) {
     const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
         tempFlowsheetData.inputData.model_objects[id].fixed = value
-        if(type==="sweep") tempFlowsheetData.inputData.model_objects[id].is_sweep = true
-        else tempFlowsheetData.inputData.model_objects[id].is_sweep = false
+        if(type==="sweep") {
+            // flowsheetData.inputData.model_objects[id].is_sweep = true
+            tempFlowsheetData.inputData.model_objects[id].is_sweep = true
+        }
+        else {
+            // flowsheetData.inputData.model_objects[id].is_sweep = false
+            tempFlowsheetData.inputData.model_objects[id].is_sweep = false
+        }
         updateFlowsheetData(tempFlowsheetData, null)
-
-        
+        runButtonRef.current?.checkDisableRun()
+        // checkDisableRun()
     }
 
     const handleUpdateBounds = (id, value, bound) => {
@@ -333,11 +324,18 @@ export default function ConfigInput(props) {
                             <div>
                                 <Button variant="outlined" startIcon={<RefreshIcon />} onClick={reset} fullWidth>RESET</Button>
                             </div>
-                            <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
+                            {/* <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
                                 <div>
                                 <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)} disabled={disableRun}>RUN</Button>
                                 </div>
-                            </Tooltip>
+                            </Tooltip> */}
+                            <RunButton
+                                updateFlowsheetData={updateFlowsheetData}
+                                flowsheetData={flowsheetData}
+                                disableRun={disableRun}
+                                solveType={solveType}
+                                ref={runButtonRef}
+                            />
                         </Stack>
                     </Grid>
 
@@ -377,4 +375,40 @@ export default function ConfigInput(props) {
     );
   
 }
- 
+
+const RunButton = forwardRef(({ ...props }, ref) => {
+    // const [childDataApi, setChildDataApi] = useState(null);
+    const { updateFlowsheetData, flowsheetData, solveType } = props;
+    const [ disableRun, setDisableRun ] = useState(false) 
+    useEffect(() => {
+        checkDisableRun()
+    }, [props])
+
+    const checkDisableRun = () => {
+        if (solveType === "solve") setDisableRun(false)
+        else {
+            let tempDisableRun = true
+            for(let each of Object.keys(flowsheetData.inputData.model_objects)) {
+                let modelObject = flowsheetData.inputData.model_objects[each]
+                if(modelObject.is_sweep) {
+                    tempDisableRun = false
+                    break
+                }
+            }
+            setDisableRun(tempDisableRun)
+        }
+    }
+    
+      useImperativeHandle(ref, () => ({
+        checkDisableRun
+      }));
+    
+    
+    return (
+        <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
+            <div>
+            <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)} disabled={disableRun}>RUN</Button>
+            </div>
+        </Tooltip>
+    );
+});    
