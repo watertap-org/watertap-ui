@@ -41,18 +41,38 @@ export default function OutputComparisonChart(props) {
         }
     }, [displayCategory])
 
+    function makeAnnotation(text, xPos) {
+        return {
+          text: text,
+          showarrow: false,
+          xref: 'x',
+          yref: 'paper',
+          x: xPos,
+          y: -0.1,
+          yanchor: 'top'
+        };
+      }
+
     const unpackData = (plotType, yVariables) => {
         if (plotType === "bar") {
-            let traces = []
-            let x = []
-            let ys = []
+            let hovertemplate = //"<b>%{text}</b><br><br>" +
+            "%{data.name}: %{y:,.3f}<br>" +
+            //"%{xaxis.title.text}: %{x:.0%}<br>" +
+            // "Number Employed: %{marker.size:,}" +
+            "<extra></extra>"
             let displayUnits
             // x: the configuration names; will be the same for each trace
             // y: the values for each y variable
+            let configMapping = {}
+            let i = 0
             for(let config of historyData) {
-                x.push(config.name)
+                let mapping = ""
+                for (let j = 0; j<i; j++) {
+                    mapping += " "
+                }
+                configMapping[config.name] = mapping
+                i++
             }
-            let yNames = []
 
             // this will store the data in an accurate, flexible manner, but will have to be reformatted after
             let barChartData = {}
@@ -60,7 +80,6 @@ export default function OutputComparisonChart(props) {
             let netValues = {}
 
             for(let yVariable of yVariables) {
-                let y = []
 
                 // initialize empty dictionary (or array?) for this variable
                 let variableData = {
@@ -68,60 +87,43 @@ export default function OutputComparisonChart(props) {
                     negatives: [],
                 }
                 for(let config of historyData) {
-                    let nextValue = round(config.raw.data[yVariable].value, 3)
-                    y.push(nextValue)
-
+                    // let nextValue = round(config.raw.data[yVariable].value, 3)
+                    let nextValue = config.raw.data[yVariable].value
                     // add key/value pairing for this section to the correct list
                     let nextPairing = {}
-                    nextPairing["key"] = config.name
+                    nextPairing["key"] = configMapping[config.name]
                     nextPairing["value"] = nextValue
-                    // nextPairing[config.name] = nextValue
                     if (nextValue >= 0) variableData.positives.push(nextPairing)
                     else variableData.negatives.push(nextPairing)
 
                     // add y value to its net value stored in netValues
                     // if that key hasnt been set yet, store it there
-                    if (Object.keys(netValues).includes(config.name)) {
-                        netValues[config.name] += nextValue
+                    if (Object.keys(netValues).includes(configMapping[config.name])) {
+                        netValues[configMapping[config.name]] += nextValue
                     } else {
-                        netValues[config.name] = nextValue
+                        netValues[configMapping[config.name]] = nextValue
                     }
                 }
-                yNames.push(`${historyData[0].raw.data[yVariable].name} (${historyData[0].raw.data[yVariable].display_units})`)
                 displayUnits = historyData[0].raw.data[yVariable].display_units
-                ys.push(y)
 
                 // add variable data to barchartdata
                 barChartData[`${historyData[0].raw.data[yVariable].name} (${historyData[0].raw.data[yVariable].display_units})`] = variableData
             }
-            // console.log(ys)
-            for(let i = 0; i < ys.length; i++) {
-                let y = ys[i]
-                let yName = yNames[i]
-                let trace = {
-                    x: x,
-                    y: y,
-                    name: yName,
-                    type: 'bar'
-                };
-                traces.push(trace)
-            }
-            // console.log(traces)
 
             //keep track of whether we found negative and positive values for each
             let configTracker = {}
             let categoryarray = []
             for(let config of historyData) {
-                configTracker[config.name] = {
+                configTracker[configMapping[config.name]] = {
                     positive: false,
                     negative: false
                 }
-                categoryarray.push(config.name + " cost")
-                categoryarray.push(config.name + " revenue")
-                categoryarray.push(config.name + " net")
+                categoryarray.push(configMapping[config.name] + " cost")
+                categoryarray.push(configMapping[config.name] + " revenue")
+                categoryarray.push(configMapping[config.name] + " net")
             }
 
-            let newTraces = []
+            let traces = []
             for (let variable of Object.keys(barChartData)) {
                 let variableData = barChartData[variable]
                 let positives = variableData.positives
@@ -145,28 +147,31 @@ export default function OutputComparisonChart(props) {
                     type: "bar",
                     x: x,
                     y: y,
+                    hovertemplate: hovertemplate
                 }
-                newTraces.push(trace)
+                traces.push(trace)
             }
             // add any unfound positives and negatives
             for (let config of Object.keys(configTracker)) {
                 if (!configTracker[config].positive) {
                     let trace = {
-                        name: config + " cost",
+                        name: "cost",
                         type: "bar",
                         x: [config + " cost"],
                         y: [0],
+                        hovertemplate: hovertemplate
                     }
-                    newTraces.push(trace)
+                    traces.push(trace)
                 }
                 if (!configTracker[config].negative) {
                     let trace = {
-                        name: config + " revenue",
+                        name: "revenue",
                         type: "bar",
                         x: [config + " revenue"],
                         y: [0],
+                        hovertemplate: hovertemplate
                     }
-                    newTraces.push(trace)
+                    traces.push(trace)
                 }
             }
             // add net value for each config
@@ -178,17 +183,27 @@ export default function OutputComparisonChart(props) {
             }
             let trace = {
                 name: "net",
-                    type: "bar",
-                    x: netX,
-                    y: netY,
+                type: "bar",
+                x: netX,
+                y: netY,
+                hovertemplate: hovertemplate
             }
-            newTraces.push(trace)
+            traces.push(trace)
+
+            //add annotations (categories ie config names)
+            i = 1
+            let annotations = []
+            for (let config of Object.keys(configMapping)) {
+                annotations.push(makeAnnotation(config, i))
+                i+=3
+            }
+
 
             let layout =  {
                 xaxis: {
-                    title: {
-                        text: "Optimization Name",
-                    },
+                    // title: {
+                    //     text: "Optimization Name",
+                    // },
                     categoryorder: "array",
                     categoryarray:  categoryarray//["A", "B", "C", "D", "E"]
                 },
@@ -199,9 +214,10 @@ export default function OutputComparisonChart(props) {
                 },
                 width: 1000,
                 height: 700,
-                barmode: 'stack'
+                barmode: 'stack',
+                annotations: annotations
             };
-            setPlotData({data: newTraces, layout:layout})
+            setPlotData({data: traces, layout:layout})
             setShowPlot(true)
         }
     }
