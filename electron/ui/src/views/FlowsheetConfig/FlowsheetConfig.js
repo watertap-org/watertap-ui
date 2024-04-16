@@ -279,7 +279,7 @@ export default function FlowsheetConfig(props) {
     }
 
     return ( 
-      <Container>
+      <Container maxWidth={false}>
       {(loadingFlowsheetData) ? 
           (
             <Dialog open={loadingFlowsheetData} fullWidth={true} maxWidth="md">
