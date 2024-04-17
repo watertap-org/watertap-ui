@@ -5,7 +5,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Select } from '@mui/material';
 import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab, Box } from '@mui/material';
 import Plot from 'react-plotly.js';
-import { round } from '../../assets/helperFunctions';
+import { round, roundList } from '../../assets/helperFunctions';
 
 export default function OutputComparisonChart(props) {
     const { flowsheetData, historyData, categoriesWithCharts } = props;
@@ -143,11 +143,13 @@ export default function OutputComparisonChart(props) {
                     configTracker[negative.key].negative = true
                 }
                 // console.log(nets)
+                let yTextLabels = roundList(y, 3)
                 let trace = {
                     name: variable,
                     type: "bar",
                     x: x,
                     y: y,
+                    text: yTextLabels.map(String),
                     hovertemplate: hovertemplate
                 }
                 traces.push(trace)
@@ -182,11 +184,13 @@ export default function OutputComparisonChart(props) {
                 netX.push(netValueKey+ " net")
                 netY.push(netValues[netValueKey])
             }
+            let netYTextLabels = roundList(netY, 3)
             let trace = {
                 name: "net",
                 type: "bar",
                 x: netX,
                 y: netY,
+                text: netYTextLabels.map(String),
                 hovertemplate: hovertemplate
             }
             traces.push(trace)
