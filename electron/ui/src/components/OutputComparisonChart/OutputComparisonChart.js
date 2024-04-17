@@ -2,8 +2,8 @@
 import React from 'react'; 
 import { useEffect, useState } from 'react';
 import DownloadIcon from '@mui/icons-material/Download';
-import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Select } from '@mui/material';
-import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab, Box } from '@mui/material';
+import { FormGroup, FormControlLabel, Checkbox, Select } from '@mui/material';
+import { Grid, InputLabel, MenuItem, FormControl } from '@mui/material';
 import Plot from 'react-plotly.js';
 import { round, roundList } from '../../assets/helperFunctions';
 
@@ -12,6 +12,8 @@ export default function OutputComparisonChart(props) {
     const [ plotData, setPlotData ] = useState({data: [], layout: []})
     const [ showPlot, setShowPlot ] = useState(false)
     const [ displayCategory, setDisplayCategory ] = useState(null)
+    const [ selectedConfigs, setSelectedConfigs ] = useState([])
+    const [ selectedConfigNames, setSelectedConfigNames ] = useState([])
 
     const styles = {
 
@@ -27,20 +29,40 @@ export default function OutputComparisonChart(props) {
         
     }, [historyData])
 
+    // useEffect(() => {
+    //     if (displayCategory) {
+    //         // console.log(historyData)
+    //         let barChartKeys = []
+    //         for (let each of historyData[0].data[displayCategory].variables) {
+    //             barChartKeys.push(each.obj_key)
+    //         }
+    //         unpackData(
+    //             // 'bar',
+    //             historyData[0].data[displayCategory].chartType,
+    //             barChartKeys
+    //         )
+    //     }
+    // }, [displayCategory])
+
     useEffect(() => {
-        if (displayCategory) {
-            // console.log(historyData)
+        let tempSelectedConfigs = []
+        for (let config of historyData) {
+            if (selectedConfigNames.includes(config.name)) {
+                tempSelectedConfigs.push(config)
+            }
+        }
+        if (tempSelectedConfigs.length > 0) {
             let barChartKeys = []
-            for (let each of historyData[0].data[displayCategory].variables) {
+            for (let each of tempSelectedConfigs[0].data[displayCategory].variables) {
                 barChartKeys.push(each.obj_key)
             }
             unpackData(
-                // 'bar',
-                historyData[0].data[displayCategory].chartType,
+                tempSelectedConfigs[0].data[displayCategory].chartType,
                 barChartKeys
             )
         }
-    }, [displayCategory])
+        setSelectedConfigs(tempSelectedConfigs)
+    }, [selectedConfigNames])
 
     function makeAnnotation(text, xPos) {
         return {
@@ -235,8 +257,7 @@ export default function OutputComparisonChart(props) {
         <Grid container spacing={2}> 
             <Grid item xs={1}>
             <InputLabel sx={{marginTop:1}} id="Parameter-Selection-label">Chart Category&nbsp;</InputLabel>
-            { showPlot && 
-
+            {/* { showPlot &&  */}
                 <FormControl>
                 <Select
                     labelId="Parameter-Selection-label"
@@ -261,8 +282,14 @@ export default function OutputComparisonChart(props) {
                 ))}
                 </Select>
                 </FormControl>
-
-            }
+            {/* }
+            { showPlot &&  */}
+                <ConfigSelect 
+                    historyData={historyData}
+                    selectedConfigNames={selectedConfigNames}
+                    setSelectedConfigNames={setSelectedConfigNames}
+                />
+            {/* } */}
             
             </Grid>
             <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={11}>
@@ -282,3 +309,30 @@ export default function OutputComparisonChart(props) {
     );
 }
  
+
+
+
+export function ConfigSelect(props) {
+    const { historyData, selectedConfigNames, setSelectedConfigNames } = props;
+
+    const handleSelect = (event) => {
+        // console.log(event.target.name)    
+        let target = event.target.name
+        let tempSelectedConfigs = [...selectedConfigNames]
+        const index = tempSelectedConfigs.indexOf(target);
+        if (index > -1) { 
+            tempSelectedConfigs.splice(index, 1);
+        } else {
+            tempSelectedConfigs.push(target)
+        }
+        setSelectedConfigNames(tempSelectedConfigs)
+    }
+
+    return (
+        <FormGroup onChange={handleSelect}>
+            {historyData.map((v, idx) => (
+                <FormControlLabel key={`${v}_${idx}`} name={v.name} control={<Checkbox checked={selectedConfigNames.includes(v.name)}/>} label={v.name} />
+            ))}
+        </FormGroup>
+    );
+}
