@@ -13,6 +13,7 @@ export default function OutputComparison(props) {
     const [ historyDataOrganized, setHistoryDataOrganized ] = useState([])
     const [ categoriesWithCharts, setCategoriesWithCharts ] = useState([])
     const [ chartData, setChartData ] = useState([])
+    const [ disableChartView, setDisableChartView ] = useState(true)
     const [ tabValue, setTabValue ] = useState(0)
 
     useEffect(() => {
@@ -134,6 +135,7 @@ export default function OutputComparison(props) {
     const organizeChartData = () => {
       // return
       var tempChartData = []
+      let tempDisableChartView = true
       for (const bvars of historyData) {
         let raw_inputs = {}
         let raw_outputs = {}
@@ -145,6 +147,7 @@ export default function OutputComparison(props) {
             let catg = v.chart_group
             let chartType = v.chart_type
             if (catg) {
+              tempDisableChartView = false
               let is_input = v.is_input
               let is_output = v.is_output
               
@@ -202,7 +205,7 @@ export default function OutputComparison(props) {
         setChartData(tempChartDataOrganized)
         setCategoriesWithCharts(tempCategoriesWithCharts)
       }
-      
+      setDisableChartView(tempDisableChartView)
     }
 
   return (
@@ -212,7 +215,7 @@ export default function OutputComparison(props) {
                 <Box sx={{display: 'flex', justifyContent: 'center'}}>
                     <Tabs value={tabValue} onChange={handleTabChange} aria-label="tabs">
                         <Tab label="Table View" />
-                        <Tab label="Chart View" /> 
+                        <Tab label="Chart View" disabled={disableChartView}/> 
                     </Tabs>
                 </Box>
                 
