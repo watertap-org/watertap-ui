@@ -251,7 +251,7 @@ export default function OutputComparisonChart(props) {
             
             { displayCategory && 
                 <>
-                    <InputLabel sx={{marginTop:1}} id="Parameter-Selection-label">Chart Category&nbsp;</InputLabel>
+                    <InputLabel sx={{marginTop:10}} id="Parameter-Selection-label">Chart Category&nbsp;</InputLabel>
                     <FormControl>
                     <Select
                         labelId="Parameter-Selection-label"
@@ -322,10 +322,13 @@ export function ConfigSelect(props) {
     }
 
     return (
-        <FormGroup onChange={handleSelect}>
-            {historyData.map((v, idx) => (
-                <FormControlLabel key={`${v}_${idx}`} name={v.name} control={<Checkbox checked={selectedConfigNames.includes(v.name)}/>} label={v.name} />
-            ))}
-        </FormGroup>
+        <>
+            <InputLabel sx={{marginTop:10}} id="Config-Selection-label">Config Selection&nbsp;</InputLabel>
+            <FormGroup onChange={handleSelect}>
+                {historyData.map((v, idx) => (
+                    <FormControlLabel key={`${v}_${idx}`} name={v.name} control={<Checkbox checked={selectedConfigNames.includes(v.name)}/>} label={v.name} />
+                ))}
+            </FormGroup>
+        </>
     );
 }
