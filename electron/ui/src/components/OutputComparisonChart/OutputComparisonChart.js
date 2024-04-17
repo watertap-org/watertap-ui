@@ -22,47 +22,39 @@ export default function OutputComparisonChart(props) {
     useEffect(() => {
         try {
             if (categoriesWithCharts.length > 0) setDisplayCategory(categoriesWithCharts[0])
-            // setDisplayCategory(Object.keys(historyData[0].data)[0])
         } catch (e) {
             console.error(e)
         }
         
     }, [historyData])
 
-    // useEffect(() => {
-    //     if (displayCategory) {
-    //         // console.log(historyData)
-    //         let barChartKeys = []
-    //         for (let each of historyData[0].data[displayCategory].variables) {
-    //             barChartKeys.push(each.obj_key)
-    //         }
-    //         unpackData(
-    //             // 'bar',
-    //             historyData[0].data[displayCategory].chartType,
-    //             barChartKeys
-    //         )
-    //     }
-    // }, [displayCategory])
-
     useEffect(() => {
-        let tempSelectedConfigs = []
+        let tempSelectedConfigs = Array(selectedConfigNames.length)
         for (let config of historyData) {
-            if (selectedConfigNames.includes(config.name)) {
-                tempSelectedConfigs.push(config)
-            }
-        }
-        if (tempSelectedConfigs.length > 0) {
-            let barChartKeys = []
-            for (let each of tempSelectedConfigs[0].data[displayCategory].variables) {
-                barChartKeys.push(each.obj_key)
-            }
-            unpackData(
-                tempSelectedConfigs[0].data[displayCategory].chartType,
-                barChartKeys
-            )
+            // add configs to same index to ensure order is preserved
+            let configIndex = selectedConfigNames.indexOf(config.name);
+            if (configIndex > -1) { 
+                tempSelectedConfigs[configIndex] = config
+            } 
         }
         setSelectedConfigs(tempSelectedConfigs)
     }, [selectedConfigNames])
+
+    useEffect(() => {
+        if (selectedConfigs.length > 0) {
+            let barChartKeys = []
+            for (let each of selectedConfigs[0].data[displayCategory].variables) {
+                barChartKeys.push(each.obj_key)
+            }
+            unpackData(
+                selectedConfigs[0].data[displayCategory].chartType,
+                barChartKeys
+            )
+        } else {
+            setShowPlot(false)
+        }
+
+    }, [selectedConfigs])
 
     function makeAnnotation(text, xPos) {
         return {
@@ -88,7 +80,7 @@ export default function OutputComparisonChart(props) {
             // y: the values for each y variable
             let configMapping = {}
             let i = 0
-            for(let config of historyData) {
+            for(let config of selectedConfigs) {
                 let mapping = ""
                 for (let j = 0; j<i; j++) {
                     mapping += " "
@@ -109,7 +101,7 @@ export default function OutputComparisonChart(props) {
                     positives: [],
                     negatives: [],
                 }
-                for(let config of historyData) {
+                for(let config of selectedConfigs) {
                     // let nextValue = round(config.raw.data[yVariable].value, 3)
                     let nextValue = config.raw.data[yVariable].value
                     // add key/value pairing for this section to the correct list
@@ -127,16 +119,16 @@ export default function OutputComparisonChart(props) {
                         netValues[configMapping[config.name]] = nextValue
                     }
                 }
-                displayUnits = historyData[0].raw.data[yVariable].display_units
+                displayUnits = selectedConfigs[0].raw.data[yVariable].display_units
 
                 // add variable data to barchartdata
-                barChartData[`${historyData[0].raw.data[yVariable].name} (${historyData[0].raw.data[yVariable].display_units})`] = variableData
+                barChartData[`${selectedConfigs[0].raw.data[yVariable].name} (${selectedConfigs[0].raw.data[yVariable].display_units})`] = variableData
             }
 
             //keep track of whether we found negative and positive values for each
             let configTracker = {}
             let categoryarray = []
-            for(let config of historyData) {
+            for(let config of selectedConfigs) {
                 configTracker[configMapping[config.name]] = {
                     positive: false,
                     negative: false
@@ -256,40 +248,41 @@ export default function OutputComparisonChart(props) {
     return ( 
         <Grid container spacing={2}> 
             <Grid item xs={1}>
-            <InputLabel sx={{marginTop:1}} id="Parameter-Selection-label">Chart Category&nbsp;</InputLabel>
-            {/* { showPlot &&  */}
-                <FormControl>
-                <Select
-                    labelId="Parameter-Selection-label"
-                    id="Parameter-Selection"
-                    value={displayCategory}
-                    onChange={handleParamaterSelection}
-                    size="small"
-                    sx={{minWidth: 200}}
-                    MenuProps={{
-                        style: {
-                            maxHeight: 400,
-                                },
-                        }}
-                >
-                {categoriesWithCharts.map((v, idx) => (
-                    <MenuItem
-                        key={`${v}_${idx}`}
-                        value={v}
-                        >
-                        {v}
-                    </MenuItem>
-                ))}
-                </Select>
-                </FormControl>
-            {/* }
-            { showPlot &&  */}
-                <ConfigSelect 
-                    historyData={historyData}
-                    selectedConfigNames={selectedConfigNames}
-                    setSelectedConfigNames={setSelectedConfigNames}
-                />
-            {/* } */}
+            
+            { displayCategory && 
+                <>
+                    <InputLabel sx={{marginTop:1}} id="Parameter-Selection-label">Chart Category&nbsp;</InputLabel>
+                    <FormControl>
+                    <Select
+                        labelId="Parameter-Selection-label"
+                        id="Parameter-Selection"
+                        value={displayCategory}
+                        onChange={handleParamaterSelection}
+                        size="small"
+                        sx={{minWidth: 200}}
+                        MenuProps={{
+                            style: {
+                                maxHeight: 400,
+                                    },
+                            }}
+                    >
+                    {categoriesWithCharts.map((v, idx) => (
+                        <MenuItem
+                            key={`${v}_${idx}`}
+                            value={v}
+                            >
+                            {v}
+                        </MenuItem>
+                    ))}
+                    </Select>
+                    </FormControl>
+                    <ConfigSelect 
+                        historyData={historyData}
+                        selectedConfigNames={selectedConfigNames}
+                        setSelectedConfigNames={setSelectedConfigNames}
+                    />
+                </>
+            }
             
             </Grid>
             <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={11}>
