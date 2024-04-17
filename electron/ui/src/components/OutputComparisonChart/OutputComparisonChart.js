@@ -66,15 +66,24 @@ export default function OutputComparisonChart(props) {
           y: -0.1,
           yanchor: 'top'
         };
-      }
+    }
+
+    function makeVerticalLine(xPos, y0, y1) {
+        return {
+            type: 'line',
+            x0: xPos,
+            y0: y0,
+            x1: xPos,
+            y1: y1,
+            fillcolor: '#d3d3d3',
+            opacity: 0.2,
+            editable: true,
+        };
+    }
 
     const unpackData = (plotType, yVariables) => {
         if (plotType === "stacked_bar_with_net") {
-            let hovertemplate = //"<b>%{text}</b><br><br>" +
-            "%{data.name}: %{y:,.3f}<br>" +
-            //"%{xaxis.title.text}: %{x:.0%}<br>" +
-            // "Number Employed: %{marker.size:,}" +
-            "<extra></extra>"
+            let hovertemplate = "%{data.name}: %{y:,.3f}<br>" + "<extra></extra>"
             let displayUnits
             // x: the configuration names; will be the same for each trace
             // y: the values for each y variable
@@ -138,6 +147,10 @@ export default function OutputComparisonChart(props) {
                 categoryarray.push(configMapping[config.name] + " net")
             }
 
+            // calculate max and min y values
+            let mins = {}
+            let maxes = {}
+
             let traces = []
             for (let variable of Object.keys(barChartData)) {
                 let variableData = barChartData[variable]
@@ -147,16 +160,24 @@ export default function OutputComparisonChart(props) {
                 let y = []
 
                 for (let positive of positives) {
-                    x.push(positive.key + " cost")
+                    let key = positive.key + " cost"
+                    x.push(key)
                     y.push(positive.value)
                     configTracker[positive.key].positive = true
+
+                    if (Object.keys(maxes).includes(key)) maxes[key] += positive.value
+                    else maxes[key] = positive.value
                 }
                 for (let negative of negatives) {
-                    x.push(negative.key + " revenue")
+                    let key = negative.key + " revenue"
+                    x.push(key)
                     y.push(negative.value)
                     configTracker[negative.key].negative = true
+
+                    if (Object.keys(mins).includes(key)) mins[key] += negative.value
+                    else mins[key] = negative.value
                 }
-                // console.log(nets)
+                
                 let yTextLabels = roundList(y, 3)
                 let trace = {
                     name: variable,
@@ -167,6 +188,16 @@ export default function OutputComparisonChart(props) {
                     hovertemplate: hovertemplate
                 }
                 traces.push(trace)
+            }
+            let maxY = 0
+            let minY = 0
+            for (let each of Object.keys(maxes)) {
+                let tempMax = maxes[each]
+                if (tempMax > maxY) maxY = tempMax
+            }
+            for (let each of Object.keys(mins)) {
+                let tempMin = mins[each]
+                if (tempMin < minY) minY = tempMin
             }
             // add any unfound positives and negatives
             for (let config of Object.keys(configTracker)) {
@@ -209,32 +240,36 @@ export default function OutputComparisonChart(props) {
             }
             traces.push(trace)
 
-            //add annotations (categories ie config names)
+            // maxY = 1.368
+            // minY = -0.705
+            // add annotations (categories ie config names) and line dividers
             i = 1
             let annotations = []
+            let verticalLines = []
             for (let config of Object.keys(configMapping)) {
                 annotations.push(makeAnnotation(config, i))
+                verticalLines.push(makeVerticalLine(i+1.5, minY, maxY))
                 i+=3
             }
 
-
             let layout =  {
                 xaxis: {
-                    // title: {
-                    //     text: "Optimization Name",
-                    // },
                     categoryorder: "array",
-                    categoryarray:  categoryarray//["A", "B", "C", "D", "E"]
+                    categoryarray:  categoryarray,
+                    showline: true,
                 },
                 yaxis: {
                     title: {
                         text: `${displayCategory} (${displayUnits})`,
                     },
+                    showline:true
                 },
                 width: 1000,
                 height: 700,
                 barmode: 'stack',
-                annotations: annotations
+                annotations: annotations,
+                shapes: verticalLines,
+                // bargap: 0.2
             };
             setPlotData({data: traces, layout:layout})
             setShowPlot(true)
