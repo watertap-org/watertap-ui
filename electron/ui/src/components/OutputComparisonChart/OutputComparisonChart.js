@@ -178,13 +178,13 @@ export default function OutputComparisonChart(props) {
                     else mins[key] = negative.value
                 }
                 
-                let yTextLabels = roundList(y, 3)
+                let yTextLabels = roundList(y, 2)
                 let trace = {
                     name: variable,
                     type: "bar",
                     x: x,
                     y: y,
-                    text: yTextLabels.map(String),
+                    text: yTextLabels.map((x) => "$"+x),
                     hovertemplate: hovertemplate
                 }
                 traces.push(trace)
@@ -229,13 +229,13 @@ export default function OutputComparisonChart(props) {
                 netX.push(netValueKey+ " net")
                 netY.push(netValues[netValueKey])
             }
-            let netYTextLabels = roundList(netY, 3)
+            let netYTextLabels = roundList(netY, 2)
             let trace = {
                 name: "net",
                 type: "bar",
                 x: netX,
                 y: netY,
-                text: netYTextLabels.map(String),
+                text: netYTextLabels.map((x) => "$"+x),
                 hovertemplate: hovertemplate
             }
             traces.push(trace)
