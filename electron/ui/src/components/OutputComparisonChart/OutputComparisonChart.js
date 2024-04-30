@@ -14,7 +14,7 @@ export default function OutputComparisonChart(props) {
     const [ displayCategory, setDisplayCategory ] = useState(null)
     const [ selectedConfigs, setSelectedConfigs ] = useState([])
     const [ selectedConfigNames, setSelectedConfigNames ] = useState([])
-
+    const brewer_colors =['#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f','#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928']
     const styles = {
 
     }
@@ -142,9 +142,9 @@ export default function OutputComparisonChart(props) {
                     positive: false,
                     negative: false
                 }
-                categoryarray.push(configMapping[config.name] + " cost")
-                categoryarray.push(configMapping[config.name] + " revenue")
-                categoryarray.push(configMapping[config.name] + " net")
+                categoryarray.push(configMapping[config.name] + " Cost")
+                categoryarray.push(configMapping[config.name] + " Revenue")
+                categoryarray.push(configMapping[config.name] + " Net")
             }
 
             // calculate max and min y values
@@ -152,6 +152,7 @@ export default function OutputComparisonChart(props) {
             let maxes = {}
 
             let traces = []
+            let color_idx=0
             for (let variable of Object.keys(barChartData)) {
                 let variableData = barChartData[variable]
                 let positives = variableData.positives
@@ -160,7 +161,7 @@ export default function OutputComparisonChart(props) {
                 let y = []
 
                 for (let positive of positives) {
-                    let key = positive.key + " cost"
+                    let key = positive.key + " Cost"
                     x.push(key)
                     y.push(positive.value)
                     configTracker[positive.key].positive = true
@@ -169,7 +170,7 @@ export default function OutputComparisonChart(props) {
                     else maxes[key] = positive.value
                 }
                 for (let negative of negatives) {
-                    let key = negative.key + " revenue"
+                    let key = negative.key + " Revenue"
                     x.push(key)
                     y.push(negative.value)
                     configTracker[negative.key].negative = true
@@ -184,9 +185,15 @@ export default function OutputComparisonChart(props) {
                     type: "bar",
                     x: x,
                     y: y,
+                    marker: {color:brewer_colors[color_idx], 
+                    line: {
+                        color: 'black',                  
+                        width: 1,                  
+                      }},
                     text: yTextLabels.map((x) => "$"+x),
                     hovertemplate: hovertemplate
                 }
+                color_idx++;
                 traces.push(trace)
             }
             let maxY = 0
@@ -203,22 +210,34 @@ export default function OutputComparisonChart(props) {
             for (let config of Object.keys(configTracker)) {
                 if (!configTracker[config].positive) {
                     let trace = {
-                        name: "cost",
+                        name: "Cost",
                         type: "bar",
-                        x: [config + " cost"],
+                        x: [config + " Cost"],
                         y: [0],
+                        marker: {color:brewer_colors[color_idx], 
+                        line: {
+                            color: 'black',                  
+                            width: 1,                  
+                          }},
                         hovertemplate: hovertemplate
                     }
+                    color_idx++;
                     traces.push(trace)
                 }
                 if (!configTracker[config].negative) {
                     let trace = {
-                        name: "revenue",
+                        name: "Revenue",
                         type: "bar",
-                        x: [config + " revenue"],
+                        marker: {color:brewer_colors[color_idx], 
+                        line: {
+                            color: 'black',                  
+                            width: 1,                  
+                          }},
+                        x: [config + " Revenue"],
                         y: [0],
                         hovertemplate: hovertemplate
                     }
+                    color_idx++;
                     traces.push(trace)
                 }
             }
@@ -226,18 +245,24 @@ export default function OutputComparisonChart(props) {
             let netX = []
             let netY = []
             for (let netValueKey of Object.keys(netValues)) {
-                netX.push(netValueKey+ " net")
+                netX.push(netValueKey+ " Net")
                 netY.push(netValues[netValueKey])
             }
             let netYTextLabels = roundList(netY, 2)
             let trace = {
-                name: "net",
+                name: "Net",
                 type: "bar",
                 x: netX,
                 y: netY,
+                marker: {color:brewer_colors[color_idx], 
+                line: {
+                    color: 'black',                  
+                    width: 1,                  
+                  }},
                 text: netYTextLabels.map((x) => "$"+x),
                 hovertemplate: hovertemplate
             }
+            color_idx++;
             traces.push(trace)
 
             // maxY = 1.368
