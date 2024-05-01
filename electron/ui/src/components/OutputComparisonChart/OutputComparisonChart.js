@@ -46,6 +46,8 @@ export default function OutputComparisonChart(props) {
             for (let each of selectedConfigs[0].data[displayCategory].variables) {
                 barChartKeys.push(each.obj_key)
             }
+            console.log("unpacking data, chart type is")
+            console.log(selectedConfigs[0].data[displayCategory].chartType)
             unpackData(
                 selectedConfigs[0].data[displayCategory].chartType,
                 barChartKeys
@@ -295,6 +297,59 @@ export default function OutputComparisonChart(props) {
                 annotations: annotations,
                 shapes: verticalLines,
                 // bargap: 0.2
+            };
+            setPlotData({data: traces, layout:layout})
+            setShowPlot(true)
+        }
+        else if (plotType === "stacked_bar") {
+            let hovertemplate = "%{data.name}: %{y:,.3f}<br>" + "<extra></extra>"
+            let traces = []
+            let x = []
+            let ys = []
+            let displayUnits
+            // x: the configuration names; will be the same for each trace
+            // y: the values for each y variable
+            for(let config of selectedConfigs) {
+                x.push(config.name)
+            }
+            let yNames = []
+            for(let yVariable of yVariables) {
+                let y = []
+                for(let config of selectedConfigs) {
+                    y.push(round(config.raw.data[yVariable].value, 3))
+                }
+                yNames.push(`${selectedConfigs[0].raw.data[yVariable].name} (${selectedConfigs[0].raw.data[yVariable].display_units})`)
+                displayUnits = selectedConfigs[0].raw.data[yVariable].display_units
+                ys.push(y)
+            }
+            // console.log(ys)
+            for(let i = 0; i < ys.length; i++) {
+                let y = ys[i]
+                let yName = yNames[i]
+                let trace = {
+                    x: x,
+                    y: y,
+                    name: yName,
+                    type: 'bar',
+                    hovertemplate: hovertemplate
+                };
+                traces.push(trace)
+            }
+            // console.log(traces)
+            let layout =  {//barmode: 'stack'};
+                xaxis: {
+                    title: {
+                        text: "Optimization Name",
+                    },
+                },
+                yaxis: {
+                    title: {
+                        text: `${displayCategory} (${displayUnits})`,
+                    },
+                },
+                width: 700,
+                height: 500,
+                barmode: 'stack'
             };
             setPlotData({data: traces, layout:layout})
             setShowPlot(true)
