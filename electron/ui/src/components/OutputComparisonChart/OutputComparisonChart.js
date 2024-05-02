@@ -230,6 +230,7 @@ export default function OutputComparisonChart(props) {
                     let trace = {
                         name: "Revenue",
                         type: "bar",
+                        showlegend: false,
                         marker: {color:brewer_colors[color_idx], 
                         line: {
                             color: 'black',                  
