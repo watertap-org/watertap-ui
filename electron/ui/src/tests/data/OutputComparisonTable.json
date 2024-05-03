@@ -3,7 +3,7 @@
     "inputData": {
         "name": "foo",
         "description": "foo flowsheet",
-        "model_objects": {
+        "exports": {
             "d5f6d3d23cf2412b8fc8a36d0fba16a1": {
                 "name": "Tank 1 inlet flowrate",
                 "value": 1,

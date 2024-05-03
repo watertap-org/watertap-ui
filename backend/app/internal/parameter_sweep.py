@@ -88,65 +88,65 @@ def run_parameter_sweep(flowsheet, info):
         keys = []
         conversion_factors = []
         results_table = {"headers": []}
-        for key in flowsheet.fs_exp.model_objects:
-            if flowsheet.fs_exp.model_objects[key].is_sweep:
+        for key in flowsheet.fs_exp.exports:
+            if flowsheet.fs_exp.exports[key].is_sweep:
                 if (
-                    flowsheet.fs_exp.model_objects[key].lb is not None
-                    and flowsheet.fs_exp.model_objects[key].ub is not None
+                    flowsheet.fs_exp.exports[key].lb is not None
+                    and flowsheet.fs_exp.exports[key].ub is not None
                 ):
                     results_table["headers"].append(
-                        flowsheet.fs_exp.model_objects[key].name
+                        flowsheet.fs_exp.exports[key].name
                     )
                     conversion_factor = (
-                        flowsheet.fs_exp.model_objects[key].ub
-                        / flowsheet.fs_exp.model_objects[key].obj.ub
+                        flowsheet.fs_exp.exports[key].ub
+                        / flowsheet.fs_exp.exports[key].obj.ub
                     )
                     try:
                         parameters.append(
                             {
-                                "name": flowsheet.fs_exp.model_objects[key].name,
-                                "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
-                                "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
-                                "num_samples": flowsheet.fs_exp.model_objects[
+                                "name": flowsheet.fs_exp.exports[key].name,
+                                "lb": flowsheet.fs_exp.exports[key].obj.lb,
+                                "ub": flowsheet.fs_exp.exports[key].obj.ub,
+                                "num_samples": flowsheet.fs_exp.exports[
                                     key
                                 ].num_samples,
-                                "param": flowsheet.fs_exp.model_objects[key].obj,
+                                "param": flowsheet.fs_exp.exports[key].obj,
                             }
                         )
                     except:
                         parameters.append(
                             {
-                                "name": flowsheet.fs_exp.model_objects[key].name,
-                                "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
-                                "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
+                                "name": flowsheet.fs_exp.exports[key].name,
+                                "lb": flowsheet.fs_exp.exports[key].obj.lb,
+                                "ub": flowsheet.fs_exp.exports[key].obj.ub,
                                 "num_samples": "5",
-                                "param": flowsheet.fs_exp.model_objects[key].obj,
+                                "param": flowsheet.fs_exp.exports[key].obj,
                             }
                         )
                     # HTTPException(500, detail=f"Sweep failed: {parameters}")
-                    flowsheet.fs_exp.model_objects[key].obj.fix()
+                    flowsheet.fs_exp.exports[key].obj.fix()
                     conversion_factors.append(conversion_factor)
                     keys.append(key)
-        for key in flowsheet.fs_exp.model_objects:
+        for key in flowsheet.fs_exp.exports:
             if (
-                flowsheet.fs_exp.model_objects[key].is_output
-                # and not flowsheet.fs_exp.model_objects[key].is_input
+                flowsheet.fs_exp.exports[key].is_output
+                # and not flowsheet.fs_exp.exports[key].is_input
             ):
                 results_table["headers"].append(
-                    flowsheet.fs_exp.model_objects[key].name
+                    flowsheet.fs_exp.exports[key].name
                 )
                 try:
                     conversion_factor = (
-                        flowsheet.fs_exp.model_objects[key].value
-                        / flowsheet.fs_exp.model_objects[key].obj.value
+                        flowsheet.fs_exp.exports[key].value
+                        / flowsheet.fs_exp.exports[key].obj.value
                     )
                 except Exception as e:
                     conversion_factor = 1
                 conversion_factors.append(conversion_factor)
                 output_params.append(
                     {
-                        "name": flowsheet.fs_exp.model_objects[key].name,
-                        "param": flowsheet.fs_exp.model_objects[key].obj,
+                        "name": flowsheet.fs_exp.exports[key].name,
+                        "param": flowsheet.fs_exp.exports[key].obj,
                     }
                 )
                 keys.append(key)

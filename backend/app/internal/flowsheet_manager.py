@@ -31,7 +31,7 @@ import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
 # _log.setLevel(logging.DEBUG)
-VERSION = 2
+VERSION = 3
 
 
 class FlowsheetInfo(BaseModel):

@@ -102,7 +102,7 @@ def test_get_config(client, flowsheet_id):
     )
     assert response.status_code == 200, body
     config = body
-    assert len(config["model_objects"]) > 0
+    assert len(config["exports"]) > 0
 
 
 @pytest.mark.unit
@@ -130,18 +130,18 @@ def test_update(client, flowsheet_id):
     response, body = get_flowsheet(client, flowsheet_id, "reset")
     assert response.status_code == 200, body
     new_body = body.copy()
-    for var_name, var_data in new_body["model_objects"].items():
+    for var_name, var_data in new_body["exports"].items():
         value = var_data["value"]
         if isinstance(value, float):
             var_data["value"] += 1
             print(f"changed {var_name}")
     response, update_body = post_flowsheet(client, flowsheet_id, "update", new_body)
     assert response.status_code == 200, update_body
-    for var_name, var_data in update_body["model_objects"].items():
+    for var_name, var_data in update_body["exports"].items():
         value = var_data["value"]
         if isinstance(value, float) and var_data["is_input"] and not var_data["is_readonly"]:
             print(f"check {var_name} is_input={var_data['is_input']}")
-            expect_value = new_body["model_objects"][var_name]["value"]
+            expect_value = new_body["exports"][var_name]["value"]
             assert value == expect_value
 
 
@@ -150,7 +150,7 @@ def test_update_missing(client, flowsheet_id):
     response, body = get_flowsheet(client, flowsheet_id, "reset")
     assert response.status_code == 200, body
     new_body = body.copy()
-    new_body["model_objects"]["missing"] = {
+    new_body["exports"]["missing"] = {
         "name": "Tank 99 inlet flowrate",
         "value": 2.0,
         "display_units": "None",
@@ -191,9 +191,9 @@ def test_load_config(client, flowsheet_id):
     )
     assert response.status_code == 200
     config = body
-    assert len(config["model_objects"]) > 0
+    assert len(config["exports"]) > 0
     # make recognizable values
-    for var_name, var_data in config["model_objects"].items():
+    for var_name, var_data in config["exports"].items():
         var_data["value"] = 99
     response, body = post_flowsheet(
         client, flowsheet_id, "save", config, query_params={"name": "test name!", "version": "1"}
@@ -204,8 +204,8 @@ def test_load_config(client, flowsheet_id):
     )
     assert response.status_code == 200, body
     config2 = body
-    for var_name, var_data in config2["model_objects"].items():
-        assert var_data["value"] == config["model_objects"][var_name]["value"]
+    for var_name, var_data in config2["exports"].items():
+        assert var_data["value"] == config["exports"][var_name]["value"]
 
 
 @pytest.mark.unit

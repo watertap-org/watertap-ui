@@ -55,7 +55,7 @@ const organizeVariables = () => {
     let var_sections = {}
     let tempVariables = {}
     let tempName = bvars.name
-    for (const [key, v] of Object.entries(bvars.data.outputData.model_objects)) {
+    for (const [key, v] of Object.entries(bvars.data.outputData.exports)) {
         
         let catg
         let is_input = v.is_input

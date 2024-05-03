@@ -58,8 +58,8 @@ export default function ConfigOutput(props) {
     const handleDownloadOutput = () => {
         let headers = ['category','metric','units','value']
         let values = []
-        for (let key of Object.keys(outputData.outputData.model_objects)) {
-            let each = outputData.outputData.model_objects[key]
+        for (let key of Object.keys(outputData.outputData.exports)) {
+            let each = outputData.outputData.exports[key]
             if (each.is_output) {
                 values.push([each.output_category, each.name, each.display_units, each.value])
             }
@@ -153,7 +153,7 @@ export default function ConfigOutput(props) {
 
 
     const renderOutputAccordions = () => { 
-        let var_sections = organizeVariables(outputData.outputData.model_objects)
+        let var_sections = organizeVariables(outputData.outputData.exports)
         // console.log("var_sections",var_sections)
         return Object.entries(var_sections).map(([key,value])=>{
             //console.log("O key:",key);
