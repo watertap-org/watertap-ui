@@ -244,7 +244,7 @@ export default function SweepOutput(props) {
                             Sweep Parameters
                         </TableCell>
                         <TableCell style={styles.tableHeader} colSpan={outputData.outputData.sweep_results.num_outputs} align="center">
-                            Outputs
+                            Variables
                         </TableCell>
                     </TableRow>
                     <TableRow key="tablehead"> 
@@ -286,7 +286,7 @@ export default function SweepOutput(props) {
             {showPlot && (outputData.outputData.sweep_results.num_parameters === 1 || outputData.outputData.sweep_results.num_parameters === 2) && 
                 <Grid sx={{marginTop:15, height:"100px"}} item xs={2}>
                     {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
-                    <InputLabel sx={{marginTop:1}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
+                    <InputLabel sx={{marginTop:1}} id="previous-configs-label">Y Variable&nbsp;</InputLabel>
                     <FormControl>
                         <Select
                         labelId="Parameter Selection"
