@@ -129,7 +129,12 @@ def run_parameter_sweep(flowsheet, info):
                     keys.append(key)
         for key in flowsheet.fs_exp.model_objects:
             if (
-                flowsheet.fs_exp.model_objects[key].is_output
+                flowsheet.fs_exp.model_objects[key].is_output or
+                (
+                    not flowsheet.fs_exp.model_objects[key].is_output and 
+                    flowsheet.fs_exp.model_objects[key].is_input and 
+                    not flowsheet.fs_exp.model_objects[key].fixed
+                )
                 # and not flowsheet.fs_exp.model_objects[key].is_input
             ):
                 results_table["headers"].append(
