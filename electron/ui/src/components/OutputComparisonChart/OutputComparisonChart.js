@@ -363,7 +363,7 @@ export default function OutputComparisonChart(props) {
     
     return ( 
         <Grid container spacing={2}> 
-            <Grid item xs={1}>
+            <Grid item xs={2}>
             
             { displayCategory && 
                 <>
@@ -401,7 +401,7 @@ export default function OutputComparisonChart(props) {
             }
             
             </Grid>
-            <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={11}>
+            <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={10}>
                 {showPlot && 
                 <>
                 <Plot
