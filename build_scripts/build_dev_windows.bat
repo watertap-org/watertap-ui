@@ -7,12 +7,13 @@
 :: TO DO SO ENSURE TO  SPECIFY file directorys for watertap ui and water tap that you are developing in.
 :: specify watertap ui directory (git repo)
 set watertap_ui_path=D:\OneDrive\NAWI_work\Analysis\WaterTAP\watertap-ui
-
+@REM set anaconda_path=D:\miniconda\Scripts\activate.bat
 :: specify watertap dev directory (git repo)
 set watertap_path=D:\OneDrive\NAWI_work\Analysis\WaterTAP\watertap-dev
-
+set anaconda_path=D:\miniconda\Scripts\activate.bat
+call %anaconda_path%
 :: activate watertap ui
-call activate watertap-ui-env
+call conda activate watertap-ui-env
 echo -------------------------------------------------
 echo Uninstalling watertap-dev and installing into env
 
