@@ -100,13 +100,15 @@ export default function ConfigInput(props) {
         .then(response => response.json())
         .then((data)=>{
             let tempFlowsheetData = {...flowsheetData}
+            // console.log("loading in flowsheet data")
+            // console.log(data)
             tempFlowsheetData.name = value
             tempFlowsheetData.outputData = data.outputData
             tempFlowsheetData.inputData = data.inputData
             let tempData = {}
             Object.assign(tempData, tempFlowsheetData.inputData)
             setDisplayData({...tempData})
-            updateFlowsheetData(tempFlowsheetData,"UPDATE_CONFIG")
+            updateFlowsheetData(tempFlowsheetData,"UPDATE_CONFIG", true)
             setConfigName(value);
         }).catch((err)=>{
             console.error("unable to get load config: ",err)

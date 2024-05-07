@@ -51,7 +51,7 @@ export default function FlowsheetConfig(props) {
     const [tabValue, setTabValue] = useState(0);
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
-    const [ sweep, setSweep ] = useState(true)
+    const [ sweep, setSweep ] = useState(false)
     // const [outputData, setOutputData] = useState(null);
     const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
@@ -95,6 +95,8 @@ export default function FlowsheetConfig(props) {
     }, [params.id]);
 
     useEffect(() => {
+      // console.log("flowsheet data use effect")
+      // console.log(flowsheetData)
       try {
         if (flowsheetData.inputData.model_objects && Object.keys(flowsheetData.inputData.model_objects).length > 0) {
           setIsBuilt(true)
@@ -149,7 +151,7 @@ export default function FlowsheetConfig(props) {
     };
 
     //send updated flowsheet data
-    const updateFlowsheetData = (data, solve) => {
+    const updateFlowsheetData = (data, solve, addOutputData) => {
       // console.log(">main updateFlowsheetData:",data);
       if(solve==="solve")
       { 
@@ -179,7 +181,12 @@ export default function FlowsheetConfig(props) {
       }
       else if(solve=== "UPDATE_CONFIG"){
         // setFlowsheetData(data)
-        handleSave(data.inputData, true);
+        if (addOutputData) {
+          handleSave(data.inputData, true, data.outputData);
+        } else {
+          handleSave(data.inputData, true);
+        }
+        
       }
     };
 
@@ -199,7 +206,7 @@ export default function FlowsheetConfig(props) {
       setSolveDialogOpen(false);
     };
 
-    const handleSave = (data, update) => {
+    const handleSave = (data, update, outputData) => {
       // console.log("handle save.....",data);
       saveFlowsheet(params.id, data)
       .then(response => {
@@ -209,6 +216,13 @@ export default function FlowsheetConfig(props) {
             // console.log("new Flowsheet Data:", data); 
             let tempFlowsheetData = {...flowsheetData}
             tempFlowsheetData.inputData = data
+            if (outputData) {
+              // if(outputData.sweep_results && Object.keys(outputData.sweep_results).length > 0) {
+              //   console.log('this one has sweep')
+              // }
+              tempFlowsheetData.outputData = outputData
+
+            }
             if (update) {
               console.log("SETTING FLOWSHEET DATA")
               setFlowsheetData(tempFlowsheetData)
