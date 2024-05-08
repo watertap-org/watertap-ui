@@ -5,6 +5,8 @@ import LoggingPanel from '../../LoggingPanel/LoggingPanel';
 import { useNavigate } from "react-router-dom";
 import { Button, Menu, MenuItem, IconButton } from '@mui/material';
 import ListIcon from '@mui/icons-material/List';
+// Theming
+import {theme} from '../../../theme';
 
 export default function Header(props) {
   let navigate = useNavigate();
@@ -32,10 +34,10 @@ export default function Header(props) {
         
          <div  className="titlebar" > 
           <div id="nawi_logo" style={{cursor:'pointer'}} onClick={handleNavigateHome}>
-            <img src={logo} alt="NAWI logo"/>
+            <img src={theme.logoOnly} alt={`${theme.project} logo`}/>
           </div>
         <div id="titlebar-name">
-          WaterTAP
+          {theme.projectTitle}
         </div>
         <div  className="right" >
         <IconButton style={{ color:"white" }} onClick={handleShowActions}><ListIcon/></IconButton>

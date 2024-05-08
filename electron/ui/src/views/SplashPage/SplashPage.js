@@ -1,8 +1,8 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';  
 import Box from '@mui/material/Box';
-import BackgroundPic from '../../assets/nawiwater.png'
-import FullLogo from '../../assets/nawi-full-logo.png'
+// Theming
+import {theme} from '../../theme';
 
 export default function SplashPage() {
 
@@ -10,7 +10,7 @@ export default function SplashPage() {
         background: {
             height: '100vh',
         },
-        bacgkroundImage: {
+        backgroundImage: {
             width: '100%',
             height: '100%',
             objectFit:'fill'
@@ -42,7 +42,7 @@ export default function SplashPage() {
 
   return ( 
     <div style={styles.background}>
-        <img alt="WaterTAP background" src={BackgroundPic} style={styles.bacgkroundImage}>
+        <img alt="WaterTAP background" src={theme.splashImage} style={styles.backgroundImage}>
         
         </img>
         <Box style={styles.boxStyle}>
@@ -50,7 +50,7 @@ export default function SplashPage() {
                 <Grid item xs={2}> </Grid>
                 <Grid item xs={8}> 
                     <Box style={{}}>
-                        <img alt="WaterTAP logo" src={FullLogo} style={{width:'100%', paddingTop:"50px"}}></img>
+                        <img alt="WaterTAP logo" src={theme.logoFull} style={{width:'100%', paddingTop:"50px"}}></img>
                     </Box>
                 </Grid>
                 <Grid item xs={2}> </Grid>
