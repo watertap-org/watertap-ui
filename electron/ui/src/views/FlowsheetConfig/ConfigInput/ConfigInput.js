@@ -9,6 +9,8 @@ import { Button, Box, Modal, Select, Stack, TextField, Tooltip } from '@mui/mate
 import { Grid, InputLabel, MenuItem, FormControl } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+// Theming
+import {theme} from '../../../theme';
 
 export default function ConfigInput(props) {
     let params = useParams(); 
@@ -407,7 +409,10 @@ const RunButton = forwardRef(({ ...props }, ref) => {
     return (
         <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
             <div>
-            <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)} disabled={disableRun}>RUN</Button>
+            <Button variant="contained"
+                    style={{background: theme.button.background}}
+                    onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)}
+                    disabled={disableRun}>RUN</Button>
             </div>
         </Tooltip>
     );

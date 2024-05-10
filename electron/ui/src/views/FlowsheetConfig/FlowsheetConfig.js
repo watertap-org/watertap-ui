@@ -12,7 +12,8 @@ import SolveDialog from "../../components/SolveDialog/SolveDialog";
 import ErrorBar from "../../components/ErrorBar/ErrorBar";
 import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
 import BuildOptions from '../../components/BuildOptions/BuildOptions';
-
+// Theming
+import {theme} from '../../theme';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -347,7 +348,7 @@ export default function FlowsheetConfig(props) {
                     
                     </Grid>
                     <Grid item xs={12}>
-                    <div style={{backgroundColor: '#F1F3F3', color: '#727272'}}>
+                    <div style={{backgroundColor: theme.tabs.background, color: theme.tabs.color}}>
                       <Tabs value={tabValue} onChange={handleTabChange} aria-label="process tabs" centered 
                         textColor='inherit'
                         TabIndicatorProps={{style: {background:'#727272'}}}
