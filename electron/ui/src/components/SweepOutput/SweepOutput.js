@@ -95,9 +95,9 @@ export default function SweepOutput(props) {
                 }
             }
 
-            let xLabel = `${outputData.outputData.sweep_results.headers[xIndex]} (${outputData.outputData.model_objects[keys[xIndex]].display_units})`
-            let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.model_objects[keys[yIndex]].display_units})`
-            let zLabel = `${outputData.outputData.sweep_results.headers[zIndex]} (${outputData.outputData.model_objects[keys[zIndex]].display_units})`
+            let xLabel = `${outputData.outputData.sweep_results.headers[xIndex]} (${outputData.outputData.exports[keys[xIndex]].display_units})`
+            let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.exports[keys[yIndex]].display_units})`
+            let zLabel = `${outputData.outputData.sweep_results.headers[zIndex]} (${outputData.outputData.exports[keys[zIndex]].display_units})`
 
             let tempPlotData = [{
                 z:z,
@@ -150,7 +150,7 @@ export default function SweepOutput(props) {
             let keyIdx = 1
             for (let each of ys) {
                 if( keyIdx === yIndex){
-                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.model_objects[keys[keyIdx]].display_units})`
+                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.exports[keys[keyIdx]].display_units})`
                     let tempTrace = {x: x, y: each, type:"scatter", name: yName}
                     tempData.push(tempTrace)
                     
@@ -159,8 +159,8 @@ export default function SweepOutput(props) {
                 
             }
             
-            let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.model_objects[keys[0]].display_units})`
-            let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.model_objects[keys[yIndex]].display_units})`
+            let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.exports[keys[0]].display_units})`
+            let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.exports[keys[yIndex]].display_units})`
             let tempLayout = {
                 xaxis: {
                     title: {

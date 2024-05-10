@@ -2,7 +2,7 @@
     "inputData": {
         "name": "Magprex",
         "description": "Magprex flowsheet",
-        "model_objects": {},
+        "exports": {},
         "version": 2,
         "requires_idaes_solver": false,
         "dof": 0,

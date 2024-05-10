@@ -96,7 +96,7 @@ export default function FlowsheetConfig(props) {
 
     useEffect(() => {
       try {
-        if (Object.keys(flowsheetData.inputData.model_objects).length > 0) {
+        if (Object.keys(flowsheetData.inputData.exports).length > 0) {
           // console.log('flowsheet is indeed built')
           setIsBuilt(true)
         } else {
@@ -162,7 +162,7 @@ export default function FlowsheetConfig(props) {
       {
         //check if sweep variables all have lower and upper bounds
         let goodToGo = true
-        for (let each of Object.entries(data.model_objects)) {
+        for (let each of Object.entries(data.exports)) {
           if(each[1].is_sweep) {
             if(each[1].ub === null || each[1].lb === null) goodToGo=false
           }
