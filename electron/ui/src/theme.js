@@ -11,7 +11,7 @@ import prommisLogo from './assets/prommis-logo.png';
 import prommisSplash from './assets/prommis-splash.png';
 // IDAES
 import idaesLogoFull from './assets/idaes-full-logo.png';
-import idaesLogo from './assets/idaes-logo.png';
+import idaesLogo from './assets/idaes-logo-white.png';
 import idaesSplash from './assets/idaes-splash.png';
 
 // Configure all possible themes
@@ -69,13 +69,13 @@ const themes = {
     header: {
       color: '#FFFFFF',
       background: '#000000',
-      logoBackground: '#222222' // FIXME?
+      logoBackground: '#333333' // FIXME?
     },
     button: {
       background: '#1669B6'
     },
     tabs: {
-      background: '#F6F4F4',
+      background: '#F1F3F3',
       color: '#727272'
     },
     menuButton: {
