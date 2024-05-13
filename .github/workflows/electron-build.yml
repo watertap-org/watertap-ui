@@ -93,7 +93,7 @@ jobs:
 
       - name: Sign Windows Distribution
         run: |
-          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.03.29_win64.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.05.13_win64.exe
 
 
       - name: Upload artifact for windows build
@@ -102,7 +102,7 @@ jobs:
         with:
             name: windows-dist
             path: |
-              electron/dist/WaterTAP-UI_24.03.29_win64.exe
+              electron/dist/WaterTAP-UI_24.05.13_win64.exe
 
 
   # linux-build:
