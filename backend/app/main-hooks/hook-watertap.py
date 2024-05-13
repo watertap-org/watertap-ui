@@ -171,6 +171,7 @@ pyomo_imports = [
     "pyomo.util.plugins",
     "pyomo.common",
     "pyomo.common.plugins",
+    "pyomo.common.dependencies",
     "pyomo.core.expr.numvalue",
     "pyomo.core.expr.numvalue",
     "pyomo.solvers.plugins.solvers.direct_solver",
