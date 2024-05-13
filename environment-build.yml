@@ -6,5 +6,5 @@ dependencies:
   - pip
   - nodejs=20.9.0
   - pip:
-    - -r backend/requirements.txt
+    - -r backend/requirements-build.txt
 #    - git+https://github.com/watertap-org/watertap@workshop_tutorial
