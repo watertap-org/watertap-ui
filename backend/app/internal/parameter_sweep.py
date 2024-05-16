@@ -5,6 +5,12 @@ from watertap.tools.parameter_sweep import LinearSample, ParameterSweep, paramet
 import watertap.examples.flowsheets.case_studies.wastewater_resource_recovery.amo_1575_magprex.magprex as magprex
 from importlib import import_module
 import idaes.logger as idaeslog
+from pyomo.environ import (
+    ConcreteModel,
+    value,
+    Var,
+    units as pyunits,
+)
 
 _log = idaeslog.getLogger(__name__)
 
@@ -23,6 +29,15 @@ def set_up_sensitivity(m, solve, output_params):
         i += 1
 
     return outputs, optimize_kwargs, opt_function
+
+
+def get_conversion_unit(flowsheet, key):
+    obj = flowsheet.fs_exp.model_objects[key].obj
+    ui_units = flowsheet.fs_exp.model_objects[key].ui_units
+    temp = Var(initialize=1, units=obj.get_units())
+    temp.construct()
+    crv = value(pyunits.convert(temp, to_units=ui_units))
+    return crv
 
 
 def run_analysis(
@@ -97,10 +112,7 @@ def run_parameter_sweep(flowsheet, info):
                     results_table["headers"].append(
                         flowsheet.fs_exp.model_objects[key].name
                     )
-                    conversion_factor = (
-                        flowsheet.fs_exp.model_objects[key].ub
-                        / flowsheet.fs_exp.model_objects[key].obj.ub
-                    )
+                    conversion_factor = get_conversion_unit(flowsheet, key)
                     try:
                         parameters.append(
                             {
@@ -129,22 +141,20 @@ def run_parameter_sweep(flowsheet, info):
                     keys.append(key)
         for key in flowsheet.fs_exp.model_objects:
             if (
-                flowsheet.fs_exp.model_objects[key].is_output or
-                (
-                    not flowsheet.fs_exp.model_objects[key].is_output and 
-                    flowsheet.fs_exp.model_objects[key].is_input and 
-                    not flowsheet.fs_exp.model_objects[key].fixed
+                flowsheet.fs_exp.model_objects[key].is_output
+                or (
+                    not flowsheet.fs_exp.model_objects[key].is_output
+                    and flowsheet.fs_exp.model_objects[key].is_input
+                    and not flowsheet.fs_exp.model_objects[key].fixed
                 )
                 # and not flowsheet.fs_exp.model_objects[key].is_input
             ):
                 results_table["headers"].append(
                     flowsheet.fs_exp.model_objects[key].name
                 )
+
                 try:
-                    conversion_factor = (
-                        flowsheet.fs_exp.model_objects[key].value
-                        / flowsheet.fs_exp.model_objects[key].obj.value
-                    )
+                    conversion_factor = get_conversion_unit(flowsheet, key)
                 except Exception as e:
                     conversion_factor = 1
                 conversion_factors.append(conversion_factor)
