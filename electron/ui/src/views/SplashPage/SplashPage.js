@@ -68,7 +68,7 @@ export default function SplashPage() {
                     <Box style={{color: "#676B71", paddingBottom:"40px"}}>
                         <p>
                             The Water treatment Technoeconomic Assessment Platform (WaterTAP) is an open-source Python-based
-                            software package that suppors the technoeconomic assessment of full water treatment trains.
+                            software package that supports the technoeconomic assessment of full water treatment trains.
                         </p>
                     </Box>
                 </Grid>
