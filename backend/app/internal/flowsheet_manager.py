@@ -79,7 +79,7 @@ class FlowsheetManager:
         self.startup_time = time.time()
 
         # Add custom flowsheets path to the system path
-        self.custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
+        self.custom_flowsheets_path = self.app_settings.data_basedir / "custom_flowsheets"
         sys.path.append(str(self.custom_flowsheets_path))
 
         for package in self.app_settings.packages:
