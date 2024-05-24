@@ -4,10 +4,10 @@ import LoggingPanel from '../../LoggingPanel/LoggingPanel';
 import {useNavigate} from "react-router-dom";
 import {Button, Menu, MenuItem, IconButton} from '@mui/material';
 import ListIcon from '@mui/icons-material/List';
-// Theming
-import {theme} from '../../../theme';
 
 export default function Header(props) {
+    let theme = props.theme;
+    console.log("header theme =", theme);
     let navigate = useNavigate();
     const [showLogs, setShowLogs] = React.useState(false)
     const [actionsList, setActionsList] = React.useState(false)
@@ -33,7 +33,10 @@ export default function Header(props) {
 
             <div className="titlebar"
                  style={{background: theme.header.background}}>
-                <div id="logo" style={{cursor: 'pointer', background: theme.header.logoBackground}} onClick={handleNavigateHome}>
+                <div id="logo" style={{
+                    cursor: 'pointer',
+                    background: theme.header.logoBackground
+                }} onClick={handleNavigateHome}>
                     <img src={theme.logoOnly} alt={`${theme.project} logo`}/>
                 </div>
                 <div id="titlebar-name" style={{color: theme.header.color}}>
@@ -56,6 +59,6 @@ export default function Header(props) {
             </div>
             <LoggingPanel open={showLogs} onClose={handleShowLogs}/>
         </div>
-    );
+    )
 }
 

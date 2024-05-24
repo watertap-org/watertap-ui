@@ -27,7 +27,7 @@ class Deployment:
     # projects and their associated packages
     PROJ = {
         "watertap": ("watertap",),
-        "idaes-pse": ("idaes",),
+        "idaes": ("idaes",),
         "prommis": ("prommis",)
     }
     DEFAULT_PROJ = "watertap"
@@ -92,3 +92,7 @@ class AppSettings(BaseSettings):
 
     class Config:
         env_prefix = f"{_dpy.project.upper()}_"
+
+
+def get_deployment() -> Deployment:
+    return _dpy

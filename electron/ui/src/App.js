@@ -10,14 +10,23 @@ import SplashPage from './views/SplashPage/SplashPage';
 import FlowsheetsList from './views/FlowsheetsList/FlowsheetsList';
 import FlowsheetConfig from './views/FlowsheetConfig/FlowsheetConfig';
 import {getFlowsheetsList} from "./services/flowsheetsList.service";
+import {getProjectName} from './services/projectName.service';
+import {themes} from './theme';
 
 function App() {
     let navigate = useNavigate();
     const [loadLandingPage, setLoadLandingPage] = useState(1)
     const [showHeader, setShowHeader] = useState(false)
     const [numberOfSubprocesses, setNumberOfSubprocesses] = useState({})
+    const [theme, setTheme] = useState({});
 
     useEffect(() => {
+        // Set the theme
+        getProjectName().then((name) => {
+            setTheme(themes[name]);
+            console.debug("app set theme =",theme);
+        });
+
         /*
           ping backend until it is ready then redirect away from splash page
         */
@@ -40,14 +49,14 @@ function App() {
     }, [loadLandingPage])
     return (
             <div className="App">
-                <Header show={showHeader}/>
+                <Header show={showHeader} theme={theme}/>
                 <Routes>
                     <Route path="flowsheet/:id/config" element={<FlowsheetConfig
                         numberOfSubprocesses={numberOfSubprocesses}
                         setNumberOfSubprocesses={setNumberOfSubprocesses}/>}/>
                     <Route path="flowsheets" element={<FlowsheetsList
                         setNumberOfSubprocesses={setNumberOfSubprocesses}/>}/>
-                    <Route path="/" element={<SplashPage/>}/>
+                    <Route path="/" element={<SplashPage theme={theme}/>}/>
                     <Route path="*" element={<Navigate replace to="flowsheets"/>}/>
                 </Routes>
             </div>

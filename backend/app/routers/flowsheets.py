@@ -1,6 +1,7 @@
 """
 Handle flowsheet-related API requests from web client.
 """
+
 # stdlib
 import io
 import aiofiles
@@ -19,13 +20,14 @@ import re
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
 from app.internal.parameter_sweep import run_parameter_sweep
 from app.internal.log_parser import parse_logs
+from app.internal.settings import get_deployment
 from watertap.ui.fsapi import FlowsheetInterface, FlowsheetExport
 import idaes.logger as idaeslog
 
 CURRENT = "current"
 
 _log = idaeslog.getLogger(__name__)
-_solver_log = idaeslog.getLogger(__name__+'.solver')
+_solver_log = idaeslog.getLogger(__name__ + ".solver")
 
 router = APIRouter(
     prefix="/flowsheets",
@@ -49,14 +51,16 @@ async def get_all():
         each.set_last_run(flowsheet_manager.get_last_run(each.id_))
 
     try:
-        currentNumberOfSubprocesses, maxNumberOfSubprocesses = flowsheet_manager.get_number_of_subprocesses()
+        currentNumberOfSubprocesses, maxNumberOfSubprocesses = (
+            flowsheet_manager.get_number_of_subprocesses()
+        )
     except Exception as e:
-        _log.info(f'unable to get number of subprocesses: {e}')
+        _log.info(f"unable to get number of subprocesses: {e}")
         currentNumberOfSubprocesses = 1
         maxNumberOfSubprocesses = 8
-    
+
     return {
-        "flowsheet_list": flowsheet_list, 
+        "flowsheet_list": flowsheet_list,
         "currentNumberOfSubprocesses": currentNumberOfSubprocesses,
         "maxNumberOfSubprocesses": maxNumberOfSubprocesses,
     }
@@ -286,7 +290,7 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
         new_files = []
         for file in files:
             # for file in files:
-            _log.info(f'reading {file.filename}')
+            _log.info(f"reading {file.filename}")
             new_files.append(file.filename)
             if "_ui.py" in file.filename:
                 new_id = file.filename.replace(".py", "")
@@ -491,13 +495,16 @@ async def download_sweep(flowsheet_id: str) -> Path:
     # # User can now download the contents of that file
     return path
 
+
 @router.post("/update_number_of_subprocesses")
 async def remove_flowsheet(request: Request):
     data = await request.json()
-    new_value = data['value']
+    new_value = data["value"]
     flowsheet_manager.set_number_of_subprocesses(new_value)
 
     return {"new_value": new_value}
+
+
 @router.get("/get_logs")
 async def get_logs() -> List:
     """Get backend logs.
@@ -507,6 +514,18 @@ async def get_logs() -> List:
     """
     logs_path = flowsheet_manager.get_logs_path() / "watertap-ui_backend_logs.log"
     return parse_logs(logs_path, flowsheet_manager.startup_time)
+
+
+@router.get("/project")
+async def get_project_name() -> str:
+    """Get Project name.
+
+    Returns:
+        Name of the project
+    """
+    dpy = get_deployment()
+    return dpy.project
+
 
 @router.post("/download_logs", response_class=FileResponse)
 async def download_logs() -> Path:

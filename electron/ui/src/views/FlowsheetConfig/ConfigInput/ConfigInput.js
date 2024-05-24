@@ -9,10 +9,9 @@ import { Button, Box, Modal, Select, Stack, TextField, Tooltip } from '@mui/mate
 import { Grid, InputLabel, MenuItem, FormControl } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-// Theming
-import {theme} from '../../../theme';
 
 export default function ConfigInput(props) {
+    const theme = props.theme;
     let params = useParams(); 
     const { flowsheetData, updateFlowsheetData, reset, solveType, numberOfSubprocesses, setNumberOfSubprocesses } = props; 
     const [ displayData, setDisplayData ] = useState({}) 
@@ -332,6 +331,7 @@ export default function ConfigInput(props) {
                                 </div>
                             </Tooltip> */}
                             <RunButton
+                                theme={theme}
                                 updateFlowsheetData={updateFlowsheetData}
                                 flowsheetData={flowsheetData}
                                 disableRun={disableRun}
@@ -380,6 +380,7 @@ export default function ConfigInput(props) {
 
 const RunButton = forwardRef(({ ...props }, ref) => {
     // const [childDataApi, setChildDataApi] = useState(null);
+    const theme = props.theme;
     const { updateFlowsheetData, flowsheetData, solveType } = props;
     const [ disableRun, setDisableRun ] = useState(false) 
     useEffect(() => {
