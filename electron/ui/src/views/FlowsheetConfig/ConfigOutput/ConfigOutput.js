@@ -9,6 +9,7 @@ import SweepOutput from '../../../components/SweepOutput/SweepOutput.js';
 import DownloadIcon from '@mui/icons-material/Download';
 import SaveIcon from '@mui/icons-material/Save';
 import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Modal, TextField, Stack, Toolbar } from '@mui/material';
+import {getOutputs} from '../FlowsheetConfig';
 
 
 export default function ConfigOutput(props) {
@@ -58,8 +59,9 @@ export default function ConfigOutput(props) {
     const handleDownloadOutput = () => {
         let headers = ['category','metric','units','value']
         let values = []
-        for (let key of Object.keys(outputData.outputData.model_objects)) {
-            let each = outputData.outputData.model_objects[key]
+        const outputs = getOutputs(outputData)
+        for (let key of Object.keys(outputs)) {
+            let each = outputs[key]
             if (each.is_output) {
                 values.push([each.output_category, each.name, each.display_units, each.value])
             }
@@ -152,8 +154,9 @@ export default function ConfigOutput(props) {
     };
 
 
-    const renderOutputAccordions = () => { 
-        let var_sections = organizeVariables(outputData.outputData.model_objects)
+    const renderOutputAccordions = () => {
+        const outputs = getOutputs(outputData)
+        let var_sections = organizeVariables(outputs)
         // console.log("var_sections",var_sections)
         return Object.entries(var_sections).map(([key,value])=>{
             //console.log("O key:",key);

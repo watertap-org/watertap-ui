@@ -26,6 +26,18 @@ import ErrorBar from "../../components/ErrorBar/ErrorBar";
 import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
 import BuildOptions from '../../components/BuildOptions/BuildOptions';
 
+/* Some utility functions */
+export const getInputs = (flowsheetData) => flowsheetData.inputData.exports;
+export const getOutputs = (flowsheetData) => flowsheetData.outputData.exports;
+export const emptyOrNullObj = (o) => {
+    try {
+        return (Object.keys(o).length == 0);
+    }
+    catch (e) {
+        return true;
+    }
+}
+
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
 
@@ -76,9 +88,10 @@ export default function FlowsheetConfig(props) {
     const [isBuilt, setIsBuilt] = useState(false)
     const [showBuildOptions, setShowBuildOptions] = useState(false)
     const theme = props.theme;
+    console.log("flowsheet config theme=",theme);
 
     useEffect(() => {
-        //console.log("params.id",params.id);
+        console.log("params.id",params.id);
         if (!params.hasOwnProperty("id") || !params.id)
             return;
         // gotta find a way to figure out whether to build or not
@@ -111,17 +124,12 @@ export default function FlowsheetConfig(props) {
     }, [params.id]);
 
     useEffect(() => {
-        try {
-            if (Object.keys(flowsheetData.inputData.model_objects).length > 0) {
-                // console.log('flowsheet is indeed built')
-                setIsBuilt(true)
-            } else {
-                // console.log('flowsheet is not built')
-            }
-        } catch (e) {
-            // console.log('unable to check for model objects: ',e)
+        console.log("Check/set whether flowsheet is built");
+        const inputs = getInputs(flowsheetData);
+        if (!emptyOrNullObj(inputs)) {
+            console.log('flowsheet is indeed built');
+            setIsBuilt(true);
         }
-
     }, [flowsheetData])
 
     useEffect(() => {
@@ -174,7 +182,7 @@ export default function FlowsheetConfig(props) {
         } else if (solve === "sweep") {
             //check if sweep variables all have lower and upper bounds
             let goodToGo = true
-            for (let each of Object.entries(data.model_objects)) {
+            for (let each of Object.entries(data.exports)) {
                 if (each[1].is_sweep) {
                     if (each[1].ub === null || each[1].lb === null) goodToGo = false
                 }
@@ -289,6 +297,8 @@ export default function FlowsheetConfig(props) {
         }
     }
 
+    console.log("Returning container for FlowsheetConfig. build_options=", flowsheetData.inputData.build_options, "isBuilt=",isBuilt,
+        "loadingFlowsheetData=",loadingFlowsheetData);
     return (
         <Container>
             {(loadingFlowsheetData) ?
@@ -336,9 +346,7 @@ export default function FlowsheetConfig(props) {
 
                         <Box sx={{width: '100%', border: '0px solid #ddd'}}>
 
-                            {/*
-                build options component
-              */}
+                            {/* build options component */}
                             {flowsheetData.inputData.build_options && Object.keys(flowsheetData.inputData.build_options).length > 0 &&
                                 <BuildOptions
                                     flowsheetData={flowsheetData}

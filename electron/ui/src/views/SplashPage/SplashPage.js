@@ -39,55 +39,60 @@ export default function SplashPage(props) {
         },
     }
 
-    return (
-        <div style={styles.background}>
-            <img alt="WaterTAP background" src={theme.splashImage}
-                 style={styles.backgroundImage}>
+    if (theme == null) {
+        return (<div></div>);
+    }
+    else {
+        return (
+            <div style={styles.background}>
+                <img alt="WaterTAP background" src={theme.splashImage}
+                     style={styles.backgroundImage}>
 
-            </img>
-            <Box style={styles.boxStyle}>
-                <Grid container>
-                    <Grid item xs={2}> </Grid>
-                    <Grid item xs={8}>
-                        <Box style={{}}>
-                            <img alt="WaterTAP logo" src={theme.logoFull}
-                                 style={{width: '100%', paddingTop: "50px"}}></img>
-                        </Box>
+                </img>
+                <Box style={styles.boxStyle}>
+                    <Grid container>
+                        <Grid item xs={2}> </Grid>
+                        <Grid item xs={8}>
+                            <Box style={{}}>
+                                <img alt="WaterTAP logo" src={theme.logoFull}
+                                     style={{width: '100%', paddingTop: "50px"}}></img>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={2}> </Grid>
+
+                        <Grid item xs={3}> </Grid>
+                        <Grid item xs={6}>
+                            <Box>
+                                <p style={{
+                                    paddingTop: 0,
+                                    marginTop: 0,
+                                    color: "#9c9c9c"
+                                }}>v24.03.29 (WaterTAP v0.12.0)</p>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={3}> </Grid>
+
+                        <Grid item xs={1}> </Grid>
+                        <Grid item xs={10}>
+                            <Box style={{color: "#676B71", paddingBottom: "40px"}}>
+                                <p>{theme.projectBlurb}</p>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={1}> </Grid>
+
+                        <Grid item xs={1}> </Grid>
+                        <Grid item xs={10}>
+                            <Box>
+                                <p style={{paddingTop: 1}}></p>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={1}> </Grid>
+
                     </Grid>
-                    <Grid item xs={2}> </Grid>
-
-                    <Grid item xs={3}> </Grid>
-                    <Grid item xs={6}>
-                        <Box>
-                            <p style={{
-                                paddingTop: 0,
-                                marginTop: 0,
-                                color: "#9c9c9c"
-                            }}>v24.03.29 (WaterTAP v0.12.0)</p>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={3}> </Grid>
-
-                    <Grid item xs={1}> </Grid>
-                    <Grid item xs={10}>
-                        <Box style={{color: "#676B71", paddingBottom: "40px"}}>
-                            <p>{theme.projectBlurb}</p>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={1}> </Grid>
-
-                    <Grid item xs={1}> </Grid>
-                    <Grid item xs={10}>
-                        <Box>
-                            <p style={{paddingTop: 1}}></p>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={1}> </Grid>
-
-                </Grid>
-            </Box>
-        </div>
-    )
+                </Box>
+            </div>
+        );
+    }
 }
 
 

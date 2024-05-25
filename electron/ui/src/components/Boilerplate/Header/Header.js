@@ -5,8 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {Button, Menu, MenuItem, IconButton} from '@mui/material';
 import ListIcon from '@mui/icons-material/List';
 
-export default function Header(props) {
-    let theme = props.theme;
+export default function Header({theme}) {
     console.log("header theme =", theme);
     let navigate = useNavigate();
     const [showLogs, setShowLogs] = React.useState(false)
@@ -28,9 +27,7 @@ export default function Header(props) {
         setAnchorEl(event.currentTarget);
     }
     return (
-        props.show &&
         <div id="Header">
-
             <div className="titlebar"
                  style={{background: theme.header.background}}>
                 <div id="logo" style={{
