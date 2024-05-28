@@ -2,12 +2,14 @@ import './SplashPage.css';
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import {displayVersion} from '../../theme';
 
 export default function SplashPage({theme, hasTheme, hasFlowsheets}) {
-    console.log("splash page theme =", theme, "hasTheme=", hasTheme, "hasFlowsheets=", hasFlowsheets);
+    console.debug("splash page theme =", theme, "hasTheme=", hasTheme, "hasFlowsheets=", hasFlowsheets);
 
-    // Without the theme, we can't display anything yet.
-    // If we have the flowsheets, then no longer show the splash page.
+    // Stop and return nothing if SplashPage should not be displayed:
+    //   - without the theme, we can't display anything yet
+    //   - if we have the flowsheets, then no longer show the splash page
     if (!hasTheme || hasFlowsheets || theme == null) {
         return null;
     }
@@ -29,7 +31,7 @@ export default function SplashPage({theme, hasTheme, hasFlowsheets}) {
                     <Grid item xs={3}> </Grid>
                     <Grid item xs={6}>
                         <Box>
-                            <p id="splashRelease">v24.03.29 (WaterTAP v0.12.0)</p>
+                            <p id="splashRelease">${displayVersion(theme)}</p>
                         </Box>
                     </Grid>
                     <Grid item xs={3}> </Grid>
@@ -53,5 +55,3 @@ export default function SplashPage({theme, hasTheme, hasFlowsheets}) {
         </div>
     );
 }
-
-
