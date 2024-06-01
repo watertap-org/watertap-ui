@@ -214,7 +214,7 @@ async def unbuild_config(flowsheet_id: str):
     fs_exp = flowsheet.fs_exp
     fs_exp.m = None
     fs_exp.obj = None
-    fs_exp.model_objects = {}
+    fs_exp.exports = {}
     fs_exp.dof = 0
     fs_exp.sweep_results = {}
     fs_exp.build_options = {}

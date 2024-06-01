@@ -145,7 +145,7 @@ export default function ConfigInput(props) {
     const handleUpdateDisplayValue = (id, value) => {
         let tempFlowsheetData = {...flowsheetData}
         const inputs = getInputs(tempFlowsheetData)
-        console.log('updating ' + id + ' with value ' + value + '. previous value was ' + inputs[id].value)
+        console.debug('updating ' + id + ' with value ' + value + '. previous value was ' + inputs[id].value)
         inputs[id].value = value
     }
 
@@ -153,11 +153,7 @@ export default function ConfigInput(props) {
         let tempFlowsheetData = {...flowsheetData}
         const inputs = getInputs(tempFlowsheetData);
         inputs.fixed = value;
-        if (type === "sweep") {
-            inputs[id].is_sweep = true
-        } else {
-            inputs[id].is_sweep = false
-        }
+        inputs[id].is_sweep = (type === "sweep");
         updateFlowsheetData(tempFlowsheetData, null)
         runButtonRef.current?.checkDisableRun()
         // checkDisableRun()
@@ -173,7 +169,7 @@ export default function ConfigInput(props) {
         let tempFlowsheetData = {...flowsheetData}
         const inputs = getInputs(tempFlowsheetData)
         inputs[id].num_samples = value
-        console.log('updating samples ' + id + ' with value ' + value + ' ' + inputs[id].num_samples)
+        console.debug('updating samples ' + id + ' with value ' + value + ' ' + inputs[id].num_samples)
     }
     /**
      * Organize variables into sections by their 'category' attribute.

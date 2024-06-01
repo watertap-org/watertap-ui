@@ -1,20 +1,23 @@
  
 import React from 'react'; 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';  
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import { saveConfig }  from '../../../services/output.service.js'
-import { downloadSweepResults, downloadSingleOutput }  from '../../../services/output.service.js'
-import SweepOutput from '../../../components/SweepOutput/SweepOutput.js';
-import DownloadIcon from '@mui/icons-material/Download';
-import SaveIcon from '@mui/icons-material/Save';
-import { Grid, Accordion, AccordionSummary, AccordionDetails, Button, Box, Modal, TextField, Stack, Toolbar } from '@mui/material';
-import {getOutputs} from '../FlowsheetConfig';
+import Modal from '@mui/material/Modal';
 
 
 export default function ConfigOutput(props) {
     let params = useParams(); 
-    const { outputData, updateFlowsheetData, isSweep } = props;
+    const { outputData } = props;
     const [ configName, setConfigName ] = useState(outputData.name)
     const [ openSaveConfig, setOpenSaveConfig ] = React.useState(false);
     const [ saved, setSaved ] = React.useState(false);
@@ -46,51 +49,13 @@ export default function ConfigOutput(props) {
             console.log('successfully saved config')
             let tempFlowsheetData = {...outputData}
             tempFlowsheetData.name=configName
-            updateFlowsheetData(tempFlowsheetData, "UPDATE_CONFIG")
+            props.updateFlowsheetData(tempFlowsheetData, "UPDATE_CONFIG")
             handleCloseSaveConfig()
             setSaved(true)
         })
         .catch((e) => {
             console.log('error saving config',e)
             handleCloseSaveConfig()
-        });
-    }
-
-    const handleDownloadOutput = () => {
-        let headers = ['category','metric','units','value']
-        let values = []
-        const outputs = getOutputs(outputData)
-        for (let key of Object.keys(outputs)) {
-            let each = outputs[key]
-            if (each.is_output) {
-                values.push([each.output_category, each.name, each.display_units, each.value])
-            }
-        }
-        let body = {headers: headers, values:values}
-        downloadSingleOutput(params.id, body)
-        .then(response => response.blob())
-        .then((data)=>{
-            const href = window.URL.createObjectURL(data);
-            const link = document.createElement('a');
-            link.href = href;
-            link.setAttribute('download', `${outputData.inputData.name}_output.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-    }
-
-    const downloadSweepOutput = () => {
-        downloadSweepResults(params.id)
-        .then(response => response.blob())
-        .then((data)=>{
-            const href = window.URL.createObjectURL(data);
-            const link = document.createElement('a');
-            link.href = href;
-            link.setAttribute('download', 'sweep_results.csv');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         });
     }
 
@@ -154,9 +119,14 @@ export default function ConfigOutput(props) {
     };
 
 
-    const renderOutputAccordions = () => {
-        const outputs = getOutputs(outputData)
-        let var_sections = organizeVariables(outputs)
+    const renderOutputAccordions = () => { 
+        // if(!outputData.hasOwnProperty("output") || !outputData.output)
+        // {
+        //     return (<Grid item xs={12} >
+        //                 <Alert severity="info">No soluction found!</Alert>
+        //             </Grid>);
+        // }
+        let var_sections = organizeVariables(outputData.outputData.model_objects)
         // console.log("var_sections",var_sections)
         return Object.entries(var_sections).map(([key,value])=>{
             //console.log("O key:",key);
@@ -167,7 +137,7 @@ export default function ConfigOutput(props) {
             let _key = key + Math.floor(Math.random() * 100001); 
             if(Object.keys(value.output_variables).length > 0) {
                 return (<Grid item xs={gridSize} key={_key}>
-                    <Accordion expanded={true} style={{border:"1px solid #71797E"}}>
+                    <Accordion expanded={true} style={{border:"1px solid #ddd"}}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />} >
                             {value.display_name}
                         </AccordionSummary>
@@ -186,62 +156,48 @@ export default function ConfigOutput(props) {
                         </AccordionDetails>
                     </Accordion>
                 </Grid>)
-            } else return null
+            }
 
         })
     };
     
     return ( 
         <> 
-        {isSweep ? 
-            <SweepOutput outputData={outputData} download={downloadSweepOutput}/>
-        : 
-        <Grid container spacing={2} alignItems="flex-start"> 
-        <Grid item xs={12}> 
-        <Toolbar spacing={2}>
-                {/* <Stack direction="row" spacing={2}></Stack> */}
-            <Box sx={{ flexGrow: 1 }}></Box>
-            <Stack direction="row" spacing={2}>
-                <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handleDownloadOutput}>
-                    Download Result
-                </Button> 
-                <Button disabled={saved ? true : false} variant="outlined" startIcon={<SaveIcon />} onClick={handleOpenSaveConfig}>
+            <Grid container spacing={2} alignItems="flex-start"> 
+            {   
+                renderOutputAccordions()
+            }
+            <Grid item xs={12}> 
+                <Button disabled={saved ? true : false} variant="contained" onClick={handleOpenSaveConfig}>
                     Save Configuration
-                </Button>
-            </Stack>
-        </Toolbar>
-            <Modal
-                open={openSaveConfig}
-                onClose={handleCloseSaveConfig}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Grid container sx={modalStyle} spacing={1}>
-                    <Grid item xs={12}>
-                        <TextField
-                            required
-                            variant="standard"
-                            id="margin-none"
-                            label="Config Name"
-                            value={configName}
-                            onChange={handleChangeConfigName}
-                            fullWidth
-                            className="modal-save-config"
-                        />
+                </Button> 
+                <Modal
+                    open={openSaveConfig}
+                    onClose={handleCloseSaveConfig}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Grid container sx={modalStyle} spacing={1}>
+                        <Grid item xs={12}>
+                            <TextField
+                                required
+                                variant="standard"
+                                id="margin-none"
+                                label="Config Name"
+                                value={configName}
+                                onChange={handleChangeConfigName}
+                                fullWidth
+                                className="modal-save-config"
+                            />
+                        </Grid>
+                        <Grid item xs={8}></Grid>
+                        <Grid item xs={4}>
+                            <Button onClick={handleSaveConfig} variant="contained">Save</Button>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={8}></Grid>
-                    <Grid item xs={4}>
-                        <Button onClick={handleSaveConfig} variant="contained">Save</Button>
-                    </Grid>
-                </Grid>
-            </Modal>
-        </Grid>
-        {   
-            renderOutputAccordions()
-        }
-        </Grid>
-        }
-            
+                </Modal>
+            </Grid>
+            </Grid>
         </>
     );
 }

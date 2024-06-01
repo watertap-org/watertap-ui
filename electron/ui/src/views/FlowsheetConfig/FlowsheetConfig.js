@@ -31,9 +31,8 @@ export const getInputs = (flowsheetData) => flowsheetData.inputData.exports;
 export const getOutputs = (flowsheetData) => flowsheetData.outputData.exports;
 export const emptyOrNullObj = (o) => {
     try {
-        return (Object.keys(o).length == 0);
-    }
-    catch (e) {
+        return (Object.keys(o).length === 0);
+    } catch (e) {
         return true;
     }
 }
@@ -88,10 +87,10 @@ export default function FlowsheetConfig(props) {
     const [isBuilt, setIsBuilt] = useState(false)
     const [showBuildOptions, setShowBuildOptions] = useState(false)
     const theme = props.theme;
-    console.log("flowsheet config theme=",theme);
+    console.log("flowsheet config theme=", theme);
 
     useEffect(() => {
-        console.log("params.id",params.id);
+        console.log("params.id", params.id);
         if (!params.hasOwnProperty("id") || !params.id)
             return;
         // gotta find a way to figure out whether to build or not
@@ -124,7 +123,7 @@ export default function FlowsheetConfig(props) {
     }, [params.id]);
 
     useEffect(() => {
-        console.log("Check/set whether flowsheet is built");
+        console.info("Check/set whether flowsheet is built");
         const inputs = getInputs(flowsheetData);
         if (!emptyOrNullObj(inputs)) {
             console.log('flowsheet is indeed built');
@@ -175,32 +174,37 @@ export default function FlowsheetConfig(props) {
 
     //send updated flowsheet data
     const updateFlowsheetData = (data, solve) => {
-        // console.log(">main updateFlowsheetData:",data);
-        if (solve === "solve") {
-            setSolveDialogOpen(true);
-            setSweep(false)
-        } else if (solve === "sweep") {
-            //check if sweep variables all have lower and upper bounds
-            let goodToGo = true
-            for (let each of Object.entries(data.exports)) {
-                if (each[1].is_sweep) {
-                    if (each[1].ub === null || each[1].lb === null) goodToGo = false
-                }
-            }
-            if (goodToGo) {
+        switch (solve) {
+            case "solve":
                 setSolveDialogOpen(true);
-                setSweep(true);
-            } else {
-                handleError('please provide a lower and upper bound for all sweep variables')
-            }
-
-        } else if (solve === null) {
-            handleSave(data.inputData, false);
-        } else if (solve === "UPDATE_CONFIG") {
-            // setFlowsheetData(data)
-            handleSave(data.inputData, true);
+                setSweep(false);
+                break;
+            case "sweep":
+                // check if sweep variables all have lower and upper bounds
+                let goodToGo = true;
+                for (let each of Object.entries(data.exports)) {
+                    if (each[1].is_sweep) {
+                        if (each[1].ub === null || each[1].lb === null) goodToGo = false
+                    }
+                }
+                if (goodToGo) {
+                    setSolveDialogOpen(true);
+                    setSweep(true);
+                } else {
+                    handleError('please provide a lower and upper bound for all sweep variables')
+                }
+                break;
+            case "UPDATE_CONFIG":
+                // setFlowsheetData(data)
+                handleSave(data.inputData, true);
+                break;
+            case null:
+                handleSave(data.inputData, false);
+                break;
+            default:
+                console.error("updateFlowsheetData: no action for solve=", solve);
         }
-    };
+    }
 
     const handleSolved = (data) => {
         // console.log("handle solved.....",data);
@@ -209,14 +213,14 @@ export default function FlowsheetConfig(props) {
         setFlowsheetData(tempFlowsheetData);
         setTabValue(1);
         setSolveDialogOpen(false);
-    };
+    }
 
     const handleError = (msg) => {
         // console.log("handle error");
         setErrorMessage(msg)
         setOpenErrorMessage(true);
         setSolveDialogOpen(false);
-    };
+    }
 
     const handleSave = (data, update) => {
         // console.log("handle save.....",data);
@@ -297,8 +301,8 @@ export default function FlowsheetConfig(props) {
         }
     }
 
-    console.log("Returning container for FlowsheetConfig. build_options=", flowsheetData.inputData.build_options, "isBuilt=",isBuilt,
-        "loadingFlowsheetData=",loadingFlowsheetData);
+    console.log("Returning container for FlowsheetConfig. build_options=", flowsheetData.inputData.build_options, "isBuilt=", isBuilt,
+        "loadingFlowsheetData=", loadingFlowsheetData);
     return (
         <Container>
             {(loadingFlowsheetData) ?
