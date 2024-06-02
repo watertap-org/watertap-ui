@@ -126,7 +126,7 @@ export default function ConfigOutput(props) {
         //                 <Alert severity="info">No soluction found!</Alert>
         //             </Grid>);
         // }
-        let var_sections = organizeVariables(outputData.outputData.model_objects)
+        let var_sections = organizeVariables(outputData.outputData.exports)
         // console.log("var_sections",var_sections)
         return Object.entries(var_sections).map(([key,value])=>{
             //console.log("O key:",key);
