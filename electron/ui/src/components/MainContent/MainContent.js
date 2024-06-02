@@ -4,6 +4,7 @@
  * Displays nothing if the theme and list of flowsheets is not yet loaded
  * -- this avoids adding conditional rendering logic to the App component.
  */
+import './MainContent.css';
 import {Container} from "@mui/material";
 import Header from "../Boilerplate/Header/Header";
 import {Navigate, Route, Routes} from "react-router-dom";
@@ -17,7 +18,7 @@ export default function MainContent(props) {
         const theme = props.theme;
         const spState = props.subProcState;
         return (
-            <Container>
+            <Container id='AppRootContainer'>
                 <Header theme={theme}/>
                 <Routes>
                     <Route path="flowsheet/:id/config" element={<FlowsheetConfig

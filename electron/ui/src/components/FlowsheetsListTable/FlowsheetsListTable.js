@@ -181,8 +181,9 @@ export default function FlowsheetsListTable(props) {
     }
 
     return (
-        <TableContainer sx={{p: 3}}>
-            { 
+        <TableContainer sx={{p: 3, paddingRight: 0}}>
+        {/* removing right padding to eliminate horiz scrollbar */}
+            {
 
               category === "" ? 
             
