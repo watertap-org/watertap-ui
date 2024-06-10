@@ -133,21 +133,21 @@ export default function ConfigInput(props) {
 
     const handleUpdateDisplayValue = (id, value) => {
         let tempFlowsheetData = {...flowsheetData}
-        let previousValue = tempFlowsheetData.inputData.model_objects[id].value
+        let previousValue = tempFlowsheetData.inputData.exports[id].value
         console.log('updating '+id+' with value '+value+'. previous value was '+previousValue)
-        tempFlowsheetData.inputData.model_objects[id].value = value
+        tempFlowsheetData.inputData.exports[id].value = value
     }
 
     const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
-        tempFlowsheetData.inputData.model_objects[id].fixed = value
+        tempFlowsheetData.inputData.exports[id].fixed = value
         if(type==="sweep") {
-            // flowsheetData.inputData.model_objects[id].is_sweep = true
-            tempFlowsheetData.inputData.model_objects[id].is_sweep = true
+            // flowsheetData.inputData.exports[id].is_sweep = true
+            tempFlowsheetData.inputData.exports[id].is_sweep = true
         }
         else {
-            // flowsheetData.inputData.model_objects[id].is_sweep = false
-            tempFlowsheetData.inputData.model_objects[id].is_sweep = false
+            // flowsheetData.inputData.exports[id].is_sweep = false
+            tempFlowsheetData.inputData.exports[id].is_sweep = false
         }
         updateFlowsheetData(tempFlowsheetData, null)
         runButtonRef.current?.checkDisableRun()
@@ -156,13 +156,13 @@ export default function ConfigInput(props) {
 
     const handleUpdateBounds = (id, value, bound) => {
         let tempFlowsheetData = {...flowsheetData}
-        tempFlowsheetData.inputData.model_objects[id][bound] = value
+        tempFlowsheetData.inputData.exports[id][bound] = value
     }
 
     const handleUpdateSamples = (id, value) => {
         let tempFlowsheetData = {...flowsheetData}
-        tempFlowsheetData.inputData.model_objects[id].num_samples = value
-        console.log('updating samples '+id+' with value '+value+ ' '+tempFlowsheetData.inputData.model_objects[id].num_samples)
+        tempFlowsheetData.inputData.exports[id].num_samples = value
+        console.log('updating samples '+id+' with value '+value+ ' '+tempFlowsheetData.inputData.exports[id].num_samples)
     }
     /**
      * Organize variables into sections by their 'category' attribute.
@@ -233,7 +233,7 @@ export default function ConfigInput(props) {
     const renderInputAccordions = () => {
         try {
             if(Object.keys(displayData).length > 0) {
-                let var_sections = organizeVariables(displayData.model_objects)
+                let var_sections = organizeVariables(displayData.exports)
                 return Object.entries(var_sections).map(([key, value])=>{
                     let _key = key + Math.floor(Math.random() * 100001);
                     if(Object.keys(value.input_variables).length > 0) {
@@ -390,8 +390,8 @@ const RunButton = forwardRef(({ ...props }, ref) => {
         if (solveType === "solve") setDisableRun(false)
         else {
             let tempDisableRun = true
-            for(let each of Object.keys(flowsheetData.inputData.model_objects)) {
-                let modelObject = flowsheetData.inputData.model_objects[each]
+            for(let each of Object.keys(flowsheetData.inputData.exports)) {
+                let modelObject = flowsheetData.inputData.exports[each]
                 if(modelObject.is_sweep) {
                     tempDisableRun = false
                     break

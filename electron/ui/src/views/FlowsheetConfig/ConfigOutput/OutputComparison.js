@@ -72,7 +72,7 @@ export default function OutputComparison(props) {
         let var_sections = {}
         let tempVariables = {}
         let tempName = bvars.name
-        for (const [key, v] of Object.entries(bvars.data.outputData.model_objects)) {
+        for (const [key, v] of Object.entries(bvars.data.outputData.exports)) {
             let catg
             let is_input = v.is_input
             let is_output = v.is_output
@@ -143,7 +143,7 @@ export default function OutputComparison(props) {
         let var_sections = {}
         let tempVariables = {}
         let tempName = bvars.name
-        for (const [key, v] of Object.entries(bvars.data.outputData.model_objects)) {
+        for (const [key, v] of Object.entries(bvars.data.outputData.exports)) {
             let catg = v.chart_group
             let chartType = v.chart_type
             if (catg) {
