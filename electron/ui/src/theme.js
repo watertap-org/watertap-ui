@@ -98,6 +98,9 @@ export const themes = {
     }
 }
 
+// Aliases (keep for JS code to work!)
+themes['nawi'] = themes['watertap'];
+
 /**
  * Build version-release display string from theme's
  * 'projectRelease' data.

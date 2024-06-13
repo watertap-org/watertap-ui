@@ -2,11 +2,11 @@ import './Header.css';
 import React from 'react';
 import LoggingPanel from '../../LoggingPanel/LoggingPanel';
 import {useNavigate} from "react-router-dom";
-import {Button, Menu, MenuItem, IconButton} from '@mui/material';
+import {Menu, MenuItem, IconButton} from '@mui/material';
 import ListIcon from '@mui/icons-material/List';
 
-export default function Header({theme}) {
-    console.log("header theme =", theme);
+export default function Header({theme, hasTheme}) {
+    console.debug("header hasTheme=", hasTheme, ", theme=", theme);
     let navigate = useNavigate();
     const [showLogs, setShowLogs] = React.useState(false)
     const [actionsList, setActionsList] = React.useState(false)
@@ -26,6 +26,20 @@ export default function Header({theme}) {
         setActionsList(!actionsList)
         setAnchorEl(event.currentTarget);
     }
+    if (!hasTheme) {
+        console.warning("theme not yet loaded, return empty header");
+        // Can't return null, or React complains about handleXYZ hooks not being
+        // called in the same order. So, return 'hidden' header.
+        return (
+            <div id="Header" style={{display: "hidden"}}>
+                <span id="logo" onClick={handleNavigateHome}></span>
+                <span onClick={handleShowActions}></span>
+                <span onClick={handleShowLogs}></span>
+                <span onClick={handleNavigateHome}></span>
+            </div>
+        );
+    }
+
     return (
         <div id="Header">
             <div className="titlebar"

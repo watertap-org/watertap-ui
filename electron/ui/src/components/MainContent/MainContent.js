@@ -16,10 +16,11 @@ export default function MainContent(props) {
     console.debug("MainContent: props=", props);
     if (props.hasTheme && props.hasFlowsheets) {
         const theme = props.theme;
+        const hasTheme = props.hasTheme;
         const spState = props.subProcState;
         return (
             <Container id='AppRootContainer'>
-                <Header theme={theme}/>
+                <Header theme={theme} hasTheme={hasTheme}/>
                 <Routes>
                     <Route path="flowsheet/:id/config" element={<FlowsheetConfig
                         numberOfSubprocesses={spState.value}

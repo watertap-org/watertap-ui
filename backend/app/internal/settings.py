@@ -26,18 +26,19 @@ class Deployment:
     PROJECT_ENV = "PSE_PROJECT"
     # projects and their associated packages
     PROJ = {
-        "watertap": ("watertap",),
+        "nawi": ("watertap",),
         "idaes": ("idaes",),
         "prommis": ("prommis",)
     }
-    DEFAULT_PROJ = "watertap"
+    DEFAULT_PROJ = "nawi"
 
     def __init__(self):
         try:
             project = os.environ[self.PROJECT_ENV].lower()
         except KeyError:
             project = self.DEFAULT_PROJ
-            _log.warning(f"Project name not found in environment variable '{self.PROJECT_ENV}', using default")
+            _log.warning(f"Project name not found in environment variable '{self.PROJECT_ENV}',"
+                         f"using default")
         _log.info(f"Deploy for project={project}")
         if project not in self.PROJ.keys():
             valid_projects = ", ".join((str(x) for x in self.PROJ))
@@ -68,12 +69,16 @@ class AppSettings(BaseSettings):
     def validate_log_dir(cls, v):
         if v is None:
             v = _dpy.data_basedir / "logs"
+        _log.info(f"Creating log directory '{v}'")
         v.mkdir(parents=True, exist_ok=True)
 
         logging_format = "[%(levelname)s] %(asctime)s %(name)s " \
                         "(%(filename)s:%(lineno)s): %(message)s"
+        project_log_file = f"{_dpy.project}-ui_backend_logs.log"
+        _log.info(f"Logs will be in rotating files with base name "
+                  f"'{v/project_log_file}'")
         logging_file_handler = logging.handlers.RotatingFileHandler(
-            v / f"{_dpy.project}-ui_backend_logs.log",
+            v / project_log_file,
             backupCount=2,
             maxBytes=5000000,
         )

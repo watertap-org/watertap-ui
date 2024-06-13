@@ -5,15 +5,13 @@
  * Without this information, the app can't know how to style the display or which
  * flowsheets to list, so it is the first thing that must happen.
  */
-import {Container} from "@mui/material";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
-import SplashPage from "../../views/SplashPage/SplashPage";
 import React from "react";
 
 export default function WaitForProject({hasTheme}) {
     if (!hasTheme) {
-        return (<Box sx={{display: 'flex'}}><CircularProgress/></Box>);
+        return (<Box sx={{display: 'flex'}}>Loading project... <CircularProgress/></Box>);
     } else {
         return null;
     }

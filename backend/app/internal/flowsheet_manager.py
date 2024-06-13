@@ -30,7 +30,7 @@ from watertap.ui.fsapi import FlowsheetInterface
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
-# _log.setLevel(logging.DEBUG)
+_log.setLevel(idaeslog.DEBUG)
 VERSION = 3
 
 
@@ -425,16 +425,20 @@ class FlowsheetManager:
         Returns:
             Mapping with keys the module names and values FlowsheetInterface objects
         """
+        # Find the entry points for the package
+        ep = metadata.entry_points()
         group_name = package_name + ".flowsheets"
-        try:
-            entry_points = metadata.entry_points()[group_name]
-        except KeyError:
-            _log.error(f"No interfaces found for package: {package_name}")
+        package_ep = [e for e in ep if e.matches(group=group_name)]
+
+        # If none are found print an erorr and abort
+        if not package_ep:
+            _log.error(f"No interfaces found for: {package_name}, group={group_name}. "
+                       f"All groups = {ep.groups}")
             return {}
 
         interfaces = {}
-        _log.debug(f"Loading {len(list(entry_points))} entry points")
-        for ep in entry_points:
+        _log.debug(f"Loading {len(list(package_ep))} entry points")
+        for ep in package_ep:
             _log.debug(f"ep = {ep}")
             module_name = ep.value
             try:
