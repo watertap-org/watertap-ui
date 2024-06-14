@@ -152,7 +152,7 @@ export default function ConfigInput(props) {
     const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
         const inputs = getInputs(tempFlowsheetData);
-        inputs.fixed = value;
+        inputs[id].fixed = value;
         inputs[id].is_sweep = (type === "sweep");
         updateFlowsheetData(tempFlowsheetData, null)
         runButtonRef.current?.checkDisableRun()

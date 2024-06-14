@@ -196,9 +196,11 @@ export default function FlowsheetConfig(props) {
                 break;
             case "UPDATE_CONFIG":
                 // setFlowsheetData(data)
+                console.debug("updateFlowsheetData[case UPDATE_CONFIG] saving data=", data.inputData);
                 handleSave(data.inputData, true);
                 break;
             case null:
+                console.debug("updateFlowsheetData[case null] saving data=", data.inputData);
                 handleSave(data.inputData, false);
                 break;
             default:

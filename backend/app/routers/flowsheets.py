@@ -5,6 +5,7 @@ Handle flowsheet-related API requests from web client.
 # stdlib
 import io
 import aiofiles
+import json
 from pathlib import Path
 from typing import List, Dict, Union
 
@@ -82,10 +83,9 @@ async def get_config(id_: str, build: str = "0") -> FlowsheetExport:
         info = flowsheet_manager.get_info(id_)
         _log.info(f"build param is 1, got info")
         flowsheet.build(build_options=flowsheet.fs_exp.build_options)
-        _log.info(f"BUILT FLOWSHEET CHUZ")
         info.updated(built=True)
         _log.info(f"updated has been confirmed")
-    _log.info(f"returning flowsheett .fs_exp")
+    _log.debug(f"returning flowsheeet .fs_exp")
     return flowsheet.fs_exp
 
 
@@ -124,13 +124,15 @@ async def solve(flowsheet_id: str, request: Request):
     # update input data before running a solve
     input_data = await request.json()
     try:
+        if _log.isEnabledFor(idaeslog.DEBUG):
+            _log.debug(f"Solve: Loading new data into flowsheet '{flowsheet_id}':\n"
+                       f"{json.dumps(input_data, indent=2)}\n")
         flowsheet.load(input_data)
-        _log.info(f"Loading new data into flowsheet '{flowsheet_id}'")
     except FlowsheetInterface.MissingObjectError as err:
-        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(f"Solve: Loading new data into flowsheet {flowsheet_id} failed: {err}")
         # XXX: return something about the error to caller
     except ValidationError as err:
-        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(f"Solve: Loading new data into flowsheet {flowsheet_id} failed: {err}")
         raise HTTPException(
             400,
             f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input",
@@ -165,13 +167,15 @@ async def sweep(flowsheet_id: str, request: Request):
     # update input data before running a sweep
     input_data = await request.json()
     try:
+        if _log.isEnabledFor(idaeslog.DEBUG):
+            _log.debug(f"Sweep: Loading new data into flowsheet '{flowsheet_id}':\n"
+                       f"{json.dumps(input_data, indent=2)}\n")
         flowsheet.load(input_data)
-        _log.info(f"Loading new data into flowsheet '{flowsheet_id}'")
     except FlowsheetInterface.MissingObjectError as err:
-        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(f"Sweep: Loading new data into flowsheet {flowsheet_id} failed: {err}")
         # XXX: return something about the error to caller
     except ValidationError as err:
-        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(f"Sweep: Loading new data into flowsheet {flowsheet_id} failed: {err}")
         raise HTTPException(
             400,
             f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input",
@@ -228,15 +232,17 @@ async def update(flowsheet_id: str, request: Request):
     flowsheet = flowsheet_manager.get_obj(flowsheet_id)
     input_data = await request.json()
     try:
+        if _log.isEnabledFor(idaeslog.DEBUG):
+            _log.debug(f"Update: Loading to flowsheet '{flowsheet_id}':\n"
+                       f"{json.dumps(input_data, indent=2)}\n")
         flowsheet.load(input_data)
-        _log.info(f"Loading new data into flowsheet '{flowsheet_id}'")
     except FlowsheetInterface.MissingObjectError as err:
         # this is unlikely, the model would need to change while running
         # (but could happen since 'build' and 'solve' can do anything they want)
-        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(f"Update: Loading new data into flowsheet {flowsheet_id} failed: {err}")
         # XXX: return something about the error to caller
     except ValidationError as err:
-        _log.error(f"Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(f"Update: Loading new data into flowsheet {flowsheet_id} failed: {err}")
         raise HTTPException(
             400,
             f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input",
