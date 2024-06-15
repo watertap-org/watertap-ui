@@ -1,4 +1,4 @@
- 
+ import './SweepOutput.css';
 import React from 'react'; 
 import { useEffect, useState } from 'react';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -7,7 +7,7 @@ import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab,
 import Plot from 'react-plotly.js';
 
 export default function SweepOutput(props) {
-    const { outputData, download } = props;
+    const { outputData, downloadOutput } = props;
     const [ plotType, setPlotType ] = useState(0)
     const [ plotData, setPlotData ] = useState({})
     const [ showPlot, setShowPlot ] = useState(false)
@@ -30,7 +30,7 @@ export default function SweepOutput(props) {
     }
 
     useEffect(() => {
-        let num_parameters = outputData.outputData.sweep_results.num_parameters
+        let num_parameters = outputData.outputData.sweep_results.num_parameters;
         if (num_parameters === 1) {
             setPlotType(1)
             unpackData(1, 0, 1)
@@ -43,6 +43,7 @@ export default function SweepOutput(props) {
             unpackData(3)
         }
     }, [props.outputData])
+
 
     const handleParamaterSelection = (event) => {
         // console.log("handle parameter selection")
@@ -277,7 +278,7 @@ export default function SweepOutput(props) {
                 
                 </Grid> 
                 <Grid item xs={12}>
-                    <Button variant="text" startIcon={<DownloadIcon />} onClick={download}>Download Results</Button>
+                    <Button variant="text" startIcon={<DownloadIcon />} onClick={downloadOutput}>Download Results</Button>
                 </Grid>
             </>
             }
