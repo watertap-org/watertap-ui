@@ -428,7 +428,18 @@ class FlowsheetManager:
         # Find the entry points for the package
         ep = metadata.entry_points()
         group_name = package_name + ".flowsheets"
-        package_ep = [e for e in ep if e.matches(group=group_name)]
+
+        def match_group(e, g):
+            result = None
+            if isinstance(e, str):
+                _log.warning(f"While matching to group {g}: "
+                             f"EntryPoint object expected, got string '{e}'")
+                result = e == g
+            else:
+                result = e.matches(group=g)
+            return result
+
+        package_ep = [e for e in ep if match_group(e, group_name)]
 
         # If none are found print an erorr and abort
         if not package_ep:
