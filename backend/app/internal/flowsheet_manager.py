@@ -12,7 +12,7 @@ else:
 try:
     from importlib import metadata
 except ImportError:
-    from importlib_metadata import metadata
+   c
 from pathlib import Path
 import time
 from types import ModuleType
@@ -426,31 +426,22 @@ class FlowsheetManager:
             Mapping with keys the module names and values FlowsheetInterface objects
         """
         # Find the entry points for the package
-        ep = metadata.entry_points()
-        group_name = package_name + ".flowsheets"
-
-        def match_group(e, g):
-            result = None
-            if isinstance(e, str):
-                _log.warning(f"While matching to group {g}: "
-                             f"EntryPoint object expected, got string '{e}'")
-                result = e == g
-            else:
-                result = e.matches(group=g)
-            return result
-
-        package_ep = [e for e in ep if match_group(e, group_name)]
+        eps = metadata.entry_points
+        project_pkg = package_name + ".flowsheets"
+        try:
+            pkg_eps = eps()[project_pkg]  # old Python <= 3.9
+        except KeyError:
+            pkg_eps = eps(group=project_pkg)  # new Python >= 3.10
 
         # If none are found print an erorr and abort
-        if not package_ep:
-            _log.error(f"No interfaces found for: {package_name}, group={group_name}. "
-                       f"All groups = {ep.groups}")
+        if not pkg_eps:
+            _log.error(f"No entry points found for package {project_pkg}")
             return {}
 
         interfaces = {}
-        _log.debug(f"Loading {len(list(package_ep))} entry points")
-        for ep in package_ep:
-            _log.debug(f"ep = {ep}")
+        _log.debug(f"Loading {len(list(pkg_eps))} entry points")
+        for ep in pkg_eps:
+            _log.debug(f"flowsheet-entry-point={ep}")
             module_name = ep.value
             try:
                 module = ep.load()
