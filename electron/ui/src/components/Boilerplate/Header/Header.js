@@ -27,12 +27,11 @@ export default function Header({theme, hasTheme}) {
         setAnchorEl(event.currentTarget);
     }
     if (!hasTheme) {
-        console.warning("theme not yet loaded, return empty header");
         // Can't return null, or React complains about handleXYZ hooks not being
         // called in the same order. So, return 'hidden' header.
         return (
             <div id="Header" style={{display: "hidden"}}>
-                <span id="logo" onClick={handleNavigateHome}></span>
+                <span id="logo" data-testid="project-logo" onClick={handleNavigateHome} alt={`${theme.project} logo`}></span>
                 <span onClick={handleShowActions}></span>
                 <span onClick={handleShowLogs}></span>
                 <span onClick={handleNavigateHome}></span>
@@ -44,7 +43,7 @@ export default function Header({theme, hasTheme}) {
         <div id="Header">
             <div className="titlebar"
                  style={{background: theme.header.background}}>
-                <div id="logo" style={{
+                <div id="logo" data-testid="project-logo" style={{
                     cursor: 'pointer',
                     background: theme.header.logoBackground
                 }} onClick={handleNavigateHome}>
