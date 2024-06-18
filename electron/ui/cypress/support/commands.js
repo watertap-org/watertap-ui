@@ -1,10 +1,23 @@
+/**
+ * Commands for use across the end-to-end tests.
+ */
 import '@testing-library/cypress/add-commands';
 
-Cypress.Commands.add('load_homepage', () => {
+/**
+ * Go to home page of the app
+ *
+ * From page: any
+ */
+Cypress.Commands.add('load_flowsheets_list', () => {
     cy.visit('/')
-    cy.screenshot('loaded homepage')
+    cy.screenshot('loaded flowsheet list page')
 })
 
+/**
+ * Load the RO with energy recovery flowsheet
+ *
+ * From page: flowsheet list
+ */
 Cypress.Commands.add('load_ro_flowsheet', () => {
     const flowsheet_name = 'RO with energy recovery flowsheet';
     cy.intercept({
@@ -16,6 +29,11 @@ Cypress.Commands.add('load_ro_flowsheet', () => {
     cy.screenshot('loaded flowsheet');
 })
 
+/**
+ * Set the water mass flowrate [input] to the given value
+ *
+ * From page: Inputs
+ */
 Cypress.Commands.add('set_ro_flowrate', (value) => {
     let input_textbox_name = 'Water mass flowrate';
     let input_textbox = cy.findByRole('textbox', {name: input_textbox_name});
@@ -25,6 +43,11 @@ Cypress.Commands.add('set_ro_flowrate', (value) => {
     cy.wait(500);
 })
 
+/**
+ * Solve the flowsheet
+ *
+ * From page: Inputs
+ */
 Cypress.Commands.add('solve_flowsheet', () => {
     cy.intercept({
         method: 'POST',
@@ -33,3 +56,4 @@ Cypress.Commands.add('solve_flowsheet', () => {
     cy.findAllByRole('button', {name: /run/i}).eq(0).click();
     cy.wait('@run');
 })
+

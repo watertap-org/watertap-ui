@@ -2,8 +2,8 @@ describe('Invalid Input Test', () => {
     it('test negative input for recovery rate', () => {
         let sc_count = 1;
 
-        cy.load_homepage();
-        cy.load_ro_flowsheet();
+        cy.load_flowsheets_list()
+        cy.load_ro_flowsheet()
 
         cy.set_ro_flowrate('dfas');
         cy.screenshot(sc_count + '_input1');

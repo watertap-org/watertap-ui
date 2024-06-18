@@ -2,7 +2,7 @@ describe('Flowsheet Output Test', () => {
     it('test output page when valid input is solved', () => {
         let sc_count = 1
 
-        cy.load_homepage()
+        cy.load_flowsheets_list()
         cy.load_ro_flowsheet()
 
         cy.set_ro_flowrate('0.96')
