@@ -7,12 +7,11 @@ import importlib
 
 if sys.version_info < (3, 10):
     from importlib_resources import files
+    importlib_old = True
 else:
     from importlib.resources import files
-try:
-    from importlib import metadata
-except ImportError:
-   c
+    importlib_old = False
+from importlib import metadata
 from pathlib import Path
 import time
 from types import ModuleType
@@ -428,9 +427,12 @@ class FlowsheetManager:
         # Find the entry points for the package
         eps = metadata.entry_points
         project_pkg = package_name + ".flowsheets"
-        try:
-            pkg_eps = eps()[project_pkg]  # old Python <= 3.9
-        except KeyError:
+        if importlib_old:
+            try:
+                pkg_eps = eps()[project_pkg]  # old Python <= 3.9
+            except KeyError:
+                pkg_eps = []
+        else:
             pkg_eps = eps(group=project_pkg)  # new Python >= 3.10
 
         # If none are found print an erorr and abort
