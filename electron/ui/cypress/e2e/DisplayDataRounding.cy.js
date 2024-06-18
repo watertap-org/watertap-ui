@@ -13,9 +13,17 @@ describe('Display Data Rounding', () => {
         // cy.screenshot(sc_count+'_clicked all flowsheets')
         // sc_count+=1
 
+        const set_flowrate = () => {
+            let input_textbox_name = "Water mass flowrate";
+            let input_textbox = cy.findByRole('textbox', {  name: input_textbox_name});
+            input_textbox.click({force:true});
+            input_textbox = cy.findByRole('textbox', {  name: input_textbox_name});
+            input_textbox.type('1{backspace}{backspace}{backspace}{backspace}0.96');
+            cy.wait(500);
+        }
 
         //click flowsheet and wait for api response
-        var flowsheet_name = "Magprex flowsheet"
+        var flowsheet_name = "RO with energy recovery flowsheet"
         cy.intercept({
             method: "GET",
             url: "http://localhost:8001/flowsheets/**",
@@ -36,6 +44,8 @@ describe('Display Data Rounding', () => {
         // cy.screenshot(sc_count+'_updated')
         // sc_count+=1
 
+        set_flowrate();
+        
         //click on solve and wait for api response
         cy.intercept({
             method: "POST",

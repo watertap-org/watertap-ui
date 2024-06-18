@@ -43,11 +43,11 @@ export default function Header({theme, hasTheme}) {
         <div id="Header">
             <div className="titlebar"
                  style={{background: theme.header.background}}>
-                <div id="logo" data-testid="project-logo" style={{
+                <div id="logo" style={{
                     cursor: 'pointer',
                     background: theme.header.logoBackground
                 }} onClick={handleNavigateHome}>
-                    <img src={theme.logoOnly} alt={`${theme.project} logo`}/>
+                    <img  data-testid="project-logo" src={theme.logoOnly} alt={`${theme.project} logo`}/>
                 </div>
                 <div id="titlebar-name" style={{color: theme.header.color}}>
                     {theme.projectTitle}

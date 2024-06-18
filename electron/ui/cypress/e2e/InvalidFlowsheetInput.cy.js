@@ -11,7 +11,7 @@ describe('Invalid Input Test', () => {
         // cy.findByText("All Flowsheets").click()
  
          //click flowsheet and wait for api response
-         var flowsheet_name = "Metab flowsheet"
+         var flowsheet_name = "RO with energy recovery flowsheet"
          cy.intercept({
              method: "GET",
              url: "http://localhost:8001/flowsheets/**",
@@ -23,7 +23,7 @@ describe('Invalid Input Test', () => {
          sc_count+=1
 
         //enter negative value for recovery rate twice to ensure it is entered
-        var input_textbox_name = "Volumetric flow rate"
+        var input_textbox_name = "Water mass flowrate"
         var input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})

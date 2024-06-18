@@ -11,7 +11,7 @@ describe('Flowsheet Output Test', () => {
         // cy.findByText("All Flowsheets").click()
 
         //click flowsheet and wait for api response
-        var flowsheet_name = "Metab flowsheet"
+        var flowsheet_name = "RO with energy recovery flowsheet"
         cy.intercept({
             method: "GET",
             url: "http://localhost:8001/flowsheets/**",
@@ -24,16 +24,16 @@ describe('Flowsheet Output Test', () => {
 
         //enter valid value for recovery rate twice to ensure it registers
         // var input_textbox_name = "COD concentration"
-        var input_textbox_name = "Volumetric flow rate"
+        var input_textbox_name = "Water mass flowrate"
         var input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
-        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}6')
+        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}0.96')
         cy.wait(500)
         var input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
-        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}6')
+        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}0.96')
         cy.screenshot(sc_count+'_input1')
         sc_count+=1
 
@@ -52,12 +52,12 @@ describe('Flowsheet Output Test', () => {
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
-        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}6')
+        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}0.96')
         cy.wait(500)
         var input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
         input_textbox.click({force:true})
         input_textbox = cy.findByRole('textbox', {  name: input_textbox_name})
-        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}6')
+        input_textbox.type('1{backspace}{backspace}{backspace}{backspace}0.96')
         cy.screenshot(sc_count+'_input2')
         sc_count+=1
 
