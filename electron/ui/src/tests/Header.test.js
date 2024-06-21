@@ -1,14 +1,19 @@
-import { render, screen } from '@testing-library/react';
-import Header from "../components/Boilerplate/Header/Header"
-import * as React from 'react'
-import { HashRouter } from "react-router-dom";
+import { render, screen, waitFor } from '@testing-library/react';
+import { HashRouter } from 'react-router-dom';
+import Header from '../components/Boilerplate/Header/Header';
+import {themes} from '../theme';
 
-//mock props
+// Test the header
+test('page header', () => {
+    const theme = themes['watertap'];
+    render( <HashRouter><Header theme={theme}></Header></HashRouter> );
 
-test('test input accordion', () => {
+    // Wait for menu button
+    waitFor(() => expect(screen.getByRole('button')).toBeDefined());
 
-    render( <HashRouter><Header show={true}></Header></HashRouter> )
+    // Test that project name is in the 'alt=' text for the logo image
+    const projectName = new RegExp(`${theme.project}.*`);
+    expect(screen.getByTestId("project-logo").getAttribute("alt")).toMatch(projectName);
 
-    //test for component elements
-    screen.getByRole('img', {  name: /NAWI logo/i});
+
 })

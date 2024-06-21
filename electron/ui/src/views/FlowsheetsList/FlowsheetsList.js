@@ -44,7 +44,7 @@ export default function FlowsheetsList(props) {
   };
   
   return ( 
-    <Container maxWidth="xl">
+    <Container>
       <h2 style={{textAlign:"left"}}>Flowsheets</h2>  
 
       <FlowsheetsListTable rows={rows} handleNewFlowsheetDialogClickOpen={handleNewFlowsheetDialogClickOpen}></FlowsheetsListTable> 
@@ -58,7 +58,7 @@ export default function FlowsheetsList(props) {
       </Snackbar> 
       }
       
-    </Container> 
+    </Container>
   );
 
 }

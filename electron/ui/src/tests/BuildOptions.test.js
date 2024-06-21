@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import BuildOptions from "../components/BuildOptions/BuildOptions"
-import * as React from 'react'
-import flowsheetData from './data/BuildOptionsData.json'
+import * as React from 'react';
+import flowsheetData from './data/BuildOptionsData.json';
 
 //mock props
 const setFlowsheetData = () => {

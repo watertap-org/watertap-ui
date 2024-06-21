@@ -6,6 +6,7 @@
   "main": "build/main.js",
   "dependencies": {
     "@electron/remote": "^2.0.8",
+    "@emotion/react": "^11.11.4",
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
     "electron-is-dev": "^2.0.0",
@@ -74,7 +75,7 @@
     },
     "deb": {
       "depends": [
-        "libgfortran5", 
+        "libgfortran5",
         "libgomp1",
         "liblapack3",
         "libblas3"
