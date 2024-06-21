@@ -1,20 +1,90 @@
-{
-    "name": "foo",
-    "inputData": {
+[
+    {
         "name": "foo",
-        "description": "foo flowsheet",
-        "model_objects": {
-            "d5f6d3d23cf2412b8fc8a36d0fba16a1": {
-                "name": "Tank 1 inlet flowrate",
-                "value": 1,
-                "display_units": "None",
-                "rounding": 0,
-                "description": "",
-                "is_input": true,
-                "is_output": true,
-                "is_readonly": false,
-                "input_category": null,
-                "output_category": null
+        "data": {
+            "Feed": {
+                "display_name": "Feed",
+                "variables": [
+                    {
+                        "name": "Volumetric flow rate",
+                        "value": 2,
+                        "display_units": "m3/h",
+                        "rounding": 2,
+                        "description": "Inlet volumetric flow rate",
+                        "is_input": true,
+                        "is_output": true,
+                        "is_readonly": false,
+                        "input_category": "Feed",
+                        "output_category": "Feed",
+                        "obj_key": "fs.feed.flow_vol[0.0]",
+                        "fixed": true,
+                        "lb": null,
+                        "ub": null,
+                        "num_samples": 2,
+                        "has_bounds": true,
+                        "is_sweep": false
+                    },
+                    {
+                        "name": "COD concentration",
+                        "value": 6.760000000000002,
+                        "display_units": "g/L",
+                        "rounding": 2,
+                        "description": "Inlet chemical oxygen demand (COD) concentration",
+                        "is_input": true,
+                        "is_output": true,
+                        "is_readonly": false,
+                        "input_category": "Feed",
+                        "output_category": "Feed",
+                        "obj_key": "fs.feed.conc_mass_comp[0.0,cod]",
+                        "fixed": true,
+                        "lb": null,
+                        "ub": null,
+                        "num_samples": 2,
+                        "has_bounds": true,
+                        "is_sweep": false
+                    }
+                ],
+                "input_variables": [],
+                "output_variables": [
+                    {
+                        "name": "Volumetric flow rate",
+                        "value": 2,
+                        "display_units": "m3/h",
+                        "rounding": 2,
+                        "description": "Inlet volumetric flow rate",
+                        "is_input": true,
+                        "is_output": true,
+                        "is_readonly": false,
+                        "input_category": "Feed",
+                        "output_category": "Feed",
+                        "obj_key": "fs.feed.flow_vol[0.0]",
+                        "fixed": true,
+                        "lb": null,
+                        "ub": null,
+                        "num_samples": 2,
+                        "has_bounds": true,
+                        "is_sweep": false
+                    },
+                    {
+                        "name": "COD concentration",
+                        "value": 6.760000000000002,
+                        "display_units": "g/L",
+                        "rounding": 2,
+                        "description": "Inlet chemical oxygen demand (COD) concentration",
+                        "is_input": true,
+                        "is_output": true,
+                        "is_readonly": false,
+                        "input_category": "Feed",
+                        "output_category": "Feed",
+                        "obj_key": "fs.feed.conc_mass_comp[0.0,cod]",
+                        "fixed": true,
+                        "lb": null,
+                        "ub": null,
+                        "num_samples": 2,
+                        "has_bounds": true,
+                        "is_sweep": false
+                    }
+                ]
             },
             "Hydrogen reactor": {
                 "display_name": "Hydrogen reactor",
