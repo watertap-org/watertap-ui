@@ -1,7 +1,17 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Grid, Button, Box, Paper, Stack, Toolbar, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
 import { downloadCSV, loadConfig, listConfigNames }  from '../../../services/output.service.js'
 
@@ -159,8 +169,8 @@ const organizeVariables = () => {
       return Object.keys(historyDataOrganized[leftConfigIndex].data).map((category,index)=>{  
         if (historyDataOrganized[leftConfigIndex].data[category] && historyDataOrganized[rightConfigIndex].data[category]) {
         if (historyDataOrganized[leftConfigIndex].data[category].variables.length > 0) {
-          return ( <Fragment key={category+index}>
-            <TableRow key={category+" "+index}>
+          return ( <Fragment>
+            <TableRow key={category+index}>
               <TableCell rowSpan={historyDataOrganized[leftConfigIndex].data[category].variables.length + 1}>
                 <b>{category}</b>
               </TableCell>
@@ -199,14 +209,6 @@ const organizeVariables = () => {
     const renderComparisonTable = () => {
 
         return <Grid item xs={12}>
-          <Grid item xs={12}>
-          <Toolbar spacing={2}>
-              <Box sx={{ flexGrow: 1 }}></Box>
-              <Stack direction="row" spacing={2}>
-                <Button variant="outlined" startIcon={<DownloadIcon />} onClick={downloadSheet}>Download Results</Button>
-              </Stack>
-          </Toolbar>
-          </Grid>
         <Paper>
           <Table style={{border:"1px solid #ddd"}} size={dense ? 'small' : 'medium'}>
             <TableHead>
@@ -223,9 +225,9 @@ const organizeVariables = () => {
             </TableBody>
           </Table>
         </Paper>
-        {/* <Grid item xs={12}>
+        <Grid item xs={12}>
         <Button variant="text" startIcon={<DownloadIcon />} onClick={downloadSheet}>Download Results</Button>
-        </Grid> */}
+        </Grid>
         </Grid>
       
     }
