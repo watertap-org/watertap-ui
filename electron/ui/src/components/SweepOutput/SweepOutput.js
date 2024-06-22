@@ -2,8 +2,8 @@
 import React from 'react'; 
 import { useEffect, useState } from 'react';
 import DownloadIcon from '@mui/icons-material/Download';
-import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Select } from '@mui/material';
-import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Select, ListItemButton } from '@mui/material';
+import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab, Box, List, ListItem, ListItemText } from '@mui/material';
 import Plot from 'react-plotly.js';
 
 export default function SweepOutput(props) {
@@ -44,9 +44,9 @@ export default function SweepOutput(props) {
         }
     }, [props.outputData])
 
-    const handleParamaterSelection = (event) => {
+    const handleParamaterSelection = (event, index) => {
         // console.log("handle parameter selection")
-        let newIndex = event.target.value + outputData.outputData.sweep_results.num_parameters
+        let newIndex = index + outputData.outputData.sweep_results.num_parameters
         if(plotType === 2) {
             unpackData(2, indices[0], indices[1], newIndex)
         }
@@ -284,34 +284,58 @@ export default function SweepOutput(props) {
             {tabValue === 1 && 
             <>
             {showPlot && (outputData.outputData.sweep_results.num_parameters === 1 || outputData.outputData.sweep_results.num_parameters === 2) && 
-                <Grid sx={{marginTop:15, height:"100px"}} item xs={2}>
-                    {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
+                // <Grid sx={{marginTop:15, height:"100px"}} item xs={2}>
+                //     {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
+                //     <InputLabel sx={{marginTop:1}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
+                //     <FormControl>
+                //         <Select
+                //         labelId="Parameter Selection"
+                //         id="Parameter Selection"
+                //         value={plotType === 2 ? indices[2]-outputData.outputData.sweep_results.num_parameters : plotType === 1 && indices[1]-outputData.outputData.sweep_results.num_parameters}
+                //         onChange={handleParamaterSelection}
+                //         size="small"
+                //         sx={{minWidth: 200}}
+                //         MenuProps={{
+                //             style: {
+                //                maxHeight: 400,
+                //                   },
+                //             }}
+                //         >
+                //         {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
+                //             <MenuItem
+                //             key={`${name}_${index}`}
+                //             value={index}
+                //             // style={getStyles(name, personName, theme)}
+                //             >
+                //             {name}
+                //             </MenuItem>
+                //         ))}
+                //         </Select>
+                //     </FormControl>
+                // </Grid>
+                // Replacing FormControl with list
+                <Grid sx={{marginTop:15, overflow: 'auto'}} item xs={2}>
+                {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
                     <InputLabel sx={{marginTop:1}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
-                    <FormControl>
-                        <Select
+                        <List
                         labelId="Parameter Selection"
                         id="Parameter Selection"
                         value={plotType === 2 ? indices[2]-outputData.outputData.sweep_results.num_parameters : plotType === 1 && indices[1]-outputData.outputData.sweep_results.num_parameters}
-                        onChange={handleParamaterSelection}
-                        size="small"
-                        sx={{minWidth: 200}}
-                        MenuProps={{
-                            style: {
-                               maxHeight: 400,
-                                  },
-                            }}
+                        sx={{minWidth: 100, maxHeight: 200}}
                         >
                         {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
-                            <MenuItem
-                            key={`${name}_${index}`}
-                            value={index}
-                            // style={getStyles(name, personName, theme)}
-                            >
-                            {name}
-                            </MenuItem>
+                            <ListItem>
+                                <ListItemButton
+                                selected={{index}}
+                                onClick={(event) => handleParamaterSelection(event, index)}
+                                key={`${name}_${index}`}
+                                value={index}
+                                >
+                                {name}
+                                </ListItemButton>
+                            </ListItem>
                         ))}
-                        </Select>
-                    </FormControl>
+                        </List>
                 </Grid>
             }
                 
@@ -334,4 +358,3 @@ export default function SweepOutput(props) {
         </Grid>
     );
 }
- 
