@@ -1,10 +1,6 @@
 describe('flowsheetslist', () => {
-    it('test flowsheetslist page', () => {
-        //load webpage
-        cy.visit('/')
-
-        //click on all flowsheets  
-        // cy.findByText("All Flowsheets").click()
+    it('test flowsheets-list page', () => {
+        cy.load_flowsheets_list()
 
         //locate heading
         cy.findByRole('heading', {  name: /flowsheets/i})

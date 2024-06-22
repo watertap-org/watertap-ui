@@ -14,7 +14,6 @@ hr {
   margin: 0px auto 10px auto;
   width: 100%;
   height: 50px;
-  background: #67c3e4;
 }
 
 .titlebar {
@@ -34,22 +33,22 @@ hr {
   color: white;
 }
 
-#nawi_logo {
+#logo {
   display: flex;
   align-items: center;
   height: 50px;
-  background: #f2f7f8;
+  /*background: #f2f7f8;*/
   padding: 0 10px 0 10px;
 }
 
-#nawi_logo img {
+#logo img {
   height: 40px;
 }
 
 #titlebar-name {
   display: flex;
   padding: 0 10px 0 10px;
-  color: #FFF;
+  /*color: #FFF;*/
   font-weight: bold;
   font-size: 25px;
 }

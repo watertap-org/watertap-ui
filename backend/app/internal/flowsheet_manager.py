@@ -7,12 +7,11 @@ import importlib
 
 if sys.version_info < (3, 10):
     from importlib_resources import files
+    importlib_old = True
 else:
     from importlib.resources import files
-try:
-    from importlib import metadata
-except ImportError:
-    from importlib_metadata import metadata
+    importlib_old = False
+from importlib import metadata
 from pathlib import Path
 import time
 from types import ModuleType
@@ -30,7 +29,7 @@ from watertap.ui.fsapi import FlowsheetInterface
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
-# _log.setLevel(logging.DEBUG)
+_log.setLevel(idaeslog.DEBUG)
 VERSION = 3
 
 
@@ -79,7 +78,7 @@ class FlowsheetManager:
         self.startup_time = time.time()
 
         # Add custom flowsheets path to the system path
-        self.custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
+        self.custom_flowsheets_path = self.app_settings.data_basedir / "custom_flowsheets"
         sys.path.append(str(self.custom_flowsheets_path))
 
         for package in self.app_settings.packages:
@@ -425,17 +424,26 @@ class FlowsheetManager:
         Returns:
             Mapping with keys the module names and values FlowsheetInterface objects
         """
-        group_name = package_name + ".flowsheets"
-        try:
-            entry_points = metadata.entry_points()[group_name]
-        except KeyError:
-            _log.error(f"No interfaces found for package: {package_name}")
+        # Find the entry points for the package
+        eps = metadata.entry_points
+        project_pkg = package_name + ".flowsheets"
+        if importlib_old:
+            try:
+                pkg_eps = eps()[project_pkg]  # old Python <= 3.9
+            except KeyError:
+                pkg_eps = []
+        else:
+            pkg_eps = eps(group=project_pkg)  # new Python >= 3.10
+
+        # If none are found print an erorr and abort
+        if not pkg_eps:
+            _log.error(f"No entry points found for package {project_pkg}")
             return {}
 
         interfaces = {}
-        _log.debug(f"Loading {len(list(entry_points))} entry points")
-        for ep in entry_points:
-            _log.debug(f"ep = {ep}")
+        _log.debug(f"Loading {len(list(pkg_eps))} entry points")
+        for ep in pkg_eps:
+            _log.debug(f"flowsheet-entry-point={ep}")
             module_name = ep.value
             try:
                 module = ep.load()

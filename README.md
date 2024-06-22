@@ -1,6 +1,7 @@
 # watertap-ui
 
-This repository is for work on the user interface (UI) for the WaterTAP library. The UI installer can be downloaded from our homepage at: https://watertap-org.github.io/
+This repository is for work on the user interface (UI) for the WaterTAP library.
+The UI installer can be downloaded from our homepage at: https://watertap-org.github.io/
 
 ## Getting started (developer)
 
@@ -101,10 +102,49 @@ npm run electron-start
 
 # Running developer tests
 
+There are three sets of tests that can be run: Python tests, JavaScript unit tests, and JavaScript end-to-end tests.
+
+## Running Python tests
+
 To run the Python tests, make sure you have the appropriate version of watertap in your conda env.  Then from the repository root directory run:
 
-`pytest backend/tests`
+To run:
+```shell
+cd backend
+pytest
+```
 
+This will take several minutes since one set of tests solves the UI flowsheets.
+
+## Running JS unit tests
+
+The unit tests are written using the [testing-library](https://testing-library.com/) package.
+
+To run:
+```shell
+cd electron/ui
+npm run test
+```
+
+Hit 'a' for "run all tests" if you want to run tests regardless of what changed.
+
+## Running JS E2E tests
+
+The end-to-end tests are written in Cypress.
+
+Before running the tests, start the back-end server, in another process (or shell):
+```shell
+cd electron/ui
+npm run start-backend
+```
+
+Then, to run the tests:
+```shell
+cd electron/ui  # if needed
+npx cypress run
+```
+
+If there are errors, screenshots and videos can be found (in subdirectories named for each test) under `electron/ui/cypress/screenshots` and `electron/ui/cypress/videos`.
 
 # Building production Electron app
 

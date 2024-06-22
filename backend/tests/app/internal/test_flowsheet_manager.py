@@ -15,7 +15,7 @@ import time
 
 @pytest.fixture(scope="module")
 def mgr():
-    return fm.FlowsheetManager(packages=["watertap", "tests.app.internal.examples"])
+    return fm.FlowsheetManager(packages=["watertap", "not.here"])
 
 
 def one_id(fm, filter_func=None):
