@@ -1,5 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 import sys
+import watertap
+from pathlib import Path 
+import os
+
+# get actual water path path incase its dev
+pkg_path = Path(watertap.__file__).parent
+
 sys.setrecursionlimit(5000)
 
 block_cipher = None
@@ -7,7 +14,7 @@ block_cipher = None
 # this file is not actually needed there, but we need the core directory 
 # to be present in the python executable to avoid errors being thrown
 added_files = [ 
-        ('../../../watertap/watertap/data/techno_economic/metab.yaml', 'watertap/core')
+        (os.path.join(pkg_path,"data/techno_economic/metab.yaml"), os.path.join("pkg_path","core"))
         ]
 
 a = Analysis(

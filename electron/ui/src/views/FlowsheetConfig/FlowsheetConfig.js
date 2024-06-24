@@ -23,7 +23,7 @@ import ConfigInput from "./ConfigInput/ConfigInput";
 import ConfigOutput from "./ConfigOutput/ConfigOutput";
 import SolveDialog from "../../components/SolveDialog/SolveDialog";
 import ErrorBar from "../../components/ErrorBar/ErrorBar";
-import ConfigOutputComparisonTable from './ConfigOutput/OutputComparisonTable'
+import ConfigOutputComparison from './ConfigOutput/OutputComparison'
 import BuildOptions from '../../components/BuildOptions/BuildOptions';
 
 /* Some utility functions */
@@ -77,7 +77,7 @@ export default function FlowsheetConfig(props) {
     const [tabValue, setTabValue] = useState(0);
     const [title, setTitle] = useState("");
     const [solveDialogOpen, setSolveDialogOpen] = useState(false);
-    const [sweep, setSweep] = useState(true)
+    const [ sweep, setSweep ] = useState(false)
     // const [outputData, setOutputData] = useState(null);
     const [openSuccessSaveConfirmation, setOpenSuccessSaveConfirmation] = React.useState(false);
     const [openErrorMessage, setOpenErrorMessage] = useState(false);
@@ -224,30 +224,31 @@ export default function FlowsheetConfig(props) {
         setSolveDialogOpen(false);
     }
 
-    const handleSave = (data, update) => {
-        // console.log("handle save.....",data);
-        saveFlowsheet(params.id, data)
-            .then(response => {
-                if (response.status === 200) {
-                    response.json()
-                        .then((data) => {
-                            // console.log("new Flowsheet Data:", data);
-                            let tempFlowsheetData = {...flowsheetData}
-                            tempFlowsheetData.inputData = data
-                            if (update) {
-                                console.log("SETTING FLOWSHEET DATA")
-                                setFlowsheetData(tempFlowsheetData)
-                            }
+    const handleSave = (data, update, outputData) => {
+      // console.log("handle save.....",data);
+      saveFlowsheet(params.id, data)
+      .then(response => {
+        if(response.status === 200) {
+          response.json()
+          .then((data)=>{
+            let tempFlowsheetData = {...flowsheetData}
+            tempFlowsheetData.inputData = data
+            if (outputData) {
+              tempFlowsheetData.outputData = outputData
 
-                            // setOpenSuccessSaveConfirmation(true);
-                        });
-                } else if (response.status === 400) {
-                    console.error("error saving data")
-                    handleError("Infeasible data, configuration not saved")
-                }
-
-            })
-
+            }
+            if (update) {
+              console.log("SETTING FLOWSHEET DATA")
+              setFlowsheetData(tempFlowsheetData)
+            }
+          });
+        } else if(response.status === 400) {
+          console.error("error saving data")
+          handleError("Infeasible data, configuration not saved")
+        }
+        
+      })
+        
     };
 
     const handleSuccessSaveConfirmationClose = () => {
@@ -421,9 +422,9 @@ export default function FlowsheetConfig(props) {
                                         </ConfigOutput>
                                     </TabPanel>
                                     <TabPanel value={tabValue} index={2}>
-                                        <ConfigOutputComparisonTable
+                                        <ConfigOutputComparison
                                             outputData={flowsheetData}>
-                                        </ConfigOutputComparisonTable>
+                                        </ConfigOutputComparison>
                                     </TabPanel>
                                 </Box>
                             }

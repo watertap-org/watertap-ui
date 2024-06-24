@@ -1,0 +1,10 @@
+name: watertap-ui-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - nodejs=20.9.0
+  - pip:
+    - -r backend/requirements-build.txt
+#    - git+https://github.com/watertap-org/watertap@workshop_tutorial
