@@ -321,15 +321,37 @@ export default function SweepOutput(props) {
                         labelId="Parameter Selection"
                         id="Parameter Selection"
                         value={plotType === 2 ? indices[2]-outputData.outputData.sweep_results.num_parameters : plotType === 1 && indices[1]-outputData.outputData.sweep_results.num_parameters}
-                        sx={{minWidth: 100, maxHeight: 200}}
+                        sx={{minWidth: 50, maxHeight: 500, fontSize: 15}}
                         >
                         {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
-                            <ListItem>
+                            <ListItem dense 
+                            // sx={{
+                            //     border: '3px solid rgba(0, 0, 0, 0.12)',
+                            //     borderRadius: '2px',
+                            //     marginBottom: '0px',
+                            //     padding: '1px', 
+                            //   }}
+                            style={{
+                            border: '1px solid rgba(0, 0, 0, 1)',
+                            paddingTop: 0, 
+                            paddingBottom: 0,
+                            paddingLeft: 0,
+                            paddingRight: 0}}
+                            >
                                 <ListItemButton
                                 selected={{index}}
                                 onClick={(event) => handleParamaterSelection(event, index)}
                                 key={`${name}_${index}`}
                                 value={index}
+                                sx={{
+                                    '&.Mui-selected': {
+                                        backgroundColor: 'transparent', 
+                                        padding: '12px', 
+                                        borderRadius: '4px', 
+                                                                },
+                                    '&:hover': {
+                                      backgroundColor: 'rgba(0, 0, 0, 0.04)', 
+                                    }}}
                                 >
                                 {name}
                                 </ListItemButton>
@@ -338,8 +360,11 @@ export default function SweepOutput(props) {
                         </List>
                 </Grid>
             }
+              <Grid item xs={1}>
+                {/* Empty grid for spacing */}
+            </Grid>
                 
-            <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={10}>
+            <Grid item xs={3} md={2}>
                 {showPlot && 
                 <>
                 <Plot
