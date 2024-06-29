@@ -13,6 +13,7 @@ export default function SweepOutput(props) {
     const [ showPlot, setShowPlot ] = useState(false)
     const [ indices, setIndices ] = useState([1, 0, 2])
     const [ tabValue, setTabValue ] = useState(0)
+    const [ selectedItem, setSelectedItem ] = useState(null);
 
     const styles = {
         parameters: {
@@ -46,6 +47,7 @@ export default function SweepOutput(props) {
 
     const handleParamaterSelection = (event, index) => {
         // console.log("handle parameter selection")
+        setSelectedItem(index)
         let newIndex = index + outputData.outputData.sweep_results.num_parameters
         if(plotType === 2) {
             unpackData(2, indices[0], indices[1], newIndex)
@@ -315,6 +317,7 @@ export default function SweepOutput(props) {
                 // </Grid>
                 // Replacing FormControl with list
                 <Grid sx={{marginTop:15, overflow: 'auto'}} item xs={2}>
+                <Grid sx={{marginTop:15, minWidth: 250, overflow: 'auto'}} item xs={3}>
                 {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
                     <InputLabel sx={{marginTop:1}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
                         <List
@@ -332,7 +335,8 @@ export default function SweepOutput(props) {
                             //     padding: '1px', 
                             //   }}
                             style={{
-                            border: '1px solid rgba(0, 0, 0, 1)',
+                            border: '1px solid rgba(0, 0, 0, 0.5)',
+                            borderRadius: '1px',
                             paddingTop: 0, 
                             paddingBottom: 0,
                             paddingLeft: 0,
@@ -343,12 +347,21 @@ export default function SweepOutput(props) {
                                 onClick={(event) => handleParamaterSelection(event, index)}
                                 key={`${name}_${index}`}
                                 value={index}
+                                selected={selectedItem === index}
                                 sx={{
+                                    textAlign: 'center',
+                                    justifyContent: 'center',
                                     '&.Mui-selected': {
-                                        backgroundColor: 'transparent', 
+                                        //backgroundColor: 'rgba(0, 0, 0, 0.04)', 
+                                        backgroundColor: 'rgba(0, 0, 255, 0.12)', 
                                         padding: '12px', 
                                         borderRadius: '4px', 
                                                                 },
+                                    '&:not(.Mui-selected)': {
+                                        backgroundColor: 'transparent',
+                                        padding: '12px',
+                                        borderRadius: '4px',
+                                        },
                                     '&:hover': {
                                       backgroundColor: 'rgba(0, 0, 0, 0.04)', 
                                     }}}
