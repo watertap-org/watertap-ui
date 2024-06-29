@@ -82,7 +82,7 @@ def test_get_all(client):
     data = body["flowsheet_list"]
     for item in data:
         # validates the result object, too
-        info = fm.FlowsheetInfo.parse_obj(item)
+        info = fm.FlowsheetInfo.model_validate(item)
         assert info.name != ""
 
 
@@ -93,7 +93,7 @@ def test_get_config(client, flowsheet_id):
     assert response.status_code == 200, body
     # make sure it's a non-empty valid response
     assert body != {}
-    fs_exp = FlowsheetExport.parse_obj(body)
+    fs_exp = FlowsheetExport.model_validate(body)
     assert fs_exp.name != ""
 
     # this time build the model, make sure there is content
