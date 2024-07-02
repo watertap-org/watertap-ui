@@ -2,7 +2,6 @@ from pathlib import Path
 from fastapi import HTTPException
 import numpy as np
 from watertap.tools.parameter_sweep import LinearSample, ParameterSweep, parameter_sweep
-import watertap.examples.flowsheets.case_studies.wastewater_resource_recovery.amo_1575_magprex.magprex as magprex
 from importlib import import_module
 import idaes.logger as idaeslog
 from pyomo.environ import (
