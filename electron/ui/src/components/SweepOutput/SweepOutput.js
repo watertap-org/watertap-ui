@@ -241,7 +241,9 @@ export default function SweepOutput(props) {
             // console.log(tempData)
             let fullData = [tempData[0]]
 
-            setPlotData({data: tempData, layout:tempLayout})
+            setPlotData({data: fullData, layout:tempLayout})
+            // log out this tempData
+            // console log plot data
             setShowPlot(true)
         } else if (plotType ===3) { //parallel coordinates plot
             // console.log('making parallel coordinates plot')
