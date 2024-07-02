@@ -1,7 +1,7 @@
 from pathlib import Path
 from fastapi import HTTPException
 import numpy as np
-from watertap.tools.parameter_sweep import LinearSample, ParameterSweep, parameter_sweep
+from parameter_sweep import LinearSample, ParameterSweep, parameter_sweep
 from importlib import import_module
 import idaes.logger as idaeslog
 from pyomo.environ import (
