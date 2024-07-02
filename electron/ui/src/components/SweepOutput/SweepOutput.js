@@ -45,6 +45,62 @@ export default function SweepOutput(props) {
         }
     }, [props.outputData])
 
+    const addPlotLine = (xIndex, yIndex) => {
+            let keys = outputData.outputData.sweep_results.keys
+            let newData = [...plotData.data];
+            let x = []
+            let ys = []
+            for (let i = 0; i < outputData.outputData.sweep_results.num_outputs; i++) {
+                ys.push([])
+            }
+            for (let each of outputData.outputData.sweep_results.values) {
+                x.push(Math.round(each[0] * 1000) / 1000)
+                
+                for(let i = 1; i < each.length; i++) {
+                    let out=null
+                    if (each[i]!==null){
+                        out = Math.round(each[i] * 1000) / 1000}
+                    ys[i-1].push(out)
+                }
+            }
+            let secData = []
+            let keyIdx = 1
+            for (let each of ys) {
+                if( keyIdx === yIndex){
+                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.exports[keys[keyIdx]].display_units})`
+                    let tempTrace = {x: x, y: each, type:"scatter", name: yName}
+                    secData.push(tempTrace)
+                    
+                }
+                keyIdx+=1
+                
+            }
+            
+            let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.exports[keys[0]].display_units})`
+            let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.exports[keys[yIndex]].display_units})`
+            let tempLayout = {
+                xaxis: {
+                    title: {
+                        text: xLabel,
+                    },
+                },
+                yaxis: {
+                    title: {
+                        text: yLabel,
+                    },
+                },
+                width: 700,
+                height: 500,
+            };
+            newData.push({
+                x: xIndex,
+                y: yIndex,
+            });
+            let finalData = [plotData.data[0], secData[0]]
+            setPlotData({data: finalData, layout:tempLayout})
+            setShowPlot(true);
+        }
+
     const handleParamaterSelection = (event, index) => {
         // console.log("handle parameter selection")
         setSelectedItem(index)
@@ -53,8 +109,10 @@ export default function SweepOutput(props) {
             unpackData(2, indices[0], indices[1], newIndex)
         }
         else if(plotType === 1) {
-            unpackData(1, indices[0], newIndex)
+            //unpackData(1, indices[0], newIndex)
+            addPlotLine(indices[0], newIndex)
         }
+        //https://plotly.com/javascript/line-charts/
         
     }
 
@@ -181,6 +239,7 @@ export default function SweepOutput(props) {
             };
             // console.log('lineplot data: ')
             // console.log(tempData)
+            let fullData = [tempData[0]]
 
             setPlotData({data: tempData, layout:tempLayout})
             setShowPlot(true)
@@ -316,7 +375,7 @@ export default function SweepOutput(props) {
                 //     </FormControl>
                 // </Grid>
                 // Replacing FormControl with list
-                <Grid sx={{marginTop:15, overflow: 'auto'}} item xs={2}>
+                // test by sweep ing TDS concentration
                 <Grid sx={{marginTop:15, minWidth: 250, overflow: 'auto'}} item xs={3}>
                 {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
                     <InputLabel sx={{marginTop:1}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
@@ -343,7 +402,6 @@ export default function SweepOutput(props) {
                             paddingRight: 0}}
                             >
                                 <ListItemButton
-                                selected={{index}}
                                 onClick={(event) => handleParamaterSelection(event, index)}
                                 key={`${name}_${index}`}
                                 value={index}
