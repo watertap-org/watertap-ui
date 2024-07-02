@@ -96,8 +96,8 @@ export default function SweepOutput(props) {
                 x: xIndex,
                 y: yIndex,
             });
-            let finalData = [plotData.data[0], secData[0]]
-            setPlotData({data: finalData, layout:tempLayout})
+            plotData.data.push(secData[0])
+            setPlotData({data: plotData.data, layout:tempLayout})
             setShowPlot(true);
         }
 
