@@ -14,6 +14,7 @@ export default function SweepOutput(props) {
     const [ indices, setIndices ] = useState([1, 0, 2])
     const [ tabValue, setTabValue ] = useState(0)
     const [ selectedItem, setSelectedItem ] = useState(null);
+    const [ selectedItems, setSelectedItems ] = useState([]);
 
     const styles = {
         parameters: {
@@ -35,6 +36,7 @@ export default function SweepOutput(props) {
         if (num_parameters === 1) {
             setPlotType(1)
             unpackData(1, 0, 1)
+            setSelectedItems([0])
         } else if (num_parameters === 2) {
             setPlotType(2)
             unpackData(2, 1, 0, 2)
@@ -46,71 +48,91 @@ export default function SweepOutput(props) {
     }, [props.outputData])
 
     const addPlotLine = (xIndex, yIndex) => {
-            let keys = outputData.outputData.sweep_results.keys
-            let newData = [...plotData.data];
-            let x = []
-            let ys = []
-            for (let i = 0; i < outputData.outputData.sweep_results.num_outputs; i++) {
-                ys.push([])
-            }
-            for (let each of outputData.outputData.sweep_results.values) {
-                x.push(Math.round(each[0] * 1000) / 1000)
-                
-                for(let i = 1; i < each.length; i++) {
-                    let out=null
-                    if (each[i]!==null){
-                        out = Math.round(each[i] * 1000) / 1000}
-                    ys[i-1].push(out)
-                }
-            }
-            let secData = []
-            let keyIdx = 1
-            for (let each of ys) {
-                if( keyIdx === yIndex){
-                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.exports[keys[keyIdx]].display_units})`
-                    let tempTrace = {x: x, y: each, type:"scatter", name: yName}
-                    secData.push(tempTrace)
-                    
-                }
-                keyIdx+=1
-                
-            }
-            
-            let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.exports[keys[0]].display_units})`
-            let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.exports[keys[yIndex]].display_units})`
-            let tempLayout = {
-                xaxis: {
-                    title: {
-                        text: xLabel,
-                    },
-                },
-                yaxis: {
-                    title: {
-                        text: yLabel,
-                    },
-                },
-                width: 700,
-                height: 500,
-            };
-            newData.push({
-                x: xIndex,
-                y: yIndex,
-            });
-            plotData.data.push(secData[0])
-            setPlotData({data: plotData.data, layout:tempLayout})
-            setShowPlot(true);
+        let keys = outputData.outputData.sweep_results.keys
+        let newData = [...plotData.data];
+        let x = []
+        let ys = []
+        for (let i = 0; i < outputData.outputData.sweep_results.num_outputs; i++) {
+            ys.push([])
         }
+        for (let each of outputData.outputData.sweep_results.values) {
+            x.push(Math.round(each[0] * 1000) / 1000)
+            
+            for(let i = 1; i < each.length; i++) {
+                let out=null
+                if (each[i]!==null){
+                    out = Math.round(each[i] * 1000) / 1000}
+                ys[i-1].push(out)
+            }
+        }
+        let secData = []
+        let keyIdx = 1
+        for (let each of ys) {
+            if( keyIdx === yIndex){
+                let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.exports[keys[keyIdx]].display_units})`
+                let tempTrace = {x: x, y: each, type:"scatter", name: yName}
+                secData.push(tempTrace)
+                
+            }
+            keyIdx+=1
+            
+        }
+        
+        let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.exports[keys[0]].display_units})`
+        let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.exports[keys[yIndex]].display_units})`
+        let tempLayout = {
+            xaxis: {
+                title: {
+                    text: xLabel,
+                },
+            },
+            yaxis: {
+                title: {
+                    text: yLabel,
+                },
+            },
+            width: 700,
+            height: 500,
+        };
+        newData.push({
+            x: xIndex,
+            y: yIndex,
+        });
+        plotData.data.push(secData[0])
+        setPlotData({data: plotData.data, layout:tempLayout})
+        setShowPlot(true);
+    }
 
     const handleParamaterSelection = (event, index) => {
         // console.log("handle parameter selection")
         setSelectedItem(index)
+        //console.log(selectedItem)
         let newIndex = index + outputData.outputData.sweep_results.num_parameters
         if(plotType === 2) {
             unpackData(2, indices[0], indices[1], newIndex)
         }
         else if(plotType === 1) {
-            //unpackData(1, indices[0], newIndex)
-            addPlotLine(indices[0], newIndex)
+            if (selectedItems.includes(index)) {
+                if (selectedItems.length == 1) {
+                    return
+                }
+                const updatedItems = selectedItems.filter(item => item !== index);
+                setSelectedItems(updatedItems);
+                //console.log("curreny elements:")
+                for (let i=0; i < updatedItems.length; i++) {
+                    console.log(updatedItems[i])
+                }
+                //console.log(plotData.data)
+                plotData.data = []
+                for (let i=0; i < updatedItems.length; i++) {
+                    addPlotLine(indices[0], updatedItems[i] + outputData.outputData.sweep_results.num_parameters)
+                }
+                //console.log(plotData.data)
+            }
+            else {
+                setSelectedItems([...selectedItems, index]);
+                addPlotLine(indices[0], newIndex)
+            }
         }
         //https://plotly.com/javascript/line-charts/
         
@@ -407,7 +429,7 @@ export default function SweepOutput(props) {
                                 onClick={(event) => handleParamaterSelection(event, index)}
                                 key={`${name}_${index}`}
                                 value={index}
-                                selected={selectedItem === index}
+                                selected={selectedItems.includes(index)}
                                 sx={{
                                     textAlign: 'center',
                                     justifyContent: 'center',
