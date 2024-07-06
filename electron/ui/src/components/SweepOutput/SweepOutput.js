@@ -118,23 +118,26 @@ export default function SweepOutput(props) {
                 }
                 const updatedItems = selectedItems.filter(item => item !== index);
                 setSelectedItems(updatedItems);
-                //console.log("curreny elements:")
                 for (let i=0; i < updatedItems.length; i++) {
                     console.log(updatedItems[i])
                 }
-                //console.log(plotData.data)
                 plotData.data = []
                 for (let i=0; i < updatedItems.length; i++) {
                     addPlotLine(indices[0], updatedItems[i] + outputData.outputData.sweep_results.num_parameters)
                 }
-                //console.log(plotData.data)
             }
             else {
-                setSelectedItems([...selectedItems, index]);
-                addPlotLine(indices[0], newIndex)
+                if (outputData.outputData.exports[outputData.outputData.sweep_results.keys[newIndex]].display_units === outputData.outputData.exports[outputData.outputData.sweep_results.keys[selectedItems[0]+outputData.outputData.sweep_results.num_parameters]].display_units) {
+                    setSelectedItems([...selectedItems, index]);
+                    addPlotLine(indices[0], newIndex)
+                }
+                else {
+                    plotData.data = []
+                    setSelectedItems([index]);
+                    addPlotLine(indices[0], newIndex)
+                }
             }
         }
-        //https://plotly.com/javascript/line-charts/
         
     }
 
