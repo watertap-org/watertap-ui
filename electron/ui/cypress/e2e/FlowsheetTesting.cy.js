@@ -87,6 +87,7 @@ describe('WaterTAP UI Testing', () => {
         cy.solve_flowsheet()
         cy.screenshot(sc_count + '_error-message');
         sc_count += 1;
+        cy.get('.error-message').should('be.visible')
 
         cy.set_ro_flowrate('-10');
         cy.screenshot(sc_count + '_invalid-negative-input');
@@ -95,6 +96,7 @@ describe('WaterTAP UI Testing', () => {
         cy.solve_flowsheet()
         cy.screenshot(sc_count + '_error-message');
         sc_count += 1;
+        cy.get('.error-message').should('be.visible')
 
         cy.screenshot(sc_count + '_end-invalid-input-test');
         sc_count += 1;
@@ -109,10 +111,9 @@ describe('WaterTAP UI Testing', () => {
         cy.screenshot(sc_count+'_opened_logs')
         sc_count += 1;
 
-        // check that a log line of type info, warning, and error are all present
+        // check that a log line of type info, warning, are present
         cy.get('.log-line').contains('INFO')
         cy.get('.log-line').contains('WARNING')
-        // cy.get('.log-line').contains('ERROR')
 
         cy.screenshot(sc_count+'_end-logging-test')
         sc_count += 1;
