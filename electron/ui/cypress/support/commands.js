@@ -2,6 +2,7 @@
  * Commands for use across the end-to-end tests.
  */
 import '@testing-library/cypress/add-commands';
+require('cypress-downloadfile/lib/downloadFileCommand');
 
 /**
  * Go to home page of the app
