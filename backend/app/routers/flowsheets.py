@@ -290,7 +290,6 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
     Returns:
         Updated flowsheet list
     """
-    custom_flowsheets_path = flowsheet_manager.app_settings.custom_flowsheets_dir / "custom_flowsheets"
     try:
         # get file contents
         new_files = []
@@ -301,7 +300,7 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
             if "_ui.py" in file.filename:
                 new_id = file.filename.replace(".py", "")
             async with aiofiles.open(
-                f"{str(custom_flowsheets_path)}/{file.filename}", "wb"
+                f"{str(flowsheet_manager.app_settings.custom_flowsheets_dir)}/{file.filename}", "wb"
             ) as out_file:
                 content = await file.read()  # async read
                 await out_file.write(content)
