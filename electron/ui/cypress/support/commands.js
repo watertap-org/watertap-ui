@@ -57,3 +57,15 @@ Cypress.Commands.add('solve_flowsheet', () => {
     cy.wait('@run');
 })
 
+/**
+ * Open logging panel
+ *
+ * From page: Any
+ */
+Cypress.Commands.add('open_logging_panel', () => {
+    cy.get('.header-actions').click();
+    cy.wait(500);
+    cy.get('.view-logs').click();
+    cy.wait(500);
+})
+
