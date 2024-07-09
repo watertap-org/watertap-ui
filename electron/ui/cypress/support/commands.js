@@ -56,6 +56,20 @@ Cypress.Commands.add('solve_flowsheet', () => {
 })
 
 /**
+ * Save configuration
+ *
+ * From page: Output
+ */
+Cypress.Commands.add('save_configuration', () => {
+    cy.intercept({
+        method: "POST",
+        url: "http://localhost:8001/flowsheets/**",
+    }).as("saveConfig");
+    cy.findByRole('button', {name: /save/i}).click()
+    cy.wait("@saveConfig");
+})
+
+/**
  * Open logging panel
  *
  * From page: Any

@@ -55,12 +55,7 @@ describe('WaterTAP UI Testing', () => {
         sc_count += 1
 
         // Click on save (config) and wait for api response
-        cy.intercept({
-            method: "POST",
-            url: "http://localhost:8001/flowsheets/**",
-        }).as("saveConfig");
-        cy.findByRole('button', {name: /save/i}).click()
-        cy.wait("@saveConfig");
+        cy.save_configuration()
         cy.screenshot(sc_count + '_saved config')
         sc_count += 1
 
@@ -69,7 +64,6 @@ describe('WaterTAP UI Testing', () => {
         cy.wait(5000)
 
         // Verify that new name is shown in comparison table
-        // cy.findAllByRole('button', {name: /new_test_configuration/i})
         cy.findAllByRole('tabpanel', {name: /compare/i})
 
         cy.screenshot(sc_count + '_end-solve-test')
@@ -87,13 +81,19 @@ describe('WaterTAP UI Testing', () => {
         sc_count += 1;
 
         cy.set_ro_flowrate('dfas');
-        cy.screenshot(sc_count + '_input1');
+        cy.screenshot(sc_count + '_invalid-text-input');
         sc_count += 1;
 
-        // TODO: run solve, test that "processing" goes away
+        cy.solve_flowsheet()
+        cy.screenshot(sc_count + '_error-message');
+        sc_count += 1;
 
-        cy.set_ro_flowrate(cy, '-10');
-        cy.screenshot(sc_count + '_input2');
+        cy.set_ro_flowrate('-10');
+        cy.screenshot(sc_count + '_invalid-negative-input');
+        sc_count += 1;
+
+        cy.solve_flowsheet()
+        cy.screenshot(sc_count + '_error-message');
         sc_count += 1;
 
         cy.screenshot(sc_count + '_end-invalid-input-test');
