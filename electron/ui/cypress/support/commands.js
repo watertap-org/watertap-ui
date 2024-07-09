@@ -10,7 +10,6 @@ import '@testing-library/cypress/add-commands';
  */
 Cypress.Commands.add('load_flowsheets_list', () => {
     cy.visit('/')
-    cy.screenshot('loaded flowsheet list page')
 })
 
 /**
@@ -26,7 +25,6 @@ Cypress.Commands.add('load_ro_flowsheet', () => {
     }).as('loadFlowsheet');
     cy.findByText(flowsheet_name).click();
     cy.wait('@loadFlowsheet');
-    cy.screenshot('loaded flowsheet');
 })
 
 /**
