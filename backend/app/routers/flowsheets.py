@@ -305,7 +305,7 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
                 content = await file.read()  # async read
                 await out_file.write(content)
         flowsheet_manager.add_custom_flowsheet(new_files, new_id)
-        return {"return": "success boy"}
+        return new_id
 
     except Exception as e:
         _log.error(f"error on file upload: {str(e)}")
