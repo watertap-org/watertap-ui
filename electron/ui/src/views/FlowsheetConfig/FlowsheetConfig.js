@@ -443,7 +443,7 @@ export default function FlowsheetConfig(props) {
             />
             <ErrorBar
                 open={openErrorMessage}
-                duration={3000}
+                duration={30000}
                 handleErrorClose={handleErrorClose}
                 severity={"error"}
                 errorMessage={errorMessage}
