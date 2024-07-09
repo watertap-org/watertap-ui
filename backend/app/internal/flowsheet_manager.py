@@ -585,7 +585,7 @@ class FlowsheetManager:
 
     def get_logs_path(self):
         """Return logs path."""
-        return self.app_settings.log_dir
+        return self.app_settings.log_dir / "nawi-ui_backend_logs.log"
 
     @staticmethod
     def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:

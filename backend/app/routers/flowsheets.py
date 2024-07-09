@@ -518,7 +518,7 @@ async def get_logs() -> List:
     Returns:
         Logs formatted as a list
     """
-    logs_path = flowsheet_manager.get_logs_path() / "watertap-ui_backend_logs.log"
+    logs_path = flowsheet_manager.get_logs_path()
     return parse_logs(logs_path, flowsheet_manager.startup_time)
 
 
@@ -540,5 +540,5 @@ async def download_logs() -> Path:
     Returns:
         Log file
     """
-    logs_path = flowsheet_manager.get_logs_path() / "watertap-ui_backend_logs.log"
+    logs_path = flowsheet_manager.get_logs_path()
     return logs_path
