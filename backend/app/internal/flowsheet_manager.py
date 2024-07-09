@@ -206,7 +206,7 @@ class FlowsheetManager:
         if info.custom:
             # do this
             data_path = (
-                Path.home() / ".watertap" / "custom_flowsheets" / f"{info.id_}.png"
+                self.app_settings.custom_flowsheets_dir / f"{info.id_}.png"
             )
             data = data_path.read_bytes()
 

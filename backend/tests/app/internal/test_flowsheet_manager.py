@@ -9,10 +9,6 @@ from fastapi import HTTPException
 import time
 
 
-# logging.getLogger("idaes.app.internal.flowsheet_manager").setLevel(logging.DEBUG)
-# logging.getLogger("idaes.watertap.ui.fsapi").setLevel(logging.DEBUG)
-
-
 @pytest.fixture(scope="module")
 def mgr():
     return fm.FlowsheetManager(packages=["watertap", "not.here"])

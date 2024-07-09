@@ -290,7 +290,7 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
     Returns:
         Updated flowsheet list
     """
-    custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
+    custom_flowsheets_path = flowsheet_manager.app_settings.custom_flowsheets_dir / "custom_flowsheets"
     try:
         # get file contents
         new_files = []
