@@ -1,10 +1,8 @@
-let sc_count = 1
 
 describe('WaterTAP UI Testing', () => {
     it('tests flowsheets-list page', () => {
         cy.load_flowsheets_list()
-        cy.screenshot(sc_count + '_loaded flowsheet list page')
-        sc_count += 1
+        cy.screenshot('loaded flowsheet list page')
 
         //locate heading
         cy.findByRole('heading', {  name: /flowsheets/i})
@@ -12,52 +10,50 @@ describe('WaterTAP UI Testing', () => {
         //locate table headers
         cy.findByRole('columnheader', {  name: /flowsheet name/i})
         cy.findByRole('columnheader', {  name: /last run/i})
-        cy.screenshot(sc_count + '_end-list-page-test')
-        sc_count += 1
+        cy.screenshot('end-list-page-test')
+        
     })
 
     it('tests output page when valid input is solved', () => {
-        // let sc_count = 1
-
         cy.load_flowsheets_list()
-        cy.screenshot(sc_count + '_loaded flowsheet list page')
-        sc_count += 1
+        cy.screenshot('loaded flowsheet list page')
+        
         cy.load_ro_flowsheet()
-        cy.screenshot(sc_count+'_loaded RO flowsheet');
-        sc_count += 1;
+        cy.screenshot('loaded RO flowsheet');
+        ;
 
         cy.set_ro_flowrate('0.96')
         cy.set_ro_flowrate('0.96')
-        cy.screenshot(sc_count + '_input1')
-        sc_count += 1
+        cy.screenshot('set flowrate to 0.96')
+        
 
         cy.set_ro_flowrate('0.96')
         cy.set_ro_flowrate('0.96')
-        cy.screenshot(sc_count + '_input2')
-        sc_count += 1
+        cy.screenshot('set flowrate to 0.96')
+        
 
         cy.solve_flowsheet()
-        cy.screenshot(sc_count + "_solved")
-        sc_count += 1
+        cy.screenshot("solved flowshet")
+        
 
         // Click save configuration button
         cy.findByRole('button', {name: /save configuration/i}).click()
         cy.wait(1000)
-        cy.screenshot(sc_count + '_pre saveConfig')
-        sc_count += 1
+        cy.screenshot('pre saveConfig')
+        
 
         // Clear preset name and enter new name
         cy.wait(1000)
         cy.get('.MuiInput-input').should('be.visible')
         cy.get('.MuiInput-input', {timeout: 10000}).clear({force: true})
         cy.get('.MuiInput-input', {timeout: 10000}).type('new_test_configuration', {force: true})
-        cy.screenshot(sc_count + '_saveConfig')
-        sc_count += 1
+        cy.screenshot('saveConfig')
+        
 
         // Click on save (config) and wait for api response
         cy.save_configuration()
-        cy.screenshot(sc_count + '_saved config')
-        sc_count += 1
+        cy.screenshot('saved config')
+        
 
         // Click compare tab
         cy.findByRole('tab', {name: /compare/i}).click()
@@ -66,57 +62,54 @@ describe('WaterTAP UI Testing', () => {
         // Verify that new name is shown in comparison table
         cy.findAllByRole('tabpanel', {name: /compare/i})
 
-        cy.screenshot(sc_count + '_end-solve-test')
-        sc_count += 1;
+        cy.screenshot('end-solve-test')
+        ;
     })
 
     it('tests negative input for recovery rate', () => {
-        // let sc_count = 1;
-
         cy.load_flowsheets_list()
-        cy.screenshot(sc_count + '_loaded flowsheet list page')
-        sc_count += 1
+        cy.screenshot('loaded flowsheet list page')
+        
         cy.load_ro_flowsheet()
-        cy.screenshot(sc_count+'_loaded RO flowsheet');
-        sc_count += 1;
+        cy.screenshot('loaded RO flowsheet');
+        ;
 
         cy.set_ro_flowrate('dfas');
-        cy.screenshot(sc_count + '_invalid-text-input');
-        sc_count += 1;
+        cy.screenshot('invalid-text-input');
+        ;
 
         cy.solve_flowsheet()
-        cy.screenshot(sc_count + '_error-message');
-        sc_count += 1;
+        cy.screenshot('error-message');
+        ;
         cy.get('.error-message').should('be.visible')
 
         cy.set_ro_flowrate('-10');
-        cy.screenshot(sc_count + '_invalid-negative-input');
-        sc_count += 1;
+        cy.screenshot('invalid-negative-input');
+        ;
 
         cy.solve_flowsheet()
-        cy.screenshot(sc_count + '_error-message');
-        sc_count += 1;
+        cy.screenshot('error-message');
+        ;
         cy.get('.error-message').should('be.visible')
 
-        cy.screenshot(sc_count + '_end-invalid-input-test');
-        sc_count += 1;
+        cy.screenshot('end-invalid-input-test');
+        ;
     })
 
     it('tests logging panel', () => {
-        // let sc_count = 1;
         cy.load_flowsheets_list()
-        cy.screenshot(sc_count + '_loaded flowsheet list page')
-        sc_count += 1
+        cy.screenshot('loaded flowsheet list page')
+        
         cy.open_logging_panel()
-        cy.screenshot(sc_count+'_opened_logs')
-        sc_count += 1;
+        cy.screenshot('opened_logs')
+        ;
 
         // check that a log line of type info, warning, are present
         cy.get('.log-line').contains('INFO')
         cy.get('.log-line').contains('WARNING')
 
-        cy.screenshot(sc_count+'_end-logging-test')
-        sc_count += 1;
+        cy.screenshot('end-logging-test')
+        ;
     })
 
     it('test values rounded to and displayed as 0 retain their original value', () => {
@@ -124,17 +117,17 @@ describe('WaterTAP UI Testing', () => {
         // XXX: because the flowsheet was changed.
 
         cy.load_flowsheets_list()
-        cy.screenshot(sc_count + '_loaded flowsheet list page')
-        sc_count += 1
+        cy.screenshot('loaded flowsheet list page')
+        
         cy.load_ro_flowsheet()
-        cy.screenshot(sc_count+'_loaded RO flowsheet');
-        sc_count += 1;
+        cy.screenshot('loaded RO flowsheet');
+        ;
 
         cy.solve_flowsheet()
 
         // XXX: Test something??
 
-        cy.screenshot(sc_count+'_end-rounding-test')
-        sc_count += 1;
+        cy.screenshot('end-rounding-test')
+        ;
     })
 })
