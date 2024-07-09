@@ -69,8 +69,23 @@ export default function SweepOutput(props) {
         let keyIdx = 1
         for (let each of ys) {
             if( keyIdx === yIndex){
-                let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.exports[keys[keyIdx]].display_units})`
-                let tempTrace = {x: x, y: each, type:"scatter", name: yName}
+                let yName = `${outputData.outputData.sweep_results.headers[keyIdx]}`// (${outputData.outputData.exports[keys[keyIdx]].display_units})`
+                let finalName = ``
+                if (yName.length > 32) {
+                    let nameArray = yName.split(" ")
+                    for (let i = 0; i < nameArray.length; i++) {
+                        console.log(nameArray[i])
+                        finalName = finalName.concat(nameArray[i], " ")
+                        console.log(finalName)
+                        if (i % 3 == 0 && i != 0 && i != nameArray.length - 1) {
+                            finalName = finalName.concat("<br>")
+                        }
+                    }
+                }
+                else {
+                    finalName = `${outputData.outputData.sweep_results.headers[keyIdx]}`
+                }
+                let tempTrace = {x: x, y: each, type:"scatter", name: finalName}
                 secData.push(tempTrace)
                 
             }
@@ -235,8 +250,21 @@ export default function SweepOutput(props) {
             let keyIdx = 1
             for (let each of ys) {
                 if( keyIdx === yIndex){
-                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.exports[keys[keyIdx]].display_units})`
-                    let tempTrace = {x: x, y: each, type:"scatter", name: yName}
+                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]}` // (${outputData.outputData.exports[keys[keyIdx]].display_units})`
+                    let finalName = ``
+                    if (yName.length > 30) {
+                        let nameArray = yName.split()
+                        for (let i = 0; i < nameArray.length; i++) {
+                            finalName.concat(nameArray[i], " ")
+                            if (i % 4 == 0 && i != 0) {
+                                finalName.concat("<br>")
+                            }
+                        }
+                    }
+                    else {
+                        finalName = `${outputData.outputData.sweep_results.headers[keyIdx]}`
+                    }
+                    let tempTrace = {x: x, y: each, type:"scatter", name: finalName}
                     tempData.push(tempTrace)
                     
                 }
