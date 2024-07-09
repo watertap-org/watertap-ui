@@ -203,9 +203,11 @@ export default function FlowsheetsListTable(props) {
                       </span>
                                 </TableCell>
                                 <TableCell></TableCell>
-                                <TableCell align="right"><Button variant="contained"
-                                                                 onClick={props.handleNewFlowsheetDialogClickOpen}>New
-                                    Flowsheet +</Button></TableCell>
+                                <TableCell align="right">
+                                    <Button className="new-flowsheet-button" variant="contained" onClick={props.handleNewFlowsheetDialogClickOpen}>
+                                        New Flowsheet +
+                                    </Button>
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

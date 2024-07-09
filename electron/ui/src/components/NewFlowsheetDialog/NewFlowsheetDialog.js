@@ -181,7 +181,7 @@ export default function NewFlowsheetDialog(props) {
 
    const fileUploaderContainer = (fileId) => {
     return (
-        <Box sx={styles.fileUploaderInnerBox}>
+        <Box className={fileId.replace(" ","")} sx={styles.fileUploaderInnerBox}>
             <h4 style={{margin:0, color:"#9B9B9B"}}>Drag and drop <u>{fileId}</u> or <Button style={{color: '#0884b4'}} variant="outlined">Browse...</Button></h4>
         </Box>
 
@@ -280,7 +280,7 @@ export default function NewFlowsheetDialog(props) {
         </Grid>
         <Grid item xs={12}>
             <Box sx={{display: 'flex', justifyContent: 'center', marginRight:'10px'}}>
-                <Button id="create-scenario-button" variant="contained" style={styles.button} onClick={handleUploadFlowsheet}>Upload Flowsheet</Button>
+                <Button className="upload-flowsheet-button" variant="contained" style={styles.button} onClick={handleUploadFlowsheet}>Upload Flowsheet</Button>
             </Box>
             </Grid>
         </Grid>
