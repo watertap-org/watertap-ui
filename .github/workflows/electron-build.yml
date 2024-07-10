@@ -25,6 +25,7 @@ jobs:
         with:
           environment-file: environment-build.yml
           activate-environment: watertap-ui-env
+          miniforge-version: latest
       
       - name: Install Azure Signtool
         run: |
