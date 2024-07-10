@@ -107,6 +107,7 @@ jobs:
         with:
           environment-file: environment.yml
           activate-environment: watertap-ui-env
+          miniforge-version: latest
 
       - name: Install watertap-ui Python package
         run: |
