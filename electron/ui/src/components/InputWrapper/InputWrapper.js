@@ -108,20 +108,11 @@ export default function InputWrapper(props) {
         
     };
 
-    // const handleShowBounds = () => {
-    //     setShowBounds(!showBounds)
-    // }
-
     const getVariableState = () => {
         if(isSweep) return "sweep"
         else if (fieldData.fixed) return "fixed"
         else return "free"
-        // else if(!fieldData.fixed && fieldData.is_sweep) return "sweep"
     }
-
-    // const reallyGetVariableState = () => {
-    //     return 
-    // }
 
 
     const displayUnits = (d) => {
@@ -155,12 +146,12 @@ export default function InputWrapper(props) {
                 </Tooltip>
                 </Grid>
                 <Grid item xs={3}>
-                <FormControl size="small" sx={{width:'80%'}}>
+                <FormControl  size="small" sx={{width:'80%'}}>
                     <Select
+                        className={fieldData.name.replace(" ","")+"_fixed-free-select"}
                         name={fieldData.obj_key} 
                         value={getVariableState()}
                         onChange={handleFixedChange}
-                        // sx={{color:'#0b89b9', fontWeight: "bold"}}
                     >
                     <MenuItem key={true} value={"fixed"}>Fixed</MenuItem>
                     <MenuItem disabled={!fieldData.has_bounds || disabled} key={false} value={"free"}>Free</MenuItem>
@@ -169,9 +160,6 @@ export default function InputWrapper(props) {
                     </Select>
                 </FormControl>
                 </Grid>
-                {/* <Grid item xs={1}>
-                    <IconButton onClick={handleShowBounds}><ExpandIcon/></IconButton>
-                </Grid> */}
                 {
                     showBounds &&
                     <>
