@@ -431,9 +431,9 @@ export default function SweepOutput(props) {
                 // </Grid>
                 // Replacing FormControl with list
                 // test by sweep ing TDS concentration
-                <Grid sx={{marginTop:15, minWidth: 250, overflow: 'auto'}} item xs={3}>
+                <Grid sx={{marginTop:5, minWidth: 250, overflow: 'auto'}} item xs={3}>
                 {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
-                    <InputLabel sx={{marginTop:1}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
+                    <InputLabel sx={{marginTop:0, fontWeight: '500', fontSize: 17}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
                         <List
                         labelId="Parameter Selection"
                         id="Parameter Selection"
