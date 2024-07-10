@@ -285,14 +285,11 @@ export default function FlowsheetsListTable(props) {
                                     sx={styles.listRow}
                                     onClick={() => handleFlowsheetClick(row.id_, row.built, row.build_options)}
                                 >
-                                    <TableCell>{row.description}</TableCell>
+                                    <TableCell><p style={{margin:0,padding:0}} className='flowsheet-name'>{row.description}</p></TableCell>
                                     <TableCell
                                         align="right">{formatLastRun(row.last_run)}</TableCell>
                                     <TableCell>
                                         {row.custom &&
-                                            // <IconButton size="small" onClick={(e) => handleRemoveCustomFlowsheet(e, row.id_)}>
-                                            //     <ClearIcon sx={{fontSize: "15px"}}/>
-                                            // </IconButton>
                                             <IconButton size="small"
                                                         onClick={(e) => handleShowModal(e, row.id_)}>
                                                 <ClearIcon sx={{fontSize: "15px"}}/>

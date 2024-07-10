@@ -102,32 +102,49 @@ describe('WaterTAP UI Testing', () => {
         
         cy.open_logging_panel()
         cy.screenshot('opened_logs')
-        ;
 
         // check that a log line of type info, warning, are present
         cy.get('.log-line').contains('INFO')
         cy.get('.log-line').contains('WARNING')
 
         cy.screenshot('end-logging-test')
-        ;
     })
 
-    it('test values rounded to and displayed as 0 retain their original value', () => {
-        // XXX: This doesn't really test anything different
-        // XXX: because the flowsheet was changed.
-
+    it('tests new flowsheet', () => {
+        let modelFile = "https://drive.google.com/uc?export=download&id=1XdjuWNpYT9teZxaF8TuwDz0XS2XyXKeT"
+        let exportFile = "https://drive.google.com/uc?export=download&id=1-jWQmI4wO2OlyUi32fqobFEmPn3zm9Q9"
         cy.load_flowsheets_list()
         cy.screenshot('loaded flowsheet list page')
+
+        // download model and export files
+        cy.downloadFile(modelFile,'cypress/downloads','testModelFile.py')
+        cy.downloadFile(exportFile,'cypress/downloads','testModelFile_ui.py')
         
-        cy.load_ro_flowsheet()
-        cy.screenshot('loaded RO flowsheet');
-        ;
+        cy.findByRole('button', {name: /new flowsheet +/i}).click()
+        cy.wait(500)
 
-        cy.solve_flowsheet()
+        cy.screenshot("clicked new flowsheet")
+        
+        // select both files
+        cy.get('.ModelFile').selectFile('./cypress/downloads/testModelFile.py', {
+            action: 'drag-drop',
+            force: true
+        })
+        cy.get('.ExportFile').selectFile('./cypress/downloads/testModelFile_ui.py', {
+            action: 'drag-drop',
+            force: true
+        })
 
-        // XXX: Test something??
+        cy.wait(500)
+        cy.screenshot("dragged and dropped files")
 
-        cy.screenshot('end-rounding-test')
-        ;
+        cy.get('.upload-flowsheet-button').click()
+        
+        cy.wait(1000)
+        cy.screenshot("uploaded files")
+
+        cy.get('.flowsheet-name').contains(/test custom flowsheet/i)
+        cy.screenshot('end-new-flowsheet-test')
+
     })
 })
