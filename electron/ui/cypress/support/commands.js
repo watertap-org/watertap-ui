@@ -82,3 +82,15 @@ Cypress.Commands.add('open_logging_panel', () => {
     cy.wait(500);
 })
 
+/**
+ * Enter text into element based on role and name
+ *
+ * From page: Inputs
+ */
+Cypress.Commands.add('enter_text', (role, name, value) => {
+    let input_textbox = cy.findByRole(role, {name: name});
+    input_textbox.click({force:true});
+    input_textbox = cy.findByRole(role, {name: name});
+    input_textbox.type('{backspace}{backspace}{backspace}{backspace}' + value);
+    cy.wait(500);
+})
