@@ -2,6 +2,7 @@
  * Commands for use across the end-to-end tests.
  */
 import '@testing-library/cypress/add-commands';
+require('cypress-downloadfile/lib/downloadFileCommand');
 
 /**
  * Go to home page of the app
@@ -10,7 +11,6 @@ import '@testing-library/cypress/add-commands';
  */
 Cypress.Commands.add('load_flowsheets_list', () => {
     cy.visit('/')
-    cy.screenshot('loaded flowsheet list page')
 })
 
 /**
@@ -26,7 +26,6 @@ Cypress.Commands.add('load_ro_flowsheet', () => {
     }).as('loadFlowsheet');
     cy.findByText(flowsheet_name).click();
     cy.wait('@loadFlowsheet');
-    cy.screenshot('loaded flowsheet');
 })
 
 /**
@@ -57,3 +56,52 @@ Cypress.Commands.add('solve_flowsheet', () => {
     cy.wait('@run');
 })
 
+/**
+ * Save configuration
+ *
+ * From page: Output
+ */
+Cypress.Commands.add('save_configuration', () => {
+    cy.intercept({
+        method: "POST",
+        url: "http://localhost:8001/flowsheets/**",
+    }).as("saveConfig");
+    cy.findByRole('button', {name: /save/i}).click()
+    cy.wait("@saveConfig");
+})
+
+/**
+ * Open logging panel
+ *
+ * From page: Any
+ */
+Cypress.Commands.add('open_logging_panel', () => {
+    cy.get('.header-actions').click();
+    cy.wait(500);
+    cy.get('.view-logs').click();
+    cy.wait(500);
+})
+
+/**
+ * Enter text into element based on role and name
+ *
+ * From page: Inputs
+ */
+Cypress.Commands.add('enter_text', (identifier, role_or_class, value, name ) => {
+    let input_textbox
+    if (identifier === "role") {
+        input_textbox = cy.findByRole(role_or_class, {name: name});
+    }
+    else if (identifier === "class") {
+        input_textbox = cy.get('.'+role_or_class);
+    }
+    input_textbox.click({force:true});
+    if (identifier === "role") {
+        input_textbox = cy.findByRole(role_or_class, {name: name});
+    }
+    else if (identifier === "class") {
+        input_textbox = cy.get('.'+role_or_class);
+    }
+    input_textbox.type('{backspace}{backspace}{backspace}{backspace}' + value);
+    cy.wait(500);
+})

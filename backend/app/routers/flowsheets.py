@@ -290,7 +290,6 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
     Returns:
         Updated flowsheet list
     """
-    custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
     try:
         # get file contents
         new_files = []
@@ -301,12 +300,15 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
             if "_ui.py" in file.filename:
                 new_id = file.filename.replace(".py", "")
             async with aiofiles.open(
-                f"{str(custom_flowsheets_path)}/{file.filename}", "wb"
+                f"{str(flowsheet_manager.app_settings.custom_flowsheets_dir)}/{file.filename}", "wb"
             ) as out_file:
                 content = await file.read()  # async read
                 await out_file.write(content)
-        flowsheet_manager.add_custom_flowsheet(new_files, new_id)
-        return {"return": "success boy"}
+        resp = flowsheet_manager.add_custom_flowsheet(new_files, new_id)
+        if resp == "success":
+            return new_id
+        else:
+            raise HTTPException(400, detail=f"Flowsheet Module not valid: {resp}")
 
     except Exception as e:
         _log.error(f"error on file upload: {str(e)}")
@@ -518,7 +520,7 @@ async def get_logs() -> List:
     Returns:
         Logs formatted as a list
     """
-    logs_path = flowsheet_manager.get_logs_path() / "watertap-ui_backend_logs.log"
+    logs_path = flowsheet_manager.get_logs_path()
     return parse_logs(logs_path, flowsheet_manager.startup_time)
 
 
@@ -540,5 +542,5 @@ async def download_logs() -> Path:
     Returns:
         Log file
     """
-    logs_path = flowsheet_manager.get_logs_path() / "watertap-ui_backend_logs.log"
+    logs_path = flowsheet_manager.get_logs_path()
     return logs_path

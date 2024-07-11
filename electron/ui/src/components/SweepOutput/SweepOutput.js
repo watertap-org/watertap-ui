@@ -353,7 +353,7 @@ export default function SweepOutput(props) {
             <>
                 <Grid item xs={12}>
                 <TableContainer sx={{maxHeight: "80vh", overflowX:'auto'}}>
-                <Table style={{border:"1.5px solid #71797E"}} size={'small'}>
+                <Table className="parameter-sweep-output-table" style={{border:"1.5px solid #71797E"}} size={'small'}>
                     <TableHead>
                     <TableRow style={styles.tableHeader}>
                         <TableCell style={styles.tableHeader} colSpan={outputData.outputData.sweep_results.num_parameters} align="center">

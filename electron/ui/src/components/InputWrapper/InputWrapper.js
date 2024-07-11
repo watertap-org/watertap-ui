@@ -108,20 +108,11 @@ export default function InputWrapper(props) {
         
     };
 
-    // const handleShowBounds = () => {
-    //     setShowBounds(!showBounds)
-    // }
-
     const getVariableState = () => {
         if(isSweep) return "sweep"
         else if (fieldData.fixed) return "fixed"
         else return "free"
-        // else if(!fieldData.fixed && fieldData.is_sweep) return "sweep"
     }
-
-    // const reallyGetVariableState = () => {
-    //     return 
-    // }
 
 
     const displayUnits = (d) => {
@@ -155,12 +146,13 @@ export default function InputWrapper(props) {
                 </Tooltip>
                 </Grid>
                 <Grid item xs={3}>
-                <FormControl size="small" sx={{width:'80%'}}>
+                <FormControl  size="small" sx={{width:'80%'}}>
                     <Select
+                        className={fieldData.name.replaceAll(" ","")+"_fixed-free-select"}
+                        // className={"fixed-free-select"}
                         name={fieldData.obj_key} 
                         value={getVariableState()}
                         onChange={handleFixedChange}
-                        // sx={{color:'#0b89b9', fontWeight: "bold"}}
                     >
                     <MenuItem key={true} value={"fixed"}>Fixed</MenuItem>
                     <MenuItem disabled={!fieldData.has_bounds || disabled} key={false} value={"free"}>Free</MenuItem>
@@ -169,16 +161,14 @@ export default function InputWrapper(props) {
                     </Select>
                 </FormControl>
                 </Grid>
-                {/* <Grid item xs={1}>
-                    <IconButton onClick={handleShowBounds}><ExpandIcon/></IconButton>
-                </Grid> */}
                 {
                     showBounds &&
                     <>
                         <Grid item xs={0.25}></Grid>
                         <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}> 
                         
-                        <TextField id={'lower_bound'} 
+                            <TextField id={'lower_bound'} 
+                                className={fieldData.name.replaceAll(" ","")+"_lower_input"}
                                 name={`${fieldData.obj_key}::lb`} 
                                 label={'Lower'}
                                 variant="outlined" 
@@ -187,13 +177,14 @@ export default function InputWrapper(props) {
                                 onChange={handleBoundsChange}
                                 fullWidth 
                                 disabled={disabled}
-                        />
+                            />
                         </Grid>
                         <Grid item xs={.25}>
                         </Grid>
 
                         <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}>
-                        <TextField id={'upper_bound'} 
+                            <TextField id={'upper_bound'} 
+                                className={fieldData.name.replaceAll(" ","")+"_upper_input"}
                                 name={`${fieldData.obj_key}::ub`} 
                                 label={'Upper'}
                                 variant="outlined" 
@@ -202,7 +193,7 @@ export default function InputWrapper(props) {
                                 onChange={handleBoundsChange}
                                 fullWidth 
                                 disabled={disabled}
-                        />
+                            />
 
                         </Grid>
                         <Grid item xs={0.25}></Grid>

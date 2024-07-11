@@ -4,7 +4,7 @@ import os
 from shutil import copytree
 import certifi
 
-idaes_extensions_dir = Path.home() / ".watertap" / ".idaes"
+idaes_extensions_dir = Path.home() / ".nawi" / ".idaes"
 
 
 def check_for_idaes_extensions():

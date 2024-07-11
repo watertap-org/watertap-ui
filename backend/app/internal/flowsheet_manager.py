@@ -206,7 +206,7 @@ class FlowsheetManager:
         if info.custom:
             # do this
             data_path = (
-                Path.home() / ".watertap" / "custom_flowsheets" / f"{info.id_}.png"
+                self.app_settings.custom_flowsheets_dir / f"{info.id_}.png"
             )
             data = data_path.read_bytes()
 
@@ -458,9 +458,19 @@ class FlowsheetManager:
 
     def add_custom_flowsheet(self, new_files, new_id):
         """Add new custom flowsheet to the mini db."""
+        for f in new_files:
+            if "_ui.py" in f:
+                module_name = f.replace(".py", "")
+                try:
+                    importlib.import_module(module_name)
+                except Exception as e:
+                    _log.info(f"unable to import module: {e}")
+                    self.remove_custom_flowsheet_files(new_files)
+                    return e
 
         query = tinydb.Query()
         try:
+            
             custom_flowsheets_dict = self._histdb.search(
                 query.fragment({"custom_flowsheets_version": VERSION})
             )
@@ -486,6 +496,7 @@ class FlowsheetManager:
         )
 
         self.add_custom_flowsheets()
+        return "success"
 
     def remove_custom_flowsheet(self, id_):
         """Remove a custom flowsheet from the mini db."""
@@ -508,15 +519,19 @@ class FlowsheetManager:
 
         # remove each file
         flowsheet_files = custom_flowsheets_dict[id_]
-        for flowsheet_file in flowsheet_files:
-            flowsheet_file_path = self.custom_flowsheets_path / flowsheet_file
-            _log.info(f"flowsheet file path: {flowsheet_file_path}")
-            if os.path.isfile(flowsheet_file_path):
-                _log.info(f"removing file: {flowsheet_file_path}")
-                os.remove(flowsheet_file_path)
+        self.remove_custom_flowsheet_files(flowsheet_files)
+        # for flowsheet_file in flowsheet_files:
+        #     flowsheet_file_path = self.custom_flowsheets_path / flowsheet_file
+        #     _log.info(f"flowsheet file path: {flowsheet_file_path}")
+        #     if os.path.isfile(flowsheet_file_path):
+        #         _log.info(f"removing file: {flowsheet_file_path}")
+        #         os.remove(flowsheet_file_path)
 
         # delete from DB
-        del custom_flowsheets_dict[id_]
+        try:
+            del custom_flowsheets_dict[id_]
+        except Exception as e:
+            _log.info(f"unable to delete {id_} from custom flowsheets dictionary")
         self._histdb.upsert(
             {
                 "custom_flowsheets_version": VERSION,
@@ -526,9 +541,22 @@ class FlowsheetManager:
         )
 
         # remove from flowsheets list
-        del self._flowsheets[id_]
+        try:
+            del self._flowsheets[id_]
+        except Exception as e:
+            _log.info(f"unable to delete {id_} from flowsheets list")
 
         self.add_custom_flowsheets()
+    
+    def remove_custom_flowsheet_files(self, flowsheet_files):
+        # remove each file
+        for flowsheet_file in flowsheet_files:
+            flowsheet_file_path = self.custom_flowsheets_path / flowsheet_file
+            _log.info(f"flowsheet file path: {flowsheet_file_path}")
+            if os.path.isfile(flowsheet_file_path):
+                _log.info(f"removing file: {flowsheet_file_path}")
+                os.remove(flowsheet_file_path)
+        return
 
     def add_custom_flowsheets(self):
         """Search for user uploaded flowsheets. If found, add them as flowsheet interfaces."""
@@ -585,7 +613,7 @@ class FlowsheetManager:
 
     def get_logs_path(self):
         """Return logs path."""
-        return self.app_settings.log_dir
+        return self.app_settings.log_dir / "nawi-ui_backend_logs.log"
 
     @staticmethod
     def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:
