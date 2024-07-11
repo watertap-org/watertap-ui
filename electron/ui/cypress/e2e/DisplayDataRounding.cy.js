@@ -7,6 +7,7 @@ describe('Display Data Rounding', () => {
 
         cy.load_flowsheets_list()
         cy.load_ro_flowsheet()
+        cy.wait(5000)
         cy.solve_flowsheet()
 
         // XXX: Test something??
