@@ -288,14 +288,12 @@ export default function ConfigInput(props) {
                                             id="previous-configs-select"
                                             value={configName}
                                             onChange={handleConfigSelection}
-                                            // MenuProps={MenuProps}
                                             size="small"
                                         >
                                             {previousConfigs.map((name) => (
                                                 <MenuItem
                                                     key={name}
                                                     value={name}
-                                                    // style={getStyles(name, personName, theme)}
                                                 >
                                                     {name}
                                                 </MenuItem>
@@ -318,7 +316,6 @@ export default function ConfigInput(props) {
                             {solveType === 'sweep' &&
                                 <TextField
                                     label={"Number of subprocesses"}
-                                    // placeholder={'[1-16]'}
                                     id={'number-of-subprocesses-input'}
                                     onChange={handleUpdateNumberOfSubprocesses}
                                     value={currentNumberOfSubprocesses === null ? '' : currentNumberOfSubprocesses}
@@ -346,11 +343,6 @@ export default function ConfigInput(props) {
                                 <Button variant="outlined" startIcon={<RefreshIcon/>}
                                         onClick={reset} fullWidth>RESET</Button>
                             </div>
-                            {/* <Tooltip title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
-                                <div>
-                                <Button variant="contained" onClick={()=>updateFlowsheetData(flowsheetData.inputData,solveType)} disabled={disableRun}>RUN</Button>
-                                </div>
-                            </Tooltip> */}
                             <RunButton
                                 theme={theme}
                                 updateFlowsheetData={updateFlowsheetData}

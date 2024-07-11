@@ -14,13 +14,12 @@ describe('WaterTAP UI Testing', () => {
         
     })
 
-    it('tests output page when valid input is solved', () => {
+    it('tests individual optimization', () => {
         cy.load_flowsheets_list()
         cy.screenshot('loaded flowsheet list page')
         
         cy.load_ro_flowsheet()
         cy.screenshot('loaded RO flowsheet');
-        ;
 
         cy.set_ro_flowrate('0.96')
         cy.set_ro_flowrate('0.96')
@@ -63,37 +62,32 @@ describe('WaterTAP UI Testing', () => {
         cy.findAllByRole('tabpanel', {name: /compare/i})
 
         cy.screenshot('end-solve-test')
-        ;
     })
 
-    it('tests negative input for recovery rate', () => {
+    it('tests invalid inputs', () => {
         cy.load_flowsheets_list()
         cy.screenshot('loaded flowsheet list page')
         
         cy.load_ro_flowsheet()
         cy.screenshot('loaded RO flowsheet');
-        ;
 
         cy.set_ro_flowrate('dfas');
         cy.screenshot('invalid-text-input');
-        ;
 
         cy.solve_flowsheet()
         cy.screenshot('error-message');
-        ;
         cy.get('.error-message').should('be.visible')
 
         cy.set_ro_flowrate('-10');
         cy.screenshot('invalid-negative-input');
-        ;
 
         cy.solve_flowsheet()
         cy.screenshot('error-message');
-        ;
+
         cy.get('.error-message').should('be.visible')
 
         cy.screenshot('end-invalid-input-test');
-        ;
+
     })
 
     it('tests logging panel', () => {
@@ -145,6 +139,39 @@ describe('WaterTAP UI Testing', () => {
 
         cy.get('.flowsheet-name').contains(/test custom flowsheet/i)
         cy.screenshot('end-new-flowsheet-test')
+
+    })
+
+    it('tests parameter sweep', () => {
+        cy.load_flowsheets_list()
+        cy.screenshot('loaded flowsheet list page')
+        
+        cy.load_ro_flowsheet()
+        cy.screenshot('loaded RO flowsheet')
+
+        // set solve type to sweep
+        cy.get('#solve-sweep-select').click()
+        cy.wait(100)
+        cy.get('#sweep-option').click()
+        cy.wait(1000)
+
+        // set sweep variable
+        cy.get('.Watermassflowrate_fixed-free-select').click()
+        cy.wait(100)
+        cy.findByRole('option', { name: /sweep/i }).click()
+        cy.wait(100)
+
+        // enter lower and upper bounds
+        cy.enter_text('class', 'Watermassflowrate_lower_input', '0.7')
+        cy.enter_text('class', 'Watermassflowrate_upper_input', '0.8')
+
+        // run sweep
+        cy.solve_flowsheet()
+        cy.wait(5000)
+        cy.screenshot("ran parameter sweep")
+
+        //test that sweep was successful
+        cy.get('.parameter-sweep-output-table').should('be.visible')
 
     })
 })

@@ -148,7 +148,8 @@ export default function InputWrapper(props) {
                 <Grid item xs={3}>
                 <FormControl  size="small" sx={{width:'80%'}}>
                     <Select
-                        className={fieldData.name.replace(" ","")+"_fixed-free-select"}
+                        className={fieldData.name.replaceAll(" ","")+"_fixed-free-select"}
+                        // className={"fixed-free-select"}
                         name={fieldData.obj_key} 
                         value={getVariableState()}
                         onChange={handleFixedChange}
@@ -166,7 +167,8 @@ export default function InputWrapper(props) {
                         <Grid item xs={0.25}></Grid>
                         <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}> 
                         
-                        <TextField id={'lower_bound'} 
+                            <TextField id={'lower_bound'} 
+                                className={fieldData.name.replaceAll(" ","")+"_lower_input"}
                                 name={`${fieldData.obj_key}::lb`} 
                                 label={'Lower'}
                                 variant="outlined" 
@@ -175,13 +177,14 @@ export default function InputWrapper(props) {
                                 onChange={handleBoundsChange}
                                 fullWidth 
                                 disabled={disabled}
-                        />
+                            />
                         </Grid>
                         <Grid item xs={.25}>
                         </Grid>
 
                         <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}>
-                        <TextField id={'upper_bound'} 
+                            <TextField id={'upper_bound'} 
+                                className={fieldData.name.replaceAll(" ","")+"_upper_input"}
                                 name={`${fieldData.obj_key}::ub`} 
                                 label={'Upper'}
                                 variant="outlined" 
@@ -190,7 +193,7 @@ export default function InputWrapper(props) {
                                 onChange={handleBoundsChange}
                                 fullWidth 
                                 disabled={disabled}
-                        />
+                            />
 
                         </Grid>
                         <Grid item xs={0.25}></Grid>

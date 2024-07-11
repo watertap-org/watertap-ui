@@ -87,10 +87,21 @@ Cypress.Commands.add('open_logging_panel', () => {
  *
  * From page: Inputs
  */
-Cypress.Commands.add('enter_text', (role, name, value) => {
-    let input_textbox = cy.findByRole(role, {name: name});
+Cypress.Commands.add('enter_text', (identifier, role_or_class, value, name ) => {
+    let input_textbox
+    if (identifier === "role") {
+        input_textbox = cy.findByRole(role_or_class, {name: name});
+    }
+    else if (identifier === "class") {
+        input_textbox = cy.get('.'+role_or_class);
+    }
     input_textbox.click({force:true});
-    input_textbox = cy.findByRole(role, {name: name});
+    if (identifier === "role") {
+        input_textbox = cy.findByRole(role_or_class, {name: name});
+    }
+    else if (identifier === "class") {
+        input_textbox = cy.get('.'+role_or_class);
+    }
     input_textbox.type('{backspace}{backspace}{backspace}{backspace}' + value);
     cy.wait(500);
 })

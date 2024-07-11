@@ -458,7 +458,6 @@ class FlowsheetManager:
 
     def add_custom_flowsheet(self, new_files, new_id):
         """Add new custom flowsheet to the mini db."""
-        ## TODO: make sure that uploaded files are valid modules
         for f in new_files:
             if "_ui.py" in f:
                 module_name = f.replace(".py", "")
