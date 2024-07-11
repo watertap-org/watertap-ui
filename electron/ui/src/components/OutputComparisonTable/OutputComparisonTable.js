@@ -13,89 +13,24 @@ import MenuItem from '@mui/material/MenuItem';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
-import { downloadCSV, loadConfig, listConfigNames }  from '../../../services/output.service.js'
+import { downloadCSV, loadConfig, listConfigNames }  from '../../services/output.service.js'
 
 export default function OutputComparisonTable(props) {
     let params = useParams(); 
-    const { outputData } = props;
-    const [ pastConfigs, setPastConfigs ] = useState([])
-    const [ historyData, setHistoryData ] = useState([])
-    const [ historyDataOrganized, setHistoryDataOrganized ] = useState([])
+    const { historyData } = props;
     const [leftConfigIndex, setLeftConfigIndex]  = React.useState(0)
     const [rightConfigIndex, setRightConfigIndex]  = React.useState(0)
     const [dense, setDense] = React.useState(true);
     const [ showTable, setShowTable ] = React.useState(false)
 
-
-useEffect(() => {
-  try{
-    organizeVariables()
-  } catch {
-    console.error("unable to organize variables")
-  }
-
-}, [historyData])
-
-useEffect(()=>{
-  listConfigNames(params.id, outputData.inputData.version)
-  .then(response => response.json())
-  .then((data)=>{
-    console.log("list config names:", data);
-    setPastConfigs(data)
-    var tempHistory = []
-    for (const config of data) {
-      loadConfig(params.id, config)
-      .then(response => response.json())
-      .then((data2)=>{
-      tempHistory.push({name: config.replaceAll('"',''), data:data2})
-      setHistoryData([...tempHistory])
-      }).catch((err)=>{
-          console.error("unable to get load config: ",err)
-      });
-  }
-  }).catch((err)=>{
-      console.error("unable to get list of config names: ",err)
-  })
-  
-}, []);
-
-const organizeVariables = () => {
-  var tempHistory = []
-  for (const bvars of historyData) {
-    let var_sections = {}
-    let tempVariables = {}
-    let tempName = bvars.name
-    for (const [key, v] of Object.entries(bvars.data.outputData.exports)) {
-        
-        let catg
-        let is_input = v.is_input
-        let is_output = v.is_output
-        if (is_input) catg = v.input_category
-        if (is_output) catg = v.output_category
-        if (catg === null) {
-            catg = ""
+    useEffect(() => {
+        if (historyData.length > 0) {
+            setLeftConfigIndex(historyData.length-1)
+            setShowTable(true)
         }
-        if (!Object.hasOwn(var_sections, catg)) {
-            var_sections[catg] = {display_name: catg, variables: [], input_variables:[], output_variables:[]}
-        }
-        if (!Object.hasOwn(tempVariables, catg)) {
-          tempVariables[catg] = {variables: [], input_variables:[], output_variables:[]}
-      }
-      tempVariables[catg].variables.push(v)
-      var_sections[catg]["variables"] = [...tempVariables[catg].variables];
-        if(is_output) {
-          tempVariables[catg].output_variables.push(v)
-          var_sections[catg]["output_variables"] = [...tempVariables[catg].output_variables];
-        }
-    }
-    tempHistory.push({name: tempName, data: var_sections})
-    setHistoryDataOrganized([...tempHistory])
-    setLeftConfigIndex(tempHistory.length-1)
-    setShowTable(true)
-    // console.log("historyDataOrganized",tempHistory)
-  }
-  
-}
+    
+    }, [historyData])
+
     const handleLeftConfigSelection = (event) => {
       setLeftConfigIndex(event.target.value)
     }
@@ -115,7 +50,7 @@ const organizeVariables = () => {
                 onChange={index===0 ? handleLeftConfigSelection : handleRightConfigSelection}
                 variant='standard'
             >
-                {historyDataOrganized.map((value, ind) => {
+                {historyData.map((value, ind) => {
                     return <MenuItem key={value+ind} value={ind}>{value.name}</MenuItem>
                 })}
             </Select>
@@ -126,22 +61,21 @@ const organizeVariables = () => {
       var arg = {"values": []}
       var cat1 = {}
       var cat2 = {}
-      for(const cat of Object.keys(historyDataOrganized[leftConfigIndex].data)) {
-        // console.log(cat)
+      for(const cat of Object.keys(historyData[leftConfigIndex].data)) {
         cat1[cat] = {}
         cat2[cat] = {}
-        for (var i = 0; i < historyDataOrganized[leftConfigIndex].data[cat].variables.length; i++) {
+        for (var i = 0; i < historyData[leftConfigIndex].data[cat].variables.length; i++) {
           var rounding
-          if (historyDataOrganized[leftConfigIndex].data[cat].variables[i]["rounding"]) {
-            rounding = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["rounding"]
+          if (historyData[leftConfigIndex].data[cat].variables[i]["rounding"]) {
+            rounding = historyData[leftConfigIndex].data[cat].variables[i]["rounding"]
           } else {
             rounding = 5
           }
           
-          var metricName = historyDataOrganized[leftConfigIndex].data[cat].variables[i]["name"]
-          var leftValue = parseFloat((historyDataOrganized[leftConfigIndex].data[cat].variables[i]["value"]).toFixed(rounding))
-          var rightValue = parseFloat((historyDataOrganized[rightConfigIndex].data[cat].variables[i]["value"]).toFixed(rounding))
-          var units = historyDataOrganized[rightConfigIndex].data[cat].variables[i]["display_units"]
+          var metricName = historyData[leftConfigIndex].data[cat].variables[i]["name"]
+          var leftValue = parseFloat((historyData[leftConfigIndex].data[cat].variables[i]["value"]).toFixed(rounding))
+          var rightValue = parseFloat((historyData[rightConfigIndex].data[cat].variables[i]["value"]).toFixed(rounding))
+          var units = historyData[rightConfigIndex].data[cat].variables[i]["display_units"]
           cat1[cat][metricName] = [leftValue,units]
           cat2[cat][metricName] = [rightValue,units]
         }
@@ -149,7 +83,6 @@ const organizeVariables = () => {
       }
       arg.values.push(cat1)
       arg.values.push(cat2)
-      console.log(arg)
       downloadCSV(params.id, arg)
       .then(response => response.blob())
       .then((data)=>{
@@ -166,16 +99,16 @@ const organizeVariables = () => {
     const renderRows = () => {
 
 
-      return Object.keys(historyDataOrganized[leftConfigIndex].data).map((category,index)=>{  
-        if (historyDataOrganized[leftConfigIndex].data[category] && historyDataOrganized[rightConfigIndex].data[category]) {
-        if (historyDataOrganized[leftConfigIndex].data[category].variables.length > 0) {
-          return ( <Fragment>
-            <TableRow key={category+index}>
-              <TableCell rowSpan={historyDataOrganized[leftConfigIndex].data[category].variables.length + 1}>
+      return Object.keys(historyData[leftConfigIndex].data).map((category,index)=>{  
+        if (historyData[leftConfigIndex].data[category] && historyData[rightConfigIndex].data[category]) {
+        if (historyData[leftConfigIndex].data[category].variables.length > 0) {
+          return ( <Fragment key={category+index}>
+            <TableRow key={category+" "+index}>
+              <TableCell rowSpan={historyData[leftConfigIndex].data[category].variables.length + 1}>
                 <b>{category}</b>
               </TableCell>
             </TableRow>
-            {historyDataOrganized[leftConfigIndex].data[category].variables.map((metric, index) => { 
+            {historyData[leftConfigIndex].data[category].variables.map((metric, index) => { 
               var rounding
               if (metric.rounding != null) {
                 rounding = metric.rounding
@@ -185,9 +118,9 @@ const organizeVariables = () => {
               return <TableRow key={index}>
                 <TableCell>{metric.name}</TableCell>
                 <TableCell>{parseFloat((metric.value).toFixed(rounding))+" "+metric.display_units}</TableCell>
-                <TableCell>{parseFloat((historyDataOrganized[rightConfigIndex].data[category].variables[index].value).toFixed(rounding))+" "+historyDataOrganized[rightConfigIndex].data[category].variables[index].display_units}</TableCell>
+                <TableCell>{parseFloat((historyData[rightConfigIndex].data[category].variables[index].value).toFixed(rounding))+" "+historyData[rightConfigIndex].data[category].variables[index].display_units}</TableCell>
                 <TableCell align='right'>
-                  {(Math.round((metric.value-historyDataOrganized[rightConfigIndex].data[category].variables[index].value) * 100) / 100).toFixed(2)}</TableCell>
+                  {(Math.round((metric.value-historyData[rightConfigIndex].data[category].variables[index].value) * 100) / 100).toFixed(2)}</TableCell>
               </TableRow>
             })}
           </Fragment>
@@ -195,10 +128,10 @@ const organizeVariables = () => {
         }
       }
       else {
-        if (!historyDataOrganized[leftConfigIndex].data[category]) {
+        if (!historyData[leftConfigIndex].data[category]) {
           console.error('category '+category+' not found for left column')
         }
-        if (!historyDataOrganized[rightConfigIndex].data[category]) {
+        if (!historyData[rightConfigIndex].data[category]) {
           console.error('category '+category+' not found for right column')
         }
       }

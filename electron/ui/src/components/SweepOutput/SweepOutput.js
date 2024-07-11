@@ -1,4 +1,4 @@
- import './SweepOutput.css';
+import './SweepOutput.css';
 import React from 'react'; 
 import { useEffect, useState } from 'react';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -360,7 +360,7 @@ export default function SweepOutput(props) {
                             Sweep Parameters
                         </TableCell>
                         <TableCell style={styles.tableHeader} colSpan={outputData.outputData.sweep_results.num_outputs} align="center">
-                            Outputs
+                            Variables
                         </TableCell>
                     </TableRow>
                     <TableRow key="tablehead"> 
@@ -400,39 +400,9 @@ export default function SweepOutput(props) {
             {tabValue === 1 && 
             <>
             {showPlot && (outputData.outputData.sweep_results.num_parameters === 1 || outputData.outputData.sweep_results.num_parameters === 2) && 
-                // <Grid sx={{marginTop:15, height:"100px"}} item xs={2}>
-                //     {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
-                //     <InputLabel sx={{marginTop:1}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
-                //     <FormControl>
-                //         <Select
-                //         labelId="Parameter Selection"
-                //         id="Parameter Selection"
-                //         value={plotType === 2 ? indices[2]-outputData.outputData.sweep_results.num_parameters : plotType === 1 && indices[1]-outputData.outputData.sweep_results.num_parameters}
-                //         onChange={handleParamaterSelection}
-                //         size="small"
-                //         sx={{minWidth: 200}}
-                //         MenuProps={{
-                //             style: {
-                //                maxHeight: 400,
-                //                   },
-                //             }}
-                //         >
-                //         {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
-                //             <MenuItem
-                //             key={`${name}_${index}`}
-                //             value={index}
-                //             // style={getStyles(name, personName, theme)}
-                //             >
-                //             {name}
-                //             </MenuItem>
-                //         ))}
-                //         </Select>
-                //     </FormControl>
-                // </Grid>
                 // Replacing FormControl with list
                 // test by sweep ing TDS concentration
                 <Grid sx={{marginTop:5, minWidth: 250, overflow: 'auto'}} item xs={3}>
-                {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
                     <InputLabel sx={{marginTop:0, fontWeight: '500', fontSize: 17}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
                         <List
                         labelId="Parameter Selection"
@@ -441,20 +411,16 @@ export default function SweepOutput(props) {
                         sx={{minWidth: 50, maxHeight: 500, fontSize: 15}}
                         >
                         {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
-                            <ListItem dense 
-                            // sx={{
-                            //     border: '3px solid rgba(0, 0, 0, 0.12)',
-                            //     borderRadius: '2px',
-                            //     marginBottom: '0px',
-                            //     padding: '1px', 
-                            //   }}
-                            style={{
-                            border: '1px solid rgba(0, 0, 0, 0.5)',
-                            borderRadius: '1px',
-                            paddingTop: 0, 
-                            paddingBottom: 0,
-                            paddingLeft: 0,
-                            paddingRight: 0}}
+                            <ListItem
+                                key={name+" "+index}
+                                dense 
+                                style={{
+                                border: '1px solid rgba(0, 0, 0, 0.5)',
+                                borderRadius: '1px',
+                                paddingTop: 0, 
+                                paddingBottom: 0,
+                                paddingLeft: 0,
+                                paddingRight: 0}}
                             >
                                 <ListItemButton
                                 onClick={(event) => handleParamaterSelection(event, index)}
