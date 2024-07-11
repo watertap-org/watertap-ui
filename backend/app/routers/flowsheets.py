@@ -304,8 +304,11 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
             ) as out_file:
                 content = await file.read()  # async read
                 await out_file.write(content)
-        flowsheet_manager.add_custom_flowsheet(new_files, new_id)
-        return new_id
+        resp = flowsheet_manager.add_custom_flowsheet(new_files, new_id)
+        if resp == "success":
+            return new_id
+        else:
+            raise HTTPException(400, detail=f"Flowsheet Module not valid: {resp}")
 
     except Exception as e:
         _log.error(f"error on file upload: {str(e)}")

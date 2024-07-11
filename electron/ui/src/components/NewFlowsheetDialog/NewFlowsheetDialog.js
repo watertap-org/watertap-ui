@@ -8,9 +8,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 import { FileUploader } from "react-drag-drop-files";
 import { uploadFlowsheet } from "../../services/flowsheetsList.service";
+import ErrorBar from "../../components/ErrorBar/ErrorBar";
 
 export default function NewFlowsheetDialog(props) {
-  const { onClose, open } = props;
+  const { onClose, open, setNewFlowsheetError } = props;
   const [ showWarning, setShowWarning ] = useState(false)
   const [ warningMessage, setWarningMessage ] = useState("")
   const [ files, setFiles ] = useState({"Model File": null, "Export File": null, "Diagram File": null, "Data Files": []})
@@ -29,23 +30,15 @@ export default function NewFlowsheetDialog(props) {
       p: 2,
     },
     header:{
-        // color:"#0884b4",
         marginTop:5
     },
     button: {
-        // backgroundColor: '#0884b4',
-        borderRadius: '8px', 
-        // color:'white',
+        borderRadius: '8px',
         width: 200,
-        // '&:hover': {
-        //     backgroundColor: '#0884b4',
-        //     opacity: 0.9
-        // },
     },
     fileUploaderOuterBox: {
         border: '2px dashed black',
         borderRadius:2,
-        // cursor: "pointer"
     },
     fileUploaderInnerBox: {
         display: 'flex', 
@@ -74,12 +67,6 @@ export default function NewFlowsheetDialog(props) {
         setTimeout(function() {
             setShowWarning(false)
           }, 5000)
-    // } else if (files["Diagram File"] === null) {
-    //     setWarningMessage("Please upload a valid diagram file")
-    //     setShowWarning(true)
-    //     setTimeout(function() {
-    //         setShowWarning(false)
-    //       }, 5000)
     } else {
         // ensure that files are all named in correct format
         let modelFileName = files["Model File"].name.replace('.py', '')
@@ -100,9 +87,6 @@ export default function NewFlowsheetDialog(props) {
         }
         if (filesAreValid) {
             // make api call
-            console.log('passed file name checks')
-            console.log('appending model file: ')
-            console.log(files['Model File'])
             const formData = new FormData();
             formData.append('files', files['Model File'], files['Model File'].name);
             formData.append('files', files['Export File'], files['Export File'].name);
@@ -118,8 +102,6 @@ export default function NewFlowsheetDialog(props) {
                 response.json()
                 .then((data)=>{
                     console.log('fileupload successful: ',data)
-                    // navigate('/flowsheets', {replace: true})
-                    // window.location = '/flowsheets';
                     window.location.reload()
 
                 }).catch((err)=>{
@@ -130,7 +112,13 @@ export default function NewFlowsheetDialog(props) {
                 in the case of bad file type
             */
             else if (response.status === 400) {
-                console.error("error on file upload: ",response.statusText)
+                response.json()
+                .then((data)=>{
+                    console.error("error on file upload: ",data.detail)
+                    setNewFlowsheetError(data.detail)
+                }).catch((err)=>{
+                    console.error("error on file upload / json(): ",err)
+                })                
             }
             })
 
