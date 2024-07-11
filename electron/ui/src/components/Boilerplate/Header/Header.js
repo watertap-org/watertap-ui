@@ -53,16 +53,17 @@ export default function Header({theme, hasTheme}) {
                     {theme.projectTitle}
                 </div>
                 <div className="right">
-                    <IconButton style={{color: theme.menuButton.color}}
-                                onClick={handleShowActions}><ListIcon/></IconButton>
+                    <IconButton className="header-actions" style={{color: theme.menuButton.color}} onClick={handleShowActions}>
+                        <ListIcon/>
+                    </IconButton>
                     <Menu
                         id="actions-list"
                         anchorEl={anchorEl}
                         open={actionsList}
                         onClose={() => setActionsList(false)}
                     >
-                        <MenuItem onClick={handleShowLogs}>View Logs</MenuItem>
-                        <MenuItem onClick={handleNavigateHome}>Return to list
+                        <MenuItem className="view-logs" onClick={handleShowLogs}>View Logs</MenuItem>
+                        <MenuItem className="return-home" onClick={handleNavigateHome}>Return to list
                             page</MenuItem>
                     </Menu>
                 </div>

@@ -165,7 +165,7 @@ def run_parameter_sweep(flowsheet, info):
                 )
                 keys.append(key)
         output_path = (
-            Path.home() / ".watertap" / "sweep_outputs" / f"{info.name}_sweep.csv"
+            Path.home() / ".nawi" / "sweep_outputs" / f"{info.name}_sweep.csv"
         )
         results = run_analysis(
             m=flowsheet.fs_exp.m,

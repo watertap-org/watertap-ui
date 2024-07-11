@@ -276,7 +276,12 @@ export default function LoggingPanel(props) {
             >   
                     {logData.map((line, idx) => {
                         if (line.log_message.toLowerCase().includes(searchTerm.toLowerCase()) && filters.includes(line.log_level)) {
-                            return <Typography style={{color: getTextColor(line.log_level), overflowWrap: "break-word"}} key={idx}>[{line.log_level}] {line.log_name}: {line.log_message}</Typography>
+                            return (
+                                <Typography style={{color: getTextColor(line.log_level), overflowWrap: "break-word"}} key={idx} className="log-line">
+                                    [{line.log_level}] {line.log_name}: {line.log_message}
+                                </Typography>
+                            )
+                            
                         }
                         
                     })}

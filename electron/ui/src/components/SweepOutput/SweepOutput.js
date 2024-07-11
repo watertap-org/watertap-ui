@@ -1,9 +1,9 @@
- import './SweepOutput.css';
+import './SweepOutput.css';
 import React from 'react'; 
 import { useEffect, useState } from 'react';
 import DownloadIcon from '@mui/icons-material/Download';
-import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Select } from '@mui/material';
-import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Select, ListItemButton } from '@mui/material';
+import { Grid, Typography, Button, InputLabel, MenuItem, FormControl, Tabs, Tab, Box, List, ListItem, ListItemText } from '@mui/material';
 import Plot from 'react-plotly.js';
 
 export default function SweepOutput(props) {
@@ -13,6 +13,8 @@ export default function SweepOutput(props) {
     const [ showPlot, setShowPlot ] = useState(false)
     const [ indices, setIndices ] = useState([1, 0, 2])
     const [ tabValue, setTabValue ] = useState(0)
+    const [ selectedItem, setSelectedItem ] = useState(null);
+    const [ selectedItems, setSelectedItems ] = useState([]);
 
     const styles = {
         parameters: {
@@ -34,6 +36,7 @@ export default function SweepOutput(props) {
         if (num_parameters === 1) {
             setPlotType(1)
             unpackData(1, 0, 1)
+            setSelectedItems([0])
         } else if (num_parameters === 2) {
             setPlotType(2)
             unpackData(2, 1, 0, 2)
@@ -44,15 +47,111 @@ export default function SweepOutput(props) {
         }
     }, [props.outputData])
 
+    const addPlotLine = (xIndex, yIndex) => {
+        let keys = outputData.outputData.sweep_results.keys
+        let newData = [...plotData.data];
+        let x = []
+        let ys = []
+        for (let i = 0; i < outputData.outputData.sweep_results.num_outputs; i++) {
+            ys.push([])
+        }
+        for (let each of outputData.outputData.sweep_results.values) {
+            x.push(Math.round(each[0] * 1000) / 1000)
+            
+            for(let i = 1; i < each.length; i++) {
+                let out=null
+                if (each[i]!==null){
+                    out = Math.round(each[i] * 1000) / 1000}
+                ys[i-1].push(out)
+            }
+        }
+        let secData = []
+        let keyIdx = 1
+        for (let each of ys) {
+            if( keyIdx === yIndex){
+                let yName = `${outputData.outputData.sweep_results.headers[keyIdx]}`// (${outputData.outputData.exports[keys[keyIdx]].display_units})`
+                let finalName = ``
+                if (yName.length > 32) {
+                    let nameArray = yName.split(" ")
+                    for (let i = 0; i < nameArray.length; i++) {
+                        console.log(nameArray[i])
+                        finalName = finalName.concat(nameArray[i], " ")
+                        console.log(finalName)
+                        if (i % 3 == 0 && i != 0 && i != nameArray.length - 1) {
+                            finalName = finalName.concat("<br>")
+                        }
+                    }
+                }
+                else {
+                    finalName = `${outputData.outputData.sweep_results.headers[keyIdx]}`
+                }
+                let tempTrace = {x: x, y: each, type:"scatter", name: finalName}
+                secData.push(tempTrace)
+                
+            }
+            keyIdx+=1
+            
+        }
+        
+        let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.exports[keys[0]].display_units})`
+        let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.exports[keys[yIndex]].display_units})`
+        let tempLayout = {
+            xaxis: {
+                title: {
+                    text: xLabel,
+                },
+            },
+            yaxis: {
+                title: {
+                    text: yLabel,
+                },
+            },
+            width: 700,
+            height: 500,
+        };
+        newData.push({
+            x: xIndex,
+            y: yIndex,
+        });
+        plotData.data.push(secData[0])
+        setPlotData({data: plotData.data, layout:tempLayout})
+        setShowPlot(true);
+    }
 
-    const handleParamaterSelection = (event) => {
+    const handleParamaterSelection = (event, index) => {
         // console.log("handle parameter selection")
-        let newIndex = event.target.value + outputData.outputData.sweep_results.num_parameters
+        setSelectedItem(index)
+        //console.log(selectedItem)
+        let newIndex = index + outputData.outputData.sweep_results.num_parameters
         if(plotType === 2) {
             unpackData(2, indices[0], indices[1], newIndex)
         }
         else if(plotType === 1) {
-            unpackData(1, indices[0], newIndex)
+            if (selectedItems.includes(index)) {
+                if (selectedItems.length == 1) {
+                    return
+                }
+                const updatedItems = selectedItems.filter(item => item !== index);
+                setSelectedItems(updatedItems);
+                for (let i=0; i < updatedItems.length; i++) {
+                    console.log(updatedItems[i])
+                }
+                plotData.data = []
+                for (let i=0; i < updatedItems.length; i++) {
+                    addPlotLine(indices[0], updatedItems[i] + outputData.outputData.sweep_results.num_parameters)
+                }
+            }
+            else {
+                if (outputData.outputData.exports[outputData.outputData.sweep_results.keys[newIndex]].display_units === outputData.outputData.exports[outputData.outputData.sweep_results.keys[selectedItems[0]+outputData.outputData.sweep_results.num_parameters]].display_units) {
+                    setSelectedItems([...selectedItems, index]);
+                    addPlotLine(indices[0], newIndex)
+                }
+                else {
+                    plotData.data = []
+                    setSelectedItems([index]);
+                    addPlotLine(indices[0], newIndex)
+                }
+            }
         }
         
     }
@@ -151,8 +250,21 @@ export default function SweepOutput(props) {
             let keyIdx = 1
             for (let each of ys) {
                 if( keyIdx === yIndex){
-                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]} (${outputData.outputData.exports[keys[keyIdx]].display_units})`
-                    let tempTrace = {x: x, y: each, type:"scatter", name: yName}
+                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]}` // (${outputData.outputData.exports[keys[keyIdx]].display_units})`
+                    let finalName = ``
+                    if (yName.length > 30) {
+                        let nameArray = yName.split()
+                        for (let i = 0; i < nameArray.length; i++) {
+                            finalName.concat(nameArray[i], " ")
+                            if (i % 4 == 0 && i != 0) {
+                                finalName.concat("<br>")
+                            }
+                        }
+                    }
+                    else {
+                        finalName = `${outputData.outputData.sweep_results.headers[keyIdx]}`
+                    }
+                    let tempTrace = {x: x, y: each, type:"scatter", name: finalName}
                     tempData.push(tempTrace)
                     
                 }
@@ -180,8 +292,11 @@ export default function SweepOutput(props) {
             };
             // console.log('lineplot data: ')
             // console.log(tempData)
+            let fullData = [tempData[0]]
 
-            setPlotData({data: tempData, layout:tempLayout})
+            setPlotData({data: fullData, layout:tempLayout})
+            // log out this tempData
+            // console log plot data
             setShowPlot(true)
         } else if (plotType ===3) { //parallel coordinates plot
             // console.log('making parallel coordinates plot')
@@ -238,7 +353,7 @@ export default function SweepOutput(props) {
             <>
                 <Grid item xs={12}>
                 <TableContainer sx={{maxHeight: "80vh", overflowX:'auto'}}>
-                <Table style={{border:"1.5px solid #71797E"}} size={'small'}>
+                <Table className="parameter-sweep-output-table" style={{border:"1.5px solid #71797E"}} size={'small'}>
                     <TableHead>
                     <TableRow style={styles.tableHeader}>
                         <TableCell style={styles.tableHeader} colSpan={outputData.outputData.sweep_results.num_parameters} align="center">
@@ -285,38 +400,63 @@ export default function SweepOutput(props) {
             {tabValue === 1 && 
             <>
             {showPlot && (outputData.outputData.sweep_results.num_parameters === 1 || outputData.outputData.sweep_results.num_parameters === 2) && 
-                <Grid sx={{marginTop:15, height:"100px"}} item xs={2}>
-                    {/* <Box sx={{display: 'flex', justifyContent: 'flex-end', width:"100%"}}> */}
-                    <InputLabel sx={{marginTop:1}} id="previous-configs-label">Y Variable&nbsp;</InputLabel>
-                    <FormControl>
-                        <Select
+                // Replacing FormControl with list
+                // test by sweep ing TDS concentration
+                <Grid sx={{marginTop:5, minWidth: 250, overflow: 'auto'}} item xs={3}>
+                    <InputLabel sx={{marginTop:0, fontWeight: '500', fontSize: 17}} id="previous-configs-label">Output Metric&nbsp;</InputLabel>
+                        <List
                         labelId="Parameter Selection"
                         id="Parameter Selection"
                         value={plotType === 2 ? indices[2]-outputData.outputData.sweep_results.num_parameters : plotType === 1 && indices[1]-outputData.outputData.sweep_results.num_parameters}
-                        onChange={handleParamaterSelection}
-                        size="small"
-                        sx={{minWidth: 200}}
-                        MenuProps={{
-                            style: {
-                               maxHeight: 400,
-                                  },
-                            }}
+                        sx={{minWidth: 50, maxHeight: 500, fontSize: 15}}
                         >
                         {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
-                            <MenuItem
-                            key={`${name}_${index}`}
-                            value={index}
-                            // style={getStyles(name, personName, theme)}
+                            <ListItem
+                                key={name+" "+index}
+                                dense 
+                                style={{
+                                border: '1px solid rgba(0, 0, 0, 0.5)',
+                                borderRadius: '1px',
+                                paddingTop: 0, 
+                                paddingBottom: 0,
+                                paddingLeft: 0,
+                                paddingRight: 0}}
                             >
-                            {name}
-                            </MenuItem>
+                                <ListItemButton
+                                onClick={(event) => handleParamaterSelection(event, index)}
+                                key={`${name}_${index}`}
+                                value={index}
+                                selected={selectedItems.includes(index)}
+                                sx={{
+                                    textAlign: 'center',
+                                    justifyContent: 'center',
+                                    '&.Mui-selected': {
+                                        //backgroundColor: 'rgba(0, 0, 0, 0.04)', 
+                                        backgroundColor: 'rgba(0, 0, 255, 0.12)', 
+                                        padding: '12px', 
+                                        borderRadius: '4px', 
+                                                                },
+                                    '&:not(.Mui-selected)': {
+                                        backgroundColor: 'transparent',
+                                        padding: '12px',
+                                        borderRadius: '4px',
+                                        },
+                                    '&:hover': {
+                                      backgroundColor: 'rgba(0, 0, 0, 0.04)', 
+                                    }}}
+                                >
+                                {name}
+                                </ListItemButton>
+                            </ListItem>
                         ))}
-                        </Select>
-                    </FormControl>
+                        </List>
                 </Grid>
             }
+              <Grid item xs={1}>
+                {/* Empty grid for spacing */}
+            </Grid>
                 
-            <Grid sx={{marginBottom:15, paddingBottom: 50}} item xs={10}>
+            <Grid item xs={3} md={2}>
                 {showPlot && 
                 <>
                 <Plot
@@ -335,4 +475,3 @@ export default function SweepOutput(props) {
         </Grid>
     );
 }
- 
