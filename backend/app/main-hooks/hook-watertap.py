@@ -97,7 +97,7 @@ for package in ["watertap", "pyomo", "scipy"]:
         except Exception as err:  # assume the import could do bad things
             print(f"Import of file '{yaml_file}' failed: {err}")
             continue
-
+datas.append((src_name, "watertap/core"))
 hiddenimports = list(imports)
 # hiddenimports.append("pyomo.common.dependencies.numpy")
 # print("hiddenimports")
