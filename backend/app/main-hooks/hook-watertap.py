@@ -17,7 +17,7 @@ datas = []
 
 # add all modules to watertap modules hidden imports
 
-for package in ["watertap", "pyomo"]:
+for package in ["watertap", "pyomo", "pkg_resources"]:
     pkg = importlib.import_module(package)
     try:
         # base_folder = Path(pkg.__path__[0])
@@ -99,6 +99,7 @@ for package in ["watertap", "pyomo"]:
             continue
 
 hiddenimports = list(imports)
+hiddenimports.append("pkg_resources.extern")
 # print("hiddenimports")
 # print(hiddenimports)
 # # manually add all pyomo hidden imports
