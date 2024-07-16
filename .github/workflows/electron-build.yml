@@ -31,6 +31,11 @@ jobs:
         run: |
           dotnet tool install --global AzureSignTool
 
+      - name: Add theme to .env file
+        working-directory: ./electron/ui
+        run: |
+            echo REACT_APP_THEME=watertap >> .env
+
       - name: Install Electron JS dependencies
         run: |
           npm --prefix electron clean-install
