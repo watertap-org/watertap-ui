@@ -68,7 +68,7 @@ export default function SweepOutput(props) {
         let keyIdx = 1
         for (let each of ys) {
             if( keyIdx === yIndex){
-                let yName = `${outputData.outputData.sweep_results.headers[keyIdx]}`// (${outputData.outputData.exports[keys[keyIdx]].display_units})`
+                let yName = `${outputData.outputData.sweep_results.headers[keyIdx]}`
                 let finalName = ``
                 if (yName.length > 32) {
                     let nameArray = yName.split(" ")
@@ -91,12 +91,18 @@ export default function SweepOutput(props) {
             keyIdx+=1
             
         }
+        tempPlotData.push(nextTrace[0])
+
         let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.exports[keys[0]].display_units})`
         let yLabel 
-        let tempLayout
+        let yUnits = outputData.outputData.exports[keys[yIndex]].display_units
+        if (tempPlotData.length > 1) {
+            yLabel = `${yUnits}`
+        } else {
+            yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${yUnits})`
+        }
         
-        yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${outputData.outputData.exports[keys[yIndex]].display_units})`
-        tempLayout = {
+        let tempLayout = {
             xaxis: {
                 title: {
                     text: xLabel,
@@ -110,7 +116,7 @@ export default function SweepOutput(props) {
             width: 700,
             height: 500,
         };
-        tempPlotData.push(nextTrace[0])
+        setCurrentUnits(yUnits)
         setPlotData({data: tempPlotData, layout:tempLayout})
         setShowPlot(true);
     }
@@ -118,19 +124,13 @@ export default function SweepOutput(props) {
     const removePlotLine = (index) => {
         let itemToRemove = outputData.outputData.sweep_results.headers[index]
         let tempPlotData = [...plotData.data]
-        for (let each of tempPlotData) {
-            console.log(each)
-        }
         let updatedPlotData = tempPlotData.filter(item => item.name !== itemToRemove);
         setPlotData({data: updatedPlotData, layout: plotData.layout})
     }
 
     const handleParameterSelection = (event, index) => {
         let newIndex = index + outputData.outputData.sweep_results.num_parameters
-        if(plotType === 2) {
-            unpackData(2, indices[0], indices[1], newIndex)
-        }
-        else if(plotType === 1) {
+        if(plotType === 1) {
             // item has already been selected
             if (selectedItems.includes(index)) {
                 if (selectedItems.length == 1) {
@@ -144,16 +144,20 @@ export default function SweepOutput(props) {
             }
             // item is unhighlighted
             else {
-                if (outputData.outputData.exports[outputData.outputData.sweep_results.keys[newIndex]].display_units === outputData.outputData.exports[outputData.outputData.sweep_results.keys[selectedItems[0]+outputData.outputData.sweep_results.num_parameters]].display_units) {
+                let newUnits = outputData.outputData.exports[outputData.outputData.sweep_results.keys[newIndex]].display_units
+                if (newUnits === currentUnits) { // add on to same plot
                     setSelectedItems([...selectedItems, index]);
                     addPlotLine(newIndex, [...plotData.data])
                 }
-                else {
+                else { // create new plot
                     setSelectedItems([index]);
                     addPlotLine(newIndex, [])
                 }
             }
-        }
+        } else {
+            setSelectedItems([index])
+            unpackData(plotType, indices[0], indices[1], newIndex)
+        } 
         
     }
 
@@ -230,66 +234,7 @@ export default function SweepOutput(props) {
             setPlotData({data: tempPlotData, layout: tempPlotLayout})
             setShowPlot(true)
         } else if (plotType===1){ // line plot
-            let x = []
-            let ys = []
-            for (let i = 0; i < outputData.outputData.sweep_results.num_outputs; i++) {
-                ys.push([])
-            }
-            for (let each of outputData.outputData.sweep_results.values) {
-                x.push(Math.round(each[0] * 1000) / 1000)
-                
-                for(let i = 1; i < each.length; i++) {
-                    let out=null
-                    if (each[i]!==null){
-                        out = Math.round(each[i] * 1000) / 1000}
-                    ys[i-1].push(out)
-                }
-            }
-            let tempData = []
-            let keyIdx = 1
-            for (let each of ys) {
-                if( keyIdx === yIndex){
-                    let yName = `${outputData.outputData.sweep_results.headers[keyIdx]}` // (${outputData.outputData.exports[keys[keyIdx]].display_units})`
-                    let finalName = ``
-                    if (yName.length > 30) {
-                        let nameArray = yName.split()
-                        for (let i = 0; i < nameArray.length; i++) {
-                            finalName.concat(nameArray[i], " ")
-                            if (i % 4 == 0 && i != 0) {
-                                finalName.concat("<br>")
-                            }
-                        }
-                    }
-                    else {
-                        finalName = `${outputData.outputData.sweep_results.headers[keyIdx]}`
-                    }
-                    let tempTrace = {x: x, y: each, type:"scatter", name: finalName}
-                    tempData.push(tempTrace)
-                    
-                }
-                keyIdx+=1
-                
-            }
-            let yUnits = outputData.outputData.exports[keys[yIndex]].display_units
-            let xLabel = `${outputData.outputData.sweep_results.headers[0]} (${outputData.outputData.exports[keys[0]].display_units})`
-            let yLabel = `${outputData.outputData.sweep_results.headers[yIndex]} (${yUnits})`
-            let tempLayout = {
-                xaxis: {
-                    title: {
-                        text: xLabel,
-                    },
-                },
-                yaxis: {
-                    title: {
-                        text: yLabel,
-                    },
-                },
-                width: 700,
-                height: 500,
-            };
-            let fullData = [tempData[0]]
-            setCurrentUnits(yUnits)
-            setPlotData({data: fullData, layout:tempLayout})
+            addPlotLine(yIndex, [])
             setShowPlot(true)
         } else if (plotType ===3) { //parallel coordinates plot
             // console.log('making parallel coordinates plot')
