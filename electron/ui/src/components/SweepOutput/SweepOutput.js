@@ -32,20 +32,22 @@ export default function SweepOutput(props) {
     }
 
     useEffect(() => {
-        let num_parameters = outputData.outputData.sweep_results.num_parameters;
-        if (num_parameters === 1) {
-            setPlotType(1)
-            unpackData(1, 0, 1)
-            setSelectedItems([0])
-        } else if (num_parameters === 2) {
-            setPlotType(2)
-            unpackData(2, 1, 0, 2)
-        } else {
-            // show parrallel lines plot
-            setPlotType(3)
-            unpackData(3)
+        if (tabValue === 1) {
+            let num_parameters = outputData.outputData.sweep_results.num_parameters;
+            if (num_parameters === 1) {
+                setPlotType(1)
+                unpackData(1, 0, 1)
+            } else if (num_parameters === 2) {
+                setPlotType(2)
+                unpackData(2, 1, 0, 2)
+            } else {
+                // show parrallel lines plot
+                setPlotType(3)
+                unpackData(3)
+            }
         }
-    }, [props.outputData])
+        
+    }, [props.outputData, tabValue])
 
     const addPlotLine = (yIndex, tempPlotData) => {
         let keys = outputData.outputData.sweep_results.keys
@@ -128,16 +130,15 @@ export default function SweepOutput(props) {
         setPlotData({data: updatedPlotData, layout: plotData.layout})
     }
 
-    const handleParameterSelection = (event, index) => {
-        let newIndex = index + outputData.outputData.sweep_results.num_parameters
+    const handleParameterSelection = (event, newIndex) => {
         if(plotType === 1) {
             // item has already been selected
-            if (selectedItems.includes(index)) {
+            if (selectedItems.includes(newIndex)) {
                 if (selectedItems.length == 1) {
                     return
                 }
 
-                const updatedItems = selectedItems.filter(item => item !== index);
+                const updatedItems = selectedItems.filter(item => item !== newIndex);
                 
                 removePlotLine(newIndex)
                 setSelectedItems(updatedItems);
@@ -146,16 +147,15 @@ export default function SweepOutput(props) {
             else {
                 let newUnits = outputData.outputData.exports[outputData.outputData.sweep_results.keys[newIndex]].display_units
                 if (newUnits === currentUnits) { // add on to same plot
-                    setSelectedItems([...selectedItems, index]);
+                    setSelectedItems([...selectedItems, newIndex]);
                     addPlotLine(newIndex, [...plotData.data])
                 }
                 else { // create new plot
-                    setSelectedItems([index]);
+                    setSelectedItems([newIndex]);
                     addPlotLine(newIndex, [])
                 }
             }
         } else {
-            setSelectedItems([index])
             unpackData(plotType, indices[0], indices[1], newIndex)
         } 
         
@@ -233,7 +233,9 @@ export default function SweepOutput(props) {
             }
             setPlotData({data: tempPlotData, layout: tempPlotLayout})
             setShowPlot(true)
+            setSelectedItems([zIndex])
         } else if (plotType===1){ // line plot
+            setSelectedItems([yIndex])
             addPlotLine(yIndex, [])
             setShowPlot(true)
         } else if (plotType ===3) { //parallel coordinates plot
@@ -348,9 +350,10 @@ export default function SweepOutput(props) {
                         value={plotType === 2 ? indices[2]-outputData.outputData.sweep_results.num_parameters : plotType === 1 && indices[1]-outputData.outputData.sweep_results.num_parameters}
                         sx={{minWidth: 50, maxHeight: 500, fontSize: 15}}
                         >
-                        {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => (
-                            <ListItem
-                                key={name+" "+index}
+                        {outputData.outputData.sweep_results.headers.slice(outputData.outputData.sweep_results.num_parameters).map((name, index) => {
+                            let realIndex = index + outputData.outputData.sweep_results.num_parameters
+                            return <ListItem
+                                key={name+" "+realIndex}
                                 dense 
                                 style={{
                                 border: '1px solid rgba(0, 0, 0, 0.5)',
@@ -361,32 +364,32 @@ export default function SweepOutput(props) {
                                 paddingRight: 0}}
                             >
                                 <ListItemButton
-                                onClick={(event) => handleParameterSelection(event, index)}
-                                key={`${name}_${index}`}
-                                value={index}
-                                selected={selectedItems.includes(index)}
-                                sx={{
-                                    textAlign: 'center',
-                                    justifyContent: 'center',
-                                    '&.Mui-selected': {
-                                        //backgroundColor: 'rgba(0, 0, 0, 0.04)', 
-                                        backgroundColor: 'rgba(0, 0, 255, 0.12)', 
-                                        padding: '12px', 
-                                        borderRadius: '4px', 
-                                                                },
-                                    '&:not(.Mui-selected)': {
-                                        backgroundColor: 'transparent',
-                                        padding: '12px',
-                                        borderRadius: '4px',
-                                        },
-                                    '&:hover': {
-                                      backgroundColor: 'rgba(0, 0, 0, 0.04)', 
-                                    }}}
-                                >
-                                {name}
+                                    onClick={(event) => handleParameterSelection(event, realIndex)}
+                                    key={`${name}_${realIndex}`}
+                                    value={realIndex}
+                                    selected={selectedItems.includes(realIndex)}
+                                    sx={{
+                                        textAlign: 'center',
+                                        justifyContent: 'center',
+                                        '&.Mui-selected': {
+                                            //backgroundColor: 'rgba(0, 0, 0, 0.04)', 
+                                            backgroundColor: 'rgba(0, 0, 255, 0.12)', 
+                                            padding: '12px', 
+                                            borderRadius: '4px', 
+                                                                    },
+                                        '&:not(.Mui-selected)': {
+                                            backgroundColor: 'transparent',
+                                            padding: '12px',
+                                            borderRadius: '4px',
+                                            },
+                                        '&:hover': {
+                                        backgroundColor: 'rgba(0, 0, 0, 0.04)', 
+                                        }}}
+                                    >
+                                    {name}
                                 </ListItemButton>
                             </ListItem>
-                        ))}
+                        })}
                         </List>
                 </Grid>
             }
