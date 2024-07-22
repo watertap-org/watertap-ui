@@ -14,55 +14,6 @@ describe('WaterTAP UI Testing', () => {
         
     })
 
-    flowsheets.forEach((flowsheet) => {
-        it('tests optimization for '+flowsheet.name, () => {
-            cy.load_flowsheets_list()
-            cy.wait(2000)
-            cy.screenshot('loaded flowsheet list page')
-            
-            cy.load_flowsheet(flowsheet.name)
-            cy.screenshot('loaded '+flowsheet.name);
-            
-            if (flowsheet.buildRequired) {
-                cy.build_flowsheet()
-                cy.screenshot("built "+flowsheet.name)
-            }
-
-            cy.solve_flowsheet()
-            cy.screenshot("solved "+flowsheet.name)
-            
-    
-            // Click save configuration button
-            cy.findByRole('button', {name: /save configuration/i}).click()
-            cy.wait(1000)
-            cy.screenshot('pre saveConfig for '+flowsheet.name)
-            
-    
-            // Clear preset name and enter new name
-            cy.wait(1000)
-            cy.get('.MuiInput-input').should('be.visible')
-            cy.get('.MuiInput-input', {timeout: 10000}).clear({force: true})
-            cy.get('.MuiInput-input', {timeout: 10000}).type('new_test_configuration', {force: true})
-            cy.screenshot('saveConfig')
-            
-    
-            // Click on save (config) and wait for api response
-            cy.save_configuration()
-            cy.screenshot('saved config for '+flowsheet.name)
-            
-    
-            // Click compare tab
-            cy.findByRole('tab', {name: /compare/i}).click()
-            cy.wait(5000)
-    
-            // Verify that new name is shown in comparison table
-            cy.findAllByRole('tabpanel', {name: /compare/i})
-    
-            cy.screenshot('end-solve-'+flowsheet.name)
-        })
-    })
-
-
     it('tests invalid inputs', () => {
         cy.load_flowsheets_list()
         cy.screenshot('loaded flowsheet list page')
@@ -86,7 +37,6 @@ describe('WaterTAP UI Testing', () => {
         cy.get('.error-message').should('be.visible')
 
         cy.screenshot('end-invalid-input-test');
-
     })
 
     it('tests logging panel', () => {
@@ -141,6 +91,55 @@ describe('WaterTAP UI Testing', () => {
         cy.screenshot('end-new-flowsheet-test')
 
     })
+
+    flowsheets.forEach((flowsheet) => {
+        it('tests optimization for '+flowsheet.name, () => {
+            cy.load_flowsheets_list()
+            cy.wait(2000)
+            cy.screenshot('loaded flowsheet list page')
+            
+            cy.load_flowsheet(flowsheet.name)
+            cy.screenshot('loaded '+flowsheet.name);
+            
+            if (flowsheet.buildRequired) {
+                cy.build_flowsheet()
+                cy.screenshot("built "+flowsheet.name)
+            }
+
+            cy.solve_flowsheet()
+            cy.screenshot("solved "+flowsheet.name)
+            
+    
+            // Click save configuration button
+            cy.findByRole('button', {name: /save configuration/i}).click()
+            cy.wait(1000)
+            cy.screenshot('pre saveConfig for '+flowsheet.name)
+            
+    
+            // Clear preset name and enter new name
+            cy.wait(1000)
+            cy.get('.MuiInput-input').should('be.visible')
+            cy.get('.MuiInput-input', {timeout: 10000}).clear({force: true})
+            cy.get('.MuiInput-input', {timeout: 10000}).type('new_test_configuration', {force: true})
+            cy.screenshot('saveConfig')
+            
+    
+            // Click on save (config) and wait for api response
+            cy.save_configuration()
+            cy.screenshot('saved config for '+flowsheet.name)
+            
+    
+            // Click compare tab
+            cy.findByRole('tab', {name: /compare/i}).click()
+            cy.wait(5000)
+    
+            // Verify that new name is shown in comparison table
+            cy.findAllByRole('tabpanel', {name: /compare/i})
+    
+            cy.screenshot('end-solve-'+flowsheet.name)
+        })
+    })
+
     flowsheets.forEach((flowsheet) => {
         it('tests parameter sweep '+flowsheet.name, () => {
             cy.load_flowsheets_list()
