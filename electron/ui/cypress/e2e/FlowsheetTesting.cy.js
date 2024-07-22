@@ -141,37 +141,38 @@ describe('WaterTAP UI Testing', () => {
         cy.screenshot('end-new-flowsheet-test')
 
     })
+    flowsheets.forEach((flowsheet) => {
+        it('tests parameter sweep '+flowsheet.name, () => {
+            cy.load_flowsheets_list()
+            cy.screenshot('loaded flowsheet list page')
+            
+            cy.load_flowsheet(flowsheet.name)
+            cy.screenshot('loaded '+flowsheet.name)
 
-    it('tests parameter sweep', () => {
-        cy.load_flowsheets_list()
-        cy.screenshot('loaded flowsheet list page')
-        
-        cy.load_flowsheet("RO with energy recovery flowsheet")
-        cy.screenshot('loaded RO flowsheet')
+            // set solve type to sweep
+            cy.get('#solve-sweep-select').click()
+            cy.wait(100)
+            cy.get('#sweep-option').click()
+            cy.wait(1000)
 
-        // set solve type to sweep
-        cy.get('#solve-sweep-select').click()
-        cy.wait(100)
-        cy.get('#sweep-option').click()
-        cy.wait(1000)
+            // set sweep variable
+            cy.get('.'+flowsheet.sweepVariable+'_fixed-free-select').click()
+            cy.wait(100)
+            cy.findByRole('option', { name: /sweep/i }).click()
+            cy.wait(100)
 
-        // set sweep variable
-        cy.get('.Watermassflowrate_fixed-free-select').click()
-        cy.wait(100)
-        cy.findByRole('option', { name: /sweep/i }).click()
-        cy.wait(100)
+            // enter lower and upper bounds
+            cy.enter_text('class', flowsheet.sweepVariable+'_lower_input', flowsheet.sweepValues[0])
+            cy.enter_text('class', flowsheet.sweepVariable+'_upper_input', flowsheet.sweepValues[1])
 
-        // enter lower and upper bounds
-        cy.enter_text('class', 'Watermassflowrate_lower_input', '0.7')
-        cy.enter_text('class', 'Watermassflowrate_upper_input', '0.8')
+            // run sweep
+            cy.solve_flowsheet()
+            cy.wait(5000)
+            cy.screenshot('ran parameter sweep '+flowsheet.name)
 
-        // run sweep
-        cy.solve_flowsheet()
-        cy.wait(5000)
-        cy.screenshot("ran parameter sweep")
+            //test that sweep was successful
+            cy.get('.parameter-sweep-output-table').should('be.visible')
 
-        //test that sweep was successful
-        cy.get('.parameter-sweep-output-table').should('be.visible')
-
+        })
     })
 })
