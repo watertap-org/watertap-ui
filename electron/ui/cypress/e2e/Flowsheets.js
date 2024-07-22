@@ -3,13 +3,13 @@ export const flowsheets = [
         name: 'NF-DSPM-DE flowsheet',
         buildRequired: true,
         sweepVariable: 'Volumetricflowrate',
-        sweepValues: []
+        sweepValues: ['3500', '3600']
     },
     {
         name: 'BSM2 flowsheet',
         buildRequired: false,
         sweepVariable: 'Watermassflowrate',
-        sweepValues: [],
+        sweepValues: ['20000', '21000'],
     },
     {
         name: 'BSM2_P_extension flowsheet',
@@ -44,14 +44,14 @@ export const flowsheets = [
     {
         name: 'Granular Activated Carbon (GAC) flowsheet',
         buildRequired: true,
-        sweepVariable: 'MW',
-        sweepValues: ['75','85'],
+        sweepVariable: 'Apparentdensity',
+        sweepValues: ['700','800'],
     },
     {
         name: 'Electrodialysis with concentrate recirculation flowsheet',
         buildRequired: false,
         sweepVariable: 'Feedsolutionvolumeflowrate',
-        sweepValues: ['0.001,0.002'],
+        sweepValues: ['0.001','0.002'],
     },
     {
         name: 'LSRRO flowsheet',

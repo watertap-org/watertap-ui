@@ -38,7 +38,7 @@ Cypress.Commands.add('build_flowsheet', () => {
         method: 'GET',
         url: 'http://localhost:8001/flowsheets/**',
     }).as('buildFlowsheet');
-    cy.findAllByRole('button', {name: /build flowsheet/i}).eq(0).click();
+    cy.get('#build-flowsheet-button').click()
     cy.wait('@buildFlowsheet', {timeout: 90000});
 })
 
