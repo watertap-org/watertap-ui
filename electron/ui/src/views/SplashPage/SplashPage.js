@@ -31,7 +31,7 @@ export default function SplashPage({theme, hasTheme, hasFlowsheets}) {
                     <Grid item xs={3}> </Grid>
                     <Grid item xs={6}>
                         <Box>
-                            <p id="splashRelease">${displayVersion(theme)}</p>
+                            <p id="splashRelease">{displayVersion(theme)}</p>
                         </Box>
                     </Grid>
                     <Grid item xs={3}> </Grid>

@@ -15,32 +15,33 @@ import {themes} from './theme';
 function App() {
     let navigate = useNavigate();
     const [hasFlowsheetsList, setHasFlowsheetsList] = useState(false);
-    const [hasTheme, setHasTheme] = useState(false);
+    const [hasTheme, setHasTheme] = useState(true);
     const [numberOfSubprocesses, setNumberOfSubprocesses] = useState({})
-    const [theme, setTheme] = useState(null);
+    const [theme, setTheme] = useState(themes[process.env.REACT_APP_THEME]);
+    const [checkAgain, setCheckAgain] = useState(1)
+    const WAIT_TIME = 2
 
     console.log("App hasTheme = ",hasTheme);
 
     useEffect(() => {
-        // Set the theme
-        if (!hasTheme) {
-            getProjectName().then((name) => {
-                console.debug("setting theme: name=", name, "value=", themes[name]);
-                setTheme(themes[name]);
-                setHasTheme(true);
-            })
-        }
-
+        if (hasTheme && checkAgain !== 0)
+        {
         // Get list of flowsheets
-        if (!hasFlowsheetsList) {
             getFlowsheetsList()
                 .then((data) => {
                     console.log("got flowsheets list")
                     setHasFlowsheetsList(true);
-                    // navigate('/flowsheets', {replace: true});
+                    setCheckAgain(0)
+                }).catch((e) => {
+                    // console.log(`unable to get flowsheets, trying again in ${WAIT_TIME} seconds`)
+                    // if its taking a long time log the error
+                    if (checkAgain > 10) console.log(`get flowsheets failed: ${e}`)
+                    setTimeout(() => {
+                        setCheckAgain(checkAgain+1)
+                    }, WAIT_TIME * 1000)
                 });
         }
-    });
+    }, [theme, checkAgain]);
 
     const subProcState = {value: numberOfSubprocesses, setValue: setNumberOfSubprocesses}
     return (

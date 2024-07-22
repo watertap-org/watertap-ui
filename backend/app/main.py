@@ -5,6 +5,13 @@ import uvicorn
 import multiprocessing
 import idaes.logger as idaeslog
 
+## Put DeferredImportCallbackFinder at the end of sys.meta_path list
+DeferredImportCallbackFinder = [finder for finder in sys.meta_path if "pyomo.common.dependencies" in repr(finder)]
+if len(DeferredImportCallbackFinder) > 0:
+    DeferredImportCallbackFinder=DeferredImportCallbackFinder[0]
+    sys.meta_path[:] = [finder for finder in sys.meta_path if "pyomo.common.dependencies" not in repr(finder)]
+    sys.meta_path.append(DeferredImportCallbackFinder)
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 

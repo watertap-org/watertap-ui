@@ -3,7 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - "new-charts"
+      - "1.0.0rc0"
 
 defaults:
   run:
@@ -31,6 +31,11 @@ jobs:
         run: |
           dotnet tool install --global AzureSignTool
 
+      - name: Add theme to .env file
+        working-directory: ./electron/ui
+        run: |
+            echo REACT_APP_THEME=watertap >> .env
+
       - name: Install Electron JS dependencies
         run: |
           npm --prefix electron clean-install
@@ -42,9 +47,9 @@ jobs:
       - name: Get idaes extensions
         run: idaes get-extensions
 
-      - name: Install adudchenko/generic treatment train Watertap
+      - name: Install Watertap locally
         working-directory: ../
-        run: git clone https://github.com/avdudchenko/watertap.git && cd watertap && git fetch --all --tags && git checkout generic_treatment_train && pip install --progress-bar off .
+        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 1.0.0rc0 && pip install --progress-bar off .
 
       - name: Transfer Entry points
         run: |
@@ -65,7 +70,7 @@ jobs:
 
       - name: Sign Windows Distribution
         run: |
-          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.05.17_win64.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.07.16_win64.exe
 
 
       - name: Upload artifact for windows build
@@ -74,4 +79,4 @@ jobs:
         with:
             name: windows-dist
             path: |
-              electron/dist/WaterTAP-UI_24.05.17_win64.exe
+              electron/dist/WaterTAP-UI_24.07.16_win64.exe
