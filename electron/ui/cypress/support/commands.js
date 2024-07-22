@@ -14,18 +14,32 @@ Cypress.Commands.add('load_flowsheets_list', () => {
 })
 
 /**
- * Load the RO with energy recovery flowsheet
+ * Load flowsheet
  *
  * From page: flowsheet list
  */
-Cypress.Commands.add('load_ro_flowsheet', () => {
-    const flowsheet_name = 'RO with energy recovery flowsheet';
+Cypress.Commands.add('load_flowsheet', (flowsheet_name) => {
+    // const flowsheet_name = 'RO with energy recovery flowsheet';
     cy.intercept({
         method: 'GET',
         url: 'http://localhost:8001/flowsheets/**',
     }).as('loadFlowsheet');
     cy.findByText(flowsheet_name).click();
-    cy.wait('@loadFlowsheet');
+    cy.wait('@loadFlowsheet', {timeout: 45000});
+})
+
+/**
+ * Build flowsheet
+ *
+ * From page: flowsheet
+ */
+Cypress.Commands.add('build_flowsheet', () => {
+    cy.intercept({
+        method: 'GET',
+        url: 'http://localhost:8001/flowsheets/**',
+    }).as('buildFlowsheet');
+    cy.findAllByRole('button', {name: /build flowsheet/i}).eq(0).click();
+    cy.wait('@buildFlowsheet', {timeout: 45000});
 })
 
 /**
@@ -53,7 +67,7 @@ Cypress.Commands.add('solve_flowsheet', () => {
         url: 'http://localhost:8001/flowsheets/**',
     }).as('run');
     cy.findAllByRole('button', {name: /run/i}).eq(0).click();
-    cy.wait('@run');
+    cy.wait('@run', {timeout: 45000});
 })
 
 /**
