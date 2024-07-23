@@ -37,6 +37,8 @@ describe('WaterTAP UI Testing', () => {
         cy.get('.error-message').should('be.visible')
 
         cy.screenshot('end-invalid-input-test');
+
+        cy.reset_flowsheet()
     })
 
     it('tests logging panel', () => {

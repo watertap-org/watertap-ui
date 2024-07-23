@@ -43,6 +43,20 @@ Cypress.Commands.add('build_flowsheet', () => {
 })
 
 /**
+ * Reset flowsheet
+ *
+ * From page: flowsheet
+ */
+Cypress.Commands.add('reset_flowsheet', () => {
+    cy.intercept({
+        method: 'GET',
+        url: 'http://localhost:8001/flowsheets/**',
+    }).as('resetFlowsheet');
+    cy.get('#reset-flowsheet-button').click()
+    cy.wait('@resetFlowsheet', {timeout: 180000});
+})
+
+/**
  * Set the water mass flowrate [input] to the given value
  *
  * From page: Inputs

@@ -8,7 +8,7 @@ export const flowsheets = [
     {
         name: 'BSM2 flowsheet',
         buildRequired: false,
-        sweepVariable: 'Watermassflowrate',
+        sweepVariable: 'Feedvolumetricflowrate',
         sweepValues: ['20000', '21000'],
     },
     {
