@@ -19,8 +19,11 @@ describe('WaterTAP UI Testing', () => {
         cy.load_flowsheet("RO with energy recovery flowsheet")
         cy.screenshot('loaded RO flowsheet');
 
-        // set invalid text input
+        // set invalid text input. do it twice to ensure it registers in slow windows runner
         cy.set_ro_flowrate('dfas');
+        cy.wait(1000)
+        cy.set_ro_flowrate('dfas');
+        cy.wait(1000)
         cy.screenshot('invalid-text-input');
 
         // solve flowsheet
