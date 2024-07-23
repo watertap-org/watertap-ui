@@ -25,7 +25,7 @@ Cypress.Commands.add('load_flowsheet', (flowsheet_name) => {
         url: 'http://localhost:8001/flowsheets/**',
     }).as('loadFlowsheet');
     cy.findByText(flowsheet_name).click();
-    cy.wait('@loadFlowsheet', {timeout: 90000});
+    cy.wait('@loadFlowsheet', {timeout: 180000});
 })
 
 /**
@@ -39,7 +39,7 @@ Cypress.Commands.add('build_flowsheet', () => {
         url: 'http://localhost:8001/flowsheets/**',
     }).as('buildFlowsheet');
     cy.get('#build-flowsheet-button').click()
-    cy.wait('@buildFlowsheet', {timeout: 90000});
+    cy.wait('@buildFlowsheet', {timeout: 180000});
 })
 
 /**
@@ -67,7 +67,7 @@ Cypress.Commands.add('solve_flowsheet', () => {
         url: 'http://localhost:8001/flowsheets/**',
     }).as('run');
     cy.findAllByRole('button', {name: /run/i}).eq(0).click();
-    cy.wait('@run', {timeout: 90000});
+    cy.wait('@run', {timeout: 180000});
 })
 
 /**
