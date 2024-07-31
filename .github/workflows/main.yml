@@ -80,11 +80,21 @@ jobs:
         timeout-minutes: 45
         run: npx cypress run
 
-      - name: stop frontend service
+      - name: stop linux frontend service
+        if: runner.os == 'Linux'
         run: fuser -k 3000/tcp
 
-      - name: stop backend service
+      - name: stop linux backend service
+        if: runner.os == 'Linux'
         run: fuser -k 8001/tcp
+
+      - name: stop windows frontend service
+        if: runner.os == 'Windows'
+        run: for /f "tokens=5" %a in ('netstat -aon ^| findstr :3000') do taskkill /PID %a /F
+
+      - name: stop windows backend service
+        if: runner.os == 'Windows'
+        run: for /f "tokens=5" %a in ('netstat -aon ^| findstr :8001') do taskkill /PID %a /F
 
       - name: Upload artifact for screenshots & videos
         uses: actions/upload-artifact@v4
