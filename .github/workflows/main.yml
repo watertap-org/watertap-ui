@@ -95,11 +95,15 @@ jobs:
             $netTCPConnection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
             if ($netTCPConnection) {
               $processId = $netTCPConnection.OwningProcess
-              if ($processId -ne 0) {  # Ensure we're not targeting the Idle process
+              if ($processId -ne 0 -and $processId -ne 4) {  # Ensure we're not targeting the Idle or System process
                 $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
                 if ($process) {
-                  Stop-Process -Id $process.Id -Force
-                  Write-Host "Process on port $port killed."
+                  if ($process.Name -ne "Idle" -and $process.Name -ne "System") {
+                    Stop-Process -Id $process.Id -Force
+                    Write-Host "Process on port $port killed."
+                  } else {
+                    Write-Host "The process using port $port is a system process and cannot be terminated."
+                  }
                 } else {
                   Write-Host "No process found using port $port."
                 }
@@ -118,11 +122,15 @@ jobs:
             $netTCPConnection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
             if ($netTCPConnection) {
               $processId = $netTCPConnection.OwningProcess
-              if ($processId -ne 0) {  # Ensure we're not targeting the Idle process
+              if ($processId -ne 0 -and $processId -ne 4) {  # Ensure we're not targeting the Idle or System process
                 $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
                 if ($process) {
-                  Stop-Process -Id $process.Id -Force
-                  Write-Host "Process on port $port killed."
+                  if ($process.Name -ne "Idle" -and $process.Name -ne "System") {
+                    Stop-Process -Id $process.Id -Force
+                    Write-Host "Process on port $port killed."
+                  } else {
+                    Write-Host "The process using port $port is a system process and cannot be terminated."
+                  }
                 } else {
                   Write-Host "No process found using port $port."
                 }
