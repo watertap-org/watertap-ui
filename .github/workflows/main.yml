@@ -90,11 +90,39 @@ jobs:
 
       - name: stop windows frontend service
         if: runner.os == 'Windows'
-        run: for /f "tokens=5" %a in ('netstat -aon ^| findstr :3000') do taskkill /PID %a /F
+        run: |
+            $port = 3000
+            $netTCPConnection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
+            if ($netTCPConnection) {
+            $process = Get-Process -Id $netTCPConnection.OwningProcess -ErrorAction SilentlyContinue
+            if ($process) {
+                Stop-Process -Id $process.Id -Force
+                Write-Host "Process on port $port killed."
+            } else {
+                Write-Host "No process found using port $port."
+            }
+            } else {
+            Write-Host "No TCP connection found on port $port."
+            }
+        shell: pwsh
 
       - name: stop windows backend service
         if: runner.os == 'Windows'
-        run: for /f "tokens=5" %a in ('netstat -aon ^| findstr :8001') do taskkill /PID %a /F
+        run: |
+            $port = 8001
+            $netTCPConnection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
+            if ($netTCPConnection) {
+            $process = Get-Process -Id $netTCPConnection.OwningProcess -ErrorAction SilentlyContinue
+            if ($process) {
+                Stop-Process -Id $process.Id -Force
+                Write-Host "Process on port $port killed."
+            } else {
+                Write-Host "No process found using port $port."
+            }
+            } else {
+            Write-Host "No TCP connection found on port $port."
+            }
+        shell: pwsh
 
       - name: Upload artifact for screenshots & videos
         uses: actions/upload-artifact@v4
