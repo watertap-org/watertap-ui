@@ -96,10 +96,12 @@ jobs:
             if ($netTCPConnections) {
               foreach ($netTCPConnection in $netTCPConnections) {
                 $processId = $netTCPConnection.OwningProcess
+                Write-Host "Found ID $processId"
                 if ($processId -ne 0 -and $processId -ne 4) {  # Ensure we're not targeting the Idle or System process
                   $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
                   if ($process) {
-                    if ($process.Name -ne "Idle" -and $process.Name -ne "System") {
+                    Write-Host "Found valid process $process"
+                    if ($process.Name -notcontains "Idle" -and $process.Name -notcontains "System") {
                       try {
                         Write-Host "Attempting to kill ID $processId with name $process.Name."
                         Stop-Process -Id $process.Id -Force
@@ -130,10 +132,12 @@ jobs:
             if ($netTCPConnections) {
               foreach ($netTCPConnection in $netTCPConnections) {
                 $processId = $netTCPConnection.OwningProcess
+                Write-Host "Found ID $processId"
                 if ($processId -ne 0 -and $processId -ne 4) {  # Ensure we're not targeting the Idle or System process
                   $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
                   if ($process) {
-                    if ($process.Name -ne "Idle" -and $process.Name -ne "System") {
+                    Write-Host "Found valid process $process"
+                    if ($process.Name -notcontains "Idle" -and $process.Name -notcontains "System") {
                       try {
                         Write-Host "Attempting to kill ID $processId with name $process.Name."
                         Stop-Process -Id $process.Id -Force
