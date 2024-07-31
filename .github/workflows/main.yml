@@ -105,7 +105,7 @@ jobs:
                         Stop-Process -Id $process.Id -Force
                         Write-Host "Process with ID $processId on port $port killed."
                       } catch {
-                        Write-Host "Failed to kill process with ID $processId: $_"
+                        Write-Host "Failed to kill process with ID $processId - $_"
                       }
                     } else {
                       Write-Host "The process using port $port is a system process and cannot be terminated."
