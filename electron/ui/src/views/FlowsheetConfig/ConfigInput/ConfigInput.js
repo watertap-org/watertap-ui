@@ -340,7 +340,7 @@ export default function ConfigInput(props) {
                                 </Select>
                             </FormControl>
                             <div>
-                                <Button variant="outlined" startIcon={<RefreshIcon/>}
+                                <Button id="reset-flowsheet-button" variant="outlined" startIcon={<RefreshIcon/>}
                                         onClick={reset} fullWidth>RESET</Button>
                             </div>
                             <RunButton

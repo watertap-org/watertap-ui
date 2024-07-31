@@ -61,7 +61,15 @@ export default function BuildOptions(props) {
         ))}
         <Grid item xs={6}>
             <div style={{display:"flex"}}>
-            <Button size="small" variant="contained" color="primary" sx={{marginLeft: 1}} onClick={runBuildFlowsheet} disabled={tabValue!==0 || disableBuildButton}>
+            <Button 
+                id='build-flowsheet-button' 
+                size="small" 
+                variant="contained" 
+                color="primary" 
+                sx={{marginLeft: 1}} 
+                onClick={runBuildFlowsheet} 
+                disabled={tabValue!==0 || disableBuildButton}
+            >
                 {isBuilt ? "Re-build Flowsheet" : "Build Flowsheet"}
             </Button>
             </div>
