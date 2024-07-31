@@ -94,9 +94,9 @@ jobs:
             $port = 3000
             $netTCPConnection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
             if ($netTCPConnection) {
-              $pid = $netTCPConnection.OwningProcess
-              if ($pid -ne 0) {  # Ensure we're not targeting the Idle process
-                $process = Get-Process -Id $pid -ErrorAction SilentlyContinue
+              $processId = $netTCPConnection.OwningProcess
+              if ($processId -ne 0) {  # Ensure we're not targeting the Idle process
+                $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
                 if ($process) {
                   Stop-Process -Id $process.Id -Force
                   Write-Host "Process on port $port killed."
@@ -117,9 +117,9 @@ jobs:
             $port = 8001
             $netTCPConnection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
             if ($netTCPConnection) {
-              $pid = $netTCPConnection.OwningProcess
-              if ($pid -ne 0) {  # Ensure we're not targeting the Idle process
-                $process = Get-Process -Id $pid -ErrorAction SilentlyContinue
+              $processId = $netTCPConnection.OwningProcess
+              if ($processId -ne 0) {  # Ensure we're not targeting the Idle process
+                $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
                 if ($process) {
                   Stop-Process -Id $process.Id -Force
                   Write-Host "Process on port $port killed."
