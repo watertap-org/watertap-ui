@@ -94,15 +94,20 @@ jobs:
             $port = 3000
             $netTCPConnection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
             if ($netTCPConnection) {
-            $process = Get-Process -Id $netTCPConnection.OwningProcess -ErrorAction SilentlyContinue
-            if ($process) {
-                Stop-Process -Id $process.Id -Force
-                Write-Host "Process on port $port killed."
+              $pid = $netTCPConnection.OwningProcess
+              if ($pid -ne 0) {  # Ensure we're not targeting the Idle process
+                $process = Get-Process -Id $pid -ErrorAction SilentlyContinue
+                if ($process) {
+                  Stop-Process -Id $process.Id -Force
+                  Write-Host "Process on port $port killed."
+                } else {
+                  Write-Host "No process found using port $port."
+                }
+              } else {
+                Write-Host "The process using port $port is a system process and cannot be terminated."
+              }
             } else {
-                Write-Host "No process found using port $port."
-            }
-            } else {
-            Write-Host "No TCP connection found on port $port."
+              Write-Host "No TCP connection found on port $port."
             }
         shell: pwsh
 
@@ -112,15 +117,20 @@ jobs:
             $port = 8001
             $netTCPConnection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
             if ($netTCPConnection) {
-            $process = Get-Process -Id $netTCPConnection.OwningProcess -ErrorAction SilentlyContinue
-            if ($process) {
-                Stop-Process -Id $process.Id -Force
-                Write-Host "Process on port $port killed."
+              $pid = $netTCPConnection.OwningProcess
+              if ($pid -ne 0) {  # Ensure we're not targeting the Idle process
+                $process = Get-Process -Id $pid -ErrorAction SilentlyContinue
+                if ($process) {
+                  Stop-Process -Id $process.Id -Force
+                  Write-Host "Process on port $port killed."
+                } else {
+                  Write-Host "No process found using port $port."
+                }
+              } else {
+                Write-Host "The process using port $port is a system process and cannot be terminated."
+              }
             } else {
-                Write-Host "No process found using port $port."
-            }
-            } else {
-            Write-Host "No TCP connection found on port $port."
+              Write-Host "No TCP connection found on port $port."
             }
         shell: pwsh
 
