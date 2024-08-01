@@ -80,6 +80,44 @@ jobs:
         timeout-minutes: 45
         run: npx cypress run
 
+      - name: stop linux services
+        if: runner.os == 'Linux'
+        run: fuser -k 3000/tcp && fuser -k 8001/tcp
+
+      - name: stop windows services
+        if: runner.os == 'Windows'
+        run: |
+            $ports = @(3000, 8001)
+            foreach ($port in $ports){
+              $netTCPConnections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
+              if ($netTCPConnections) {
+                foreach ($netTCPConnection in $netTCPConnections) {
+                  $processId = $netTCPConnection.OwningProcess
+                  Write-Host "Found ID $processId"
+                  $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
+                  if ($process) {
+                    Write-Host "Found valid process $process"
+                    if ($process.Name -notcontains "Idle") {
+                      try {
+                        Write-Host "Attempting to kill ID $processId with name $process.Name."
+                        Stop-Process -Id $process.Id -Force
+                        Write-Host "Process with ID $processId on port $port killed."
+                      } catch {
+                        Write-Host "Failed to kill process with ID $processId - $_"
+                      }
+                    } else {
+                      Write-Host "The process using port $port is the idle process and cannot be terminated."
+                    }
+                  } else {
+                    Write-Host "No process found using port $port."
+                  }
+                }
+              } else {
+                Write-Host "No TCP connection found on port $port."
+              }
+            }
+        shell: pwsh
+
       - name: Upload artifact for screenshots & videos
         uses: actions/upload-artifact@v4
         if: always()
