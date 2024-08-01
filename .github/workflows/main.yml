@@ -97,26 +97,22 @@ jobs:
               foreach ($netTCPConnection in $netTCPConnections) {
                 $processId = $netTCPConnection.OwningProcess
                 Write-Host "Found ID $processId"
-                if ($processId -ne 0 -and $processId -ne 4) {  # Ensure we're not targeting the Idle or System process
-                  $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
-                  if ($process) {
-                    Write-Host "Found valid process $process"
-                    if ($process.Name -notcontains "Idle" -and $process.Name -notcontains "System") {
-                      try {
-                        Write-Host "Attempting to kill ID $processId with name $process.Name."
-                        Stop-Process -Id $process.Id -Force
-                        Write-Host "Process with ID $processId on port $port killed."
-                      } catch {
-                        Write-Host "Failed to kill process with ID $processId - $_"
-                      }
-                    } else {
-                      Write-Host "The process using port $port is a system process and cannot be terminated."
+                $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
+                if ($process) {
+                  Write-Host "Found valid process $process"
+                  if ($process.Name -notcontains "Idle" -and $process.Name -notcontains "System") {
+                    try {
+                      Write-Host "Attempting to kill ID $processId with name $process.Name."
+                      Stop-Process -Id $process.Id -Force
+                      Write-Host "Process with ID $processId on port $port killed."
+                    } catch {
+                      Write-Host "Failed to kill process with ID $processId - $_"
                     }
                   } else {
-                    Write-Host "No process found using port $port."
+                    Write-Host "The process using port $port is a system process and cannot be terminated."
                   }
                 } else {
-                  Write-Host "The process using port $port is a system process and cannot be terminated."
+                  Write-Host "No process found using port $port."
                 }
               }
             } else {
@@ -133,26 +129,22 @@ jobs:
               foreach ($netTCPConnection in $netTCPConnections) {
                 $processId = $netTCPConnection.OwningProcess
                 Write-Host "Found ID $processId"
-                if ($processId -ne 0 -and $processId -ne 4) {  # Ensure we're not targeting the Idle or System process
-                  $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
-                  if ($process) {
-                    Write-Host "Found valid process $process"
-                    if ($process.Name -notcontains "Idle" -and $process.Name -notcontains "System") {
-                      try {
-                        Write-Host "Attempting to kill ID $processId with name $process.Name."
-                        Stop-Process -Id $process.Id -Force
-                        Write-Host "Process with ID $processId on port $port killed."
-                      } catch {
-                        Write-Host "Failed to kill process with ID $processId - $_"
-                      }
-                    } else {
-                      Write-Host "The process using port $port is a system process and cannot be terminated."
+                $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
+                if ($process) {
+                  Write-Host "Found valid process $process"
+                  if ($process.Name -notcontains "Idle" -and $process.Name -notcontains "System") {
+                    try {
+                      Write-Host "Attempting to kill ID $processId with name $process.Name."
+                      Stop-Process -Id $process.Id -Force
+                      Write-Host "Process with ID $processId on port $port killed."
+                    } catch {
+                      Write-Host "Failed to kill process with ID $processId - $_"
                     }
                   } else {
-                    Write-Host "No process found using port $port."
+                    Write-Host "The process using port $port is a system process and cannot be terminated."
                   }
                 } else {
-                  Write-Host "The process using port $port is a system process and cannot be terminated."
+                  Write-Host "No process found using port $port."
                 }
               }
             } else {
