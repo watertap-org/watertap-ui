@@ -101,7 +101,7 @@ jobs:
                   $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
                   if ($process) {
                     Write-Host "Found valid process $process"
-                    if ($process.Name -notcontains "Idle" -and $process.Name -notcontains "System") {
+                    if ($process.Name -notcontains "Idle") {
                       try {
                         Write-Host "Attempting to kill ID $processId with name $process.Name."
                         Stop-Process -Id $process.Id -Force
@@ -110,7 +110,7 @@ jobs:
                         Write-Host "Failed to kill process with ID $processId - $_"
                       }
                     } else {
-                      Write-Host "The process using port $port is a system process and cannot be terminated."
+                      Write-Host "The process using port $port is the idle process and cannot be terminated."
                     }
                   } else {
                     Write-Host "No process found using port $port."
