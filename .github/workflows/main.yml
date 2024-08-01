@@ -80,13 +80,9 @@ jobs:
         timeout-minutes: 45
         run: npx cypress run
 
-      - name: stop linux frontend service
+      - name: stop linux services
         if: runner.os == 'Linux'
-        run: fuser -k 3000/tcp
-
-      - name: stop linux backend service
-        if: runner.os == 'Linux'
-        run: fuser -k 8001/tcp
+        run: fuser -k 3000/tcp && fuser -k 8001/tcp
 
       - name: stop windows services
         if: runner.os == 'Windows'
