@@ -21,15 +21,13 @@ function App() {
     const [checkAgain, setCheckAgain] = useState(1)
     const WAIT_TIME = 2
 
-    console.log("App hasTheme = ",hasTheme);
-
     useEffect(() => {
         if (hasTheme && checkAgain !== 0)
         {
         // Get list of flowsheets
             getFlowsheetsList()
                 .then((data) => {
-                    console.log("got flowsheets list")
+                    // console.log("got flowsheets list")
                     setHasFlowsheetsList(true);
                     setCheckAgain(0)
                 }).catch((e) => {
