@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {useParams} from "react-router-dom";
 // MUI imports
 import Accordion from "@mui/material/Accordion";
@@ -14,6 +14,14 @@ import SaveIcon from '@mui/icons-material/Save';
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from '@mui/material'
 
 export default function SingleOutput(props) {
     let params = useParams();
@@ -21,10 +29,32 @@ export default function SingleOutput(props) {
     const [configName, setConfigName] = useState(outputData.name)
     const [openSaveConfig, setOpenSaveConfig] = React.useState(false);
     const [saved, setSaved] = React.useState(false);
+    const [outputTableData, setOutputTableData] = useState({})
 
     const handleOpenSaveConfig = () => setOpenSaveConfig(true);
     const handleCloseSaveConfig = () => setOpenSaveConfig(false);
 
+    useEffect(()=> {
+        let export_variables = {...outputData.outputData.exports}
+        let rows = {}
+        for (let key of Object.keys(export_variables)) {
+            let export_variable = export_variables[key]
+            let category = export_variable.output_category
+            let category_rows
+            if (Object.keys(rows).includes(category)) category_rows = rows[category]
+            else {
+                category_rows = []
+                rows[category] = category_rows
+            } 
+            category_rows.push({
+                key: key,
+                name: export_variable.name,
+                value: export_variable.value,
+                units: export_variable.display_units
+            })
+        }
+        setOutputTableData(rows)
+    }, [outputData])
 
     const modalStyle = {
         position: 'absolute',
@@ -184,6 +214,42 @@ export default function SingleOutput(props) {
         return var_sections
     }
 
+    const renderRows = () => {
+        try {
+            return (
+                <TableBody>
+                    {Object.entries(outputTableData).map(([category, rows]) => (
+                        <>
+                        <TableRow>
+                            <TableCell rowSpan={rows.length+1}>{category}</TableCell>
+                        </TableRow>
+                            {rows.map((row, idx) => (
+                                
+                            <TableRow>
+                                <TableCell>
+                                    {row.name}
+                                </TableCell>
+                                    <TableCell>
+                                    {row.units}
+                                </TableCell>
+                                    <TableCell>
+                                    {row.value}
+                                </TableCell>
+                            </TableRow>
+                            ))}
+                        
+                        </>
+                    ))}
+    
+                </TableBody>
+            )
+        } catch(e) {
+            console.log("unable to render rows: ")
+            console.log(e)
+        }
+        
+    }
+
     return (
         <>
             <Grid item xs={12}>
@@ -228,7 +294,17 @@ export default function SingleOutput(props) {
                     </Grid>
                 </Modal>
             </Grid>
-            {renderOutputAccordions()}
+            <Table size="small">
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Category</TableCell>
+                        <TableCell>Variable</TableCell>
+                        <TableCell>Units</TableCell>
+                        <TableCell>Value</TableCell>
+                    </TableRow>
+                </TableHead>
+                {renderRows()}
+            </Table>
         </>
     );
 }
