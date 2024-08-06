@@ -22,7 +22,8 @@ export default function ConfigInput(props) {
         reset,
         solveType,
         numberOfSubprocesses,
-        setNumberOfSubprocesses
+        setNumberOfSubprocesses,
+        setInputsChanged
     } = props;
     const [displayData, setDisplayData] = useState({})
     const [previousConfigs, setPreviousConfigs] = useState([])
@@ -66,6 +67,12 @@ export default function ConfigInput(props) {
                 }
             })
     }, [flowsheetData.inputData]);
+
+    // this is bad
+    useEffect(() => {
+        setInputsChanged(true)
+    }, [displayData])
+
 
     useEffect(() => {
         // console.log(`setting number of subprocesses current: ${numberOfSubprocesses.current}, max: ${numberOfSubprocesses.max}`)
@@ -143,11 +150,11 @@ export default function ConfigInput(props) {
     }
 
     const handleUpdateDisplayValue = (id, value) => {
-        let tempFlowsheetData = {...flowsheetData}
+        let tempFlowsheetData = { ...flowsheetData };
         const inputs = getInputs(tempFlowsheetData)
         console.debug('updating ' + id + ' with value ' + value + '. previous value was ' + inputs[id].value)
         inputs[id].value = value
-    }
+}
 
     const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
@@ -349,7 +356,7 @@ export default function ConfigInput(props) {
                                 flowsheetData={flowsheetData}
                                 disableRun={disableRun}
                                 solveType={solveType}
-                                ref={runButtonRef}
+                                ref={runButtonRef}                           
                             />
                         </Stack>
                     </Grid>
