@@ -17,7 +17,7 @@ function App() {
     const [hasFlowsheetsList, setHasFlowsheetsList] = useState(false);
     const [hasTheme, setHasTheme] = useState(true);
     const [numberOfSubprocesses, setNumberOfSubprocesses] = useState({})
-    const [theme, setTheme] = useState(themes[process.env.REACT_APP_THEME]);
+    const [theme, setTheme] = useState(themes[process.env.REACT_APP_THEME] || themes["watertap"]);
     const [checkAgain, setCheckAgain] = useState(1)
     const WAIT_TIME = 2
 

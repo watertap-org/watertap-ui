@@ -8,6 +8,6 @@ module.exports = defineConfig({
       on('task', {downloadFile});
     },
     baseUrl: 'http://localhost:3000',
-    video: true
+    video: false
   },
 });
