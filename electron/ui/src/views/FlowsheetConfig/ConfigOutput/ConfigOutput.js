@@ -13,7 +13,7 @@ import SingleOutput from "../../../components/SingleOutput/SingleOutput";
 
 export default function ConfigOutput(props) {
     let params = useParams();    
-    const {outputData, isSweep} = props;
+    const {outputData, isSweep, inputsChanged} = props;
     
     // Use a temporary hyperlink to download sweep output
     const downloadSweepOutput = () => {
