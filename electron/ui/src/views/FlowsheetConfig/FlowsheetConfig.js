@@ -91,6 +91,8 @@ export default function FlowsheetConfig(props) {
 
 
     const [inputsChanged, setInputsChanged] = useState(false);
+    // const [alteredInputs, setAlteredInputs] = useState([])
+
     // const [dialogVisible, setDialogVisible] = useState(false);
     // const [pendingPath, setPendingPath] = useState(null);
 
@@ -219,6 +221,7 @@ export default function FlowsheetConfig(props) {
         setFlowsheetData(tempFlowsheetData);
         setTabValue(1);
         setSolveDialogOpen(false);
+        setInputsChanged(false)
     }
 
     const handleError = (msg) => {
@@ -307,6 +310,13 @@ export default function FlowsheetConfig(props) {
             return option
         }
     }
+
+    // useEffect(()=>{
+    //     if(alteredInputs.length >= 1) {
+    //         setInputsChanged(true)
+    //     }
+
+    // }, [alteredInputs])
 
     console.log("Returning container for FlowsheetConfig. build_options=", flowsheetData.inputData.build_options, "isBuilt=", isBuilt,
         "loadingFlowsheetData=", loadingFlowsheetData);
