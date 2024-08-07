@@ -22,7 +22,8 @@ export default function ConfigInput(props) {
         reset,
         solveType,
         numberOfSubprocesses,
-        setNumberOfSubprocesses
+        setNumberOfSubprocesses,
+        setInputsChanged
     } = props;
     const [displayData, setDisplayData] = useState({})
     const [previousConfigs, setPreviousConfigs] = useState([])
@@ -143,11 +144,28 @@ export default function ConfigInput(props) {
     }
 
     const handleUpdateDisplayValue = (id, value) => {
-        let tempFlowsheetData = {...flowsheetData}
+        let tempFlowsheetData = { ...flowsheetData };
         const inputs = getInputs(tempFlowsheetData)
+
         console.debug('updating ' + id + ' with value ' + value + '. previous value was ' + inputs[id].value)
         inputs[id].value = value
-    }
+
+        // if (outputs!= null || value != Number(outputs.exports[id].value).toFixed(outputs.exports[id].rounding)) {
+            setInputsChanged(true)
+            //   }
+        //      else {
+        //     setInputsChanged(false)
+
+        //         // setAlteredInputs(alteredInputs().filter((_,i) => i !== id))
+        //     // setAlteredInputs(altertedInputs)
+        // }
+
+}
+
+// solved, solved and changed, only changed
+// solved ->
+// solved and changed,
+//  only changed
 
     const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
@@ -155,6 +173,7 @@ export default function ConfigInput(props) {
         inputs[id].fixed = value;
         inputs[id].is_sweep = (type === "sweep");
         updateFlowsheetData(tempFlowsheetData, null)
+        setInputsChanged(true)
         runButtonRef.current?.checkDisableRun()
         // checkDisableRun()
     }
@@ -162,6 +181,7 @@ export default function ConfigInput(props) {
     const handleUpdateBounds = (id, value, bound) => {
         let tempFlowsheetData = {...flowsheetData}
         const inputs = getInputs(tempFlowsheetData)
+        setInputsChanged(true)
         inputs[id][bound] = value
     }
 
@@ -169,6 +189,7 @@ export default function ConfigInput(props) {
         let tempFlowsheetData = {...flowsheetData}
         const inputs = getInputs(tempFlowsheetData)
         inputs[id].num_samples = value
+        setInputsChanged(true)
         console.debug('updating samples ' + id + ' with value ' + value + ' ' + inputs[id].num_samples)
     }
     /**
@@ -349,7 +370,7 @@ export default function ConfigInput(props) {
                                 flowsheetData={flowsheetData}
                                 disableRun={disableRun}
                                 solveType={solveType}
-                                ref={runButtonRef}
+                                ref={runButtonRef}                           
                             />
                         </Stack>
                     </Grid>

@@ -1,13 +1,13 @@
 //import './Page.css';
 import React from 'react';
-import {useEffect, useState} from 'react';
-import {useParams, useNavigate, useLocation} from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
     getFlowsheet,
     saveFlowsheet,
     resetFlowsheet
 } from "../../services/flowsheet.service";
-import {Dialog, DialogTitle, DialogActions, DialogContent} from '@mui/material'
+import { Dialog, DialogTitle, DialogActions, DialogContent } from '@mui/material'
 import {
     Typography,
     CircularProgress,
@@ -16,7 +16,7 @@ import {
     Box,
     Grid,
     Container,
-    Snackbar
+    Snackbar,
 } from '@mui/material';
 import Graph from "../../components/Graph/Graph";
 import ConfigInput from "./ConfigInput/ConfigInput";
@@ -89,6 +89,13 @@ export default function FlowsheetConfig(props) {
     const theme = props.theme;
     console.log("flowsheet config theme=", theme);
 
+
+    const [inputsChanged, setInputsChanged] = useState(false);
+    // const [alteredInputs, setAlteredInputs] = useState([])
+
+    // const [dialogVisible, setDialogVisible] = useState(false);
+    // const [pendingPath, setPendingPath] = useState(null);
+
     useEffect(() => {
         console.log("params.id", params.id);
         if (!params.hasOwnProperty("id") || !params.id)
@@ -117,9 +124,9 @@ export default function FlowsheetConfig(props) {
                 setFlowsheetData({outputData: null, inputData: data, name: data.name});
                 setTitle(getTitle(data));
             }).catch((e) => {
-            console.error('error getting flowsheet: ', e)
-            navigateHome(e)
-        });
+                console.error('error getting flowsheet: ', e)
+                navigateHome(e)
+            });
     }, [params.id]);
 
     useEffect(() => {
@@ -146,19 +153,18 @@ export default function FlowsheetConfig(props) {
                 setFlowsheetData({outputData: null, inputData: data, name: data.name});
                 setTitle(getTitle(data));
             }).catch((e) => {
-            console.error('error getting flowsheet: ', e)
-            navigateHome(e)
-        });
+                console.error('error getting flowsheet: ', e)
+                navigateHome(e)
+            });
     }
 
     const navigateHome = (e) => {
-        navigate("/flowsheets", {replace: true, state: {error: e}})
+        navigate("/flowsheets", { replace: true, state: { error: e } })
     }
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
-    };
-
+};
 
     const getTitle = (data) => {
         try {
@@ -215,6 +221,7 @@ export default function FlowsheetConfig(props) {
         setFlowsheetData(tempFlowsheetData);
         setTabValue(1);
         setSolveDialogOpen(false);
+        setInputsChanged(false)
     }
 
     const handleError = (msg) => {
@@ -229,26 +236,26 @@ export default function FlowsheetConfig(props) {
       saveFlowsheet(params.id, data)
       .then(response => {
         if(response.status === 200) {
-          response.json()
+                    response.json()
           .then((data)=>{
             let tempFlowsheetData = {...flowsheetData}
-            tempFlowsheetData.inputData = data
-            if (outputData) {
-              tempFlowsheetData.outputData = outputData
+                            tempFlowsheetData.inputData = data
+                            if (outputData) {
+                                tempFlowsheetData.outputData = outputData
 
-            }
-            if (update) {
-              console.log("SETTING FLOWSHEET DATA")
-              setFlowsheetData(tempFlowsheetData)
-            }
-          });
+                            }
+                            if (update) {
+                                console.log("SETTING FLOWSHEET DATA")
+                                setFlowsheetData(tempFlowsheetData)
+                            }
+                        });
         } else if(response.status === 400) {
-          console.error("error saving data")
-          handleError("Infeasible data, configuration not saved")
-        }
-        
-      })
-        
+                    console.error("error saving data")
+                    handleError("Infeasible data, configuration not saved")
+                }
+
+            })
+
     };
 
     const handleSuccessSaveConfirmationClose = () => {
@@ -269,9 +276,9 @@ export default function FlowsheetConfig(props) {
                 setFlowsheetData({outputData: null, inputData: data, name: data.name});
                 setTitle(getTitle(data));
             }).catch((e) => {
-            console.error('error getting flowsheet: ', e)
-            navigateHome(e)
-        });
+                console.error('error getting flowsheet: ', e)
+                navigateHome(e)
+            });
     }
 
     const handleSelectSolveType = (event) => {
@@ -289,12 +296,12 @@ export default function FlowsheetConfig(props) {
 
     const handleSaveConfiguration = () => {
         if (analysisName.length > 0) {
-
+            
         } else {
             setOpenErrorMessage(true)
             setErrorMessage("Please provide a name for analysis.")
         }
-    }
+}
 
     const formatOptionType = (option) => {
         try {
@@ -303,6 +310,13 @@ export default function FlowsheetConfig(props) {
             return option
         }
     }
+
+    // useEffect(()=>{
+    //     if(alteredInputs.length >= 1) {
+    //         setInputsChanged(true)
+    //     }
+
+    // }, [alteredInputs])
 
     console.log("Returning container for FlowsheetConfig. build_options=", flowsheetData.inputData.build_options, "isBuilt=", isBuilt,
         "loadingFlowsheetData=", loadingFlowsheetData);
@@ -390,10 +404,10 @@ export default function FlowsheetConfig(props) {
                                                     <Tab
                                                         label="Input" {...a11yProps(0)} />
                                                     <Tab label="Output"
-                                                         disabled={!flowsheetData.outputData} {...a11yProps(1)} />
+                                                        disabled={!flowsheetData.outputData} {...a11yProps(1)} />
                                                     {solveType === "solve" &&
                                                         <Tab label="Compare"
-                                                             disabled={!flowsheetData.outputData} {...a11yProps(2)} />}
+                                                            disabled={!flowsheetData.outputData} {...a11yProps(2)} />}
                                                 </Tabs>
                                             </div>
 
@@ -411,14 +425,16 @@ export default function FlowsheetConfig(props) {
                                             handleSelectSolveType={handleSelectSolveType}
                                             numberOfSubprocesses={props.numberOfSubprocesses}
                                             setNumberOfSubprocesses={props.setNumberOfSubprocesses}
-                                        >
-                                        </ConfigInput>
+                                            setInputsChanged={setInputsChanged}
+                                        />
                                     </TabPanel>
                                     <TabPanel value={tabValue} index={1}>
                                         <ConfigOutput outputData={flowsheetData}
                                                       updateFlowsheetData={updateFlowsheetData}
                                                       isSweep={sweep}
-                                                      solveType={solveType}>
+                                                      solveType={solveType}
+                                                      inputsChanged={inputsChanged}
+                                                      >
                                         </ConfigOutput>
                                     </TabPanel>
                                     <TabPanel value={tabValue} index={2}>
@@ -433,8 +449,8 @@ export default function FlowsheetConfig(props) {
                 )
             }
             <SolveDialog open={solveDialogOpen} handleSolved={handleSolved}
-                         handleError={handleError} flowsheetData={flowsheetData}
-                         id={params.id} isSweep={sweep}></SolveDialog>
+                handleError={handleError} flowsheetData={flowsheetData}
+                id={params.id} isSweep={sweep}></SolveDialog>
             <Snackbar
                 open={openSuccessSaveConfirmation}
                 autoHideDuration={2000}
