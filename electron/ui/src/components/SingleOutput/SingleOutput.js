@@ -1,13 +1,9 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, Fragment} from "react";
 import {useParams} from "react-router-dom";
 // MUI imports
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import DownloadIcon from '@mui/icons-material/Download';
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Grid from "@mui/material/Grid";
 import Modal from "@mui/material/Modal";
 import SaveIcon from '@mui/icons-material/Save';
@@ -46,12 +42,13 @@ export default function SingleOutput(props) {
             else {
                 category_rows = []
                 rows[category] = category_rows
-            } 
+            }
             category_rows.push({
                 key: key,
                 name: export_variable.name,
                 value: export_variable.value,
-                units: export_variable.display_units
+                units: export_variable.display_units,
+                rounding: export_variable.rounding || 2
             })
         }
         setOutputTableData(rows)
@@ -123,7 +120,7 @@ export default function SingleOutput(props) {
             return (
                 <TableBody>
                     {Object.entries(outputTableData).map(([category, rows]) => (
-                        <>
+                        <Fragment key={category}>
                         <TableRow>
                             <TableCell rowSpan={rows.length+1}>{category}</TableCell>
                         </TableRow>
@@ -136,13 +133,14 @@ export default function SingleOutput(props) {
                                     <TableCell>
                                     {row.units}
                                 </TableCell>
-                                    <TableCell>
-                                    {row.value}
+                                <TableCell align="right">
+                                    {row.value.toLocaleString('en-US', {maximumFractionDigits:row.rounding})}
+                                    {/* {row.value} */}
                                 </TableCell>
                             </TableRow>
                             ))}
                         
-                        </>
+                        </Fragment>
                     ))}
     
                 </TableBody>
@@ -204,7 +202,7 @@ export default function SingleOutput(props) {
                         <TableCell>Category</TableCell>
                         <TableCell>Variable</TableCell>
                         <TableCell>Units</TableCell>
-                        <TableCell>Value</TableCell>
+                        <TableCell align="right">Value</TableCell>
                     </TableRow>
                 </TableHead>
                 {renderRows()}
