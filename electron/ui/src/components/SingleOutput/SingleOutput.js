@@ -40,6 +40,7 @@ export default function SingleOutput(props) {
         for (let key of Object.keys(export_variables)) {
             let export_variable = export_variables[key]
             let category = export_variable.output_category
+            if (!category) category = export_variable.input_category
             let category_rows
             if (Object.keys(rows).includes(category)) category_rows = rows[category]
             else {
@@ -115,103 +116,6 @@ export default function SingleOutput(props) {
                 link.click();
                 document.body.removeChild(link);
             });
-    }
-
-    const renderOutputAccordions = () => {
-        let var_sections = organizeVariables(outputData.outputData.exports)
-        // console.log("var_sections",var_sections)
-        return Object.entries(var_sections).map(([key, value]) => {
-            let gridSize = 4;
-            let _key = key + Math.floor(Math.random() * 100001);
-            if (Object.keys(value.output_variables).length > 0) {
-                return (<Grid item xs={gridSize} key={_key}>
-                    <Accordion expanded={true} style={{border: "1px solid #ddd"}}>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-                            {value.display_name}
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <Box
-                                component="form"
-                                sx={{
-                                    '& > :not(style)': {m: 1},
-                                }}
-                                autoComplete="off"
-                            >
-                                {
-                                    renderFields(value.output_variables)
-                                }
-                            </Box>
-                        </AccordionDetails>
-                    </Accordion>
-                </Grid>)
-            }
-            else {
-                return null;
-            }
-        })
-    };
-
-    // renders the data in output accordions
-    const renderFields = (fieldData) => {
-        // console.log("field data", fieldData)
-        return Object.keys(fieldData).map((key) => {
-            let _key = key + Math.floor(Math.random() * 100001);
-
-            // handle rounding
-            let roundedValue
-            if (fieldData[key].rounding != null) {
-                if (fieldData[key].rounding > 0) {
-                    roundedValue = parseFloat((fieldData[key].value).toFixed(fieldData[key].rounding))
-                } else if (fieldData[key].rounding === 0) {
-                    roundedValue = Math.round(fieldData[key].value)
-                } else // if rounding is negative
-                {
-                    let factor = 1
-                    let tempRounding = fieldData[key].rounding
-                    console.log('rounding is negative : ', fieldData[key].rounding)
-                    while (tempRounding < 0) {
-                        factor *= 10
-                        tempRounding += 1
-                    }
-                    roundedValue = Math.round((fieldData[key].value / factor)) * factor
-                    console.log("old value is: ", fieldData[key].value)
-                    console.log('new value is: ', roundedValue)
-                }
-            } else // if rounding is not provided, just use given value
-            {
-                roundedValue = fieldData[key].value
-            }
-            return (<div key={_key}>
-                <span>{fieldData[key].name + " "}</span>
-                <span
-                    style={{color: "#68c3e4", fontWeight: "bold"}}>{roundedValue}</span>
-                <span>{" " + fieldData[key].display_units}</span>
-            </div>)
-        })
-    };
-
-    const organizeVariables = (bvars) => {
-        let var_sections = {}
-        for (const [key, v] of Object.entries(bvars)) {
-            let catg = v.output_category
-            let is_input = v.is_input
-            let is_output = v.is_output
-            if (catg === null) {
-                catg = ""
-            }
-            if (!Object.hasOwn(var_sections, catg)) {
-                var_sections[catg] = {
-                    display_name: catg,
-                    variables: {},
-                    input_variables: {},
-                    output_variables: {}
-                }
-            }
-            var_sections[catg]["variables"][key] = v
-            if (is_input) var_sections[catg]["input_variables"][key] = v;
-            if (is_output) var_sections[catg]["output_variables"][key] = v
-        }
-        return var_sections
     }
 
     const renderRows = () => {
