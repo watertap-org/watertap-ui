@@ -37,6 +37,4 @@ if sys.platform == "darwin":
         datas.append((f'{each_one}', f'{dst}'))
 
     print(datas)
-
-# add lorem ipsum.txt for jaraco
-datas.append(('internal/assets/Lorem ipsum.txt', 'jaraco/text'))
+    
