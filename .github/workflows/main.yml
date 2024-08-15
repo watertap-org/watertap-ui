@@ -62,10 +62,6 @@ jobs:
         run: |
           pip install --progress-bar off .
 
-      - name: Install fork of watertap with required change
-        working-directory: ../
-        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
-
       - name: Display installed environment
         run: |
           conda env export --no-builds
