@@ -99,10 +99,9 @@ for package in ["watertap", "pyomo", "scipy"]:
             continue
 datas.append((src_name, "watertap/core"))
 hiddenimports = list(imports)
-# hiddenimports.append("pyomo.common.dependencies.numpy")
-# print("hiddenimports")
-# print(hiddenimports)
-# # manually add all pyomo hidden imports
+# add lorem ipsum.txt for jaraco
+datas.append(('internal/assets/Lorem ipsum.txt', 'jaraco/text'))
+
 pyomo_imports = [
     "networkx",
     "pint",
