@@ -371,10 +371,7 @@ export default function FlowsheetConfig(props) {
 
                                         </Grid>
                                         <Grid item xs={12}>
-                                            <div style={{
-                                                backgroundColor: theme.tabs.background,
-                                                color: theme.tabs.color
-                                            }}>
+                                            <div style={theme.tabs}>
                                                 <Tabs value={tabValue}
                                                       onChange={handleTabChange}
                                                       aria-label="process tabs" centered
