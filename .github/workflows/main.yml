@@ -40,6 +40,11 @@ jobs:
           activate-environment: watertap-ui-env
           miniforge-version: latest
 
+      - name: Set up debug logging
+        run: |
+          echo "ACTIONS_RUNNER_DEBUG=true" >> $GITHUB_ENV
+          echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
+
       - name: Add theme to .env file
         working-directory: ./electron/ui
         run: |
