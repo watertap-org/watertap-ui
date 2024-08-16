@@ -16,7 +16,9 @@ env:
   PYTEST_ADDOPTS: --color=yes
 
 jobs:
-  prepare-environment:
+  component_e2e_testing:
+    name: E2E testing (${{ matrix.os }})
+
     runs-on: ${{ matrix.os-version }}
     strategy:
       fail-fast: false
@@ -29,6 +31,7 @@ jobs:
             os-version: ubuntu-latest
           - os: win64
             os-version: windows-latest
+
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
@@ -36,31 +39,6 @@ jobs:
           environment-file: environment.yml
           activate-environment: watertap-ui-env
           miniforge-version: latest
-
-  component_e2e_testing:
-    name: E2E testing (${{ matrix.os }})
-
-    runs-on: ${{ matrix.os-version }}
-    needs: prepare-environment
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - linux
-          - win64
-        include:
-          - os: linux
-            os-version: ubuntu-latest
-          - os: win64
-            os-version: windows-latest
-
-    steps:
-      # - uses: actions/checkout@v4
-      # - uses: conda-incubator/setup-miniconda@v3
-      #   with:
-      #     environment-file: environment.yml
-      #     activate-environment: watertap-ui-env
-      #     miniforge-version: latest
 
       - name: Add theme to .env file
         working-directory: ./electron/ui
