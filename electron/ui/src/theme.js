@@ -35,9 +35,6 @@ export const themes = {
         },
         button: {
             background: '#1976d2',
-            "&.Mui-disabled": {
-                background: '#E0E0E0'
-            }
         },
         tabs: {
             background: '#F1F3F3', color: '#727272'
@@ -66,9 +63,6 @@ export const themes = {
         },
         button: {
             background: '#1669B6',
-            "&.Mui-disabled": {
-                background: '#E0E0E0'
-            }
         },
         tabs: {
             background: '#F6F4F4', color: '#727272'
@@ -93,10 +87,7 @@ export const themes = {
             color: '#FFFFFF', background: '#000000', logoBackground: '#333333' // FIXME?
         },
         button: {
-            background: '#1669B6',
-            "&.Mui-disabled": {
-                background: '#E0E0E0'
-            }
+            background: '#333333',
         },
         tabs: {
             background: '#F1F3F3', color: '#727272'

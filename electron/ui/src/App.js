@@ -11,6 +11,8 @@ import {getProjectName} from './services/projectName.service';
 import MainContent from "./components/MainContent/MainContent";
 import WaitForProject from "./components/WaitForProject/WaitForProject";
 import {themes} from './theme';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
 
 function App() {
     let navigate = useNavigate();
@@ -20,6 +22,14 @@ function App() {
     const [theme, setTheme] = useState(themes[process.env.REACT_APP_THEME] || themes["watertap"]);
     const [checkAgain, setCheckAgain] = useState(1)
     const WAIT_TIME = 2
+
+    const mui_theme = createTheme({
+        palette: {
+            primary: {
+                main: theme?.button.background,
+            },
+        },
+    });
 
     useEffect(() => {
         if (hasTheme && checkAgain !== 0)
@@ -43,12 +53,15 @@ function App() {
 
     const subProcState = {value: numberOfSubprocesses, setValue: setNumberOfSubprocesses}
     return (
-        <div className="App">
-            <MainContent theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}
-                         subProcState={subProcState}/>
-            <WaitForProject hasTheme={hasTheme}></WaitForProject>
-            <SplashPage theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}/>
-        </div>
+
+        <ThemeProvider theme={mui_theme}>
+            <div className="App">
+                <MainContent theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}
+                            subProcState={subProcState}/>
+                <WaitForProject hasTheme={hasTheme}></WaitForProject>
+                <SplashPage theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}/>
+            </div>
+        </ThemeProvider>
     )
 }
 

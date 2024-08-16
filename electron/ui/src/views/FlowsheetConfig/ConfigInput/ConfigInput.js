@@ -487,7 +487,6 @@ const RunButton = forwardRef(({...props}, ref) => {
             title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
             <div>
                 <Button variant="contained"
-                        sx={theme.button}
                         onClick={() => updateFlowsheetData(flowsheetData.inputData, solveType)}
                         disabled={disableRun}>RUN</Button>
             </div>
