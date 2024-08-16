@@ -126,7 +126,7 @@ export default function SingleOutput(props) {
                         </TableRow>
                             {rows.map((row, idx) => (
                                 
-                            <TableRow>
+                            <TableRow key={`_${idx}`}>
                                 <TableCell>
                                     {row.name}
                                 </TableCell>
