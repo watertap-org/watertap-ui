@@ -48,7 +48,7 @@ jobs:
       - name: Set up performance monitoring (Windows)
         if: runner.os == 'Windows'
         run: |
-          logman create counter "MyPerfLog" -f bincirc -max 50 -c "\Processor(_Total)\% Processor Time" "\Memory\Available MBytes" -si 10 -o perf_log
+          logman create counter "MyPerfLog" -f bincirc -max 50 -c "\Processor(_Total)\% Processor Time" "\Memory\Available MBytes" -si 10 -o perf_log.blg
           logman start "MyPerfLog"
         shell: pwsh
 
