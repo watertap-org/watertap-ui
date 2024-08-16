@@ -16,7 +16,6 @@ _log = idaeslog.getLogger(__name__)
 
 def set_up_sensitivity(m, solve, output_params):
     outputs = {}
-    # optimize_kwargs = {"fail_flag": False}
     optimize_kwargs = {}
     opt_function = solve
 
@@ -40,7 +39,6 @@ def get_conversion_unit(flowsheet, key):
 
 
 def run_analysis(
-    m,
     flowsheet,
     parameters,
     output_params,
@@ -48,11 +46,8 @@ def run_analysis(
     interpolate_nan_outputs=True,
     custom_do_param_sweep_kwargs=None,
 ):
-    flowsheet = import_module(flowsheet)
-    try:
-        solve_function = flowsheet.solve
-    except:
-        solve_function = flowsheet.optimize
+    m = flowsheet.fs_exp.m
+    solve_function = flowsheet.get_action("solve")
     outputs, optimize_kwargs, opt_function = set_up_sensitivity(
         m, solve_function, output_params
     )
@@ -168,13 +163,10 @@ def run_parameter_sweep(flowsheet, info):
             Path.home() / ".nawi" / "sweep_outputs" / f"{info.name}_sweep.csv"
         )
         results = run_analysis(
-            m=flowsheet.fs_exp.m,
-            # flowsheet=info.module[0:-3], # replace _ui instead?
-            flowsheet=info.module.replace("_ui", ""),
+            flowsheet=flowsheet,
             parameters=parameters,
             output_params=output_params,
             results_path=output_path,
-            # custom_do_param_sweep_kwargs=flowsheet.custom_do_param_sweep_kwargs,
         )
     except Exception as err:
         _log.error(f"err: {err}")
@@ -184,14 +176,6 @@ def run_parameter_sweep(flowsheet, info):
         for i in range(len(value)):
             if np.isnan(value[i]):
                 value[i] = None
-                # error_params = ""
-                # for j in range(len(parameters)):
-                #     error_param = parameters[j]["name"]
-                #     error_value = value[j]
-                #     error_params += f'{error_param}: {error_value}, '
-                # error_params = error_params[:-2]
-                # _log.error(f'Sweep produced invalid results: {error_params}')
-                # raise HTTPException(500, detail=f"Sweep produced invalid results for input parameters: {error_params}")
             else:
                 conversion_factor = conversion_factors[i]
                 value[i] = value[i] * conversion_factor
