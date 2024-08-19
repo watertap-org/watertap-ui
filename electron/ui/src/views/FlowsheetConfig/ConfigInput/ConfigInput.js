@@ -144,13 +144,12 @@ export default function ConfigInput(props) {
     }
 
     const handleUpdateDisplayValue = (id, value) => {
-        let tempFlowsheetData = { ...flowsheetData };
-        const inputs = getInputs(tempFlowsheetData);
-
-        console.debug('updating ' + id + ' with value ' + value + '. previous value was ' + inputs[id].value);
-        inputs[id].value = value;
-        setInputsChanged(true);
-    };
+        let tempFlowsheetData = {...flowsheetData}
+        const inputs = getInputs(tempFlowsheetData)
+        console.debug('updating ' + id + ' with value ' + value + '. previous value was ' + inputs[id].value)
+        inputs[id].value = value
+        setInputsChanged(true)
+    }
 
     const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
@@ -255,9 +254,8 @@ export default function ConfigInput(props) {
                     if (key === undefined || key === null) {
                         _key = key + Math.floor(Math.random() * 100001);
                     } else {
-                        _key = key + value.display_name + value.output_variables;
+                    _key = key + value.display_name + value.output_variables;
                     }
-
                     if (Object.keys(value.input_variables).length > 0) {
                         return (<Grid item xs={6} key={_key}>
                             <InputAccordion
@@ -361,7 +359,7 @@ export default function ConfigInput(props) {
                                 flowsheetData={flowsheetData}
                                 disableRun={disableRun}
                                 solveType={solveType}
-                                ref={runButtonRef}                           
+                                ref={runButtonRef}
                             />
                         </Stack>
                     </Grid>

@@ -12,9 +12,9 @@ import SingleOutput from "../../../components/SingleOutput/SingleOutput";
 
 
 export default function ConfigOutput(props) {
-    let params = useParams();    
+    let params = useParams();
     const {outputData, isSweep, inputsChanged} = props;
-    
+
     // Use a temporary hyperlink to download sweep output
     const downloadSweepOutput = () => {
         downloadSweepResults(params.id)
@@ -33,22 +33,20 @@ export default function ConfigOutput(props) {
     // Return either sweep or single-output version
     return (
         <Box>
-             {inputsChanged ? 
-            <Alert  color = "warning" severity = 'warning' >
-            Inputs changed since last Run
-
-        </Alert> : <></>}
+            {inputsChanged ?
+                <Alert color="warning" severity='warning' >
+                    Inputs changed since last run
+                </Alert> : <></>}
             <Grid container spacing={2} alignItems="flex-start">
                 {isSweep ?
                     <SweepOutput outputData={outputData}
-                                downloadOutput={downloadSweepOutput}/>
+                        downloadOutput={downloadSweepOutput} />
                     :
                     <SingleOutput outputData={outputData}
-                                downloadOutput={downloadSingleOutput}
-                                saveConfig={saveConfig}/>
+                        downloadOutput={downloadSingleOutput}
+                        saveConfig={saveConfig} />
                 }
             </Grid>
         </Box>
     );
 }
-
