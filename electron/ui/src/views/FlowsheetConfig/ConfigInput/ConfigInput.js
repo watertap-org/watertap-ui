@@ -257,7 +257,6 @@ export default function ConfigInput(props) {
                     } else {
                         _key = key + value.display_name + value.output_variables;
                     }
-                    console.log(_key);
 
                     if (Object.keys(value.input_variables).length > 0) {
                         return (<Grid item xs={6} key={_key}>

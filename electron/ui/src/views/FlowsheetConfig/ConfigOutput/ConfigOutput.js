@@ -35,12 +35,9 @@ export default function ConfigOutput(props) {
         <Box>
              {inputsChanged ? 
             <Alert  color = "warning" severity = 'warning' >
-            Inputs changed since last run
+            Inputs changed since last Run
 
-        </Alert> :
-            <Alert color = 'success' severity='success'>
-                success!
-            </Alert>}
+        </Alert> : <></>}
             <Grid container spacing={2} alignItems="flex-start">
                 {isSweep ?
                     <SweepOutput outputData={outputData}
