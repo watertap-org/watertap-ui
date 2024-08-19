@@ -145,27 +145,12 @@ export default function ConfigInput(props) {
 
     const handleUpdateDisplayValue = (id, value) => {
         let tempFlowsheetData = { ...flowsheetData };
-        const inputs = getInputs(tempFlowsheetData)
+        const inputs = getInputs(tempFlowsheetData);
 
-        console.debug('updating ' + id + ' with value ' + value + '. previous value was ' + inputs[id].value)
-        inputs[id].value = value
-
-        // if (outputs!= null || value != Number(outputs.exports[id].value).toFixed(outputs.exports[id].rounding)) {
-            setInputsChanged(true)
-            //   }
-        //      else {
-        //     setInputsChanged(false)
-
-        //         // setAlteredInputs(alteredInputs().filter((_,i) => i !== id))
-        //     // setAlteredInputs(altertedInputs)
-        // }
-
-}
-
-// solved, solved and changed, only changed
-// solved ->
-// solved and changed,
-//  only changed
+        console.debug('updating ' + id + ' with value ' + value + '. previous value was ' + inputs[id].value);
+        inputs[id].value = value;
+        setInputsChanged(true);
+    };
 
     const handleUpdateFixed = (id, value, type) => {
         let tempFlowsheetData = {...flowsheetData}
@@ -266,7 +251,14 @@ export default function ConfigInput(props) {
             if (Object.keys(displayData).length > 0) {
                 let var_sections = organizeVariables(displayData.exports)
                 return Object.entries(var_sections).map(([key, value]) => {
-                    let _key = key + Math.floor(Math.random() * 100001);
+                    let _key;
+                    if (key === undefined || key === null) {
+                        _key = key + Math.floor(Math.random() * 100001);
+                    } else {
+                        _key = key + value.display_name + value.output_variables;
+                    }
+                    console.log(_key);
+
                     if (Object.keys(value.input_variables).length > 0) {
                         return (<Grid item xs={6} key={_key}>
                             <InputAccordion
