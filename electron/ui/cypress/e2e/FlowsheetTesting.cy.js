@@ -269,9 +269,9 @@ describe('WaterTAP UI Testing', () => {
 
     // })
 
-    it('input change flag for RO with energy recovery value change- fixed/free change', () => {
+    it('input change flag for RO with energy recovery value change- bounds change', () => {
         cy.load_flowsheets_list()
-        cy.screenshot('fixed/free: loaded flowsheet list page')
+        cy.screenshot('bounds: loaded flowsheet list page')
         
         const flowsheet_name = 'RO with energy recovery flowsheet'
         
@@ -279,18 +279,18 @@ describe('WaterTAP UI Testing', () => {
         
         // load flowsheet
         cy.load_flowsheet(flowsheet.name)
-        cy.screenshot('fixed/free: loaded '+flowsheet.name)
+        cy.screenshot('bounds: loaded '+flowsheet.name)
 
         // solve flowsheet
         cy.solve_flowsheet()
-        cy.screenshot("fixed/free: solved "+flowsheet.name)
+        cy.screenshot("bounds: solved "+flowsheet.name)
 
 
         cy.findByRole('tab', {name: /output/i}).click();
 
         // check no flag
         cy.get('#inputChangeFlag').should('not.exist');
-        cy.screenshot('fixed/free: no-input-change-no-flag-'+flowsheet.name)
+        cy.screenshot('bounds: no-input-change-no-flag-'+flowsheet.name)
 
         cy.findByRole('tab', {name: /input/i}).click();
 
@@ -300,7 +300,7 @@ describe('WaterTAP UI Testing', () => {
         cy.wait(100)
         cy.findByRole('option', { name: /free/i }).click()
         cy.wait(100)
-        cy.screenshot('fixed/free: change-option-free '+flowsheet.name)
+        cy.screenshot('bounds: change-option-free '+flowsheet.name)
 
         // enter lower and upper bounds
         cy.enter_text('class', flowsheet.sweepVariable+'_lower_input', flowsheet.sweepValues[0])
@@ -312,7 +312,7 @@ describe('WaterTAP UI Testing', () => {
 
         // check for flag 
         cy.get('#inputChangeFlag').should('exist');
-        cy.screenshot('fixed/free: output-flag-after-input-change-flag ' + flowsheet.name);
+        cy.screenshot('bounds: output-flag-after-input-change-flag ' + flowsheet.name);
         
         // return to inputs 
         cy.findByRole('tab', {name: /input/i}).click();
@@ -322,6 +322,6 @@ describe('WaterTAP UI Testing', () => {
 
         // check no flag after solving again
         cy.get('#inputChangeFlag').should('not.exist');
-        cy.screenshot("fixed/free: re-solved-after-input-change-no-flag "+flowsheet_name)
+        cy.screenshot("bounds: re-solved-after-input-change-no-flag "+flowsheet_name)
     })
 })
