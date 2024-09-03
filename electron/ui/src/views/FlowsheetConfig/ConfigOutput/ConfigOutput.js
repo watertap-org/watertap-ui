@@ -34,7 +34,7 @@ export default function ConfigOutput(props) {
     return (
         <Box>
             {inputsChanged ?
-                <Alert color="warning" severity='warning' >
+                <Alert id = 'inputChangeFlag' color="warning" severity='warning' >
                     Inputs changed since last run
                 </Alert> : <></>}
             <Grid container spacing={2} alignItems="flex-start">

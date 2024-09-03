@@ -172,4 +172,59 @@ describe('WaterTAP UI Testing', () => {
 
         })
     })
+
+    // RO is most kikely the most canonical 
+    // Exclusively run on 'RO with energy recovery flowsheet'
+    it('input change flag for RO with energy recovery value change', () => {
+        cy.load_flowsheets_list()
+        cy.screenshot('loaded flowsheet list page')
+        
+        const flowsheet_name = 'RO with energy recovery flowsheet'
+
+        // load flowsheet
+        cy.load_flowsheet(flowsheet_name)
+        cy.screenshot('loaded '+ flowsheet_name)
+
+        // solve flowsheet
+        cy.solve_flowsheet()
+        cy.screenshot("solved "+flowsheet_name)
+
+        // check no flag
+        cy.get('#inputChangeFlag').should('not.exist');
+        cy.screenshot('no-input-change-no-flag-'+flowsheet_name)
+
+        // go to inputs
+        cy.findByRole('tab', {name: /input/i}).click();
+        cy.screenshot('input-tab-click-' + flowsheet_name);
+        let username; 
+
+        cy.findByRole('textbox', {name: 'Water mass flowrate'}).invoke('val').then((val) => {
+            const changed_val = val * 1.02
+
+            // change input 
+            cy.enter_text('role' ,'textbox', changed_val, 'Water mass flowrate')
+
+            // Take the screenshot after the input has v has been logged
+            cy.screenshot('input-change-' + flowsheet_name);
+            
+        });
+
+        // go to outputs
+        cy.findByRole('tab', {name: /output/i}).click()
+
+        // check for flag 
+        cy.get('#inputChangeFlag').should('exist');
+        cy.screenshot('output-flag-after-input-change-flag' + flowsheet_name);
+
+        // return to inputs 
+        cy.findByRole('tab', {name: /input/i}).click();
+
+        // solve flowsheet
+        cy.solve_flowsheet()
+
+        // check no flag after solving again
+        cy.get('#inputChangeFlag').should('not.exist');
+        cy.screenshot("re-solved-after-input-change-no-flag "+flowsheet_name)
+    })
+
 })
