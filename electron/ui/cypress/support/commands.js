@@ -134,7 +134,5 @@ Cypress.Commands.add('enter_text', (identifier, role_or_class, value, name ) => 
         input_textbox.type('{backspace}{backspace}{backspace}{backspace}' + value);
 
     }
-    // input_textbox.clear().type(value)
-    // input_textbox.type('{backspace}{backspace}{backspace}{backspace}' + value);
     cy.wait(500);
 })
