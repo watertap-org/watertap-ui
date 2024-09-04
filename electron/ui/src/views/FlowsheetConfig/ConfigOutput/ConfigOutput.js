@@ -1,6 +1,6 @@
 import React from 'react';
 import {useParams} from "react-router-dom";
-import Grid from '@mui/material/Grid';
+import { Grid, Box, Alert } from '@mui/material';
 import {
     downloadSweepResults,
     downloadSingleOutput,
@@ -13,7 +13,7 @@ import SingleOutput from "../../../components/SingleOutput/SingleOutput";
 
 export default function ConfigOutput(props) {
     let params = useParams();
-    const {outputData, isSweep} = props;
+    const {outputData, isSweep, inputsChanged} = props;
 
     // Use a temporary hyperlink to download sweep output
     const downloadSweepOutput = () => {
@@ -32,16 +32,21 @@ export default function ConfigOutput(props) {
 
     // Return either sweep or single-output version
     return (
-        <Grid container spacing={2} alignItems="flex-start">
-            {isSweep ?
-                <SweepOutput outputData={outputData}
-                             downloadOutput={downloadSweepOutput}/>
-                :
-                <SingleOutput outputData={outputData}
-                              downloadOutput={downloadSingleOutput}
-                              saveConfig={saveConfig}/>
-            }
-        </Grid>
+        <Box>
+            {inputsChanged ?
+                <Alert id = 'inputChangeFlag' color="warning" severity='warning' sx={{ mb: '2rem' }}>
+                    Inputs changed since last run
+                </Alert> : <></>}
+            <Grid container spacing={2} alignItems="flex-start">
+                {isSweep ?
+                    <SweepOutput outputData={outputData}
+                        downloadOutput={downloadSweepOutput} />
+                    :
+                    <SingleOutput outputData={outputData}
+                        downloadOutput={downloadSingleOutput}
+                        saveConfig={saveConfig} />
+                }
+            </Grid>
+        </Box>
     );
 }
- 

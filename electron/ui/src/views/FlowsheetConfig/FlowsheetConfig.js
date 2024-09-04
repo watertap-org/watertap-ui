@@ -89,6 +89,8 @@ export default function FlowsheetConfig(props) {
     const theme = props.theme;
     console.log("flowsheet config theme=", theme);
 
+    const [inputsChanged, setInputsChanged] = useState(false);
+
     useEffect(() => {
         console.log("params.id", params.id);
         if (!params.hasOwnProperty("id") || !params.id)
@@ -215,6 +217,7 @@ export default function FlowsheetConfig(props) {
         setFlowsheetData(tempFlowsheetData);
         setTabValue(1);
         setSolveDialogOpen(false);
+        setInputsChanged(false)
     }
 
     const handleError = (msg) => {
@@ -390,10 +393,10 @@ export default function FlowsheetConfig(props) {
                                                     <Tab
                                                         label="Input" {...a11yProps(0)} />
                                                     <Tab label="Output"
-                                                         disabled={!flowsheetData.outputData} {...a11yProps(1)} />
+                                                        disabled={!flowsheetData.outputData} {...a11yProps(1)} />
                                                     {solveType === "solve" &&
                                                         <Tab label="Compare"
-                                                             disabled={!flowsheetData.outputData} {...a11yProps(2)} />}
+                                                            disabled={!flowsheetData.outputData} {...a11yProps(2)} />}
                                                 </Tabs>
                                             </div>
 
@@ -411,14 +414,16 @@ export default function FlowsheetConfig(props) {
                                             handleSelectSolveType={handleSelectSolveType}
                                             numberOfSubprocesses={props.numberOfSubprocesses}
                                             setNumberOfSubprocesses={props.setNumberOfSubprocesses}
-                                        >
-                                        </ConfigInput>
+                                            setInputsChanged={setInputsChanged}
+                                        />
                                     </TabPanel>
                                     <TabPanel value={tabValue} index={1}>
                                         <ConfigOutput outputData={flowsheetData}
                                                       updateFlowsheetData={updateFlowsheetData}
                                                       isSweep={sweep}
-                                                      solveType={solveType}>
+                                                      solveType={solveType}
+                                                      inputsChanged={inputsChanged}
+                                        >
                                         </ConfigOutput>
                                     </TabPanel>
                                     <TabPanel value={tabValue} index={2}>

@@ -22,7 +22,8 @@ export default function ConfigInput(props) {
         reset,
         solveType,
         numberOfSubprocesses,
-        setNumberOfSubprocesses
+        setNumberOfSubprocesses,
+        setInputsChanged
     } = props;
     const [displayData, setDisplayData] = useState({})
     const [previousConfigs, setPreviousConfigs] = useState([])
@@ -147,6 +148,7 @@ export default function ConfigInput(props) {
         const inputs = getInputs(tempFlowsheetData)
         console.debug('updating ' + id + ' with value ' + value + '. previous value was ' + inputs[id].value)
         inputs[id].value = value
+        setInputsChanged(true)
     }
 
     const handleUpdateFixed = (id, value, type) => {
@@ -155,6 +157,7 @@ export default function ConfigInput(props) {
         inputs[id].fixed = value;
         inputs[id].is_sweep = (type === "sweep");
         updateFlowsheetData(tempFlowsheetData, null)
+        setInputsChanged(true)
         runButtonRef.current?.checkDisableRun()
         // checkDisableRun()
     }
@@ -162,6 +165,7 @@ export default function ConfigInput(props) {
     const handleUpdateBounds = (id, value, bound) => {
         let tempFlowsheetData = {...flowsheetData}
         const inputs = getInputs(tempFlowsheetData)
+        setInputsChanged(true)
         inputs[id][bound] = value
     }
 
@@ -169,6 +173,7 @@ export default function ConfigInput(props) {
         let tempFlowsheetData = {...flowsheetData}
         const inputs = getInputs(tempFlowsheetData)
         inputs[id].num_samples = value
+        setInputsChanged(true)
         console.debug('updating samples ' + id + ' with value ' + value + ' ' + inputs[id].num_samples)
     }
     /**
@@ -245,7 +250,12 @@ export default function ConfigInput(props) {
             if (Object.keys(displayData).length > 0) {
                 let var_sections = organizeVariables(displayData.exports)
                 return Object.entries(var_sections).map(([key, value]) => {
-                    let _key = key + Math.floor(Math.random() * 100001);
+                    let _key;
+                    if (key === undefined || key === null) {
+                        _key = key + Math.floor(Math.random() * 100001);
+                    } else {
+                    _key = key + value.display_name + value.output_variables;
+                    }
                     if (Object.keys(value.input_variables).length > 0) {
                         return (<Grid item xs={6} key={_key}>
                             <InputAccordion
