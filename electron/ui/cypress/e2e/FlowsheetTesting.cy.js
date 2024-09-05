@@ -172,4 +172,163 @@ describe('WaterTAP UI Testing', () => {
 
         })
     })
+
+    // RO is most kikely the most canonical 
+    // Exclusively run on 'RO with energy recovery flowsheet'
+    it('input change flag for RO with energy recovery- value change', () => {
+        cy.load_flowsheets_list()
+        cy.screenshot('loaded flowsheet list page')
+        
+        const flowsheet_name = 'RO with energy recovery flowsheet'
+
+        // load flowsheet
+        cy.load_flowsheet(flowsheet_name)
+        cy.screenshot('loaded '+ flowsheet_name)
+
+        // solve flowsheet
+        cy.solve_flowsheet()
+        cy.screenshot("solved "+flowsheet_name)
+
+        // check no flag
+        cy.get('#inputChangeFlag').should('not.exist');
+        cy.screenshot('value: no-input-change-no-flag-'+flowsheet_name)
+
+        // go to inputs
+        cy.findByRole('tab', {name: /input/i}).click();
+        cy.screenshot('value: input-tab-click-' + flowsheet_name);
+
+        cy.findByRole('textbox', {name: 'Water mass flowrate'}).invoke('val').then((val) => {
+            const changed_val = val * 1.02
+
+            // change input 
+            cy.enter_text('role' ,'textbox', changed_val, 'Water mass flowrate')
+
+            // Take the screenshot after the input has v has been logged
+            cy.screenshot('value: input-change-' + flowsheet_name);
+            
+        });
+
+        // go to outputs
+        cy.findByRole('tab', {name: /output/i}).click()
+
+        // check for flag 
+        cy.get('#inputChangeFlag').should('exist');
+        cy.screenshot('value: output-flag-after-input-change-flag' + flowsheet_name);
+
+        // return to inputs 
+        cy.findByRole('tab', {name: /input/i}).click();
+
+        // solve flowsheet
+        cy.solve_flowsheet()
+
+        // check no flag after solving again
+        cy.get('#inputChangeFlag').should('not.exist');
+        cy.screenshot("value: re-solved-after-input-change-no-flag "+flowsheet_name)
+    })
+
+    it('input change flag for RO with energy recovery value change- fixed/free change', () => {
+        cy.load_flowsheets_list()
+        cy.screenshot('fixed/free: loaded flowsheet list page')
+        
+        const flowsheet_name = 'RO with energy recovery flowsheet'
+        
+        const flowsheet = flowsheets.find(flowsheet => flowsheet.name === flowsheet_name);
+        
+        // load flowsheet
+        cy.load_flowsheet(flowsheet.name)
+        cy.screenshot('fixed/free: loaded '+flowsheet.name)
+
+        // solve flowsheet
+        cy.solve_flowsheet()
+        cy.screenshot("fixed/free: solved "+flowsheet.name)
+
+
+        cy.findByRole('tab', {name: /output/i}).click();
+
+        // check no flag
+        cy.get('#inputChangeFlag').should('not.exist');
+        cy.screenshot('fixed/free: no-input-change-no-flag-'+flowsheet.name)
+
+        cy.findByRole('tab', {name: /input/i}).click();
+
+
+        // set free variable
+        cy.get('.'+flowsheet.sweepVariable+'_fixed-free-select').click()
+        cy.wait(100)
+        cy.findByRole('option', { name: /free/i }).click()
+        cy.get('.'+flowsheet.sweepVariable+'_fixed-free-select').click()
+        cy.wait(100)
+
+        cy.findByRole('option', { name: /fixed/i }).click()
+
+        cy.wait(100)
+        cy.screenshot('fixed/free: change-option-free '+flowsheet.name)
+
+        // go to outputs
+        cy.findByRole('tab', {name: /output/i}).click()
+        cy.screenshot('fixed/free: LOOK' + flowsheet.name);
+
+        cy.wait(500)
+
+        // // check for flag 
+        cy.get('#inputChangeFlag').should('exist');
+        cy.screenshot('fixed/free: output-flag-after-input-change-flag ' + flowsheet.name);
+
+    })
+
+    it('input change flag for RO with energy recovery value change- bounds change', () => {
+        cy.load_flowsheets_list()
+        cy.screenshot('bounds: loaded flowsheet list page')
+        
+        const flowsheet_name = 'RO with energy recovery flowsheet'
+        
+        const flowsheet = flowsheets.find(flowsheet => flowsheet.name === flowsheet_name);
+        
+        // load flowsheet
+        cy.load_flowsheet(flowsheet.name)
+        cy.screenshot('bounds: loaded '+flowsheet.name)
+
+        // solve flowsheet
+        cy.solve_flowsheet()
+        cy.screenshot("bounds: solved "+flowsheet.name)
+
+
+        cy.findByRole('tab', {name: /output/i}).click();
+
+        // check no flag
+        cy.get('#inputChangeFlag').should('not.exist');
+        cy.screenshot('bounds: no-input-change-no-flag-'+flowsheet.name)
+
+        cy.findByRole('tab', {name: /input/i}).click();
+
+
+        // set free variable
+        cy.get('.'+flowsheet.sweepVariable+'_fixed-free-select').click()
+        cy.wait(100)
+        cy.findByRole('option', { name: /free/i }).click()
+        cy.wait(100)
+        cy.screenshot('bounds: change-option-free '+flowsheet.name)
+
+        // enter lower and upper bounds
+        cy.enter_text('class', flowsheet.sweepVariable+'_lower_input', flowsheet.sweepValues[0])
+        cy.enter_text('class', flowsheet.sweepVariable+'_upper_input', flowsheet.sweepValues[1])
+
+
+        // go to outputs
+        cy.findByRole('tab', {name: /output/i}).click()
+
+        // check for flag 
+        cy.get('#inputChangeFlag').should('exist');
+        cy.screenshot('bounds: output-flag-after-input-change-flag ' + flowsheet.name);
+        
+        // return to inputs 
+        cy.findByRole('tab', {name: /input/i}).click();
+
+        // solve flowsheet
+        cy.solve_flowsheet()
+
+        // check no flag after solving again
+        cy.get('#inputChangeFlag').should('not.exist');
+        cy.screenshot("bounds: re-solved-after-input-change-no-flag "+flowsheet_name)
+    })
 })

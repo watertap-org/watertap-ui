@@ -126,10 +126,13 @@ Cypress.Commands.add('enter_text', (identifier, role_or_class, value, name ) => 
     input_textbox.click({force:true});
     if (identifier === "role") {
         input_textbox = cy.findByRole(role_or_class, {name: name});
+        input_textbox.clear().type(value)
+
     }
     else if (identifier === "class") {
         input_textbox = cy.get('.'+role_or_class);
+        input_textbox.type('{backspace}{backspace}{backspace}{backspace}' + value);
+
     }
-    input_textbox.type('{backspace}{backspace}{backspace}{backspace}' + value);
     cy.wait(500);
 })
