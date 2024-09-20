@@ -19,7 +19,6 @@ export default function Graph() {
               setGraphImage(URL.createObjectURL(data))
             }
             else {
-              console.log("data.size is 0")
               if (tryAgain) setTryAgain(false)
             }
           }).catch((err)=>{

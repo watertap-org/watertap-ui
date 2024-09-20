@@ -18,6 +18,7 @@ import {
     TableHead,
     TableRow,
 } from '@mui/material'
+import Paper from '@mui/material/Paper';
 
 export default function SingleOutput(props) {
     let params = useParams();
@@ -122,7 +123,12 @@ export default function SingleOutput(props) {
                     {Object.entries(outputTableData).map(([category, rows]) => (
                         <Fragment key={category}>
                         <TableRow>
-                            <TableCell rowSpan={rows.length+1}>{category}</TableCell>
+                            <TableCell 
+                                rowSpan={rows.length+1}
+                                sx={{border:"1px solid #ddd"}}
+                            >
+                                <b>{category}</b>
+                            </TableCell>
                         </TableRow>
                             {rows.map((row, idx) => (
                                 
@@ -196,17 +202,21 @@ export default function SingleOutput(props) {
                     </Grid>
                 </Modal>
             </Grid>
-            <Table size="small">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Category</TableCell>
-                        <TableCell>Variable</TableCell>
-                        <TableCell>Units</TableCell>
-                        <TableCell align="right">Value</TableCell>
-                    </TableRow>
-                </TableHead>
-                {renderRows()}
-            </Table>
+            <Grid item xs={12}>
+            <Paper>
+                <Table size="small" sx={{border:"1px solid #ddd"}}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Category</TableCell>
+                            <TableCell>Variable</TableCell>
+                            <TableCell>Units</TableCell>
+                            <TableCell align="right">Value</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    {renderRows()}
+                </Table>
+            </Paper>
+            </Grid>
         </>
     );
 }
