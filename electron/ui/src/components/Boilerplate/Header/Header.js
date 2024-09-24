@@ -4,9 +4,9 @@ import LoggingPanel from '../../LoggingPanel/LoggingPanel';
 import {useNavigate} from "react-router-dom";
 import {Menu, MenuItem, IconButton} from '@mui/material';
 import ListIcon from '@mui/icons-material/List';
+import {themes} from '../../../theme';
 
-export default function Header({theme, hasTheme}) {
-    console.debug("header hasTheme=", hasTheme, ", theme=", theme);
+export default function Header({theme, hasTheme, changeTheme}) {
     let navigate = useNavigate();
     const [showLogs, setShowLogs] = React.useState(false)
     const [actionsList, setActionsList] = React.useState(false)
@@ -63,8 +63,12 @@ export default function Header({theme, hasTheme}) {
                         onClose={() => setActionsList(false)}
                     >
                         <MenuItem className="view-logs" onClick={handleShowLogs}>View Logs</MenuItem>
-                        <MenuItem className="return-home" onClick={handleNavigateHome}>Return to list
-                            page</MenuItem>
+                        {Object.keys(themes).map((key, idx) => {
+                            if (key != localStorage.getItem("theme")) return (
+                                <MenuItem key={key} className="change_theme" onClick={() => changeTheme(key)}>Switch to {key}</MenuItem>
+                            )
+                        })}
+                        <MenuItem className="return-home" onClick={handleNavigateHome}>Return to list page</MenuItem>
                     </Menu>
                 </div>
             </div>

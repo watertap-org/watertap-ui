@@ -20,7 +20,7 @@ export default function MainContent(props) {
         const spState = props.subProcState;
         return (
             <Container id='AppRootContainer'>
-                <Header theme={theme} hasTheme={hasTheme}/>
+                <Header theme={theme} hasTheme={hasTheme} changeTheme={props.changeTheme}/>
                 <Routes>
                     <Route path="flowsheet/:id/config" element={<FlowsheetConfig
                         numberOfSubprocesses={spState.value}
