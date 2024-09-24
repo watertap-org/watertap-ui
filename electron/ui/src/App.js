@@ -15,11 +15,12 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 function App() {
     let navigate = useNavigate();
-    const [hasFlowsheetsList, setHasFlowsheetsList] = useState(false);
-    const [hasTheme, setHasTheme] = useState(true);
+    const [connectedToBackend, setConnectedToBackend] = useState(false);
     const [numberOfSubprocesses, setNumberOfSubprocesses] = useState({})
-    const [theme, setTheme] = useState(themes[process.env.REACT_APP_THEME] || themes["watertap"]);
     const [checkAgain, setCheckAgain] = useState(1)
+    
+    const hasTheme = true
+    const theme = themes[process.env.REACT_APP_THEME] || themes["watertap"]
     const WAIT_TIME = 2
 
     const mui_theme = createTheme({
@@ -36,9 +37,7 @@ function App() {
         // Get list of flowsheets
             setProject(theme.project.toLowerCase())
                 .then((data) => {
-                    console.log("set project successful:")
-                    console.log(data)
-                    setHasFlowsheetsList(true);
+                    setConnectedToBackend(true);
                     setCheckAgain(0)
                 }).catch((e) => {
                     // console.log(`unable to get flowsheets, trying again in ${WAIT_TIME} seconds`)
@@ -56,10 +55,10 @@ function App() {
 
         <ThemeProvider theme={mui_theme}>
             <div className="App">
-                <MainContent theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}
+                <MainContent theme={theme} hasTheme={hasTheme} connectedToBackend={connectedToBackend}
                             subProcState={subProcState}/>
                 <WaitForProject hasTheme={hasTheme}></WaitForProject>
-                <SplashPage theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}/>
+                <SplashPage theme={theme} hasTheme={hasTheme} connectedToBackend={connectedToBackend}/>
             </div>
         </ThemeProvider>
     )

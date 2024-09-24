@@ -14,7 +14,7 @@ import React from "react";
 
 export default function MainContent(props) {
     console.debug("MainContent: props=", props);
-    if (props.hasTheme && props.hasFlowsheets) {
+    if (props.hasTheme && props.connectedToBackend) {
         const theme = props.theme;
         const hasTheme = props.hasTheme;
         const spState = props.subProcState;
