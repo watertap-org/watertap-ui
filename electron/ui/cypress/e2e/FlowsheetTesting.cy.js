@@ -226,9 +226,9 @@ describe('WaterTAP UI Testing', () => {
         cy.screenshot("value: re-solved-after-input-change-no-flag "+flowsheet_name)
     })
 
-    it('input change flag for RO with energy recovery value change- fixed/free change', () => {
+    it('input change flag for RO with energy recovery value change- fixed_free change', () => {
         cy.load_flowsheets_list()
-        cy.screenshot('fixed/free: loaded flowsheet list page')
+        cy.screenshot('fixed_free: loaded flowsheet list page')
         
         const flowsheet_name = 'RO with energy recovery flowsheet'
         
@@ -236,18 +236,18 @@ describe('WaterTAP UI Testing', () => {
         
         // load flowsheet
         cy.load_flowsheet(flowsheet.name)
-        cy.screenshot('fixed/free: loaded '+flowsheet.name)
+        cy.screenshot('fixed_free: loaded '+flowsheet.name)
 
         // solve flowsheet
         cy.solve_flowsheet()
-        cy.screenshot("fixed/free: solved "+flowsheet.name)
+        cy.screenshot("fixed_free: solved "+flowsheet.name)
 
 
         cy.findByRole('tab', {name: /output/i}).click();
 
         // check no flag
         cy.get('#inputChangeFlag').should('not.exist');
-        cy.screenshot('fixed/free: no-input-change-no-flag-'+flowsheet.name)
+        cy.screenshot('fixed_free: no-input-change-no-flag-'+flowsheet.name)
 
         cy.findByRole('tab', {name: /input/i}).click();
 
@@ -262,17 +262,17 @@ describe('WaterTAP UI Testing', () => {
         cy.findByRole('option', { name: /fixed/i }).click()
 
         cy.wait(100)
-        cy.screenshot('fixed/free: change-option-free '+flowsheet.name)
+        cy.screenshot('fixed_free: change-option-free '+flowsheet.name)
 
         // go to outputs
         cy.findByRole('tab', {name: /output/i}).click()
-        cy.screenshot('fixed/free: LOOK' + flowsheet.name);
+        cy.screenshot('fixed_free: LOOK' + flowsheet.name);
 
         cy.wait(500)
 
         // // check for flag 
         cy.get('#inputChangeFlag').should('exist');
-        cy.screenshot('fixed/free: output-flag-after-input-change-flag ' + flowsheet.name);
+        cy.screenshot('fixed_free: output-flag-after-input-change-flag ' + flowsheet.name);
 
     })
 
