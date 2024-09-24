@@ -146,6 +146,12 @@ describe('WaterTAP UI Testing', () => {
             cy.load_flowsheet(flowsheet.name)
             cy.screenshot('loaded '+flowsheet.name)
 
+            // if model has build options, it must be manually built
+            if (flowsheet.buildRequired) {
+                cy.build_flowsheet()
+                cy.screenshot("built "+flowsheet.name)
+            }
+
             // set solve type to sweep
             cy.get('#solve-sweep-select').click()
             cy.wait(100)
