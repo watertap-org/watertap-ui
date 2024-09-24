@@ -6,8 +6,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import {useNavigate} from "react-router-dom";
 import SplashPage from './views/SplashPage/SplashPage';
-import {getFlowsheetsList} from "./services/flowsheetsList.service";
-import {getProjectName} from './services/projectName.service';
+import {setProject} from "./services/flowsheet.service";
 import MainContent from "./components/MainContent/MainContent";
 import WaitForProject from "./components/WaitForProject/WaitForProject";
 import {themes} from './theme';
@@ -35,9 +34,10 @@ function App() {
         if (hasTheme && checkAgain !== 0)
         {
         // Get list of flowsheets
-            getFlowsheetsList()
+            setProject(theme.project.toLowerCase())
                 .then((data) => {
-                    // console.log("got flowsheets list")
+                    console.log("set project successful:")
+                    console.log(data)
                     setHasFlowsheetsList(true);
                     setCheckAgain(0)
                 }).catch((e) => {
