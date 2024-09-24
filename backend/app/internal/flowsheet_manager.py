@@ -32,6 +32,35 @@ _log = idaeslog.getLogger(__name__)
 _log.setLevel(idaeslog.DEBUG)
 VERSION = 3
 
+class Deployment:
+    """Values related to the deployment context of the UI,
+    e.g., NAWI WaterTAP, PROMMIS, or IDAES.
+    """
+    # env var for project name
+    PROJECT_ENV = "PSE_PROJECT"
+    # projects and their associated packages
+    PROJ = {
+        "nawi": ("watertap",),
+        "idaes": ("idaes",),
+        "prommis": ("prommis",)
+    }
+    DEFAULT_PROJ = "nawi"
+
+    def __init__(self, project=DEFAULT_PROJ):
+        _log.info(f"Deploy for project={project}")
+        if project not in self.PROJ.keys():
+            valid_projects = ", ".join((str(x) for x in self.PROJ))
+            raise ValueError(f"project '{project}' not in ({valid_projects})")
+        self.project = project
+        self.package = self.PROJ[project]
+        self.data_basedir = Path.home() / f".{self.project}"
+        try:
+            self.data_basedir.mkdir(parents=True, exist_ok=True)
+        except (FileNotFoundError, OSError) as err:
+            _log.error(f"error creating project data directory '{self.data_basedir}'")
+            raise
+        _log.info(f"Deployment: project={self.project} package={self.package} data_basedir={self.data_basedir}")
+
 
 class FlowsheetInfo(BaseModel):
     """Information about a flowsheet."""
@@ -73,12 +102,27 @@ class FlowsheetManager:
         Args:
             **kwargs: Passed as keywords to :class:`AppSettings`.
         """
-        self.app_settings = AppSettings(**kwargs)
-        self._objs, self._flowsheets = {}, {}
+        # self.app_settings = AppSettings(**kwargs)
         self.startup_time = time.time()
+        
+
+    def set_project(self, project: str):
+        self._objs, self._flowsheets = {}, {}
+        self.project = project
+        self._dpy = Deployment(project)
+        
+        # Set App Settings
+        self.app_settings = AppSettings(
+            # _dpy_package = self._dpy.package,
+            # _dpy_project = self._dpy.project,
+            packages = list(self._dpy.package),
+            log_dir = self._dpy.data_basedir / "logs",
+            custom_flowsheets_dir = self._dpy.data_basedir / "custom_flowsheets",
+            data_basedir = self._dpy.data_basedir,
+        )
 
         # Add custom flowsheets path to the system path
-        self.custom_flowsheets_path = self.app_settings.data_basedir / "custom_flowsheets"
+        self.custom_flowsheets_path = self.app_settings.custom_flowsheets_dir
         sys.path.append(str(self.custom_flowsheets_path))
 
         for package in self.app_settings.packages:
@@ -98,6 +142,10 @@ class FlowsheetManager:
         path = self.app_settings.data_basedir / self.HISTORY_DB_FILE
         self._histdb = tinydb.TinyDB(path)
 
+        ## set last run
+        self.set_last_run_dictionary()
+
+    def set_last_run_dictionary(self):
         # check for (and set if necessary) the last_run dictionary
         query = tinydb.Query()
         last_run_dict = self._histdb.search(
