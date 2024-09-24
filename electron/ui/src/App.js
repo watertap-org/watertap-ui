@@ -18,9 +18,8 @@ function App() {
     const [connectedToBackend, setConnectedToBackend] = useState(false);
     const [numberOfSubprocesses, setNumberOfSubprocesses] = useState({})
     const [checkAgain, setCheckAgain] = useState(1)
-    
+    const [theme,setTheme] = useState(themes[localStorage.getItem("theme")] || themes[process.env.REACT_APP_THEME] || themes["watertap"])
     const hasTheme = true
-    const theme = themes[process.env.REACT_APP_THEME] || themes["watertap"]
     const WAIT_TIME = 2
 
     const mui_theme = createTheme({
@@ -34,21 +33,26 @@ function App() {
     useEffect(() => {
         if (hasTheme && checkAgain !== 0)
         {
-        // Get list of flowsheets
             setProject(theme.project.toLowerCase())
-                .then((data) => {
-                    setConnectedToBackend(true);
-                    setCheckAgain(0)
-                }).catch((e) => {
-                    // console.log(`unable to get flowsheets, trying again in ${WAIT_TIME} seconds`)
-                    // if its taking a long time log the error
-                    if (checkAgain > 10) console.log(`get flowsheets failed: ${e}`)
-                    setTimeout(() => {
-                        setCheckAgain(checkAgain+1)
-                    }, WAIT_TIME * 1000)
-                });
+            .then((data) => {
+                localStorage.setItem("theme", theme.project.toLowerCase())
+                setConnectedToBackend(true);
+                setCheckAgain(0)
+            }).catch((e) => {
+                // console.log(`unable to get flowsheets, trying again in ${WAIT_TIME} seconds`)
+                // if its taking a long time log the error
+                if (checkAgain > 10) console.log(`get flowsheets failed: ${e}`)
+                setTimeout(() => {
+                    setCheckAgain(checkAgain+1)
+                }, WAIT_TIME * 1000)
+            });
         }
     }, [theme, checkAgain]);
+
+    const changeTheme = (new_theme) => {
+        localStorage.setItem("theme", new_theme)
+        window.location.reload()
+    }
 
     const subProcState = {value: numberOfSubprocesses, setValue: setNumberOfSubprocesses}
     return (
@@ -56,7 +60,7 @@ function App() {
         <ThemeProvider theme={mui_theme}>
             <div className="App">
                 <MainContent theme={theme} hasTheme={hasTheme} connectedToBackend={connectedToBackend}
-                            subProcState={subProcState}/>
+                            subProcState={subProcState} changeTheme={changeTheme}/>
                 <WaitForProject hasTheme={hasTheme}></WaitForProject>
                 <SplashPage theme={theme} hasTheme={hasTheme} connectedToBackend={connectedToBackend}/>
             </div>
