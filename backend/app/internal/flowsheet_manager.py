@@ -73,11 +73,14 @@ class FlowsheetManager:
         Args:
             **kwargs: Passed as keywords to :class:`AppSettings`.
         """
-        # self.app_settings = AppSettings(**kwargs)
+        current_project = os.environ.get("project", None)
+        if current_project:
+            self.set_project(current_project)
         self.startup_time = time.time()
         
 
     def set_project(self, project: str):
+        os.environ["project"] = project
         self._objs, self._flowsheets = {}, {}
         self.project = project
         self._dpy = Deployment(project)
@@ -632,7 +635,7 @@ class FlowsheetManager:
 
     def get_logs_path(self):
         """Return logs path."""
-        return self.app_settings.log_dir / "nawi-ui_backend_logs.log"
+        return self.app_settings.log_dir / "ui_backend_logs.log"
 
     @staticmethod
     def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:
