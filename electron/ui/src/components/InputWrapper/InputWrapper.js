@@ -8,13 +8,20 @@ export default function InputWrapper(props) {
     // const [ disabled, setDisabled ] = useState(false)
     const [value, setValue] = useState("");
     const [ showBounds, setShowBounds ] = useState(!fieldData.fixed)
+    // const [ isSweep, setIsSweep ] = useState(fieldData.is_sweep)
+    const [ isSweep, setIsSweep ] = useState(false)
     const disabled = false
 
-    useEffect(()=>{  
+    useEffect(()=>{
         if (fieldData.fixed === undefined) {
             fieldData.fixed = true
         } else if (!fieldData.fixed) {
             setShowBounds(true)
+        }
+        if (fieldData.fixed === true) {
+
+        } else if(fieldData.is_sweep) {
+            setIsSweep(true)
         }
     }, [fieldData]);
 
@@ -22,6 +29,7 @@ export default function InputWrapper(props) {
         // handleFixedChange({target: {name: fieldData.obj_key, value: false}})
         if (solveType === "solve" && fieldData.is_sweep) {
             fieldData.is_sweep = false
+            handleSetSweep(false)
             handleUpdateFixed(fieldData.obj_key, false, "free")
         }
         
@@ -36,18 +44,33 @@ export default function InputWrapper(props) {
     const handleFixedChange = (event) => {
         console.log(`updating fixed for ${event.target.name} with value ${event.target.value}`)
         let value
-        if(event.target.value === "fixed") value = true
-        else if(event.target.value === "free") value = false
+        if(event.target.value === "fixed") { 
+            value = true
+            
+            handleSetSweep(false)
+        }
+        else if(event.target.value === "free") {
+            value = false
+            handleSetSweep(false)
+        }
         else if(event.target.value === "sweep") {
             value = false
             fieldData.is_sweep = true
+            handleSetSweep(true)
             // add variable to sweep variables
         }
         // setDisabled(true)
         fieldData.fixed = value;
         handleUpdateFixed(event.target.name,value, event.target.value)
+
         setShowBounds(!value)
+        
     };
+
+    const handleSetSweep = (v) => {
+        // if (v) console.log("v is true")
+        setIsSweep(v)
+    }
 
     const handleBoundsChange = (event) => {
         let value = event.target.value;
@@ -85,14 +108,10 @@ export default function InputWrapper(props) {
         
     };
 
-    // const handleShowBounds = () => {
-    //     setShowBounds(!showBounds)
-    // }
-
     const getVariableState = () => {
-        if (fieldData.fixed) return "fixed"
-        else if(!fieldData.fixed && !fieldData.is_sweep) return "free"
-        else if(!fieldData.fixed && fieldData.is_sweep) return "sweep"
+        if(isSweep) return "sweep"
+        else if (fieldData.fixed) return "fixed"
+        else return "free"
     }
 
 
@@ -127,12 +146,13 @@ export default function InputWrapper(props) {
                 </Tooltip>
                 </Grid>
                 <Grid item xs={3}>
-                <FormControl size="small" sx={{width:'80%'}}>
+                <FormControl  size="small" sx={{width:'80%'}}>
                     <Select
+                        className={fieldData.name.replaceAll(" ","")+"_fixed-free-select"}
+                        // className={"fixed-free-select"}
                         name={fieldData.obj_key} 
                         value={getVariableState()}
                         onChange={handleFixedChange}
-                        // sx={{color:'#0b89b9', fontWeight: "bold"}}
                     >
                     <MenuItem key={true} value={"fixed"}>Fixed</MenuItem>
                     <MenuItem disabled={!fieldData.has_bounds || disabled} key={false} value={"free"}>Free</MenuItem>
@@ -141,16 +161,14 @@ export default function InputWrapper(props) {
                     </Select>
                 </FormControl>
                 </Grid>
-                {/* <Grid item xs={1}>
-                    <IconButton onClick={handleShowBounds}><ExpandIcon/></IconButton>
-                </Grid> */}
                 {
                     showBounds &&
                     <>
                         <Grid item xs={0.25}></Grid>
                         <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}> 
                         
-                        <TextField id={'lower_bound'} 
+                            <TextField id={'lower_bound'} 
+                                className={fieldData.name.replaceAll(" ","")+"_lower_input"}
                                 name={`${fieldData.obj_key}::lb`} 
                                 label={'Lower'}
                                 variant="outlined" 
@@ -159,13 +177,14 @@ export default function InputWrapper(props) {
                                 onChange={handleBoundsChange}
                                 fullWidth 
                                 disabled={disabled}
-                        />
+                            />
                         </Grid>
                         <Grid item xs={.25}>
                         </Grid>
 
                         <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}>
-                        <TextField id={'upper_bound'} 
+                            <TextField id={'upper_bound'} 
+                                className={fieldData.name.replaceAll(" ","")+"_upper_input"}
                                 name={`${fieldData.obj_key}::ub`} 
                                 label={'Upper'}
                                 variant="outlined" 
@@ -174,13 +193,14 @@ export default function InputWrapper(props) {
                                 onChange={handleBoundsChange}
                                 fullWidth 
                                 disabled={disabled}
-                        />
+                            />
 
                         </Grid>
                         <Grid item xs={0.25}></Grid>
 
                         {
-                        fieldData.is_sweep===true &&
+                        // fieldData.is_sweep===true &&
+                        isSweep &&
                         <>
                         <Grid item xs={3} sx={{marginTop:1, marginBottom: 2}}>
                             

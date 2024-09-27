@@ -79,9 +79,10 @@ def test_get_all(client):
     response = client.get("/flowsheets")
     assert response.status_code == 200
     body = response.json()
-    for item in body:
+    data = body["flowsheet_list"]
+    for item in data:
         # validates the result object, too
-        info = fm.FlowsheetInfo.parse_obj(item)
+        info = fm.FlowsheetInfo.model_validate(item)
         assert info.name != ""
 
 
@@ -92,7 +93,7 @@ def test_get_config(client, flowsheet_id):
     assert response.status_code == 200, body
     # make sure it's a non-empty valid response
     assert body != {}
-    fs_exp = FlowsheetExport.parse_obj(body)
+    fs_exp = FlowsheetExport.model_validate(body)
     assert fs_exp.name != ""
 
     # this time build the model, make sure there is content
@@ -101,7 +102,7 @@ def test_get_config(client, flowsheet_id):
     )
     assert response.status_code == 200, body
     config = body
-    assert len(config["model_objects"]) > 0
+    assert len(config["exports"]) > 0
 
 
 @pytest.mark.unit
@@ -129,18 +130,18 @@ def test_update(client, flowsheet_id):
     response, body = get_flowsheet(client, flowsheet_id, "reset")
     assert response.status_code == 200, body
     new_body = body.copy()
-    for var_name, var_data in new_body["model_objects"].items():
+    for var_name, var_data in new_body["exports"].items():
         value = var_data["value"]
         if isinstance(value, float):
             var_data["value"] += 1
             print(f"changed {var_name}")
     response, update_body = post_flowsheet(client, flowsheet_id, "update", new_body)
     assert response.status_code == 200, update_body
-    for var_name, var_data in update_body["model_objects"].items():
+    for var_name, var_data in update_body["exports"].items():
         value = var_data["value"]
         if isinstance(value, float) and var_data["is_input"] and not var_data["is_readonly"]:
             print(f"check {var_name} is_input={var_data['is_input']}")
-            expect_value = new_body["model_objects"][var_name]["value"]
+            expect_value = new_body["exports"][var_name]["value"]
             assert value == expect_value
 
 
@@ -149,7 +150,7 @@ def test_update_missing(client, flowsheet_id):
     response, body = get_flowsheet(client, flowsheet_id, "reset")
     assert response.status_code == 200, body
     new_body = body.copy()
-    new_body["model_objects"]["missing"] = {
+    new_body["exports"]["missing"] = {
         "name": "Tank 99 inlet flowrate",
         "value": 2.0,
         "display_units": "None",
@@ -190,9 +191,9 @@ def test_load_config(client, flowsheet_id):
     )
     assert response.status_code == 200
     config = body
-    assert len(config["model_objects"]) > 0
+    assert len(config["exports"]) > 0
     # make recognizable values
-    for var_name, var_data in config["model_objects"].items():
+    for var_name, var_data in config["exports"].items():
         var_data["value"] = 99
     response, body = post_flowsheet(
         client, flowsheet_id, "save", config, query_params={"name": "test name!", "version": "1"}
@@ -203,8 +204,8 @@ def test_load_config(client, flowsheet_id):
     )
     assert response.status_code == 200, body
     config2 = body
-    for var_name, var_data in config2["model_objects"].items():
-        assert var_data["value"] == config["model_objects"][var_name]["value"]
+    for var_name, var_data in config2["exports"].items():
+        assert var_data["value"] == config["exports"][var_name]["value"]
 
 
 @pytest.mark.unit
@@ -267,9 +268,7 @@ def test_download(client, flowsheet_id):
         client, flowsheet_id, "download", compare_data, get_body=False
     )
     assert response.status_code == 200
-    csv_data = ""
-    for chunk in response.iter_content(65536):
-        csv_data += str(chunk, encoding="utf-8")
+    csv_data = str(response.content, encoding="utf-8")
     if "\r\n" in csv_data:
         sep = "\r\n"
     else:

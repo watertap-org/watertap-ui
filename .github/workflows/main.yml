@@ -35,11 +35,17 @@ jobs:
             os-version: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: environment.yml
           activate-environment: watertap-ui-env
+          miniforge-version: latest
+
+      - name: Add theme to .env file
+        working-directory: ./electron/ui
+        run: |
+            echo REACT_APP_THEME=watertap >> .env
 
       - name: Install Electron JS dependencies
         run: |
@@ -56,26 +62,12 @@ jobs:
         run: |
           pip install --progress-bar off .
 
-      # - name: Install my fork of watertap
-      #   working-directory: ../
-      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout build-options && pip install --progress-bar off .
-
-      # - name: Install correct branch of watertap
-      #   working-directory: ../
-      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && pip install --progress-bar off .
-
       - name: Display installed environment
         run: |
           conda env export --no-builds
 
-      # - name: run pytest
-      #   working-directory: backend
-      #   env:
-      #     PYTHONPATH: ${{ env.GITHUB_WORKSPACE }}/backend
-      #   run: pytest tests -v
-
       - name: run backend server
-        run: uvicorn --app-dir backend/app main:app --reload --host 0.0.0.0 --port 8001 & sleep 30
+        run: uvicorn --app-dir backend/app main:app --reload --host 127.0.0.1 --port 8001 & sleep 30
 
       - name: run frontend
         run: npm --prefix electron/ui start & sleep 30
@@ -85,11 +77,49 @@ jobs:
 
       - name: Cypress e2e tests
         working-directory: electron/ui
-        timeout-minutes: 15
+        timeout-minutes: 45
         run: npx cypress run
 
+      - name: stop linux services
+        if: runner.os == 'Linux'
+        run: fuser -k 3000/tcp && fuser -k 8001/tcp
+
+      - name: stop windows services
+        if: runner.os == 'Windows'
+        run: |
+            $ports = @(3000, 8001)
+            foreach ($port in $ports){
+              $netTCPConnections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
+              if ($netTCPConnections) {
+                foreach ($netTCPConnection in $netTCPConnections) {
+                  $processId = $netTCPConnection.OwningProcess
+                  Write-Host "Found ID $processId"
+                  $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
+                  if ($process) {
+                    Write-Host "Found valid process $process"
+                    if ($process.Name -notcontains "Idle") {
+                      try {
+                        Write-Host "Attempting to kill ID $processId with name $process.Name."
+                        Stop-Process -Id $process.Id -Force
+                        Write-Host "Process with ID $processId on port $port killed."
+                      } catch {
+                        Write-Host "Failed to kill process with ID $processId - $_"
+                      }
+                    } else {
+                      Write-Host "The process using port $port is the idle process and cannot be terminated."
+                    }
+                  } else {
+                    Write-Host "No process found using port $port."
+                  }
+                }
+              } else {
+                Write-Host "No TCP connection found on port $port."
+              }
+            }
+        shell: pwsh
+
       - name: Upload artifact for screenshots & videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
             name: cypress_results-${{ matrix.os }}
@@ -115,19 +145,20 @@ jobs:
             os-version: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: environment.yml
           activate-environment: watertap-ui-env
+          miniforge-version: latest
 
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
 
-      # - name: Install my fork of watertap
-      #   working-directory: ../
-      #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout build-options && pip install --progress-bar off .
+      - name: Install httpx
+        run: |
+          pip install httpx
 
       - name: get idaes extensions
         run: idaes get-extensions

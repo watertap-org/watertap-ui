@@ -1,0 +1,60 @@
+{
+    "inputData": {
+        "name": "Magprex",
+        "description": "Magprex flowsheet",
+        "model_objects": {},
+        "version": 2,
+        "requires_idaes_solver": false,
+        "dof": 0,
+        "sweep_results": {},
+        "build_options": {
+            "TestStrOptionValid": {
+                "name": "TestStrOptionValid",
+                "category": "String Options",
+                "display_name": "String Option",
+                "description": "String Option",
+                "display_values": [],
+                "values_allowed": "string",
+                "min_val": null,
+                "max_val": null,
+                "value": "test option"
+            },
+            "TestIntOptionValid": {
+                "name": "TestIntOptionValid",
+                "category": "Int Options",
+                "display_name": "Int Option",
+                "description": "Int Option",
+                "display_values": [],
+                "values_allowed": "int",
+                "min_val": 0,
+                "max_val": 16,
+                "value": 10
+            },
+            "TestFloatOptionValid": {
+                "name": "TestFloatOptionValid",
+                "category": "Float Options",
+                "display_name": "Float Option",
+                "description": "Float Option",
+                "display_values": [],
+                "values_allowed": "float",
+                "min_val": 0,
+                "max_val": 16,
+                "value": 10.1
+            },
+            "TestListOptionValid": {
+                "name": "TestListOptionValid",
+                "category": "List Options",
+                "display_name": "List Option",
+                "description": "List Option",
+                "display_values": [],
+                "values_allowed": [
+                    "valid option a",
+                    "valid option b"
+                ],
+                "min_val": null,
+                "max_val": null,
+                "value": "valid option a"
+            }
+        }
+    }
+}

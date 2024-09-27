@@ -1,0 +1,64 @@
+/*
+Styles for the 'splash' screen.
+ */
+.splashBackground {
+    height: 100vh;
+}
+
+.splashBackground img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+
+/* Project logo */
+#splashLogo {
+    width: 100%;
+    padding-top: 50px;
+}
+
+/* Project name and release version */
+#splashRelease {
+    padding-top: 0;
+    margin-top: 0;
+    color: #9c9c9c;
+}
+
+/* Project 'about' blurb */
+#splashBlurb {
+    color: #676B71;
+    padding-bottom: 40px;
+}
+
+/* Content background */
+#splashContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600;
+    border-radius: 8;
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+    p: 4;
+    background: white;
+}
+
+/*
+  Not sure what this bit of CSS does,
+  it's left over from old SplashPage inline styles.
+  -dang 5/2024
+
+        table-box: {
+            border: 1px solid #0884b4';
+            border-radius: 2;
+        }
+        newButton: {
+            backgroundColor: '#0884b4',
+            borderRadius: '8px',
+            '&:hover': {
+                backgroundColor: '#0884b4',
+                opacity: 0.9
+            },
+        }
+
+*/

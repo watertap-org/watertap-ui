@@ -54,3 +54,4 @@ export const downloadSweepResults = (id) => {
         mode: 'cors',
     });
 }
+

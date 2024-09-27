@@ -1,55 +1,58 @@
- 
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import Header from './components/Boilerplate/Header/Header'; 
+import {useNavigate} from "react-router-dom";
 import SplashPage from './views/SplashPage/SplashPage';
-import FlowsheetsList from './views/FlowsheetsList/FlowsheetsList';
-import FlowsheetConfig from './views/FlowsheetConfig/FlowsheetConfig';
-import { getFlowsheetsList } from "./services/flowsheetsList.service"; 
+import {getFlowsheetsList} from "./services/flowsheetsList.service";
+import {getProjectName} from './services/projectName.service';
+import MainContent from "./components/MainContent/MainContent";
+import WaitForProject from "./components/WaitForProject/WaitForProject";
+import {themes} from './theme';
 
 function App() {
-  let navigate = useNavigate();
-  const [ loadLandingPage, setLoadLandingPage ] = useState(1)
-  const [ showHeader, setShowHeader ] = useState(false)
+    let navigate = useNavigate();
+    const [hasFlowsheetsList, setHasFlowsheetsList] = useState(false);
+    const [hasTheme, setHasTheme] = useState(true);
+    const [numberOfSubprocesses, setNumberOfSubprocesses] = useState({})
+    const [theme, setTheme] = useState(themes[process.env.REACT_APP_THEME] || themes["watertap"]);
+    const [checkAgain, setCheckAgain] = useState(1)
+    const WAIT_TIME = 2
 
-  useEffect(()=>{
-    /*
-      ping backend until it is ready then redirect away from splash page
-    */
-    getFlowsheetsList()
-    .then(response => response.json())
-    .then((data)=>{
-      // console.log('connected to backend')
-      setShowHeader(true)
-      navigate('/flowsheets', {replace: true})
-    })
-    .catch(e => {
-      console.error('try #'+loadLandingPage+' unable to connect to backend: ',e)
-      setTimeout(function() {
-        setLoadLandingPage(loadLandingPage => loadLandingPage+1)
-      }, 1000)
-  
-      
-    })
-    
-}, [loadLandingPage])
-  return (
-    <div className="App">  
-      <Header show={showHeader}/>
-      <Routes> 
-        <Route path="flowsheet/:id/config" element={<FlowsheetConfig />} /> 
-        <Route path="flowsheets" element={<FlowsheetsList />} />
-        <Route path="/" element={<SplashPage />} />
-        <Route path="*" element={<Navigate replace to="flowsheets" />}/>
-      </Routes> 
-    </div> 
-  );
-  
+    console.log("App hasTheme = ",hasTheme);
+
+    useEffect(() => {
+        if (hasTheme && checkAgain !== 0)
+        {
+        // Get list of flowsheets
+            getFlowsheetsList()
+                .then((data) => {
+                    console.log("got flowsheets list")
+                    setHasFlowsheetsList(true);
+                    setCheckAgain(0)
+                }).catch((e) => {
+                    // console.log(`unable to get flowsheets, trying again in ${WAIT_TIME} seconds`)
+                    // if its taking a long time log the error
+                    if (checkAgain > 10) console.log(`get flowsheets failed: ${e}`)
+                    setTimeout(() => {
+                        setCheckAgain(checkAgain+1)
+                    }, WAIT_TIME * 1000)
+                });
+        }
+    }, [theme, checkAgain]);
+
+    const subProcState = {value: numberOfSubprocesses, setValue: setNumberOfSubprocesses}
+    return (
+        <div className="App">
+            <MainContent theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}
+                         subProcState={subProcState}/>
+            <WaitForProject hasTheme={hasTheme}></WaitForProject>
+            <SplashPage theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}/>
+        </div>
+    )
 }
+
 
 export default App;

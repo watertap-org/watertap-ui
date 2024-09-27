@@ -6,6 +6,7 @@ import { getDiagram } from "../../services/graph.service";
 
 export default function Graph() {
   const [ graphImage, setGraphImage ] = useState(null)
+  const [ tryAgain, setTryAgain ] = useState(true)
   let params = useParams();
     useEffect(() => {
       
@@ -17,6 +18,10 @@ export default function Graph() {
             if(data.size > 0) {
               setGraphImage(URL.createObjectURL(data))
             }
+            else {
+              console.log("data.size is 0")
+              if (tryAgain) setTryAgain(false)
+            }
           }).catch((err)=>{
               console.error("error fetching diagram: ",err)
           })
@@ -26,7 +31,7 @@ export default function Graph() {
       }
       })
 
-    },[])
+    },[tryAgain])
 
     const noImage = () => {
       return <h1 style={{marginTop:'50px'}}>No Diagram Found</h1>

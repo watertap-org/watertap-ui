@@ -7,21 +7,20 @@ import importlib
 
 if sys.version_info < (3, 10):
     from importlib_resources import files
+    importlib_old = True
 else:
     from importlib.resources import files
-try:
-    from importlib import metadata
-except ImportError:
-    from importlib_metadata import metadata
+    importlib_old = False
+from importlib import metadata
 from pathlib import Path
 import time
 from types import ModuleType
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 import app
 
 # third-party
 from fastapi import HTTPException
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, field_validator, ValidationInfo, Field
 import tinydb  # JSON single-file 'database'
 
 # package-local
@@ -30,8 +29,8 @@ from watertap.ui.fsapi import FlowsheetInterface
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)
-# _log.setLevel(logging.DEBUG)
-VERSION = 2
+_log.setLevel(idaeslog.DEBUG)
+VERSION = 3
 
 
 class FlowsheetInfo(BaseModel):
@@ -40,18 +39,18 @@ class FlowsheetInfo(BaseModel):
     # static information
     id_: str
     name: str
-    description: str = ""
+    description: Union[None, str] = Field(default="", validate_default=True)
     module: str = ""
     build_options: dict = {}
     # current status of flowsheet
     built: bool = False
     ts: float = 0  # time last updated (including built)
-    last_run: str = ""
+    last_run: Union[str, float] = ""
     custom: bool = False
 
     # Make sure name is lowercase
-    @validator("name")
-    def normalize_name(cls, v: str, values):
+    @field_validator("name")
+    def normalize_name(cls, v: str, info: ValidationInfo):
         return v.lower()
 
     def updated(self, built: Optional[bool] = None):
@@ -76,9 +75,10 @@ class FlowsheetManager:
         """
         self.app_settings = AppSettings(**kwargs)
         self._objs, self._flowsheets = {}, {}
+        self.startup_time = time.time()
 
         # Add custom flowsheets path to the system path
-        self.custom_flowsheets_path = Path.home() / ".watertap" / "custom_flowsheets"
+        self.custom_flowsheets_path = self.app_settings.data_basedir / "custom_flowsheets"
         sys.path.append(str(self.custom_flowsheets_path))
 
         for package in self.app_settings.packages:
@@ -202,11 +202,11 @@ class FlowsheetManager:
 
         data = b""
         info = self.get_info(id_)
-        _log.info(f"inide get diagram:: info is - {info}")
+        # _log.info(f"inside get diagram:: info is - {info}")
         if info.custom:
             # do this
             data_path = (
-                Path.home() / ".watertap" / "custom_flowsheets" / f"{info.id_}.png"
+                self.app_settings.custom_flowsheets_dir / f"{info.id_}.png"
             )
             data = data_path.read_bytes()
 
@@ -424,17 +424,26 @@ class FlowsheetManager:
         Returns:
             Mapping with keys the module names and values FlowsheetInterface objects
         """
-        group_name = package_name + ".flowsheets"
-        try:
-            entry_points = metadata.entry_points()[group_name]
-        except KeyError:
-            _log.error(f"No interfaces found for package: {package_name}")
+        # Find the entry points for the package
+        eps = metadata.entry_points
+        project_pkg = package_name + ".flowsheets"
+        if importlib_old:
+            try:
+                pkg_eps = eps()[project_pkg]  # old Python <= 3.9
+            except KeyError:
+                pkg_eps = []
+        else:
+            pkg_eps = eps(group=project_pkg)  # new Python >= 3.10
+
+        # If none are found print an erorr and abort
+        if not pkg_eps:
+            _log.error(f"No entry points found for package {project_pkg}")
             return {}
 
         interfaces = {}
-        _log.debug(f"Loading {len(list(entry_points))} entry points")
-        for ep in entry_points:
-            _log.debug(f"ep = {ep}")
+        _log.debug(f"Loading {len(list(pkg_eps))} entry points")
+        for ep in pkg_eps:
+            _log.debug(f"flowsheet-entry-point={ep}")
             module_name = ep.value
             try:
                 module = ep.load()
@@ -449,9 +458,19 @@ class FlowsheetManager:
 
     def add_custom_flowsheet(self, new_files, new_id):
         """Add new custom flowsheet to the mini db."""
+        for f in new_files:
+            if "_ui.py" in f:
+                module_name = f.replace(".py", "")
+                try:
+                    importlib.import_module(module_name)
+                except Exception as e:
+                    _log.info(f"unable to import module: {e}")
+                    self.remove_custom_flowsheet_files(new_files)
+                    return e
 
         query = tinydb.Query()
         try:
+            
             custom_flowsheets_dict = self._histdb.search(
                 query.fragment({"custom_flowsheets_version": VERSION})
             )
@@ -477,6 +496,7 @@ class FlowsheetManager:
         )
 
         self.add_custom_flowsheets()
+        return "success"
 
     def remove_custom_flowsheet(self, id_):
         """Remove a custom flowsheet from the mini db."""
@@ -499,15 +519,19 @@ class FlowsheetManager:
 
         # remove each file
         flowsheet_files = custom_flowsheets_dict[id_]
-        for flowsheet_file in flowsheet_files:
-            flowsheet_file_path = self.custom_flowsheets_path / flowsheet_file
-            _log.info(f"flowsheet file path: {flowsheet_file_path}")
-            if os.path.isfile(flowsheet_file_path):
-                _log.info(f"removing file: {flowsheet_file_path}")
-                os.remove(flowsheet_file_path)
+        self.remove_custom_flowsheet_files(flowsheet_files)
+        # for flowsheet_file in flowsheet_files:
+        #     flowsheet_file_path = self.custom_flowsheets_path / flowsheet_file
+        #     _log.info(f"flowsheet file path: {flowsheet_file_path}")
+        #     if os.path.isfile(flowsheet_file_path):
+        #         _log.info(f"removing file: {flowsheet_file_path}")
+        #         os.remove(flowsheet_file_path)
 
         # delete from DB
-        del custom_flowsheets_dict[id_]
+        try:
+            del custom_flowsheets_dict[id_]
+        except Exception as e:
+            _log.info(f"unable to delete {id_} from custom flowsheets dictionary")
         self._histdb.upsert(
             {
                 "custom_flowsheets_version": VERSION,
@@ -517,9 +541,22 @@ class FlowsheetManager:
         )
 
         # remove from flowsheets list
-        del self._flowsheets[id_]
+        try:
+            del self._flowsheets[id_]
+        except Exception as e:
+            _log.info(f"unable to delete {id_} from flowsheets list")
 
         self.add_custom_flowsheets()
+    
+    def remove_custom_flowsheet_files(self, flowsheet_files):
+        # remove each file
+        for flowsheet_file in flowsheet_files:
+            flowsheet_file_path = self.custom_flowsheets_path / flowsheet_file
+            _log.info(f"flowsheet file path: {flowsheet_file_path}")
+            if os.path.isfile(flowsheet_file_path):
+                _log.info(f"removing file: {flowsheet_file_path}")
+                os.remove(flowsheet_file_path)
+        return
 
     def add_custom_flowsheets(self):
         """Search for user uploaded flowsheets. If found, add them as flowsheet interfaces."""
@@ -531,13 +568,52 @@ class FlowsheetManager:
         for f in files:
             if "_ui.py" in f:
                 try:
-                    _log.info(f"attempting to add custom flowsheet module: {f}")
+                    _log.info(f"adding imported flowsheet module: {f}")
                     module_name = f.replace(".py", "")
                     custom_module = importlib.import_module(module_name)
                     fsi = self._get_flowsheet_interface(custom_module)
                     self.add_flowsheet_interface(module_name, fsi, custom=True)
                 except Exception as e:
                     _log.error(f"unable to add flowsheet module: {e}")
+
+    def get_number_of_subprocesses(self):
+        # _log.info(f'getting number of subprocesses')
+        maxNumberOfSubprocesses = 8
+        query = tinydb.Query()
+        item = self._histdb.search(query.fragment({"version": VERSION, "name": "numberOfSubprocesses"}))
+        # _log.info(f'item is : {item}')
+        if len(item) == 0:
+            # _log.info(f'setting number of subprocesses to be 1')
+            currentNumberOfSubprocesses = 1
+            self._histdb.upsert(
+                {
+                    "version": VERSION,
+                    "name": "numberOfSubprocesses",
+                    "value": currentNumberOfSubprocesses
+                },
+                (query.version == VERSION and query.name == "numberOfSubprocesses"),
+            )
+        else:
+            currentNumberOfSubprocesses = item[0]["value"]
+            # _log.info(f'number of subprocesses is: {currentNumberOfSubprocesses}')
+        return currentNumberOfSubprocesses, maxNumberOfSubprocesses
+    
+    def set_number_of_subprocesses(self, value):
+        # _log.info(f'setting number of subprocesses to {value}')
+        query = tinydb.Query()
+        self._histdb.upsert(
+            {
+                "version": VERSION,
+                "name": "numberOfSubprocesses",
+                "value": value
+            },
+            (query.version == VERSION and query.name == "numberOfSubprocesses"),
+        )
+        return value
+
+    def get_logs_path(self):
+        """Return logs path."""
+        return self.app_settings.log_dir / "nawi-ui_backend_logs.log"
 
     @staticmethod
     def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:

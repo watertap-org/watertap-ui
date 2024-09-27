@@ -1,19 +1,21 @@
 from pathlib import Path
 from fastapi import HTTPException
 import numpy as np
-from watertap.tools.parameter_sweep import LinearSample, ParameterSweep, parameter_sweep
-import watertap.examples.flowsheets.case_studies.wastewater_resource_recovery.amo_1575_magprex.magprex as magprex
-from watertap.tools.parameter_sweep import ParameterSweepReader
-
+from parameter_sweep import LinearSample, ParameterSweep, parameter_sweep
 from importlib import import_module
 import idaes.logger as idaeslog
+from pyomo.environ import (
+    ConcreteModel,
+    value,
+    Var,
+    units as pyunits,
+)
 
 _log = idaeslog.getLogger(__name__)
 
 
 def set_up_sensitivity(solve, output_params):
     outputs = {}
-    # optimize_kwargs = {"fail_flag": False}
     optimize_kwargs = {}
     opt_function = solve
 
@@ -34,6 +36,15 @@ def build_outputs(model, output_keys):
     return outputs
 
 
+def get_conversion_unit(flowsheet, key):
+    obj = flowsheet.fs_exp.exports[key].obj
+    ui_units = flowsheet.fs_exp.exports[key].ui_units
+    temp = Var(initialize=1, units=obj.get_units())
+    temp.construct()
+    crv = value(pyunits.convert(temp, to_units=ui_units))
+    return crv
+
+
 def run_analysis(
     ui_config,
     flowsheet,
@@ -52,6 +63,8 @@ def run_analysis(
     except:
         solve_function = flowsheet.solve
 
+    m = flowsheet.fs_exp.m
+    solve_function = flowsheet.get_action("solve")
     outputs, optimize_kwargs, opt_function = set_up_sensitivity(
         solve_function, output_params
     )
@@ -161,46 +174,41 @@ def run_parameter_sweep(flowsheet, info):
         keys = []
         conversion_factors = []
         results_table = {"headers": []}
-        for key in flowsheet.fs_exp.model_objects:
-            if flowsheet.fs_exp.model_objects[key].is_sweep:
+        for key in flowsheet.fs_exp.exports:
+            if flowsheet.fs_exp.exports[key].is_sweep:
                 if (
-                    flowsheet.fs_exp.model_objects[key].lb is not None
-                    and flowsheet.fs_exp.model_objects[key].ub is not None
+                    flowsheet.fs_exp.exports[key].lb is not None
+                    and flowsheet.fs_exp.exports[key].ub is not None
                 ):
-                    results_table["headers"].append(
-                        flowsheet.fs_exp.model_objects[key].name
-                    )
-                    conversion_factor = (
-                        flowsheet.fs_exp.model_objects[key].ub
-                        / flowsheet.fs_exp.model_objects[key].obj.ub
-                    )
+                    results_table["headers"].append(flowsheet.fs_exp.exports[key].name)
+                    conversion_factor = get_conversion_unit(flowsheet, key)
                     try:
                         parameters.append(
                             {
-                                "name": flowsheet.fs_exp.model_objects[key].obj.name,
-                                "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
-                                "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
-                                "num_samples": flowsheet.fs_exp.model_objects[
+                                "name": flowsheet.fs_exp.exports[key].name,
+                                "lb": flowsheet.fs_exp.exports[key].obj.lb,
+                                "ub": flowsheet.fs_exp.exports[key].obj.ub,
+                                "num_samples": flowsheet.fs_exp.exports[
                                     key
                                 ].num_samples,
-                                "param": flowsheet.fs_exp.model_objects[key].obj.name,
+                                "param": flowsheet.fs_exp.exports[key].obj,
                             }
                         )
                     except:
                         parameters.append(
                             {
-                                "name": flowsheet.fs_exp.model_objects[key].obj.name,
-                                "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
-                                "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
+                                "name": flowsheet.fs_exp.exports[key].name,
+                                "lb": flowsheet.fs_exp.exports[key].obj.lb,
+                                "ub": flowsheet.fs_exp.exports[key].obj.ub,
                                 "num_samples": "5",
-                                "param": flowsheet.fs_exp.model_objects[key].obj.name,
+                                "param": flowsheet.fs_exp.exports[key].obj,
                             }
                         )
                     export_keys.append(
                         ["sweep_params", flowsheet.fs_exp.model_objects[key].obj.name]
                     )
                     # HTTPException(500, detail=f"Sweep failed: {parameters}")
-                    flowsheet.fs_exp.model_objects[key].obj.fix()
+                    flowsheet.fs_exp.exports[key].obj.fix()
                     conversion_factors.append(conversion_factor)
                     keys.append(key)
             elif flowsheet.fs_exp.model_objects[key].is_input:
@@ -216,35 +224,34 @@ def run_parameter_sweep(flowsheet, info):
                     }
                 )
                 fixed_parameters_keys.append(flowsheet.fs_exp.model_objects[key].name)
-        for key in flowsheet.fs_exp.model_objects:
+        for key in flowsheet.fs_exp.exports:
             if (
-                flowsheet.fs_exp.model_objects[key].is_output
-                # and not flowsheet.fs_exp.model_objects[key].is_input
-            ):
-                results_table["headers"].append(
-                    flowsheet.fs_exp.model_objects[key].name
+                flowsheet.fs_exp.exports[key].is_output
+                or (
+                    not flowsheet.fs_exp.exports[key].is_output
+                    and flowsheet.fs_exp.exports[key].is_input
+                    and not flowsheet.fs_exp.exports[key].fixed
                 )
+                # and not flowsheet.fs_exp.exports[key].is_input
+            ):
+                results_table["headers"].append(flowsheet.fs_exp.exports[key].name)
+
                 try:
-                    conversion_factor = (
-                        flowsheet.fs_exp.model_objects[key].value
-                        / flowsheet.fs_exp.model_objects[key].obj.value
-                    )
+                    conversion_factor = get_conversion_unit(flowsheet, key)
                 except Exception as e:
                     conversion_factor = 1
                 conversion_factors.append(conversion_factor)
                 output_params.append(
                     {
-                        "name": flowsheet.fs_exp.model_objects[key].obj.name,
-                        "param": flowsheet.fs_exp.model_objects[key].obj.name,
+                        "name": flowsheet.fs_exp.exports[key].name,
+                        "param": flowsheet.fs_exp.exports[key].obj,
                     }
                 )
                 export_keys.append(
                     ["outputs", flowsheet.fs_exp.model_objects[key].obj.name]
                 )
                 keys.append(key)
-        output_path = (
-            Path.home() / ".watertap" / "sweep_outputs" / f"{info.name}_sweep.csv"
-        )
+        output_path = Path.home() / ".nawi" / "sweep_outputs" / f"{info.name}_sweep.csv"
         results_arr, output_dict = run_analysis(
             ui_config=flowsheet,
             flowsheet=info.module,
@@ -262,13 +269,18 @@ def run_parameter_sweep(flowsheet, info):
         raise HTTPException(500, detail=f"Sweep failed: {err}")
     num_samples = output_dict[export_keys[0][0]][export_keys[0][1]]["value"].size
     result_arr = []
-    for ns in range(num_samples):
-        result_arr.append([])
-        for i, (result_type, key) in enumerate(export_keys):
-            value = output_dict[export_keys[i][0]][export_keys[i][1]]["value"][ns]
+    # for ns in range(num_samples):
+    #     result_arr.append([])
+    #     for i, (result_type, key) in enumerate(export_keys):
+    #         value = output_dict[export_keys[i][0]][export_keys[i][1]]["value"][ns]
 
-            if np.isnan(value) or output_dict["solve_successful"][ns] == False:
-                value = None
+    #         if np.isnan(value) or output_dict["solve_successful"][ns] == False:
+    #             value = None
+    results_table["values"] = results[0].tolist()
+    for value in results_table["values"]:
+        for i in range(len(value)):
+            if np.isnan(value[i]):
+                value[i] = None
             else:
                 conversion_factor = conversion_factors[i]
                 value = value * conversion_factor

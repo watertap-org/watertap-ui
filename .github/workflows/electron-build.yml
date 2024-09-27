@@ -3,7 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - "streamline-flowsheet-imports"
+      - "1.0.0"
 
 defaults:
   run:
@@ -19,19 +19,22 @@ jobs:
 
     runs-on: windows-latest
 
-    # strategy:
-    #   fail-fast: false
-
     steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
-          environment-file: environment.yml
+          environment-file: environment-build.yml
           activate-environment: watertap-ui-env
+          miniforge-version: latest
       
       - name: Install Azure Signtool
         run: |
           dotnet tool install --global AzureSignTool
+
+      - name: Add theme to .env file
+        working-directory: ./electron/ui
+        run: |
+            echo REACT_APP_THEME=watertap >> .env
 
       - name: Install Electron JS dependencies
         run: |
@@ -46,11 +49,7 @@ jobs:
 
       - name: Install Watertap locally
         working-directory: ../
-        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout 0.10.0_michael && pip install --progress-bar off .
-
-      # - name: Install Watertap locally
-      #   working-directory: ../
-      #   run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 0.10.0 && pip install --progress-bar off .
+        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 1.0.0 && pip install --progress-bar off .
 
       - name: Transfer Entry points
         run: |
@@ -59,20 +58,6 @@ jobs:
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
-
-      # install slightly older versions of numpy, pandas, and scipy. 
-      # having issues when freezing the latest packages of each (numpy 1.26, pandas 2.1, scipy 1.11)
-      - name: Install numpy 1.24.3
-        run: |
-          pip uninstall -y numpy && pip install numpy==1.24.3
-      
-      - name: Install pandas 2.0.3
-        run: |
-          pip uninstall -y pandas && pip install pandas==2.0.3
-
-      - name: Install scipy 1.9.1
-        run: |
-          pip uninstall -y scipy && pip install scipy==1.9.1
 
       - name: Build Backend
         run: npm --prefix electron run build-backend
@@ -85,151 +70,13 @@ jobs:
 
       - name: Sign Windows Distribution
         run: |
-          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_23.11.28_win64.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.08.15_win64.exe
 
 
       - name: Upload artifact for windows build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
             name: windows-dist
             path: |
-              electron/dist/WaterTAP-UI_23.11.28_win64.exe
-  # windows-build:
-  #   name: Windows Build
-
-  #   runs-on: windows-latest
-
-  #   env:
-  #     CSC_LINK: ${{ secrets.CSC_LINK }}
-  #     CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-
-  #   # strategy:
-  #   #   fail-fast: false
-
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: conda-incubator/setup-miniconda@v2
-  #       with:
-  #         environment-file: environment.yml
-  #         activate-environment: watertap-ui-env
-
-  #     - name: Install Electron JS dependencies
-  #       run: |
-  #         npm --prefix electron clean-install
-
-  #     - name: Install frontend JS dependencies
-  #       run: |
-  #         npm --prefix electron/ui clean-install
-
-  #     - name: Get idaes extensions
-  #       run: idaes get-extensions
-
-  #     # - name: Install Watertap locally
-  #     #   working-directory: ../
-  #     #   run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all && git checkout springmeeting-2023 && pip install --progress-bar off .
-
-  #     - name: Install Watertap locally
-  #       working-directory: ../
-  #       run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 0.9.0rc0 && pip install --progress-bar off .
-
-  #     - name: Transfer Entry points
-  #       run: |
-  #         npm --prefix electron run move-entrypoints
-
-  #     - name: Install watertap-ui Python package
-  #       run: |
-  #         pip install --progress-bar off .
-
-  #     - name: Install scipy 1.9.1
-  #       run: |
-  #         pip uninstall -y scipy && pip install scipy==1.9.1
-
-  #     - name: Build Backend
-  #       run: npm --prefix electron run build-backend
-
-  #     - name: Build Frontend
-  #       run: npm --prefix electron run build-frontend-win
-
-  #     - name: Build Windows Distribution
-  #       run: npm --prefix electron run electron-build-win
-
-  #     - name: Upload artifact for windows build
-  #       uses: actions/upload-artifact@v3
-  #       if: always()
-  #       with:
-  #           name: windows-dist
-  #           path: |
-  #             electron/dist/WaterTAP-UI_Setup.exe
-
-  linux-build:
-    name: Linux Build
-
-    runs-on: ubuntu-latest
-
-    env: 
-      CI: false
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          environment-file: environment.yml
-          activate-environment: watertap-ui-env
-
-      - name: Install Electron JS dependencies
-        run: |
-          npm --prefix electron clean-install
-
-      - name: Install frontend JS dependencies
-        run: |
-          npm --prefix electron/ui clean-install
-
-      - name: Install GNU FORTRAN, GOMP, Blas, and Lapack libraries
-        run: |
-          sudo apt-get install -y libgfortran5 libgomp1 liblapack3 libblas3
-
-      - name: Get idaes extensions
-        run: idaes get-extensions
-
-      - name: Install Watertap locally
-        working-directory: ../
-        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 0.9.0rc0 && pip install --progress-bar off .
-
-      - name: Transfer Entry points
-        run: |
-          npm --prefix electron run move-entrypoints
-
-      - name: Install watertap-ui Python package
-        run: |
-          pip install --progress-bar off .
-
-      # - name: Create idaes extensions installer
-      #   run: |
-      #     npm --prefix electron run get-extensions-installer
-
-      # - name: Revert to correct idaes version
-      #   run: |
-      #     pip uninstall -y idaes-pse && pip install 'idaes-pse @ https://github.com/IDAES/idaes-pse/archive/2.0.0a3.zip'
-
-      - name: Build Backend
-        run: npm --prefix electron run build-backend
-
-      - name: Build Frontend
-        run: npm --prefix electron run build-frontend
-
-      # for some reason, ico file breaks linux build. going without icon for now
-      - name: Remove ico file
-        run: rm electron/build/nawi-logo.ico
-
-      - name: Build Linux Distribution
-        run: npm --prefix electron run electron-build-lin
-
-      - name: Upload artifact for linux build
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-            name: linux-dist
-            path: |
-              electron/dist/watertap-ui_0.1.0_amd64.deb
-
+              electron/dist/WaterTAP-UI_24.08.15_win64.exe
