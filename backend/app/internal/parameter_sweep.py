@@ -1,11 +1,13 @@
 from pathlib import Path
 from fastapi import HTTPException
 import numpy as np
-from parameter_sweep import LinearSample, ParameterSweep, parameter_sweep
+from parameter_sweep import (
+    ParameterSweep,
+    ParameterSweepReader,
+)
 from importlib import import_module
 import idaes.logger as idaeslog
 from pyomo.environ import (
-    ConcreteModel,
     value,
     Var,
     units as pyunits,
@@ -62,13 +64,15 @@ def run_analysis(
         solve_function = flowsheet.optimize
     except:
         solve_function = flowsheet.solve
-
-    m = flowsheet.fs_exp.m
-    solve_function = flowsheet.get_action("solve")
+    # TODO: this does not return an actual solve function from the flowsheet...
+    # solve_function_action= ui_config.get_action("solve")
+    # print(solve_function_action) # This does not return a solve, but a add_action object... not sure why
     outputs, optimize_kwargs, opt_function = set_up_sensitivity(
         solve_function, output_params
     )
-
+    number_of_subprocess = ui_config.get_number_of_subprocesses()
+    print(number_of_subprocess)
+    assert False
     try:
         build_function = flowsheet_ui.build_flowsheet
         build_kwargs = {"build_options": ui_config.fs_exp.build_options}
@@ -76,7 +80,6 @@ def run_analysis(
         build_function = flowsheet.build
         build_kwargs = {}
     sweep_params = {}
-    # sensitivity analysis
     i = 0
     for each in parameters:
         sweep_params[each["param"]] = {
@@ -91,41 +94,33 @@ def run_analysis(
     for f_param in fixed_parameters:
         if f_param["fixed"]:
             sweep_params[f_param["param"] + "_fixed_state"] = {
-                "type": "LinearSample",
+                "type": "PredeterminedFixedSample",
                 "param": f_param["param"],
-                "lower_limit": f_param["value"],
-                "upper_limit": f_param["value"],
-                "num_samples": 1,
+                "array": np.array([f_param["value"]]),
             }
         else:
             sweep_params[f_param["param"] + "_fixed_state"] = {
                 "type": "LinearSample",
+                "type": "PredeterminedFixedSample",
                 "param": f_param["param"],
-                "lower_limit": 0,
-                "upper_limit": 0,
-                "num_samples": 1,
+                "array": np.array([0]),
                 "set_mode": "set_fixed_state",
                 "default_value": f_param["value"],
             }
             if f_param["lb"] is not None:
                 sweep_params[f_param["param"] + "_lb"] = {
-                    "type": "LinearSample",
+                    "type": "PredeterminedFixedSample",
                     "param": f_param["param"],
-                    "lower_limit": f_param["lb"],
-                    "upper_limit": f_param["lb"],
-                    "num_samples": 1,
+                    "array": np.array([f_param["lb"]]),
                     "set_mode": "set_lb",
                 }
             if f_param["ub"] is not None:
                 sweep_params[f_param["param"] + "_ub"] = {
-                    "type": "LinearSample",
+                    "type": "PredeterminedFixedSample",
                     "param": f_param["param"],
-                    "lower_limit": f_param["ub"],
-                    "upper_limit": f_param["ub"],
-                    "num_samples": 1,
+                    "array": np.array([f_param["ub"]]),
                     "set_mode": "set_ub",
                 }
-    print("sweep_params", sweep_params)
     # Check if user provided custom kwargs, if not don't use cutm swep param
     # else check if user provided custom sweep function, if not use watertap default (will be merged)
     if custom_do_param_sweep_kwargs is None:
@@ -136,17 +131,15 @@ def run_analysis(
         )
         if custom_do_param_sweep is None:
             custom_do_param_sweep_kwargs = None
-    print(fixed_parameters)
     ps = ParameterSweep(
         csv_results_file_name=results_path,
         optimize_function=solve_function,
-        # optimize_kwargs=optimize_kwargs,
         interpolate_nan_outputs=False,
         custom_do_param_sweep=custom_do_param_sweep,
         custom_do_param_sweep_kwargs=custom_do_param_sweep_kwargs,
         reinitialize_before_sweep=False,
         parallel_back_end="MultiProcessing",
-        number_of_subprocesses=10,
+        number_of_subprocesses=2,
     )
     global_results = ps.parameter_sweep(
         build_model=build_function,
@@ -161,133 +154,121 @@ def run_analysis(
 
 
 def run_parameter_sweep(flowsheet, info):
-    try:
-        _log.info("trying to sweep")
-        parameters = []
-        # for keeping track of user defined paramters in flowsheet that are changed
-        fixed_parameters = []
-        fixed_parameters_keys = []
-        output_params = []
-        # for keeping track of key to export, will be a list in same order a keys, and conversion factors
-        # but defines sweep_params and outputs.
-        export_keys = []
-        keys = []
-        conversion_factors = []
-        results_table = {"headers": []}
-        for key in flowsheet.fs_exp.exports:
-            if flowsheet.fs_exp.exports[key].is_sweep:
-                if (
-                    flowsheet.fs_exp.exports[key].lb is not None
-                    and flowsheet.fs_exp.exports[key].ub is not None
-                ):
-                    results_table["headers"].append(flowsheet.fs_exp.exports[key].name)
-                    conversion_factor = get_conversion_unit(flowsheet, key)
-                    try:
-                        parameters.append(
-                            {
-                                "name": flowsheet.fs_exp.exports[key].name,
-                                "lb": flowsheet.fs_exp.exports[key].obj.lb,
-                                "ub": flowsheet.fs_exp.exports[key].obj.ub,
-                                "num_samples": flowsheet.fs_exp.exports[
-                                    key
-                                ].num_samples,
-                                "param": flowsheet.fs_exp.exports[key].obj,
-                            }
-                        )
-                    except:
-                        parameters.append(
-                            {
-                                "name": flowsheet.fs_exp.exports[key].name,
-                                "lb": flowsheet.fs_exp.exports[key].obj.lb,
-                                "ub": flowsheet.fs_exp.exports[key].obj.ub,
-                                "num_samples": "5",
-                                "param": flowsheet.fs_exp.exports[key].obj,
-                            }
-                        )
-                    export_keys.append(
-                        ["sweep_params", flowsheet.fs_exp.model_objects[key].obj.name]
-                    )
-                    # HTTPException(500, detail=f"Sweep failed: {parameters}")
-                    flowsheet.fs_exp.exports[key].obj.fix()
-                    conversion_factors.append(conversion_factor)
-                    keys.append(key)
-            elif flowsheet.fs_exp.model_objects[key].is_input:
-                fixed_parameters.append(
-                    {
-                        "name": flowsheet.fs_exp.model_objects[key].obj.name,
-                        "value": flowsheet.fs_exp.model_objects[key].obj.value,
-                        "num_samples": "1",
-                        "param": flowsheet.fs_exp.model_objects[key].obj.name,
-                        "fixed": flowsheet.fs_exp.model_objects[key].fixed,
-                        "lb": flowsheet.fs_exp.model_objects[key].obj.lb,
-                        "ub": flowsheet.fs_exp.model_objects[key].obj.ub,
-                    }
-                )
-                fixed_parameters_keys.append(flowsheet.fs_exp.model_objects[key].name)
-        for key in flowsheet.fs_exp.exports:
+    # try:
+    _log.info("trying to sweep")
+    parameters = []
+    # for keeping track of user defined paramters in flowsheet that are changed
+    fixed_parameters = []
+    fixed_parameters_keys = []
+    output_params = []
+    # for keeping track of key to export, will be a list in same order a keys, and conversion factors
+    # but defines sweep_params and outputs.
+    export_keys = []
+    keys = []
+    conversion_factors = {}
+    results_table = {"headers": []}
+    for key in flowsheet.fs_exp.exports:
+        if flowsheet.fs_exp.exports[key].is_sweep:
             if (
-                flowsheet.fs_exp.exports[key].is_output
-                or (
-                    not flowsheet.fs_exp.exports[key].is_output
-                    and flowsheet.fs_exp.exports[key].is_input
-                    and not flowsheet.fs_exp.exports[key].fixed
-                )
-                # and not flowsheet.fs_exp.exports[key].is_input
+                flowsheet.fs_exp.exports[key].lb is not None
+                and flowsheet.fs_exp.exports[key].ub is not None
             ):
                 results_table["headers"].append(flowsheet.fs_exp.exports[key].name)
-
+                conversion_factor = get_conversion_unit(flowsheet, key)
                 try:
-                    conversion_factor = get_conversion_unit(flowsheet, key)
-                except Exception as e:
-                    conversion_factor = 1
-                conversion_factors.append(conversion_factor)
-                output_params.append(
-                    {
-                        "name": flowsheet.fs_exp.exports[key].name,
-                        "param": flowsheet.fs_exp.exports[key].obj,
-                    }
-                )
+                    parameters.append(
+                        {
+                            "name": flowsheet.fs_exp.exports[key].name,
+                            "lb": flowsheet.fs_exp.exports[key].obj.lb,
+                            "ub": flowsheet.fs_exp.exports[key].obj.ub,
+                            "num_samples": flowsheet.fs_exp.exports[key].num_samples,
+                            "param": flowsheet.fs_exp.exports[key].obj.name,
+                        }
+                    )
+                except:
+                    parameters.append(
+                        {
+                            "name": flowsheet.fs_exp.exports[key].name,
+                            "lb": flowsheet.fs_exp.exports[key].obj.lb,
+                            "ub": flowsheet.fs_exp.exports[key].obj.ub,
+                            "num_samples": "5",
+                            "param": flowsheet.fs_exp.exports[key].obj.name,
+                        }
+                    )
                 export_keys.append(
-                    ["outputs", flowsheet.fs_exp.model_objects[key].obj.name]
+                    ["sweep_params", flowsheet.fs_exp.exports[key].obj.name]
                 )
+                flowsheet.fs_exp.exports[key].obj.fix()
+                conversion_factors[key] = conversion_factor
                 keys.append(key)
-        output_path = Path.home() / ".nawi" / "sweep_outputs" / f"{info.name}_sweep.csv"
-        results_arr, output_dict = run_analysis(
-            ui_config=flowsheet,
-            flowsheet=info.module,
-            # # flowsheet=info.module[0:-3], # replace _ui instead?
-            # flowsheet=info.module.replace("_ui", ""),
-            parameters=parameters,
-            output_params=output_params,
-            results_path=output_path,
-            fixed_parameters=fixed_parameters,
-            # custom_do_param_sweep_kwargs=flowsheet.custom_do_param_sweep_kwargs,
-        )
-        # print(results)
-    except Exception as err:
-        _log.error(f"err: {err}")
-        raise HTTPException(500, detail=f"Sweep failed: {err}")
+        elif flowsheet.fs_exp.exports[key].is_input:
+            fixed_parameters.append(
+                {
+                    "name": flowsheet.fs_exp.exports[key].obj.name,
+                    "value": flowsheet.fs_exp.exports[key].obj.value,
+                    "num_samples": "1",
+                    "param": flowsheet.fs_exp.exports[key].obj.name,
+                    "fixed": flowsheet.fs_exp.exports[key].fixed,
+                    "lb": flowsheet.fs_exp.exports[key].obj.lb,
+                    "ub": flowsheet.fs_exp.exports[key].obj.ub,
+                }
+            )
+            fixed_parameters_keys.append(flowsheet.fs_exp.exports[key].name)
+    for key in flowsheet.fs_exp.exports:
+        if (
+            flowsheet.fs_exp.exports[key].is_output
+            or (
+                not flowsheet.fs_exp.exports[key].is_output
+                and flowsheet.fs_exp.exports[key].is_input
+                and not flowsheet.fs_exp.exports[key].fixed
+            )
+            # and not flowsheet.fs_exp.exports[key].is_input
+        ):
+            results_table["headers"].append(flowsheet.fs_exp.exports[key].name)
+
+            try:
+                conversion_factor = get_conversion_unit(flowsheet, key)
+            except Exception as e:
+                conversion_factor = 1
+            conversion_factors[key] = conversion_factor
+            # we will use obj names through out
+            output_params.append(
+                {
+                    "name": flowsheet.fs_exp.exports[key].obj.name,
+                    "param": flowsheet.fs_exp.exports[key].obj.name,
+                }
+            )
+            export_keys.append(["outputs", flowsheet.fs_exp.exports[key].obj.name])
+            keys.append(key)
+    output_path = Path.home() / ".nawi" / "sweep_outputs" / f"{info.name}_sweep.csv"
+    results_arr, output_dict = run_analysis(
+        ui_config=flowsheet,
+        flowsheet=info.module,
+        parameters=parameters,
+        output_params=output_params,
+        results_path=output_path,
+        fixed_parameters=fixed_parameters,
+    )
+    # except Exception as err:
+    #     _log.error(f"err: {err}")
+    #     raise HTTPException(500, detail=f"Sweep failed: {err}")
+    # we can't rely on result_arr order, as it will be async and out of order,
+    # so instead here, we will rebuild expected order from out output_dict
     num_samples = output_dict[export_keys[0][0]][export_keys[0][1]]["value"].size
     result_arr = []
-    # for ns in range(num_samples):
-    #     result_arr.append([])
-    #     for i, (result_type, key) in enumerate(export_keys):
-    #         value = output_dict[export_keys[i][0]][export_keys[i][1]]["value"][ns]
+    for ns in range(num_samples):
+        result_arr.append([])
+        for i, (result_type, key) in enumerate(export_keys):
+            value = output_dict[export_keys[i][0]][export_keys[i][1]]["value"][ns]
 
-    #         if np.isnan(value) or output_dict["solve_successful"][ns] == False:
-    #             value = None
-    results_table["values"] = results[0].tolist()
-    for value in results_table["values"]:
-        for i in range(len(value)):
-            if np.isnan(value[i]):
-                value[i] = None
+            if np.isnan(value) or output_dict["solve_successful"][ns] == False:
+                value = None
             else:
-                conversion_factor = conversion_factors[i]
+                conversion_factor = conversion_factors[key]
                 value = value * conversion_factor
             result_arr[-1].append(value)
     results_table["values"] = result_arr
     results_table["keys"] = keys
     results_table["num_parameters"] = len(parameters)
     results_table["num_outputs"] = len(output_params)
-    print(results_table)
     return results_table
