@@ -70,9 +70,9 @@ def run_analysis(
     outputs, optimize_kwargs, opt_function = set_up_sensitivity(
         solve_function, output_params
     )
-    number_of_subprocess = ui_config.get_number_of_subprocesses()
-    print(number_of_subprocess)
-    assert False
+    # number_of_subprocess = ui_config.get_number_of_subprocesses()
+    # print(number_of_subprocess)
+    # assert False
     try:
         build_function = flowsheet_ui.build_flowsheet
         build_kwargs = {"build_options": ui_config.fs_exp.build_options}
