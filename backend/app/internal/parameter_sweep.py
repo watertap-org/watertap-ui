@@ -56,6 +56,7 @@ def run_analysis(
     interpolate_nan_outputs=True,
     custom_do_param_sweep_kwargs=None,
     fixed_parameters=None,
+    number_of_subprocess=1,
 ):
     flowsheet_ui = import_module(flowsheet)
     flowsheet = import_module(flowsheet.replace("_ui", ""))
@@ -70,9 +71,7 @@ def run_analysis(
     outputs, optimize_kwargs, opt_function = set_up_sensitivity(
         solve_function, output_params
     )
-    # number_of_subprocess = ui_config.get_number_of_subprocesses()
-    # print(number_of_subprocess)
-    # assert False
+
     try:
         build_function = flowsheet_ui.build_flowsheet
         build_kwargs = {"build_options": ui_config.fs_exp.build_options}
@@ -139,8 +138,9 @@ def run_analysis(
         custom_do_param_sweep_kwargs=custom_do_param_sweep_kwargs,
         reinitialize_before_sweep=False,
         parallel_back_end="MultiProcessing",
-        number_of_subprocesses=2,
+        number_of_subprocesses=number_of_subprocess,
     )
+    print("number_of_subprocess ", number_of_subprocess)
     global_results = ps.parameter_sweep(
         build_model=build_function,
         build_sweep_params=ParameterSweepReader()._dict_to_params,
@@ -153,7 +153,7 @@ def run_analysis(
     return global_results
 
 
-def run_parameter_sweep(flowsheet, info):
+def run_parameter_sweep(flowsheet, info, number_of_subprocess):
     # try:
     _log.info("trying to sweep")
     parameters = []
@@ -248,6 +248,7 @@ def run_parameter_sweep(flowsheet, info):
         output_params=output_params,
         results_path=output_path,
         fixed_parameters=fixed_parameters,
+        number_of_subprocess=number_of_subprocess,
     )
     # except Exception as err:
     #     _log.error(f"err: {err}")

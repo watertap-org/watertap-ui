@@ -7,9 +7,11 @@ import importlib
 
 if sys.version_info < (3, 10):
     from importlib_resources import files
+
     importlib_old = True
 else:
     from importlib.resources import files
+
     importlib_old = False
 from importlib import metadata
 from pathlib import Path
@@ -17,6 +19,7 @@ import time
 from types import ModuleType
 from typing import Optional, Dict, List, Union
 import app
+from multiprocessing import cpu_count
 
 # third-party
 from fastapi import HTTPException
@@ -78,7 +81,9 @@ class FlowsheetManager:
         self.startup_time = time.time()
 
         # Add custom flowsheets path to the system path
-        self.custom_flowsheets_path = self.app_settings.data_basedir / "custom_flowsheets"
+        self.custom_flowsheets_path = (
+            self.app_settings.data_basedir / "custom_flowsheets"
+        )
         sys.path.append(str(self.custom_flowsheets_path))
 
         for package in self.app_settings.packages:
@@ -205,9 +210,7 @@ class FlowsheetManager:
         # _log.info(f"inside get diagram:: info is - {info}")
         if info.custom:
             # do this
-            data_path = (
-                self.app_settings.custom_flowsheets_dir / f"{info.id_}.png"
-            )
+            data_path = self.app_settings.custom_flowsheets_dir / f"{info.id_}.png"
             data = data_path.read_bytes()
 
         else:
@@ -470,7 +473,7 @@ class FlowsheetManager:
 
         query = tinydb.Query()
         try:
-            
+
             custom_flowsheets_dict = self._histdb.search(
                 query.fragment({"custom_flowsheets_version": VERSION})
             )
@@ -547,7 +550,7 @@ class FlowsheetManager:
             _log.info(f"unable to delete {id_} from flowsheets list")
 
         self.add_custom_flowsheets()
-    
+
     def remove_custom_flowsheet_files(self, flowsheet_files):
         # remove each file
         for flowsheet_file in flowsheet_files:
@@ -578,10 +581,15 @@ class FlowsheetManager:
 
     def get_number_of_subprocesses(self):
         # _log.info(f'getting number of subprocesses')
-        maxNumberOfSubprocesses = 8
+        maxNumberOfSubprocesses = (
+            int(cpu_count()) - 1
+        )  # this will get max number of processors on system reserve 1 for UI
+
         query = tinydb.Query()
-        item = self._histdb.search(query.fragment({"version": VERSION, "name": "numberOfSubprocesses"}))
-        # _log.info(f'item is : {item}')
+        item = self._histdb.search(
+            query.fragment({"version": VERSION, "name": "numberOfSubprocesses"})
+        )
+        _log.info(f"item MS is : {item}")
         if len(item) == 0:
             # _log.info(f'setting number of subprocesses to be 1')
             currentNumberOfSubprocesses = 1
@@ -589,24 +597,25 @@ class FlowsheetManager:
                 {
                     "version": VERSION,
                     "name": "numberOfSubprocesses",
-                    "value": currentNumberOfSubprocesses
+                    "value": currentNumberOfSubprocesses,
                 },
                 (query.version == VERSION and query.name == "numberOfSubprocesses"),
             )
         else:
             currentNumberOfSubprocesses = item[0]["value"]
             # _log.info(f'number of subprocesses is: {currentNumberOfSubprocesses}')
+        # prevent user from overspecifying number of sub processes on accident and killing thier system
+        print("get_number_of_subprocesses", currentNumberOfSubprocesses)
+        if currentNumberOfSubprocesses > maxNumberOfSubprocesses:
+            currentNumberOfSubprocesses = maxNumberOfSubprocesses
+        print("get_number_of_subprocesses", currentNumberOfSubprocesses)
         return currentNumberOfSubprocesses, maxNumberOfSubprocesses
-    
+
     def set_number_of_subprocesses(self, value):
         # _log.info(f'setting number of subprocesses to {value}')
         query = tinydb.Query()
         self._histdb.upsert(
-            {
-                "version": VERSION,
-                "name": "numberOfSubprocesses",
-                "value": value
-            },
+            {"version": VERSION, "name": "numberOfSubprocesses", "value": value},
             (query.version == VERSION and query.name == "numberOfSubprocesses"),
         )
         return value

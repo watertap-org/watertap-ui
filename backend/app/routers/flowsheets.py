@@ -125,14 +125,20 @@ async def solve(flowsheet_id: str, request: Request):
     input_data = await request.json()
     try:
         if _log.isEnabledFor(idaeslog.DEBUG):
-            _log.debug(f"Solve: Loading new data into flowsheet '{flowsheet_id}':\n"
-                       f"{json.dumps(input_data, indent=2)}\n")
+            _log.debug(
+                f"Solve: Loading new data into flowsheet '{flowsheet_id}':\n"
+                f"{json.dumps(input_data, indent=2)}\n"
+            )
         flowsheet.load(input_data)
     except FlowsheetInterface.MissingObjectError as err:
-        _log.error(f"Solve: Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(
+            f"Solve: Loading new data into flowsheet {flowsheet_id} failed: {err}"
+        )
         # XXX: return something about the error to caller
     except ValidationError as err:
-        _log.error(f"Solve: Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(
+            f"Solve: Loading new data into flowsheet {flowsheet_id} failed: {err}"
+        )
         raise HTTPException(
             400,
             f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input",
@@ -163,19 +169,25 @@ async def solve(flowsheet_id: str, request: Request):
 async def sweep(flowsheet_id: str, request: Request):
     flowsheet = flowsheet_manager.get_obj(flowsheet_id)
     info = flowsheet_manager.get_info(flowsheet_id)
-
+    number_of_subprocess, _ = flowsheet_manager.get_number_of_subprocesses()
     # update input data before running a sweep
     input_data = await request.json()
     try:
         if _log.isEnabledFor(idaeslog.DEBUG):
-            _log.debug(f"Sweep: Loading new data into flowsheet '{flowsheet_id}':\n"
-                       f"{json.dumps(input_data, indent=2)}\n")
+            _log.debug(
+                f"Sweep: Loading new data into flowsheet '{flowsheet_id}':\n"
+                f"{json.dumps(input_data, indent=2)}\n"
+            )
         flowsheet.load(input_data)
     except FlowsheetInterface.MissingObjectError as err:
-        _log.error(f"Sweep: Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(
+            f"Sweep: Loading new data into flowsheet {flowsheet_id} failed: {err}"
+        )
         # XXX: return something about the error to caller
     except ValidationError as err:
-        _log.error(f"Sweep: Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(
+            f"Sweep: Loading new data into flowsheet {flowsheet_id} failed: {err}"
+        )
         raise HTTPException(
             400,
             f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input",
@@ -192,8 +204,7 @@ async def sweep(flowsheet_id: str, request: Request):
     _log.info("trying to sweep")
     with idaeslog.solver_log(_log, level=idaeslog.INFO) as slc:
         results_table = run_parameter_sweep(
-            flowsheet=flowsheet,
-            info=info,
+            flowsheet=flowsheet, info=info, number_of_subprocess=number_of_subprocess
         )
     flowsheet.fs_exp.sweep_results = results_table
     # set last run in tiny db
@@ -233,16 +244,22 @@ async def update(flowsheet_id: str, request: Request):
     input_data = await request.json()
     try:
         if _log.isEnabledFor(idaeslog.DEBUG):
-            _log.debug(f"Update: Loading to flowsheet '{flowsheet_id}':\n"
-                       f"{json.dumps(input_data, indent=2)}\n")
+            _log.debug(
+                f"Update: Loading to flowsheet '{flowsheet_id}':\n"
+                f"{json.dumps(input_data, indent=2)}\n"
+            )
         flowsheet.load(input_data)
     except FlowsheetInterface.MissingObjectError as err:
         # this is unlikely, the model would need to change while running
         # (but could happen since 'build' and 'solve' can do anything they want)
-        _log.error(f"Update: Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(
+            f"Update: Loading new data into flowsheet {flowsheet_id} failed: {err}"
+        )
         # XXX: return something about the error to caller
     except ValidationError as err:
-        _log.error(f"Update: Loading new data into flowsheet {flowsheet_id} failed: {err}")
+        _log.error(
+            f"Update: Loading new data into flowsheet {flowsheet_id} failed: {err}"
+        )
         raise HTTPException(
             400,
             f"Cannot update flowsheet id='{flowsheet_id}' due to invalid data input",
@@ -300,7 +317,8 @@ async def upload_flowsheet(files: List[UploadFile]) -> str:
             if "_ui.py" in file.filename:
                 new_id = file.filename.replace(".py", "")
             async with aiofiles.open(
-                f"{str(flowsheet_manager.app_settings.custom_flowsheets_dir)}/{file.filename}", "wb"
+                f"{str(flowsheet_manager.app_settings.custom_flowsheets_dir)}/{file.filename}",
+                "wb",
             ) as out_file:
                 content = await file.read()  # async read
                 await out_file.write(content)
