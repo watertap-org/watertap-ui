@@ -130,6 +130,11 @@ def run_analysis(
         )
         if custom_do_param_sweep is None:
             custom_do_param_sweep_kwargs = None
+
+    if number_of_subprocess == 1:
+        parallel_back_end = "Serial"
+    else:
+        parallel_back_end = "MultiProcessing"
     ps = ParameterSweep(
         csv_results_file_name=results_path,
         optimize_function=solve_function,
@@ -137,10 +142,9 @@ def run_analysis(
         custom_do_param_sweep=custom_do_param_sweep,
         custom_do_param_sweep_kwargs=custom_do_param_sweep_kwargs,
         reinitialize_before_sweep=False,
-        parallel_back_end="MultiProcessing",
+        parallel_back_end=parallel_back_end,
         number_of_subprocesses=number_of_subprocess,
     )
-    print("number_of_subprocess ", number_of_subprocess)
     global_results = ps.parameter_sweep(
         build_model=build_function,
         build_sweep_params=ParameterSweepReader()._dict_to_params,

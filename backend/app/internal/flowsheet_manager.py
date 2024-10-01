@@ -605,10 +605,9 @@ class FlowsheetManager:
             currentNumberOfSubprocesses = item[0]["value"]
             # _log.info(f'number of subprocesses is: {currentNumberOfSubprocesses}')
         # prevent user from overspecifying number of sub processes on accident and killing thier system
-        print("get_number_of_subprocesses", currentNumberOfSubprocesses)
+
         if currentNumberOfSubprocesses > maxNumberOfSubprocesses:
             currentNumberOfSubprocesses = maxNumberOfSubprocesses
-        print("get_number_of_subprocesses", currentNumberOfSubprocesses)
         return currentNumberOfSubprocesses, maxNumberOfSubprocesses
 
     def set_number_of_subprocesses(self, value):
