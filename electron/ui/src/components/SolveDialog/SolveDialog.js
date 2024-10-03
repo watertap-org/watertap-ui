@@ -10,11 +10,9 @@ export default function SolveDialog(props) {
   const { open, handleSolved, handleError, flowsheetData, id, isSweep } = props;
 
   useEffect(()=>{  
-    console.log("solve dialog use effect")
     try {
       if(open)
         { 
-            console.log("open solve dialog is true")
             if(isSweep) {
               sweep(id, flowsheetData.inputData)
               .then(r =>  r.json().then(data => ({status: r.status, body: data})))

@@ -179,7 +179,7 @@ export default function ConfigInput(props) {
     /**
      * Organize variables into sections by their 'category' attribute.
      *
-     * @returns Object {<category-name>: [list, of, variable, objects]}
+     * @returns [Object(left) {<category-name>: [list, of, variable, objects]}, Object(right) {<category-name>: [list, of, variable, objects]}]
      */
     const organizeVariables = (bvars) => {
         let var_sections = {}
@@ -234,41 +234,110 @@ export default function ConfigInput(props) {
 
         }
 
-        //sorting the keys of var_sections by amount of variables into object "items"
-        let items = Object.keys(var_sections).map(function (key) {
-            return [key, var_sections[key]['num_variables']];
-        });
-        items.sort(function (first, second) {
-            return second[1] - first[1];
-        });
-        // console.log(items)
-        return var_sections
+        /** 
+         * sort the keys of var_sections into two groups that have as close as possible to even amount of total variables
+         * we want the two columns to be roughly the same length if possible
+        **/
+        let var_sections_left = {}
+        let var_sections_right = {}
+        let total_variables_left = 0
+        let total_variables_right = 0
+        let next_section = "left"
+        try {
+            for (let category of Object.keys(var_sections)) {
+                let section = var_sections[category]
+                let input_data = section.input_variables
+
+                // calculate variable amount - fixed variables take up about 45% as much space as free
+                // if variable is fixed, count it as 1
+                // if variable is free, count it as 2
+                let variable_amount = 0 
+                for (let input_variable_key of Object.keys(input_data)) {
+                    let input_variable = input_data[input_variable_key]
+                    if (input_variable.fixed) {
+                        variable_amount += 1
+                    }
+                    else {
+                        variable_amount += 2
+                    }
+                }
+                
+                if (next_section === "left") {
+                    total_variables_left+=variable_amount
+                    var_sections_left[category] = section
+                    if (total_variables_left > total_variables_right) next_section = "right"
+                }
+                else // if (next_section === "right") 
+                {
+                    total_variables_right+=variable_amount
+                    var_sections_right[category] = section
+                    if (total_variables_right > total_variables_left) next_section = "left"
+                }
+            }
+        } catch(e) {
+            console.log("error sorting: ")
+            console.log(e)
+        }
+        
+        return [var_sections_left, var_sections_right]
     }
 
     const renderInputAccordions = () => {
         try {
             if (Object.keys(displayData).length > 0) {
                 let var_sections = organizeVariables(displayData.exports)
-                return Object.entries(var_sections).map(([key, value]) => {
-                    let _key;
-                    if (key === undefined || key === null) {
-                        _key = key + Math.floor(Math.random() * 100001);
-                    } else {
-                    _key = key + value.display_name + value.output_variables;
-                    }
-                    if (Object.keys(value.input_variables).length > 0) {
-                        return (<Grid item xs={6} key={_key}>
-                            <InputAccordion
-                                handleUpdateDisplayValue={handleUpdateDisplayValue}
-                                handleUpdateFixed={handleUpdateFixed}
-                                handleUpdateBounds={handleUpdateBounds}
-                                handleUpdateSamples={handleUpdateSamples}
-                                data={value}
-                                solveType={solveType}
-                            />
-                        </Grid>)
-                    }
-                })
+                let var_sections_left = var_sections[0]
+                let var_sections_right = var_sections[1]
+
+                return <Grid container sx={{mt: 2}}>
+                    <Grid item xs={5.8}>
+                        {Object.entries(var_sections_left).map(([key, value]) => {
+                            let _key;
+                            if (key === undefined || key === null) {
+                                _key = key + Math.floor(Math.random() * 100001);
+                            } else {
+                                _key = key + value.display_name + value.output_variables;
+                            }
+                            if (Object.keys(value.input_variables).length > 0) {
+                                return (
+                                    <InputAccordion
+                                        key={_key}
+                                        handleUpdateDisplayValue={handleUpdateDisplayValue}
+                                        handleUpdateFixed={handleUpdateFixed}
+                                        handleUpdateBounds={handleUpdateBounds}
+                                        handleUpdateSamples={handleUpdateSamples}
+                                        data={value}
+                                        solveType={solveType}
+                                    />)
+                            }
+                        })}
+                    </Grid>
+                    <Grid item xs={0.4}></Grid>
+
+                    <Grid item xs={5.8}>
+                        {Object.entries(var_sections_right).map(([key, value]) => {
+                            let _key;
+                            if (key === undefined || key === null) {
+                                _key = key + Math.floor(Math.random() * 100001);
+                            } else {
+                                _key = key + value.display_name + value.output_variables;
+                            }
+                            if (Object.keys(value.input_variables).length > 0) {
+                                return (
+                                    <InputAccordion
+                                        key={_key}
+                                        handleUpdateDisplayValue={handleUpdateDisplayValue}
+                                        handleUpdateFixed={handleUpdateFixed}
+                                        handleUpdateBounds={handleUpdateBounds}
+                                        handleUpdateSamples={handleUpdateSamples}
+                                        data={value}
+                                        solveType={solveType}
+                                    />)
+                            }
+                        })}
+                    </Grid>
+
+                </Grid>
             }
         } catch (e) {
             // version of data is likely wrong
@@ -431,13 +500,11 @@ const RunButton = forwardRef(({...props}, ref) => {
         checkDisableRun
     }));
 
-
     return (
         <Tooltip
             title={disableRun ? "To run a sweep, at least one variable must be set to sweep" : ""}>
             <div>
                 <Button variant="contained"
-                        style={{background: theme.button.background}}
                         onClick={() => updateFlowsheetData(flowsheetData.inputData, solveType)}
                         disabled={disableRun}>RUN</Button>
             </div>

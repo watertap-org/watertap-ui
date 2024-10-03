@@ -34,7 +34,7 @@ export const themes = {
             color: '#FFFFFF', background: '#67C3E4', logoBackground: '#F2F7F8'
         },
         button: {
-            background: '#1976d2'
+            background: '#1976d2',
         },
         tabs: {
             background: '#F1F3F3', color: '#727272'
@@ -62,7 +62,7 @@ export const themes = {
             color: '#000000', background: '#F6F4F4', logoBackground: '#F8F6F6'
         },
         button: {
-            background: '#1669B6'
+            background: '#1669B6',
         },
         tabs: {
             background: '#F6F4F4', color: '#727272'
@@ -87,7 +87,7 @@ export const themes = {
             color: '#FFFFFF', background: '#000000', logoBackground: '#333333' // FIXME?
         },
         button: {
-            background: '#1669B6'
+            background: '#333333',
         },
         tabs: {
             background: '#F1F3F3', color: '#727272'

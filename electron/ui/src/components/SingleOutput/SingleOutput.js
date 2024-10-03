@@ -1,19 +1,24 @@
-import React, {useState} from "react";
+import React, {useState, useEffect, Fragment} from "react";
 import {useParams} from "react-router-dom";
 // MUI imports
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import DownloadIcon from '@mui/icons-material/Download';
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Grid from "@mui/material/Grid";
 import Modal from "@mui/material/Modal";
 import SaveIcon from '@mui/icons-material/Save';
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from '@mui/material'
+import Paper from '@mui/material/Paper';
 
 export default function SingleOutput(props) {
     let params = useParams();
@@ -21,10 +26,37 @@ export default function SingleOutput(props) {
     const [configName, setConfigName] = useState(outputData.name)
     const [openSaveConfig, setOpenSaveConfig] = React.useState(false);
     const [saved, setSaved] = React.useState(false);
+    const [outputTableData, setOutputTableData] = useState({})
 
     const handleOpenSaveConfig = () => setOpenSaveConfig(true);
     const handleCloseSaveConfig = () => setOpenSaveConfig(false);
 
+    /**
+     * organize output data into a list of dictionaries formatted for the output table
+     */
+    useEffect(()=> {
+        let export_variables = {...outputData.outputData.exports}
+        let rows = {}
+        for (let key of Object.keys(export_variables)) {
+            let export_variable = export_variables[key]
+            let category = export_variable.output_category
+            if (!category) category = export_variable.input_category
+            let category_rows
+            if (Object.keys(rows).includes(category)) category_rows = rows[category]
+            else {
+                category_rows = []
+                rows[category] = category_rows
+            }
+            category_rows.push({
+                key: key,
+                name: export_variable.name,
+                value: export_variable.value,
+                units: export_variable.display_units,
+                rounding: export_variable.rounding || 2
+            })
+        }
+        setOutputTableData(rows)
+    }, [outputData])
 
     const modalStyle = {
         position: 'absolute',
@@ -87,101 +119,49 @@ export default function SingleOutput(props) {
             });
     }
 
-    const renderOutputAccordions = () => {
-        let var_sections = organizeVariables(outputData.outputData.exports)
-        // console.log("var_sections",var_sections)
-        return Object.entries(var_sections).map(([key, value]) => {
-            let gridSize = 4;
-            let _key = key + Math.floor(Math.random() * 100001);
-            if (Object.keys(value.output_variables).length > 0) {
-                return (<Grid item xs={gridSize} key={_key}>
-                    <Accordion expanded={true} style={{border: "1px solid #ddd"}}>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-                            {value.display_name}
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <Box
-                                component="form"
-                                sx={{
-                                    '& > :not(style)': {m: 1},
-                                }}
-                                autoComplete="off"
+    /**
+     * generate html for table
+     * @returns table body component containing table rows
+     */
+    const renderRows = () => {
+        try {
+            return (
+                <TableBody>
+                    {Object.entries(outputTableData).map(([category, rows]) => (
+                        <Fragment key={category}>
+                        <TableRow>
+                            <TableCell 
+                                rowSpan={rows.length+1}
+                                sx={{border:"1px solid #ddd"}}
                             >
-                                {
-                                    renderFields(value.output_variables)
-                                }
-                            </Box>
-                        </AccordionDetails>
-                    </Accordion>
-                </Grid>)
-            }
-            else {
-                return null;
-            }
-        })
-    };
-
-    // renders the data in output accordions
-    const renderFields = (fieldData) => {
-        // console.log("field data", fieldData)
-        return Object.keys(fieldData).map((key) => {
-            let _key = key + Math.floor(Math.random() * 100001);
-
-            // handle rounding
-            let roundedValue
-            if (fieldData[key].rounding != null) {
-                if (fieldData[key].rounding > 0) {
-                    roundedValue = parseFloat((fieldData[key].value).toFixed(fieldData[key].rounding))
-                } else if (fieldData[key].rounding === 0) {
-                    roundedValue = Math.round(fieldData[key].value)
-                } else // if rounding is negative
-                {
-                    let factor = 1
-                    let tempRounding = fieldData[key].rounding
-                    console.log('rounding is negative : ', fieldData[key].rounding)
-                    while (tempRounding < 0) {
-                        factor *= 10
-                        tempRounding += 1
-                    }
-                    roundedValue = Math.round((fieldData[key].value / factor)) * factor
-                    console.log("old value is: ", fieldData[key].value)
-                    console.log('new value is: ', roundedValue)
-                }
-            } else // if rounding is not provided, just use given value
-            {
-                roundedValue = fieldData[key].value
-            }
-            return (<div key={_key}>
-                <span>{fieldData[key].name + " "}</span>
-                <span
-                    style={{color: "#68c3e4", fontWeight: "bold"}}>{roundedValue}</span>
-                <span>{" " + fieldData[key].display_units}</span>
-            </div>)
-        })
-    };
-
-    const organizeVariables = (bvars) => {
-        let var_sections = {}
-        for (const [key, v] of Object.entries(bvars)) {
-            let catg = v.output_category
-            let is_input = v.is_input
-            let is_output = v.is_output
-            if (catg === null) {
-                catg = ""
-            }
-            if (!Object.hasOwn(var_sections, catg)) {
-                var_sections[catg] = {
-                    display_name: catg,
-                    variables: {},
-                    input_variables: {},
-                    output_variables: {}
-                }
-            }
-            var_sections[catg]["variables"][key] = v
-            if (is_input) var_sections[catg]["input_variables"][key] = v;
-            if (is_output) var_sections[catg]["output_variables"][key] = v
+                                <b>{category}</b>
+                            </TableCell>
+                        </TableRow>
+                            {rows.map((row, idx) => (
+                                
+                            <TableRow key={`_${idx}`}>
+                                <TableCell align='right'>
+                                    {row.name}
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {row.value.toLocaleString('en-US', {maximumFractionDigits:row.rounding})}
+                                </TableCell>
+                                <TableCell align='left'>
+                                    {row.units}
+                                </TableCell>
+                            </TableRow>
+                            ))}
+                        
+                        </Fragment>
+                    ))}
+    
+                </TableBody>
+            )
+        } catch(e) {
+            console.log("unable to render rows: ")
+            console.log(e)
         }
-        return var_sections
+        
     }
 
     return (
@@ -228,7 +208,21 @@ export default function SingleOutput(props) {
                     </Grid>
                 </Modal>
             </Grid>
-            {renderOutputAccordions()}
+            <Grid item xs={12}>
+            <Paper>
+                <Table size="small" sx={{border:"1px solid #ddd"}}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Category</TableCell>
+                            <TableCell align='right'>Variable</TableCell>
+                            <TableCell align='center'>Value</TableCell>
+                            <TableCell align='left'>Units</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    {renderRows()}
+                </Table>
+            </Paper>
+            </Grid>
         </>
     );
 }

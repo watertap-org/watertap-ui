@@ -87,12 +87,10 @@ export default function FlowsheetConfig(props) {
     const [isBuilt, setIsBuilt] = useState(false)
     const [showBuildOptions, setShowBuildOptions] = useState(false)
     const theme = props.theme;
-    console.log("flowsheet config theme=", theme);
 
     const [inputsChanged, setInputsChanged] = useState(false);
 
     useEffect(() => {
-        console.log("params.id", params.id);
         if (!params.hasOwnProperty("id") || !params.id)
             return;
         // gotta find a way to figure out whether to build or not
@@ -125,10 +123,8 @@ export default function FlowsheetConfig(props) {
     }, [params.id]);
 
     useEffect(() => {
-        console.info("Check/set whether flowsheet is built");
         const inputs = getInputs(flowsheetData);
         if (!emptyOrNullObj(inputs)) {
-            console.log('flowsheet is indeed built');
             setIsBuilt(true);
         }
     }, [flowsheetData])
@@ -307,8 +303,6 @@ export default function FlowsheetConfig(props) {
         }
     }
 
-    console.log("Returning container for FlowsheetConfig. build_options=", flowsheetData.inputData.build_options, "isBuilt=", isBuilt,
-        "loadingFlowsheetData=", loadingFlowsheetData);
     return (
         <Container>
             {(loadingFlowsheetData) ?
@@ -380,10 +374,7 @@ export default function FlowsheetConfig(props) {
 
                                         </Grid>
                                         <Grid item xs={12}>
-                                            <div style={{
-                                                backgroundColor: theme.tabs.background,
-                                                color: theme.tabs.color
-                                            }}>
+                                            <div style={theme.tabs}>
                                                 <Tabs value={tabValue}
                                                       onChange={handleTabChange}
                                                       aria-label="process tabs" centered
