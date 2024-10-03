@@ -119,6 +119,10 @@ export default function SingleOutput(props) {
             });
     }
 
+    /**
+     * generate html for table
+     * @returns table body component containing table rows
+     */
     const renderRows = () => {
         try {
             return (
@@ -141,7 +145,6 @@ export default function SingleOutput(props) {
                                 </TableCell>
                                 <TableCell align='center'>
                                     {row.value.toLocaleString('en-US', {maximumFractionDigits:row.rounding})}
-                                    {/* {row.value} */}
                                 </TableCell>
                                 <TableCell align='left'>
                                     {row.units}
