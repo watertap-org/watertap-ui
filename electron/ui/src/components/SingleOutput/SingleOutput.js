@@ -31,6 +31,9 @@ export default function SingleOutput(props) {
     const handleOpenSaveConfig = () => setOpenSaveConfig(true);
     const handleCloseSaveConfig = () => setOpenSaveConfig(false);
 
+    /**
+     * organize output data into a list of dictionaries formatted for the output table
+     */
     useEffect(()=> {
         let export_variables = {...outputData.outputData.exports}
         let rows = {}
