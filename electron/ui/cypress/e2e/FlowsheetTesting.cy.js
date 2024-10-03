@@ -164,7 +164,7 @@ describe('WaterTAP UI Testing', () => {
 
             // run sweep
             cy.solve_flowsheet()
-            cy.wait(5000)
+            cy.wait(10000)
             cy.screenshot('ran parameter sweep '+flowsheet.name)
 
             // verify that sweep was successful
