@@ -179,7 +179,7 @@ export default function ConfigInput(props) {
     /**
      * Organize variables into sections by their 'category' attribute.
      *
-     * @returns Object {<category-name>: [list, of, variable, objects]}
+     * @returns [Object(left) {<category-name>: [list, of, variable, objects]}, Object(right) {<category-name>: [list, of, variable, objects]}]
      */
     const organizeVariables = (bvars) => {
         let var_sections = {}
@@ -234,7 +234,10 @@ export default function ConfigInput(props) {
 
         }
 
-        // sort the keys of var_sections into two groups that have as close as possible to even amount of total variables
+        /** 
+         * sort the keys of var_sections into two groups that have as close as possible to even amount of total variables
+         * we want the two columns to be roughly the same length if possible
+        **/
         let var_sections_left = {}
         let var_sections_right = {}
         let total_variables_left = 0
