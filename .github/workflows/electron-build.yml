@@ -3,7 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - "1.1rc0"
+      - "1.1.0"
 
 defaults:
   run:
@@ -49,7 +49,7 @@ jobs:
 
       - name: Install Watertap locally
         working-directory: ../
-        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 1.1.0rc0 && pip install --progress-bar off .
+        run: git clone https://github.com/watertap-org/watertap.git && cd watertap && git fetch --all --tags && git checkout 1.1.0 && pip install --progress-bar off .
 
       - name: Transfer Entry points
         run: |
@@ -70,7 +70,7 @@ jobs:
 
       - name: Sign Windows Distribution
         run: |
-          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.10.03_win64.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.10.11_win64.exe
 
 
       - name: Upload artifact for windows build
@@ -79,4 +79,4 @@ jobs:
         with:
             name: windows-dist
             path: |
-              electron/dist/WaterTAP-UI_24.10.03_win64.exe
+              electron/dist/WaterTAP-UI_24.10.11_win64.exe
