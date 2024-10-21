@@ -31,6 +31,9 @@ export default function SingleOutput(props) {
     const handleOpenSaveConfig = () => setOpenSaveConfig(true);
     const handleCloseSaveConfig = () => setOpenSaveConfig(false);
 
+    /**
+     * organize output data into a list of dictionaries formatted for the output table
+     */
     useEffect(()=> {
         let export_variables = {...outputData.outputData.exports}
         let rows = {}
@@ -116,6 +119,10 @@ export default function SingleOutput(props) {
             });
     }
 
+    /**
+     * generate html for table
+     * @returns table body component containing table rows
+     */
     const renderRows = () => {
         try {
             return (
@@ -133,15 +140,14 @@ export default function SingleOutput(props) {
                             {rows.map((row, idx) => (
                                 
                             <TableRow key={`_${idx}`}>
-                                <TableCell>
+                                <TableCell align='right'>
                                     {row.name}
                                 </TableCell>
-                                    <TableCell>
-                                    {row.units}
-                                </TableCell>
-                                <TableCell align="right">
+                                <TableCell align='center'>
                                     {row.value.toLocaleString('en-US', {maximumFractionDigits:row.rounding})}
-                                    {/* {row.value} */}
+                                </TableCell>
+                                <TableCell align='left'>
+                                    {row.units}
                                 </TableCell>
                             </TableRow>
                             ))}
@@ -208,9 +214,9 @@ export default function SingleOutput(props) {
                     <TableHead>
                         <TableRow>
                             <TableCell>Category</TableCell>
-                            <TableCell>Variable</TableCell>
-                            <TableCell>Units</TableCell>
-                            <TableCell align="right">Value</TableCell>
+                            <TableCell align='right'>Variable</TableCell>
+                            <TableCell align='center'>Value</TableCell>
+                            <TableCell align='left'>Units</TableCell>
                         </TableRow>
                     </TableHead>
                     {renderRows()}

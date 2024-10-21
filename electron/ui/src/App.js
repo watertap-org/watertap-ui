@@ -22,6 +22,7 @@ function App() {
     const hasTheme = true
     const WAIT_TIME = 2
 
+    // use Material UI theme for styles to be consistent throughout app
     const mui_theme = createTheme({
         palette: {
             primary: {
