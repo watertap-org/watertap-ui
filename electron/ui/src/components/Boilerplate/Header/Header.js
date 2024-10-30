@@ -64,8 +64,9 @@ export default function Header({theme, hasTheme, changeTheme}) {
                     >
                         <MenuItem className="view-logs" onClick={handleShowLogs}>View Logs</MenuItem>
                         {Object.keys(themes).map((key, idx) => {
-                            if (key != localStorage.getItem("theme")) return (
-                                <MenuItem key={key} className="change_theme" onClick={() => changeTheme(key)}>Switch to {key}</MenuItem>
+                            let current_theme = localStorage.getItem("theme")
+                            if (key !== current_theme && key !== "watertap") return (
+                                <MenuItem key={key} className="change_theme" onClick={() => changeTheme(key)}>Switch to {key.replace("nawi", "watertap")}</MenuItem>
                             )
                         })}
                         <MenuItem className="return-home" onClick={handleNavigateHome}>Return to list page</MenuItem>
