@@ -5,7 +5,7 @@ import json
 import os
 from urllib.parse import quote
 
-from watertap.ui.fsapi import FlowsheetExport
+from idaes_flowsheet_processor.api import FlowsheetExport
 from fastapi.responses import FileResponse
 
 # add 'examples' to packages, *before* app starts
@@ -24,7 +24,7 @@ def client():
 
 def pytest_generate_tests(metafunc):
     if "flowsheet_id" in metafunc.fixturenames:
-        from watertap.ui.fsapi import FlowsheetInterface
+        from idaes_flowsheet_processor.api import FlowsheetInterface
 
         module_names = list(FlowsheetInterface.from_installed_packages())
         metafunc.parametrize(

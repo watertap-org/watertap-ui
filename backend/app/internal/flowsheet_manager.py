@@ -25,7 +25,7 @@ import tinydb  # JSON single-file 'database'
 
 # package-local
 from app.internal.settings import AppSettings
-from watertap.ui.fsapi import FlowsheetInterface
+from idaes_flowsheet_processor.api import FlowsheetInterface
 import idaes.logger as idaeslog
 
 _log = idaeslog.getLogger(__name__)

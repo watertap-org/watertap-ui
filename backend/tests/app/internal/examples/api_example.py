@@ -1,4 +1,4 @@
-from watertap.ui.fsapi import FlowsheetInterface
+from idaes_flowsheet_processor.api import FlowsheetInterface
 from idaes.core.solvers import get_solver
 
 
