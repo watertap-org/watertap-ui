@@ -52,7 +52,7 @@ h5py==3.10.0
 htmlmin==0.1.12
 httpcore==1.0.4
 httpx==0.27.0
-idaes-flowsheet-processor @ file:///Users/michaelpesce/Desktop/idaes-flowsheet-processor
+idaes-flowsheet-processor @ git+https://github.com/watertap-org/idaes-flowsheet-processor.git
 idaes-pse==2.6.0
 identify==2.5.35
 idna==3.3
