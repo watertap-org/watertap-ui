@@ -139,7 +139,10 @@ jobs:
       - name: Rename conda package cache
         if: runner.os == 'Windows'
         shell: bash
-        run: mv "${CONDA_PKGS_DIR}" "${CONDA_PKGS_DIR}_do_not_cache"
+        run: |
+          if [ -d "${CONDA_PKGS_DIR}" ]; then
+            mv "${CONDA_PKGS_DIR}" "${CONDA_PKGS_DIR}_do_not_cache"
+          fi
 
   pytest:
     name: pytest (${{ matrix.os }})
