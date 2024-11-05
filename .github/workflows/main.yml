@@ -65,6 +65,10 @@ jobs:
         run: |
           pip install --progress-bar off .
 
+      - name: Test against my branch of watertap with corresponding changes
+        working-directory: ../
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all --tags && git checkout use-idaes-flowsheet-processor-api && pip install --progress-bar off .
+
       - name: Display installed environment
         run: |
           conda env export --no-builds
@@ -165,6 +169,10 @@ jobs:
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
+      
+      - name: Test against my branch of watertap with corresponding changes
+        working-directory: ../
+        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all --tags && git checkout use-idaes-flowsheet-processor-api && pip install --progress-bar off .
 
       - name: Install httpx
         run: |
