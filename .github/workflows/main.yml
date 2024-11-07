@@ -65,7 +65,7 @@ jobs:
         run: |
           pip install --progress-bar off .
 
-      - name: Test against my branch of watertap with corresponding changes
+      - name: Test against PR branch of watertap with corresponding changes
         working-directory: ../
         run: git clone https://github.com/lbianchi-lbl/watertap.git && cd watertap && git fetch --all --tags && git checkout idaes-flowsheet-processor && pip install --progress-bar off .
 
@@ -173,7 +173,7 @@ jobs:
         run: |
           pip install --progress-bar off .
       
-      - name: Test against my branch of watertap with corresponding changes
+      - name: Test against PR branch of watertap with corresponding changes
         working-directory: ../
         run: git clone https://github.com/lbianchi-lbl/watertap.git && cd watertap && git fetch --all --tags && git checkout idaes-flowsheet-processor && pip install --progress-bar off .
 
