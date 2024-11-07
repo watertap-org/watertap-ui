@@ -67,7 +67,7 @@ jobs:
 
       - name: Test against my branch of watertap with corresponding changes
         working-directory: ../
-        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all --tags && git checkout use-idaes-flowsheet-processor-api && pip install --progress-bar off .
+        run: git clone https://github.com/lbianchi-lbl/watertap.git && cd watertap && git fetch --all --tags && git checkout idaes-flowsheet-processor && pip install --progress-bar off .
 
       - name: Display installed environment
         run: |
@@ -175,7 +175,7 @@ jobs:
       
       - name: Test against my branch of watertap with corresponding changes
         working-directory: ../
-        run: git clone https://github.com/MichaelPesce/watertap.git && cd watertap && git fetch --all --tags && git checkout use-idaes-flowsheet-processor-api && pip install --progress-bar off .
+        run: git clone https://github.com/lbianchi-lbl/watertap.git && cd watertap && git fetch --all --tags && git checkout idaes-flowsheet-processor && pip install --progress-bar off .
 
       - name: Install httpx
         run: |
