@@ -76,6 +76,10 @@ def update_entry_points(project):
             else:
                 entrypoints_dst_str+=line
 
+    ## remove any trailing new lines
+    while entrypoints_dst_str[-1] == "\n":
+        entrypoints_dst_str = entrypoints_dst_str[0:-1]
+
     ## add in entrypoints from the list
     entrypoints_dst_str+=f"\n\n[{entry_points_project_name}.flowsheets]"
     for each in entry_points:
