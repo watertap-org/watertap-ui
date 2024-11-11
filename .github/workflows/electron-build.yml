@@ -56,7 +56,7 @@ jobs:
 
       - name: Transfer Entry points
         run: |
-          npm --prefix electron run move-entrypoints -p pse_ui_prommis
+          python move-entrypoints.py -p pse_ui_prommis
 
       - name: Install watertap-ui Python package
         run: |
@@ -73,7 +73,7 @@ jobs:
 
       - name: Sign Windows Distribution
         run: |
-          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.10.11_win64.exe
+          AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc ${{ secrets.AZURE_CERT_NAME }} -tr http://timestamp.digicert.com -v electron/dist/WaterTAP-UI_24.11.11_win64.exe
 
 
       - name: Upload artifact for windows build
@@ -82,4 +82,4 @@ jobs:
         with:
             name: windows-dist
             path: |
-              electron/dist/WaterTAP-UI_24.10.11_win64.exe
+              electron/dist/WaterTAP-UI_24.11.11_win64.exe
