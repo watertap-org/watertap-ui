@@ -101,3 +101,35 @@ datas.append((src_name, "watertap/core"))
 hiddenimports = list(imports)
 # add lorem ipsum.txt for jaraco
 datas.append(('internal/assets/Lorem ipsum.txt', 'jaraco/text'))
+
+pyomo_imports = [
+    "networkx",
+    "pint",
+    "numbers",
+    "pyutilib",
+    "sys",
+    "logging",
+    "re",
+    "pkg_resources.extern",
+    "pyomo.common.dependencies.numpy",
+    "collections.abc",
+    "types",
+    "pyutilib",
+    "pyutilib.component",
+    "importlib.abc",
+    "importlib",
+    "ctypes",
+    "random",
+    "yaml",
+    "numpy",
+    "scipy._lib.array_api_compat.numpy.fft",
+    "scipy._lib.array_api_compat.numpy",
+    "scipy._lib.array_api_compat",
+    "scipy._lib.",
+    "scipy.sparse",
+    "scipy.special._special_ufuncs",
+    "scipy.special._cdflib",
+    "scipy.special",
+]
+
+hiddenimports.extend(pyomo_imports)
