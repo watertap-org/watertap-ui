@@ -4,13 +4,12 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {displayVersion} from '../../theme';
 
-export default function SplashPage({theme, hasTheme, connectedToBackend}) {
-    console.debug("splash page theme =", theme, "hasTheme=", hasTheme, "connectedToBackend=", connectedToBackend);
+export default function SplashPage({theme, connectedToBackend}) {
 
     // Stop and return nothing if SplashPage should not be displayed:
     //   - without the theme, we can't display anything yet
     //   - if we have the flowsheets, then no longer show the splash page
-    if (!hasTheme || connectedToBackend || theme == null) {
+    if (connectedToBackend || theme == null) {
         return null;
     }
 

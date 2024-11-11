@@ -67,9 +67,9 @@ function App() {
 
         <ThemeProvider theme={mui_theme}>
             <div className="App">
-                <MainContent theme={theme} hasTheme={hasTheme} connectedToBackend={connectedToBackend}
+                <MainContent theme={theme} connectedToBackend={connectedToBackend}
                             subProcState={subProcState} changeTheme={changeTheme}/>
-                <WaitForProject hasTheme={hasTheme}></WaitForProject>
+                {/* <WaitForProject hasTheme={hasTheme}></WaitForProject> */}
                 <SplashPage theme={theme} hasTheme={hasTheme} connectedToBackend={connectedToBackend}/>
             </div>
         </ThemeProvider>

@@ -14,13 +14,12 @@ import React from "react";
 
 export default function MainContent(props) {
     console.debug("MainContent: props=", props);
-    if (props.hasTheme && props.connectedToBackend) {
+    if (props.connectedToBackend) {
         const theme = props.theme;
-        const hasTheme = props.hasTheme;
         const spState = props.subProcState;
         return (
             <Container id='AppRootContainer'>
-                <Header theme={theme} hasTheme={hasTheme} changeTheme={props.changeTheme}/>
+                <Header theme={theme} changeTheme={props.changeTheme}/>
                 <Routes>
                     <Route path="flowsheet/:id/config" element={<FlowsheetConfig
                         numberOfSubprocesses={spState.value}

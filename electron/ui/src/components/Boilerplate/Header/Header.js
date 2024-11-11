@@ -6,7 +6,7 @@ import {Menu, MenuItem, IconButton} from '@mui/material';
 import ListIcon from '@mui/icons-material/List';
 import {themes} from '../../../theme';
 
-export default function Header({theme, hasTheme, changeTheme}) {
+export default function Header({theme, changeTheme}) {
     let navigate = useNavigate();
     const [showLogs, setShowLogs] = React.useState(false)
     const [actionsList, setActionsList] = React.useState(false)
@@ -25,18 +25,6 @@ export default function Header({theme, hasTheme, changeTheme}) {
     const handleShowActions = (event) => {
         setActionsList(!actionsList)
         setAnchorEl(event.currentTarget);
-    }
-    if (!hasTheme) {
-        // Can't return null, or React complains about handleXYZ hooks not being
-        // called in the same order. So, return 'hidden' header.
-        return (
-            <div id="Header" style={{display: "hidden"}}>
-                <span id="logo" data-testid="project-logo" onClick={handleNavigateHome} alt={`${theme.project} logo`}></span>
-                <span onClick={handleShowActions}></span>
-                <span onClick={handleShowLogs}></span>
-                <span onClick={handleNavigateHome}></span>
-            </div>
-        );
     }
 
     return (
