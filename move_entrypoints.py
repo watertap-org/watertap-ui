@@ -7,25 +7,33 @@ from pathlib import Path
 
 def update_entry_points(project):
 
+    ## temporarily use workarounds while storing flowsheet entrypoints in watertap-ui
+    if project == "pse_ui_prommis":
+        conda_package_name = "watertap_ui"
+        entry_points_project_name = "prommis"
+    else:
+        conda_package_name = project
+        entry_points_project_name = project
+
     conda_prefix = os.environ["CONDA_PREFIX"]
 
     try:
         if sys.platform == "darwin":
             print("darwin")
             entrypoints_src_path = (
-                f"{conda_prefix}/lib/python*/site-packages/{project}-*info/entry_points.txt"
+                f"{conda_prefix}/lib/python*/site-packages/{conda_package_name}-*info/entry_points.txt"
             )
             entrypoints_dst_path = f"{conda_prefix}/lib/python*/site-packages/setuptools-*info/entry_points.txt"
         elif sys.platform == "linux":
             print("linux")
             entrypoints_src_path = (
-                f"{conda_prefix}/lib/python*/site-packages/{project}-*info/entry_points.txt"
+                f"{conda_prefix}/lib/python*/site-packages/{conda_package_name}-*info/entry_points.txt"
             )
             entrypoints_dst_path = f"{conda_prefix}/lib/python*/site-packages/setuptools-*info/entry_points.txt"
         else:
             # print("windows")
             entrypoints_src_path = (
-                f"{conda_prefix}/lib/site-packages/{project}-*info/entry_points.txt"
+                f"{conda_prefix}/lib/site-packages/{conda_package_name}-*info/entry_points.txt"
             )
             entrypoints_dst_path = (
                 f"{conda_prefix}/lib/site-packages/setuptools-*info/entry_points.txt"
@@ -42,7 +50,7 @@ def update_entry_points(project):
     start_getting_entries = False
     with open(entrypoints_src, "r") as f:
         for line in f:
-            if f"[{project}.flowsheets]" in line:
+            if f"[{entry_points_project_name}.flowsheets]" in line:
                 start_getting_entries = True
             elif start_getting_entries == True and ("]" in line or line == None or line == "\n"):
                 print(f"reached end of entry points, breaking")
@@ -59,7 +67,7 @@ def update_entry_points(project):
     found_entrypoints = False
     with open(entrypoints_dst, "r") as f:
         for line in f:
-            if f"[{project}.flowsheets]" in line:
+            if f"[{entry_points_project_name}.flowsheets]" in line:
                 found_entrypoints = True
             elif found_entrypoints == True and (line == None or line == "\n"):
                 found_entrypoints = False
@@ -69,7 +77,7 @@ def update_entry_points(project):
                 entrypoints_dst_str+=line
 
     ## add in entrypoints from the list
-    entrypoints_dst_str+=f"\n\n[{project}.flowsheets]"
+    entrypoints_dst_str+=f"\n\n[{entry_points_project_name}.flowsheets]"
     for each in entry_points:
         entrypoints_dst_str+=f"\n{each}"
 
