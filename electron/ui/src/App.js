@@ -14,13 +14,21 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 
 function App() {
-    let navigate = useNavigate();
     const [connectedToBackend, setConnectedToBackend] = useState(false);
     const [numberOfSubprocesses, setNumberOfSubprocesses] = useState({})
     const [checkAgain, setCheckAgain] = useState(1)
-    const [theme,setTheme] = useState(themes[localStorage.getItem("theme")] || themes[process.env.REACT_APP_THEME] || themes["watertap"])
+
+    /* 
+        if in dev mode, first check for theme in local storage because we allow for toggling between themes in dev mode
+        if not found or not in dev mode, check for environment variable. 
+        if not found, use watertap as default
+    */
+    let theme
+    if (process.env.NODE_ENV === 'development') theme = themes[localStorage.getItem("theme")] || themes[process.env.REACT_APP_THEME] || themes["watertap"]
+    else theme = themes[process.env.REACT_APP_THEME] || themes["watertap"]
+     
     const hasTheme = true
-    const WAIT_TIME = 2
+    const WAIT_TIME = 1
 
     // use Material UI theme for styles to be consistent throughout app
     const mui_theme = createTheme({
@@ -30,9 +38,8 @@ function App() {
             },
         },
     });
-
     useEffect(() => {
-        if (hasTheme && checkAgain !== 0)
+        if (checkAgain !== 0)
         {
             setProject(theme.project.toLowerCase())
             .then((data) => {
@@ -48,7 +55,7 @@ function App() {
                 }, WAIT_TIME * 1000)
             });
         }
-    }, [theme, checkAgain]);
+    }, [checkAgain]);
 
     const changeTheme = (new_theme) => {
         localStorage.setItem("theme", new_theme)
