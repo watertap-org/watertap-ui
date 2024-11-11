@@ -53,14 +53,14 @@ jobs:
 
       - name: Install Prommis
         run: pip install --progress-bar off prommis
+      
+      - name: Install watertap-ui Python package
+        run: |
+          pip install --progress-bar off .
 
       - name: Transfer Entry points
         run: |
           python move_entrypoints.py -p pse_ui_prommis
-
-      - name: Install watertap-ui Python package
-        run: |
-          pip install --progress-bar off .
 
       - name: Build Backend
         run: npm --prefix electron run build-backend
