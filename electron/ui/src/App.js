@@ -4,11 +4,9 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import {useNavigate} from "react-router-dom";
 import SplashPage from './views/SplashPage/SplashPage';
 import {setProject} from "./services/flowsheet.service";
 import MainContent from "./components/MainContent/MainContent";
-import WaitForProject from "./components/WaitForProject/WaitForProject";
 import {themes} from './theme';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
@@ -26,8 +24,7 @@ function App() {
     let theme
     if (process.env.NODE_ENV === 'development') theme = themes[localStorage.getItem("theme")] || themes[process.env.REACT_APP_THEME] || themes["watertap"]
     else theme = themes[process.env.REACT_APP_THEME] || themes["watertap"]
-     
-    const hasTheme = true
+
     const WAIT_TIME = 1
 
     // use Material UI theme for styles to be consistent throughout app
@@ -70,7 +67,7 @@ function App() {
                 <MainContent theme={theme} connectedToBackend={connectedToBackend}
                             subProcState={subProcState} changeTheme={changeTheme}/>
                 {/* <WaitForProject hasTheme={hasTheme}></WaitForProject> */}
-                <SplashPage theme={theme} hasTheme={hasTheme} connectedToBackend={connectedToBackend}/>
+                <SplashPage theme={theme} connectedToBackend={connectedToBackend}/>
             </div>
         </ThemeProvider>
     )
