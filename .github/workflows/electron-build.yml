@@ -34,7 +34,7 @@ jobs:
       - name: Add theme to .env file
         working-directory: ./electron/ui
         run: |
-            echo REACT_APP_THEME=prommis >> .env
+            echo REACT_APP_THEME=watertap >> .env
 
       - name: Install Electron JS dependencies
         run: |
@@ -51,8 +51,8 @@ jobs:
         working-directory: ../
         run: git clone https://github.com/watertap-org/watertap.git && cd watertap && pip install --progress-bar off .
 
-      - name: Install Prommis
-        run: pip install --progress-bar off prommis
+      # - name: Install Prommis
+      #   run: pip install --progress-bar off prommis
       
       - name: Install watertap-ui Python package
         run: |
@@ -60,7 +60,7 @@ jobs:
 
       - name: Transfer Entry points
         run: |
-          python move_entrypoints.py -p pse_ui_prommis
+          python move_entrypoints.py
 
       - name: Build Backend
         run: npm --prefix electron run build-backend

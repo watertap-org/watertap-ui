@@ -17,7 +17,8 @@ datas = []
 
 # add all modules to watertap modules hidden imports
 
-for package in ["watertap", "pyomo", "scipy", "prommis"]:
+# for package in ["watertap", "pyomo", "scipy", "prommis"]:
+for package in ["watertap", "pyomo", "scipy"]:
     pkg = importlib.import_module(package)
     try:
         # base_folder = Path(pkg.__path__[0])
