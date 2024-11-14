@@ -8,7 +8,7 @@ from pathlib import Path
 def update_entry_points(project):
 
     ## temporarily use workarounds while storing flowsheet entrypoints in watertap-ui
-    if project == "pse_ui_prommis":
+    if project == "prommis":
         conda_package_name = "watertap_ui"
         entry_points_project_name = "prommis"
     else:
