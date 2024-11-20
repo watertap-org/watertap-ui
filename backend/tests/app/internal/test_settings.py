@@ -34,7 +34,12 @@ def test_deployment_env_default():
     assert dpy.project == Deployment.DEFAULT_PROJ
 
 def test_appsettings():
-    settings = AppSettings()
+    settings = AppSettings(
+        packages = ["watertap"],
+        log_dir = "./nawi/logs",
+        custom_flowsheets_dir = "./nawi/custom_flowsheets",
+        data_basedir = "./nawi/",
+    )
     assert settings.packages
     assert settings.log_dir
     assert settings.custom_flowsheets_dir

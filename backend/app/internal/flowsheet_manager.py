@@ -87,8 +87,6 @@ class FlowsheetManager:
         
         # Set App Settings
         self.app_settings = AppSettings(
-            # _dpy_package = self._dpy.package,
-            # _dpy_project = self._dpy.project,
             packages = list(self._dpy.package),
             log_dir = self._dpy.data_basedir / "logs",
             custom_flowsheets_dir = self._dpy.data_basedir / "custom_flowsheets",

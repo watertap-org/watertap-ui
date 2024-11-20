@@ -5,6 +5,7 @@ Configuration for the backend
 import os
 from pathlib import Path
 import logging
+from logging import handlers as logging_handlers
 from typing import List, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
@@ -63,7 +64,7 @@ class AppSettings(BaseSettings):
         project_log_file = f"ui_backend_logs.log"
         _log.info(f"Logs will be in rotating files with base name "
                 f"'{v/project_log_file}'")
-        logging_file_handler = logging.handlers.RotatingFileHandler(
+        logging_file_handler = logging_handlers.RotatingFileHandler(
             v / project_log_file,
             backupCount=2,
             maxBytes=5000000,
