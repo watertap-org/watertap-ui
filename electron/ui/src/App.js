@@ -66,7 +66,6 @@ function App() {
             <div className="App">
                 <MainContent theme={theme} connectedToBackend={connectedToBackend}
                             subProcState={subProcState} changeTheme={changeTheme}/>
-                {/* <WaitForProject hasTheme={hasTheme}></WaitForProject> */}
                 <SplashPage theme={theme} connectedToBackend={connectedToBackend}/>
             </div>
         </ThemeProvider>
