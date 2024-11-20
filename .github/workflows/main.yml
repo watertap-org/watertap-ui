@@ -163,7 +163,7 @@ jobs:
           miniforge-version: latest
 
       - name: Set env
-        run: echo "project=watertap" >> $GITHUB_ENV
+        run: echo "project=nawi" >> $GITHUB_ENV
 
       - name: Test
         run: echo $project
