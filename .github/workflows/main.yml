@@ -40,6 +40,10 @@ jobs:
           activate-environment: watertap-ui-env
           miniforge-version: latest
 
+
+      - name: print environment variables
+        run: printenv
+        
       - name: Set up debug logging
         run: |
           echo "ACTIONS_RUNNER_DEBUG=true" >> $GITHUB_ENV
