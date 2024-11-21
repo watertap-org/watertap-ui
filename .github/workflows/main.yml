@@ -137,7 +137,7 @@ jobs:
         shell: bash
         run: | # Try renaming hardcoded directory
           if [ -d C:\\Users\\runneradmin\\conda_pkgs_dir ]; then
-            mv C:\\Users\\runneradmin\\conda_pkgs_dir C:\\Users\\runneradmin\\conda_pkgs_dir
+            mv C:\\Users\\runneradmin\\conda_pkgs_dir C:\\Users\\runneradmin\\conda_pkgs_dir_do_not_cache
           fi
 
   pytest:
