@@ -40,10 +40,6 @@ jobs:
           activate-environment: watertap-ui-env
           miniforge-version: latest
 
-
-      - name: print environment variables
-        run: printenv
-        
       - name: Set up debug logging
         run: |
           echo "ACTIONS_RUNNER_DEBUG=true" >> $GITHUB_ENV
@@ -141,6 +137,10 @@ jobs:
         shell: bash
         run: |
           if [ -d "${CONDA_PKGS_DIR}" ]; then
+            mv "${CONDA_PKGS_DIR}" "${CONDA_PKGS_DIR}_do_not_cache"
+          else
+            # Try using hardcoded directory
+            CONDA_PKGS_DIR="C:\Users\runneradmin\conda_pkgs_dir\"
             mv "${CONDA_PKGS_DIR}" "${CONDA_PKGS_DIR}_do_not_cache"
           fi
 
