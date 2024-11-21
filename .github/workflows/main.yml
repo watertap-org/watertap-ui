@@ -136,13 +136,9 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          if [ -d "${CONDA_PKGS_DIR}" ]; then
-            mv "${CONDA_PKGS_DIR}" "${CONDA_PKGS_DIR}_do_not_cache"
-          else
-            # Try using hardcoded directory
-            CONDA_PKGS_DIR="C:\Users\runneradmin\conda_pkgs_dir\"
-            mv "${CONDA_PKGS_DIR}" "${CONDA_PKGS_DIR}_do_not_cache"
-          fi
+          # Try renaming hardcoded directory
+          CONDA_PKGS_DIR="C:\Users\runneradmin\conda_pkgs_dir\"
+          mv "C:\Users\runneradmin\conda_pkgs_dir" "C:\Users\runneradmin\conda_pkgs_dir_do_not_cache"
 
   pytest:
     name: pytest (${{ matrix.os }})
