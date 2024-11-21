@@ -11,12 +11,12 @@ export const flowsheets = [
         sweepVariable: 'Feedvolumetricflowrate',
         sweepValues: ['20000', '21000'],
     },
-    {
-        name: 'BSM2_P_extension flowsheet',
-        buildRequired: false,
-        sweepVariable: 'Feedvolumetricflowrate',
-        sweepValues: ['20000', '21000'],
-    },
+    // {
+    //     name: 'BSM2_P_extension flowsheet',
+    //     buildRequired: false,
+    //     sweepVariable: 'Feedvolumetricflowrate',
+    //     sweepValues: ['20000', '21000'],
+    // },
     {
         name: 'Dye Desalination flowsheet',
         buildRequired: false,
@@ -35,24 +35,24 @@ export const flowsheets = [
         sweepVariable: 'Watermassflowrate',
         sweepValues: ['0.7','0.8'],
     },
-    {
-        name: 'OARO flowsheet',
-        buildRequired: true,
-        sweepVariable: 'Watermassflowrate',
-        sweepValues: ['5','6'],
-    },
-    {
-        name: 'Granular Activated Carbon (GAC) flowsheet',
-        buildRequired: true,
-        sweepVariable: 'Apparentdensity',
-        sweepValues: ['700','800'],
-    },
-    {
-        name: 'Electrodialysis with concentrate recirculation flowsheet',
-        buildRequired: false,
-        sweepVariable: 'Feedsolutionvolumeflowrate',
-        sweepValues: ['0.001','0.002'],
-    },
+    // {
+    //     name: 'OARO flowsheet',
+    //     buildRequired: true,
+    //     sweepVariable: 'Watermassflowrate',
+    //     sweepValues: ['5','6'],
+    // },
+    // {
+    //     name: 'Granular Activated Carbon (GAC) flowsheet',
+    //     buildRequired: true,
+    //     sweepVariable: 'Apparentdensity',
+    //     sweepValues: ['700','800'],
+    // },
+    // {
+    //     name: 'Electrodialysis with concentrate recirculation flowsheet',
+    //     buildRequired: false,
+    //     sweepVariable: 'Feedsolutionvolumeflowrate',
+    //     sweepValues: ['0.001','0.002'],
+    // },
     {
         name: 'LSRRO flowsheet',
         buildRequired: true,
