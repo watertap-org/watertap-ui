@@ -132,10 +132,10 @@ jobs:
 
       ## post-run conda often fails for weird reasons. this is a potential solution
       ## see https://github.com/conda-incubator/setup-miniconda/issues/277#issuecomment-1431458277
-      - name: Rename conda package cache
-        if: runner.os == 'Windows'
-        shell: bash
-        run: mv "${CONDA_PKGS_DIR}" "${CONDA_PKGS_DIR}_do_not_cache"
+      # - name: Rename conda package cache
+      #   if: runner.os == 'Windows'
+      #   shell: bash
+      #   run: mv "${CONDA_PKGS_DIR}" "${CONDA_PKGS_DIR}_do_not_cache"
 
   pytest:
     name: pytest (${{ matrix.os }})
@@ -162,11 +162,9 @@ jobs:
           activate-environment: watertap-ui-env
           miniforge-version: latest
 
+      # Set project as environment variable. This can also be set by the frontend.
       - name: Set env
         run: echo "project=nawi" >> $GITHUB_ENV
-
-      - name: Test
-        run: echo $project
 
       - name: Install watertap-ui Python package
         run: |
