@@ -11,6 +11,9 @@ def update_entry_points(project):
     if project == "prommis":
         conda_package_name = "watertap_ui"
         entry_points_project_name = "prommis"
+    elif project == "idaes":
+        conda_package_name = "watertap_ui"
+        entry_points_project_name = "idaes"
     else:
         conda_package_name = project
         entry_points_project_name = project
@@ -98,7 +101,7 @@ if __name__ == "__main__":
     if project is None:
         project = "watertap"
     elif project.lower() == "idaes":
-        project = "idaes_pse"
+        project = "idaes"
     else:
         project = project.lower()
     update_entry_points(project)
