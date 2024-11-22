@@ -60,7 +60,7 @@ jobs:
 
       - name: Transfer Entry points
         run: |
-          python move_entrypoints.py
+          python move_entrypoints.py -p watertap
 
       - name: Build Backend
         run: npm --prefix electron run build-backend

@@ -50,9 +50,9 @@ jobs:
         run: |
             echo REACT_APP_THEME=watertap >> .env
 
-      - name: Install Electron JS dependencies
-        run: |
-          npm --prefix electron clean-install
+      # - name: Install Electron JS dependencies
+      #   run: |
+      #     npm --prefix electron clean-install
 
       - name: Install frontend JS dependencies
         run: |
