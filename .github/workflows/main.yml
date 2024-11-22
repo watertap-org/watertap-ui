@@ -50,9 +50,9 @@ jobs:
         run: |
             echo REACT_APP_THEME=watertap >> .env
 
-      - name: Install Electron JS dependencies
-        run: |
-          npm --prefix electron clean-install
+      # - name: Install Electron JS dependencies
+      #   run: |
+      #     npm --prefix electron clean-install
 
       - name: Install frontend JS dependencies
         run: |
@@ -139,9 +139,9 @@ jobs:
       - name: Rename conda package cache
         if: runner.os == 'Windows'
         shell: bash
-        run: |
-          if [ -d "${CONDA_PKGS_DIR}" ]; then
-            mv "${CONDA_PKGS_DIR}" "${CONDA_PKGS_DIR}_do_not_cache"
+        run: | # Try renaming hardcoded directory
+          if [ -d C:\\Users\\runneradmin\\conda_pkgs_dir ]; then
+            mv C:\\Users\\runneradmin\\conda_pkgs_dir C:\\Users\\runneradmin\\conda_pkgs_dir_do_not_cache
           fi
 
   pytest:
@@ -168,6 +168,10 @@ jobs:
           environment-file: environment.yml
           activate-environment: watertap-ui-env
           miniforge-version: latest
+
+      # Set project as environment variable. This can also be set by the frontend.
+      - name: Set env
+        run: echo "project=nawi" >> $GITHUB_ENV
 
       - name: Install watertap-ui Python package
         run: |

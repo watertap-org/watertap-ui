@@ -4,24 +4,28 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import {useNavigate} from "react-router-dom";
 import SplashPage from './views/SplashPage/SplashPage';
-import {getFlowsheetsList} from "./services/flowsheetsList.service";
-import {getProjectName} from './services/projectName.service';
+import {setProject} from "./services/flowsheet.service";
 import MainContent from "./components/MainContent/MainContent";
-import WaitForProject from "./components/WaitForProject/WaitForProject";
 import {themes} from './theme';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 
 function App() {
-    let navigate = useNavigate();
-    const [hasFlowsheetsList, setHasFlowsheetsList] = useState(false);
-    const [hasTheme, setHasTheme] = useState(true);
+    const [connectedToBackend, setConnectedToBackend] = useState(false);
     const [numberOfSubprocesses, setNumberOfSubprocesses] = useState({})
-    const [theme, setTheme] = useState(themes[process.env.REACT_APP_THEME] || themes["watertap"]);
     const [checkAgain, setCheckAgain] = useState(1)
-    const WAIT_TIME = 2
+
+    /* 
+        if in dev mode, first check for theme in local storage because we allow for toggling between themes in dev mode
+        if not found or not in dev mode, check for environment variable. 
+        if not found, use watertap as default
+    */
+    let theme
+    if (process.env.NODE_ENV === 'development') theme = themes[localStorage.getItem("theme")] || themes[process.env.REACT_APP_THEME] || themes["watertap"]
+    else theme = themes[process.env.REACT_APP_THEME] || themes["watertap"]
+
+    const WAIT_TIME = 1
 
     // use Material UI theme for styles to be consistent throughout app
     const mui_theme = createTheme({
@@ -31,36 +35,38 @@ function App() {
             },
         },
     });
-
     useEffect(() => {
-        if (hasTheme && checkAgain !== 0)
+        if (checkAgain !== 0)
         {
-        // Get list of flowsheets
-            getFlowsheetsList()
-                .then((data) => {
-                    // console.log("got flowsheets list")
-                    setHasFlowsheetsList(true);
-                    setCheckAgain(0)
-                }).catch((e) => {
-                    // console.log(`unable to get flowsheets, trying again in ${WAIT_TIME} seconds`)
-                    // if its taking a long time log the error
-                    if (checkAgain > 10) console.log(`get flowsheets failed: ${e}`)
-                    setTimeout(() => {
-                        setCheckAgain(checkAgain+1)
-                    }, WAIT_TIME * 1000)
-                });
+            setProject(theme.project.toLowerCase())
+            .then((data) => {
+                localStorage.setItem("theme", theme.project.toLowerCase())
+                setConnectedToBackend(true);
+                setCheckAgain(0)
+            }).catch((e) => {
+                // console.log(`unable to get flowsheets, trying again in ${WAIT_TIME} seconds`)
+                // if its taking a long time log the error
+                if (checkAgain > 10) console.log(`get flowsheets failed: ${e}`)
+                setTimeout(() => {
+                    setCheckAgain(checkAgain+1)
+                }, WAIT_TIME * 1000)
+            });
         }
-    }, [theme, checkAgain]);
+    }, [checkAgain]);
+
+    const changeTheme = (new_theme) => {
+        localStorage.setItem("theme", new_theme)
+        window.location.reload()
+    }
 
     const subProcState = {value: numberOfSubprocesses, setValue: setNumberOfSubprocesses}
     return (
 
         <ThemeProvider theme={mui_theme}>
             <div className="App">
-                <MainContent theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}
-                            subProcState={subProcState}/>
-                <WaitForProject hasTheme={hasTheme}></WaitForProject>
-                <SplashPage theme={theme} hasTheme={hasTheme} hasFlowsheets={hasFlowsheetsList}/>
+                <MainContent theme={theme} connectedToBackend={connectedToBackend}
+                            subProcState={subProcState} changeTheme={changeTheme}/>
+                <SplashPage theme={theme} connectedToBackend={connectedToBackend}/>
             </div>
         </ThemeProvider>
     )

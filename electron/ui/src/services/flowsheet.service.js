@@ -51,3 +51,10 @@ export const downloadLogs = () => {
         mode: 'cors'
     });
 }
+
+export const setProject = (project) => {
+    return fetch('http://localhost:8001/flowsheets/set_project/'+project, {
+        method: 'GET', 
+        mode: 'cors'
+    });
+}

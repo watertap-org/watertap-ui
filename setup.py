@@ -19,5 +19,8 @@ setup(
     entry_points={
         "watertap.flowsheets": [
         ],
+        "prommis.flowsheets": [
+            "uky = prommis.uky.uky_flowsheet_ui",
+        ],
     }
 )

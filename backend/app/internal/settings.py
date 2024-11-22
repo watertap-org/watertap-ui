@@ -5,6 +5,7 @@ Configuration for the backend
 import os
 from pathlib import Path
 import logging
+from logging import handlers as logging_handlers
 from typing import List, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
@@ -16,7 +17,6 @@ h = logging.StreamHandler()
 h.setFormatter(logging.Formatter("[%(levelname)s] %(name)s - %(message)s"))
 _log.addHandler(h)
 _log.setLevel(logging.WARNING)
-
 
 class Deployment:
     """Values related to the deployment context of the UI,
@@ -32,13 +32,7 @@ class Deployment:
     }
     DEFAULT_PROJ = "nawi"
 
-    def __init__(self):
-        try:
-            project = os.environ[self.PROJECT_ENV].lower()
-        except KeyError:
-            project = self.DEFAULT_PROJ
-            _log.warning(f"Project name not found in environment variable '{self.PROJECT_ENV}',"
-                         f"using default")
+    def __init__(self, project=DEFAULT_PROJ):
         _log.info(f"Deploy for project={project}")
         if project not in self.PROJ.keys():
             valid_projects = ", ".join((str(x) for x in self.PROJ))
@@ -53,31 +47,24 @@ class Deployment:
             raise
         _log.info(f"Deployment: project={self.project} package={self.package} data_basedir={self.data_basedir}")
 
-
-_dpy = Deployment()
-
-
 class AppSettings(BaseSettings):
     #: List of package names in which to look for flowsheets
-    packages: List[str] = list(_dpy.package)
-    log_dir: Union[Path, None] = None
-    custom_flowsheets_dir: Union[Path, None] = None
-    data_basedir: Path = _dpy.data_basedir
+    packages: List[str]
+    log_dir: Path
+    custom_flowsheets_dir: Path
+    data_basedir : Path
 
-    # @validator("log_dir", always=True)
     @field_validator("log_dir")
     def validate_log_dir(cls, v):
-        if v is None:
-            v = _dpy.data_basedir / "logs"
         _log.info(f"Creating log directory '{v}'")
         v.mkdir(parents=True, exist_ok=True)
 
         logging_format = "[%(levelname)s] %(asctime)s %(name)s " \
                         "(%(filename)s:%(lineno)s): %(message)s"
-        project_log_file = f"{_dpy.project}-ui_backend_logs.log"
+        project_log_file = f"ui_backend_logs.log"
         _log.info(f"Logs will be in rotating files with base name "
-                  f"'{v/project_log_file}'")
-        logging_file_handler = logging.handlers.RotatingFileHandler(
+                f"'{v/project_log_file}'")
+        logging_file_handler = logging_handlers.RotatingFileHandler(
             v / project_log_file,
             backupCount=2,
             maxBytes=5000000,
@@ -90,14 +77,16 @@ class AppSettings(BaseSettings):
     # @validator("custom_flowsheets_dir", always=True)
     @field_validator("custom_flowsheets_dir")
     def validate_custom_flowsheets_dir(cls, v):
-        if v is None:
-            v = _dpy.data_basedir / "custom_flowsheets"
         v.mkdir(parents=True, exist_ok=True)
         return v
 
-    class Config:
-        env_prefix = f"{_dpy.project.upper()}_"
+    # class Config:
+    #     env_prefix = f"{_dpy.project.upper()}_"
 
 
-def get_deployment() -> Deployment:
-    return _dpy
+# def get_deployment() -> Deployment:
+#     return _dpy
+
+# def set_deployment(project_name) -> Deployment:
+#     _dpy = Deployment(project_name)
+#     return _dpy

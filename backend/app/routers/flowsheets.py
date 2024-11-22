@@ -21,7 +21,6 @@ import re
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
 from app.internal.parameter_sweep import run_parameter_sweep
 from app.internal.log_parser import parse_logs
-from app.internal.settings import get_deployment
 from idaes_flowsheet_processor.api import FlowsheetInterface, FlowsheetExport
 import idaes.logger as idaeslog
 
@@ -524,15 +523,15 @@ async def get_logs() -> List:
     return parse_logs(logs_path, flowsheet_manager.startup_time)
 
 
-@router.get("/project")
-async def get_project_name() -> str:
-    """Get Project name.
+# @router.get("/project")
+# async def get_project_name() -> str:
+#     """Get Project name.
 
-    Returns:
-        Name of the project
-    """
-    dpy = get_deployment()
-    return dpy.project
+#     Returns:
+#         Name of the project
+#     """
+#     dpy = get_deployment()
+#     return dpy.project
 
 
 @router.post("/download_logs", response_class=FileResponse)
@@ -544,3 +543,13 @@ async def download_logs() -> Path:
     """
     logs_path = flowsheet_manager.get_logs_path()
     return logs_path
+
+@router.get("/set_project/{project_name}")
+async def set_project(project_name: str) -> str:
+    """Set Project in settings.
+
+    Returns:
+        Name of the project
+    """
+    flowsheet_manager.set_project(project_name)
+    return project_name
