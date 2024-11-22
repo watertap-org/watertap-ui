@@ -10,7 +10,12 @@ require('cypress-downloadfile/lib/downloadFileCommand');
  * From page: any
  */
 Cypress.Commands.add('load_flowsheets_list', () => {
+    cy.intercept({
+        method: 'GET',
+        url: 'http://localhost:8001/flowsheets/**',
+    }).as('loadFlowsheetsList');
     cy.visit('/')
+    cy.wait('@loadFlowsheetsList', {timeout: 30000});
 })
 
 /**

@@ -24,7 +24,7 @@ from pydantic import BaseModel, validator, field_validator, ValidationInfo, Fiel
 import tinydb  # JSON single-file 'database'
 
 # package-local
-from app.internal.settings import AppSettings
+from app.internal.settings import Deployment, AppSettings
 from watertap.ui.fsapi import FlowsheetInterface
 import idaes.logger as idaeslog
 
@@ -73,12 +73,28 @@ class FlowsheetManager:
         Args:
             **kwargs: Passed as keywords to :class:`AppSettings`.
         """
-        self.app_settings = AppSettings(**kwargs)
-        self._objs, self._flowsheets = {}, {}
+        current_project = os.environ.get("project", None)
+        if current_project:
+            self.set_project(current_project)
         self.startup_time = time.time()
+        
+
+    def set_project(self, project: str):
+        os.environ["project"] = project
+        self._objs, self._flowsheets = {}, {}
+        self.project = project
+        self._dpy = Deployment(project)
+        
+        # Set App Settings
+        self.app_settings = AppSettings(
+            packages = list(self._dpy.package),
+            log_dir = self._dpy.data_basedir / "logs",
+            custom_flowsheets_dir = self._dpy.data_basedir / "custom_flowsheets",
+            data_basedir = self._dpy.data_basedir,
+        )
 
         # Add custom flowsheets path to the system path
-        self.custom_flowsheets_path = self.app_settings.data_basedir / "custom_flowsheets"
+        self.custom_flowsheets_path = self.app_settings.custom_flowsheets_dir
         sys.path.append(str(self.custom_flowsheets_path))
 
         for package in self.app_settings.packages:
@@ -98,6 +114,10 @@ class FlowsheetManager:
         path = self.app_settings.data_basedir / self.HISTORY_DB_FILE
         self._histdb = tinydb.TinyDB(path)
 
+        ## set last run
+        self.set_last_run_dictionary()
+
+    def set_last_run_dictionary(self):
         # check for (and set if necessary) the last_run dictionary
         query = tinydb.Query()
         last_run_dict = self._histdb.search(
@@ -570,6 +590,8 @@ class FlowsheetManager:
                 try:
                     _log.info(f"adding imported flowsheet module: {f}")
                     module_name = f.replace(".py", "")
+                    if module_name in sys.modules:
+                        sys.modules.pop(module_name)
                     custom_module = importlib.import_module(module_name)
                     fsi = self._get_flowsheet_interface(custom_module)
                     self.add_flowsheet_interface(module_name, fsi, custom=True)
@@ -613,7 +635,7 @@ class FlowsheetManager:
 
     def get_logs_path(self):
         """Return logs path."""
-        return self.app_settings.log_dir / "nawi-ui_backend_logs.log"
+        return self.app_settings.log_dir / "ui_backend_logs.log"
 
     @staticmethod
     def _get_flowsheet_interface(module: ModuleType) -> Optional[FlowsheetInterface]:

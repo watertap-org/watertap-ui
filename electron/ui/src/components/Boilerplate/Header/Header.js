@@ -4,9 +4,9 @@ import LoggingPanel from '../../LoggingPanel/LoggingPanel';
 import {useNavigate} from "react-router-dom";
 import {Menu, MenuItem, IconButton} from '@mui/material';
 import ListIcon from '@mui/icons-material/List';
+import {themes} from '../../../theme';
 
-export default function Header({theme, hasTheme}) {
-    console.debug("header hasTheme=", hasTheme, ", theme=", theme);
+export default function Header({theme, changeTheme}) {
     let navigate = useNavigate();
     const [showLogs, setShowLogs] = React.useState(false)
     const [actionsList, setActionsList] = React.useState(false)
@@ -25,18 +25,6 @@ export default function Header({theme, hasTheme}) {
     const handleShowActions = (event) => {
         setActionsList(!actionsList)
         setAnchorEl(event.currentTarget);
-    }
-    if (!hasTheme) {
-        // Can't return null, or React complains about handleXYZ hooks not being
-        // called in the same order. So, return 'hidden' header.
-        return (
-            <div id="Header" style={{display: "hidden"}}>
-                <span id="logo" data-testid="project-logo" onClick={handleNavigateHome} alt={`${theme.project} logo`}></span>
-                <span onClick={handleShowActions}></span>
-                <span onClick={handleShowLogs}></span>
-                <span onClick={handleNavigateHome}></span>
-            </div>
-        );
     }
 
     return (
@@ -63,8 +51,15 @@ export default function Header({theme, hasTheme}) {
                         onClose={() => setActionsList(false)}
                     >
                         <MenuItem className="view-logs" onClick={handleShowLogs}>View Logs</MenuItem>
-                        <MenuItem className="return-home" onClick={handleNavigateHome}>Return to list
-                            page</MenuItem>
+                        {process.env.NODE_ENV === 'development' && (
+                            Object.keys(themes).map((key, idx) => {
+                                let current_theme = localStorage.getItem("theme")
+                                if (key !== current_theme && key !== "watertap") return (
+                                    <MenuItem key={key} className="change_theme" onClick={() => changeTheme(key)}>Switch to {key.replace("nawi", "watertap")}</MenuItem>
+                                )
+                            })
+                        )}
+                        <MenuItem className="return-home" onClick={handleNavigateHome}>Return to list page</MenuItem>
                     </Menu>
                 </div>
             </div>
