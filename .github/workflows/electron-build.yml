@@ -3,7 +3,7 @@ name: App build
 on:
   push:
     branches:
-      - "use-env-for-project"
+      - "build"
 
 defaults:
   run:
