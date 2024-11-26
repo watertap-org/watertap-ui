@@ -172,10 +172,6 @@ jobs:
       - name: Install watertap-ui Python package
         run: |
           pip install --progress-bar off .
-      
-      - name: Test against PR branch of watertap with corresponding changes
-        working-directory: ../
-        run: git clone https://github.com/lbianchi-lbl/watertap.git && cd watertap && git fetch --all --tags && git checkout idaes-flowsheet-processor && pip install --progress-bar off .
 
       - name: Install httpx
         run: |
