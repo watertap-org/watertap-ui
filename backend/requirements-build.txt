@@ -205,3 +205,4 @@ websocket-client==1.7.0
 widgetsnbextension==4.0.10
 wrapt==1.16.0
 zipp==3.17.0
+git+https://github.com/watertap-org/idaes-flowsheet-processor.git

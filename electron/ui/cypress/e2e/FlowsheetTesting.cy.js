@@ -55,8 +55,8 @@ describe('WaterTAP UI Testing', () => {
 
     it('tests new flowsheet', () => {
         let modelFile = "https://drive.google.com/uc?export=download&id=1XdjuWNpYT9teZxaF8TuwDz0XS2XyXKeT"
-        // let exportFile = "https://drive.google.com/uc?export=download&id=1-jWQmI4wO2OlyUi32fqobFEmPn3zm9Q9"
-        let exportFile = "https://drive.google.com/uc?export=download&id=1_KtDRLSQeyKoQ3rH-4kNuxpvuQVuhQCu"
+        let exportFile = "https://drive.google.com/uc?export=download&id=1-jWQmI4wO2OlyUi32fqobFEmPn3zm9Q9"
+        // let exportFile = "https://drive.google.com/uc?export=download&id=1_KtDRLSQeyKoQ3rH-4kNuxpvuQVuhQCu"
         cy.load_flowsheets_list()
         cy.screenshot('loaded flowsheet list page')
 

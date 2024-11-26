@@ -21,7 +21,7 @@ import re
 from app.internal.flowsheet_manager import FlowsheetManager, FlowsheetInfo
 from app.internal.parameter_sweep import run_parameter_sweep
 from app.internal.log_parser import parse_logs
-from watertap.ui.fsapi import FlowsheetInterface, FlowsheetExport
+from idaes_flowsheet_processor.api import FlowsheetInterface, FlowsheetExport
 import idaes.logger as idaeslog
 
 CURRENT = "current"
