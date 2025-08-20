@@ -1,5 +1,13 @@
 # watertap-ui
 
+----
+
+DO NOT USE FOR DEVELOPMENT
+
+This repository is superseded by: https://github.com/prommis/idaes-flowsheet-processor-ui
+
+----
+
 This repository is for work on the user interface (UI) for the WaterTAP library.
 The UI installer can be downloaded from our homepage at: https://watertap-org.github.io/
 
