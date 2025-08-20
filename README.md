@@ -2,7 +2,7 @@
 
 ----
 
-**ARCHIVED** 20 August 2025
+DO NOT USE FOR DEVELOPMENT
 
 This repository is superseded by: https://github.com/prommis/idaes-flowsheet-processor-ui
 
